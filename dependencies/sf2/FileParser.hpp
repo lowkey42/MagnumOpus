@@ -27,6 +27,30 @@
 namespace sf2 {
 
 	namespace io {
+		class StreamCharSource : public CharSource {
+			public:
+				explicit StreamCharSource(std::istream& is) : _is(is) {}
+				~StreamCharSource()noexcept{}
+
+				bool isGood()const {
+					return _is.good();
+				}
+
+				bool close() {
+					return _is.good();
+				}
+
+			protected:
+				char readNext() {
+					if( _is.eof() || _is.bad() )
+						return 0;
+
+					return _is.get();
+				}
+
+				std::istream& _is;
+		};
+
 		class FileCharSource : public CharSource {
 			public:
 				explicit FileCharSource(std::string file) : _file(file) {}
@@ -52,6 +76,26 @@ namespace sf2 {
 				std::ifstream _file;
 		};
 
+		class StreamCharSink : public CharSink {
+			public:
+				explicit StreamCharSink(std::ostream& os) : _os(os) {}
+				~StreamCharSink()noexcept {}
+
+				bool close() {
+					return _os.good();
+				}
+
+				bool isGood()const {
+					return _os.good();
+				}
+
+				void operator()(char c) {
+					_os.put(c);
+				}
+
+			private:
+				std::ostream& _os;
+		};
 		class FileCharSink : public CharSink {
 			public:
 				explicit FileCharSink(std::string file) : _file(file) {}
@@ -96,6 +140,27 @@ namespace sf2 {
 		return sink.close();
 	}
 
+
+	template<typename T>
+	bool parseStream(std::istream& is, T& target) {
+		io::StreamCharSource source(is);
+		if( !source.isGood() )
+			return false;
+
+		ParserDefChooser<T>::get().parse(source, target);
+
+		return source.close();
+	}
+
+	template<typename T>
+	bool writeStream(std::ostream& os, const T& obj) {
+		io::StreamCharSink sink(os);
+		if( !sink.isGood() )
+			return false;
+
+		ParserDefChooser<T>::get().write(sink, obj);
+		return sink.close();
+	}
 }
 
 #endif /* SF2_FILEPARSER_HPP_ */
