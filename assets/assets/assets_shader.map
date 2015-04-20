@@ -1,0 +1,5 @@
+vert_shader:sprite = shader/SimpleVertexShader.vert
+frag_shader:sprite = shader/SimpleFragmentShader.frag
+
+vert_shader:simple = shader/simple.vert
+frag_shader:simple = shader/simple.frag
