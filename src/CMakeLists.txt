@@ -59,7 +59,12 @@ file(GLOB_RECURSE MAGNUM_SRCS
 add_executable(MagnumOpus main.cpp ${MAGNUM_SRCS})
 target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
 
-if(NOT EMSCRIPTEN)
+
+option(Tests "Tests" OFF)
+
+if(NOT EMSCRIPTEN AND Tests)
 # Tests
+add_executable(TestLevelGen test_level_gen.cpp ${MAGNUM_SRCS})
+target_link_libraries(TestLevelGen ${SDL2_LIBRARY} core)
 endif()
 

@@ -113,5 +113,14 @@ namespace util {
 		return str;
 	}
 
+	inline bool starts_with(const std::string& str, const std::string& pattern) {
+		if(pattern.length()>str.length())
+		for(auto i=0ul; i<pattern.length(); ++i)
+			if(pattern[i]!=str[i])
+				return false;
+
+		return true;
+	}
+
 }
 }

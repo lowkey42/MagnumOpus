@@ -24,6 +24,7 @@
 
 namespace game {
 namespace level {
+	struct TiledLevel;
 
 	enum class Tile_type {
 		indestructible_wall,
@@ -31,6 +32,7 @@ namespace level {
 		floor_tile,
 		floor_stone,
 		floor_dirt,
+
 
 		wall_tile,
 		wall_stone,
@@ -44,6 +46,7 @@ namespace level {
 		stairs_up,
 		stairs_down
 	};
+	constexpr auto tile_type_count = static_cast<std::size_t>(Tile_type::stairs_down)+1;
 
 	struct Tile {
 		Tile_type type;
@@ -54,15 +57,32 @@ namespace level {
 		void toggle();
 	};
 
-	// currently played part of the world
+	enum class Room_type {
+		normal,
+		start,
+		end,
+		boss,
+		secret
+	};
+	struct Room {
+		std::size_t id;
+		int top, left, right, bottom;
+		Room_type type = Room_type::normal;
+	//	std::vector<Room*> connections;
+
+		Room() = default;
+		Room(int top, int left, int right, int bottom)
+		    : top(top), left(left), right(right), bottom(bottom) {}
+	};
+
 	class Level {
 		public:
 			Level(Tile_type default_type, int width, int height);
 			Level(int width, int height, std::vector<Tile> data);
-			Level(std::istream& stream);
 			Level();
 
-			void store(std::ostream& stream);
+			void store(std::ostream& stream)const;
+			void load(std::istream& stream);
 
 			auto& get(int x, int y)      {return _tiles.at(y*_width + x);}
 			auto& get(int x, int y)const {return _tiles.at(y*_width + x);}
@@ -71,13 +91,16 @@ namespace level {
 			template<typename F>
 			void foreach_tile(int min_x, int min_y, int max_x, int max_y, F handler)const;
 
-			bool  solid(int x, int y)   const {return get(x,y).solid();}
-			float friction(int x, int y)const {return get(x,y).friction();}
+			auto solid   (int x, int y)const -> bool {return get(x,y).solid();}
+			auto friction(int x, int y)const -> float {return get(x,y).friction();}
 
-			int width() const noexcept {return _width;}
-			int height()const noexcept {return _height;}
+			auto width() const noexcept -> int {return _width;}
+			auto height()const noexcept -> int {return _height;}
 
 		protected:
+			virtual void _store(TiledLevel&)const {}
+			virtual void _load(const TiledLevel&) {}
+
 			int _width;
 			int _height;
 			std::vector<Tile> _tiles;
@@ -109,10 +132,12 @@ namespace asset {
 		using RT = std::shared_ptr<const game::level::Level>;
 
 		RT operator()(istream in) throw(Loading_failed){
-			return std::make_shared<game::level::Level>(in);
+			auto l = std::make_shared<game::level::Level>();
+			l->load(in);
+			return l;
 		}
 
-		void operator()(ostream out, game::level::Level& level) throw(Loading_failed) {
+		void operator()(ostream out, const game::level::Level& level) throw(Loading_failed) {
 			level.store(out);
 		}
 	};
