@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Game-specific engine                                                   *
+ * Manages enemy spawn-points, global behaivor, etc.                      *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,27 +15,37 @@
 
 #pragma once
 
-#include "core/engine.hpp"
-#include "core/configuration.hpp"
+#include "../game_engine.hpp"
+#include "level/level.hpp"
+#include "level/level_generator.hpp"
 
-class Game_engine : public core::Engine {
-	public:
-		Game_engine(const std::string& title, core::Configuration cfg)
-		    : Engine(title, std::move(cfg)) {
-		}
-
-		/// re-define enter_screen to inject Game_engine instead of Engine into screens
-		using core::Engine::enter_screen;
-
-		template<class T, typename ...Args>
-		auto enter_screen(Args&&... args) -> T& {
-			return static_cast<T&>(enter_screen(std::make_unique<T>(*this, std::forward(args)...)));
-		}
+#include "../core/utils/maybe.hpp"
 
 
-	protected:
-		void _on_frame(float dt) {
-		}
+namespace game {
 
-	private:
-};
+	struct Game_state;
+
+	struct Saved_game_state {
+		uint64_t seed;
+		int current_level;
+		int current_difficulty;
+		core::util::maybe<level::Level> stored_level;
+		// TODO: add ECS-save
+	};
+
+
+	class Game_master {
+		public:
+			Game_master(Game_engine& engine, const Saved_game_state& state);
+
+			void update();
+
+			auto& level()noexcept {return _level;}
+			auto& level()const noexcept {return _level;}
+
+		private:
+			level::Level _level;
+	};
+
+}

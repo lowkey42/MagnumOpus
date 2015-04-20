@@ -60,9 +60,9 @@ add_executable(MagnumOpus main.cpp ${MAGNUM_SRCS})
 target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
 
 
-option(Tests "Tests" OFF)
+option(BUILD_TESTS "Build tests" OFF)
 
-if(NOT EMSCRIPTEN AND Tests)
+if(BUILD_TESTS AND NOT EMSCRIPTEN)
 # Tests
 add_executable(TestLevelGen test_level_gen.cpp ${MAGNUM_SRCS})
 target_link_libraries(TestLevelGen ${SDL2_LIBRARY} core)
