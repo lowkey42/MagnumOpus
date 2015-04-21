@@ -53,9 +53,9 @@
 
 				return buffer.str();
 			}
-			void printStackTrace(std::string error) {
+			/*void printStackTrace(std::string error) {
 				CRASH_REPORT("\n"<<error);
-			}
+			}*/
 		}
 
 		bool is_stacktrace_available() {
