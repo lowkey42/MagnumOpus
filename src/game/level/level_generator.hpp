@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Game-specific engine                                                   *
+ * procedurally generates a level                                         *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,27 +15,26 @@
 
 #pragma once
 
-#include "core/engine.hpp"
-#include "core/configuration.hpp"
+#include "level.hpp"
 
-class Game_engine : public core::Engine {
-	public:
-		Game_engine(const std::string& title, core::Configuration cfg)
-		    : Engine(title, std::move(cfg)) {
-		}
+namespace core {
+namespace asset {
+	class Asset_manager;
+}
+}
 
-		/// re-define enter_screen to inject Game_engine instead of Engine into screens
-		using core::Engine::enter_screen;
+namespace game {
+namespace level {
 
-		template<class T, typename ...Args>
-		auto enter_screen(Args&&... args) -> T& {
-			return static_cast<T&>(enter_screen(std::make_unique<T>(*this, std::forward(args)...)));
-		}
+	/**
+	 * @brief procedurally generates a level
+	 * @param seed The seed used for the current playthrough
+	 * @param depth The depth of the level (higher number is deeper => later in game)
+	 * @param difficulty The base difficulty of the generated level (MIN_INT=treasure, MAX_INT="fun")
+	 * @return the generated level
+	 */
+	extern Level generate_level(core::asset::Asset_manager& assets, uint64_t seed,
+	                            int depth, int difficulty=0);
 
-
-	protected:
-		void _on_frame(float dt) {
-		}
-
-	private:
-};
+}
+}

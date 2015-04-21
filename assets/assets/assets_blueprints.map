@@ -1,1 +1,2 @@
 blueprint: = blueprints/
+blueprint:player = blueprints/player.json
