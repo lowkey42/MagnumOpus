@@ -89,7 +89,7 @@ namespace level {
 		auto max_elements = 0ul;
 		for(auto& t : _tiles) {
 			tile_layer.data.push_back(static_cast<int>(t.type));
-			max_elements = std::max(max_elements, t.elements.size());
+			max_elements = std::max(max_elements, static_cast<unsigned long>(t.elements.size()));
 		}
 
 		for(auto i : range(max_elements)) {

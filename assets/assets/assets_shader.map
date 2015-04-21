@@ -3,3 +3,6 @@ frag_shader:sprite = shader/SimpleFragmentShader.frag
 
 vert_shader:simple = shader/simple.vert
 frag_shader:simple = shader/simple.frag
+
+vert_shader:tilemap = shader/tilemap.vert
+frag_shader:tilemap = shader/tilemap.frag
