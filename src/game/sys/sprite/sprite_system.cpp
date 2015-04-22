@@ -22,6 +22,7 @@ namespace sprite{
 			process(entity.get<sys::physics::Transform_comp>(),
 	                entity.get<sys::sprite::Sprite_comp>())
 	        >> [&](const auto& trans, const auto& sp) {
+				std::cout << "There is something around!" << std::endl;
 				struct core::renderer::Sprite_batch::Sprite sprite;
 				sprite.position = trans.position();
 				sprite.rotation = trans.rotation();

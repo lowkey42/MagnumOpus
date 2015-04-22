@@ -19,7 +19,7 @@ namespace renderer {
 		       .build();
 	}
 
-	void Sprite_batch::draw(const core::renderer::Camera& cam, Sprite& sprite) const noexcept {
+	void Sprite_batch::draw(const core::renderer::Camera& cam, Sprite& sprite) noexcept {
 
 		float x = sprite.position.x.value(), y = sprite.position.y.value();
 		glm::vec4 uv = glm::vec4(sprite.uv);
@@ -50,7 +50,7 @@ namespace renderer {
 	}
 
 
-	void Sprite_batch::drawAll(const core::renderer::Camera& cam) const noexcept {
+	void Sprite_batch::drawAll(const core::renderer::Camera& cam) noexcept {
 
 		glm::mat4 MVP = cam.vp();
 		_shader.set_uniform("MVP", MVP)
@@ -61,8 +61,6 @@ namespace renderer {
 
 		_object.buffer().set(_vertices);
 		_object.draw();
-
-		std::cout << "Draw All" << std::endl;
 
 		_vertices.clear();
 

@@ -48,20 +48,19 @@ namespace renderer {
 		Sprite_batch(core::asset::Asset_manager& asset_manager);
 
 		// Methods
-		void draw(const core::renderer::Camera& cam, Sprite& sprite) const noexcept;
-		void drawAll(const core::renderer::Camera& cam) const noexcept;
+		void draw(const core::renderer::Camera& cam, Sprite& sprite) noexcept;
+		void drawAll(const core::renderer::Camera& cam) noexcept;
 
 
 	private:
 
 		core::asset::Asset_manager& _asset_manager;
 
-		mutable core::renderer::Object _object;
-		mutable core::renderer::Shader_program _shader;
-		mutable core::asset::Ptr<core::renderer::Texture> _texture;
+		core::renderer::Object _object;
+		core::renderer::Shader_program _shader;
+		core::asset::Ptr<core::renderer::Texture> _texture;
 
-		mutable std::vector<TileVertex> _vertices;
-
+		std::vector<TileVertex> _vertices;
 
 	};
 

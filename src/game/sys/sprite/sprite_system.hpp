@@ -40,7 +40,6 @@ namespace sprite{
 			sys::physics::Transform_system& _transform;
 			core::renderer::Sprite_batch _sprite_batch;
 
-
 	};
 
 }
