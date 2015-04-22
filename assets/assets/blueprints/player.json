@@ -1,2 +1,9 @@
 {
+    "Transform",
+	"Physics":{
+		"radius": 0.5,
+		"mass": 60,
+		"restitution": 0.3,
+		"friction": 0.001
+	}
 }

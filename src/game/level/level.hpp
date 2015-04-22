@@ -21,6 +21,7 @@
 #include "elements.hpp"
 #include "../../core/asset/asset_manager.hpp"
 #include "../../core/utils/template_utils.hpp"
+#include "../sys/physics/physics_system.hpp"
 
 namespace game {
 namespace level {
@@ -75,7 +76,7 @@ namespace level {
 		    : top(top), left(left), right(right), bottom(bottom) {}
 	};
 
-	class Level {
+	class Level : public sys::physics::World_interface {
 		public:
 			Level(Tile_type default_type, int width, int height);
 			Level(int width, int height, std::vector<Tile> data);
@@ -91,11 +92,11 @@ namespace level {
 			template<typename F>
 			void foreach_tile(int min_x, int min_y, int max_x, int max_y, F handler)const;
 
-			auto solid   (int x, int y)const -> bool {return get(x,y).solid();}
-			auto friction(int x, int y)const -> float {return get(x,y).friction();}
+			auto solid   (int x, int y)const -> bool  override {return get(x,y).solid();}
+			auto friction(int x, int y)const -> float override {return get(x,y).friction();}
 
-			auto width() const noexcept -> int {return _width;}
-			auto height()const noexcept -> int {return _height;}
+			auto width()  const noexcept     -> int   override {return _width;}
+			auto height() const noexcept     -> int   override {return _height;}
 
 		protected:
 			virtual void _store(TiledLevel&)const {}
