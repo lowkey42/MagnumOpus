@@ -198,7 +198,6 @@ namespace util {
 		  typedef seq<S...> type;
 		};
 
-		// FIXME: broken
 		template<typename... T>
 		struct processor {
 			std::tuple<T&&...> args;
@@ -216,9 +215,9 @@ namespace util {
 
 				template<typename Func, typename... Args>
 				void call(Func&& f, Args&&... m) {
-						for(bool b : {m.is_some()...})
-								if(!b)
-										return;
+					for(bool b : {m.is_some()...})
+						if(!b)
+							return;
 
 					f(m.get_or_throw()...);
 				}
