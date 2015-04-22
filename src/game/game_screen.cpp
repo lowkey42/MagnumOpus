@@ -8,17 +8,24 @@ namespace game {
 	using namespace core::util;
 	using namespace core::unit_literals;
 
+	constexpr auto MinEntitySize = 25_cm;
+	constexpr auto MaxEntitySize = 5_m;
+	constexpr auto MaxEntityVelocity = 90_km/hour;
+
+
 	Meta_system::Meta_system(core::Engine& engine, level::Level& level)
-		: em(), entity_store(em, engine.assets()) {
-		// TODO: init systems here
+		: em(), entity_store(em, engine.assets()),
+	      transform(em, MaxEntitySize, level.width(), level.height()),
+		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level) {
 	}
 
 	void Meta_system::update(core::Time dt) {
 		em.process_queued_actions();
 
-		// TODO: update systems here
+		transform.update(dt);
+		physics.update(dt);
 	}
-	void Meta_system::draw(const Camera& cam) {
+	void Meta_system::draw(const core::renderer::Camera& cam) {
 		// TODO: draw systems here
 	}
 
@@ -33,9 +40,11 @@ namespace game {
 	Game_screen::Game_screen(Game_engine& engine) :
 		core::Screen(engine), _engine(engine),
 		_gm(new Game_master(engine, load_save_game(engine))),
-		_state(engine, _gm->level())
+		_state(engine, _gm->level()),
+	    _camera(engine, 16.f)
 	{
-		//TODO: enable when there are components: _add_player();
+		_camera.position({10,10});
+		_add_player();
 	}
 
 	Game_screen::~Game_screen()noexcept {
@@ -52,8 +61,8 @@ namespace game {
 
 	class Camera {};
 
-	void Game_screen::_draw(float time ) {
-		_state.draw(Camera{}); // TODO: receive camera from somewhere
+	void Game_screen::_draw(float time) {
+		_state.draw(_camera);
 
 		// TODO: draw ui
 	}

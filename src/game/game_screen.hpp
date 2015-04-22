@@ -23,21 +23,27 @@
 
 #include "level/level.hpp"
 
+#include "../core/renderer/camera.hpp"
+
+#include "sys/physics/transform_system.hpp"
+#include "sys/physics/physics_system.hpp"
+
 
 namespace game {
-	class Camera;
 	class Game_master;
 
 	struct Meta_system {
 		core::ecs::Entity_manager em;
 		core::ecs::Serializer entity_store;
 
-		// TODO: add systems here
+		sys::physics::Transform_system transform;
+		sys::physics::Physics_system physics;
+
 
 		Meta_system(core::Engine& engine, level::Level& level);
 
 		void update(core::Time dt);
-		void draw(const Camera& cam);
+		void draw(const core::renderer::Camera& cam);
 	};
 
 	class Game_screen : public core::Screen {
@@ -62,6 +68,8 @@ namespace game {
 
 			std::unique_ptr<Game_master> _gm;
 			Meta_system _state;
+
+			core::renderer::Camera _camera;
 
 			core::ecs::Entity_ptr _main_player;
 			std::vector<core::ecs::Entity_ptr> _sec_players;
