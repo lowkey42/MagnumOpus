@@ -198,7 +198,6 @@ namespace util {
 		  typedef seq<S...> type;
 		};
 
-		// FIXME: broken
 		template<typename... T>
 		struct processor {
 			std::tuple<T&&...> args;
