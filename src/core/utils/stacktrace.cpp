@@ -53,9 +53,6 @@
 
 				return buffer.str();
 			}
-			/*void printStackTrace(std::string error) {
-				CRASH_REPORT("\n"<<error);
-			}*/
 		}
 
 		bool is_stacktrace_available() {
@@ -277,6 +274,10 @@
 		}
 
 		namespace {
+			void printStackTrace(std::string error) {
+				CRASH_REPORT("\n"<<error);
+			}
+
 			void posix_signal_handler(int sig, siginfo_t *siginfo, void *context) {
 			  (void)context;
 			  switch(sig) {

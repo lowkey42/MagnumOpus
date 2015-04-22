@@ -22,6 +22,7 @@
 #include "../core/ecs/serializer.hpp"
 
 #include "level/level.hpp"
+#include "level/tilemap.hpp"
 
 #include "../core/renderer/camera.hpp"
 
@@ -70,6 +71,7 @@ namespace game {
 			Meta_system _state;
 
 			core::renderer::Camera _camera;
+			level::Tilemap _tilemap;
 
 			core::ecs::Entity_ptr _main_player;
 			std::vector<core::ecs::Entity_ptr> _sec_players;

@@ -41,7 +41,7 @@ namespace game {
 		core::Screen(engine), _engine(engine),
 		_gm(new Game_master(engine, load_save_game(engine))),
 		_state(engine, _gm->level()),
-	    _camera(engine, 16.f)
+	    _camera(engine, 16.f), _tilemap(engine, _gm->level())
 	{
 		_camera.position({10,10});
 		_add_player();
@@ -62,6 +62,7 @@ namespace game {
 	class Camera {};
 
 	void Game_screen::_draw(float time) {
+		_tilemap.draw(_camera);
 		_state.draw(_camera);
 
 		// TODO: draw ui
