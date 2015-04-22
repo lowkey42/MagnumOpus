@@ -3,6 +3,10 @@
 
 #include "game_master.hpp"
 
+#include "sys/physics/transform_comp.hpp"
+#include "sys/sprite/sprite_comp.hpp"
+
+
 
 namespace game {
 	using namespace core::util;
@@ -16,7 +20,8 @@ namespace game {
 	Meta_system::Meta_system(core::Engine& engine, level::Level& level)
 		: em(), entity_store(em, engine.assets()),
 	      transform(em, MaxEntitySize, level.width(), level.height()),
-		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level) {
+		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
+		  spritesys(em, transform, engine.assets())	{
 	}
 
 	void Meta_system::update(core::Time dt) {
@@ -27,6 +32,7 @@ namespace game {
 	}
 	void Meta_system::draw(const core::renderer::Camera& cam) {
 		// TODO: draw systems here
+		spritesys.draw(cam);
 	}
 
 	namespace {
@@ -73,6 +79,14 @@ namespace game {
 		core::ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
 
 		// TODO: assigne controller
+
+		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
+					trans.position({10, 10});
+				});
+
+		float x = 16.0 / 255.0, y = 16.0 / 128.0;
+
+		p->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
 
 		if(!_main_player)
 			_main_player = p;

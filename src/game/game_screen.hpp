@@ -28,6 +28,7 @@
 
 #include "sys/physics/transform_system.hpp"
 #include "sys/physics/physics_system.hpp"
+#include "sys/sprite/sprite_system.hpp"
 
 
 namespace game {
@@ -39,7 +40,7 @@ namespace game {
 
 		sys::physics::Transform_system transform;
 		sys::physics::Physics_system physics;
-
+		sys::sprite::Sprite_system spritesys;
 
 		Meta_system(core::Engine& engine, level::Level& level);
 
