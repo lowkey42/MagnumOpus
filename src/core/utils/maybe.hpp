@@ -214,10 +214,11 @@ namespace util {
 					call(std::forward<Func>(f), std::forward<decltype(std::get<S>(args))>(std::get<S>(args))...);
 				}
 
-				template<typename Func>
-				void call(Func&& f, T&&... m) {
+				template<typename Func, typename... Args>
+				void call(Func&& f, Args&&... m) {
 					for(bool b : {m.is_some()...})
 						if(!b)
+							return;
 
 					f(m.get_or_throw()...);
 				}
