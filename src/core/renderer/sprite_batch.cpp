@@ -12,7 +12,7 @@ namespace renderer {
 		core::renderer::vertex("uv",     &Sprite_batch::TileVertex::uv)
 	};
 
-	Sprite_batch::Sprite_batch(core::asset::Asset_manager& asset_manager) : _asset_manager(asset_manager), _object(layout, core::renderer::create_buffer(_vertices, true)){
+	Sprite_batch::Sprite_batch(core::asset::Asset_manager& asset_manager) : _object(layout, core::renderer::create_buffer(_vertices, true)){
 		_shader.attach_shader(asset_manager.load<core::renderer::Shader>("vert_shader:sprite_batch"_aid))
 		       .attach_shader(asset_manager.load<core::renderer::Shader>("frag_shader:sprite_batch"_aid))
 		       .bind_all_attribute_locations(layout)
@@ -24,8 +24,8 @@ namespace renderer {
 		float x = sprite.position.x.value(), y = sprite.position.y.value();
 		glm::vec4 uv = glm::vec4(sprite.uv);
 
-		std::cout << "Entity with Sprite Component at: " << x << "/" << y << std::endl;
-		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
+//		std::cout << "Entity with Sprite Component at: " << x << "/" << y << std::endl;
+//		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
 
 		_vertices.push_back({{x, y}, {uv.x, uv.w}});
 		_vertices.push_back({{x, y+1.f}, {uv.x, uv.y}});
@@ -45,7 +45,7 @@ namespace renderer {
 		_vertices.push_back({{x, y}, {uv.x, uv.w}});
 		_vertices.push_back({{x+1.f, y}, {uv.z, uv.w}});
 
-		std::cout << "vertices size: " << _vertices.size() << std::endl;
+//		std::cout << "vertices size: " << _vertices.size() << std::endl;
 
 	}
 

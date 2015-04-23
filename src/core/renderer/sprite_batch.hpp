@@ -54,8 +54,6 @@ namespace renderer {
 
 	private:
 
-		core::asset::Asset_manager& _asset_manager;
-
 		core::renderer::Object _object;
 		core::renderer::Shader_program _shader;
 		core::asset::Ptr<core::renderer::Texture> _texture;
