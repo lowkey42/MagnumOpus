@@ -26,8 +26,8 @@ namespace controller {
 
 	class Input_controller_base : public Controller, core::util::no_copy_move {
 		public:
-			Input_controller_base(Mapping_ptr mapping)
-				: _mapping(mapping), _h_dir(0), _v_dir(0), _attack(false), _use(false), _weapon{0} {}
+			Input_controller_base(Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events)
+				: _mapping(mapping), _h_dir(0), _v_dir(0), _attack(false), _use(false), _weapon{0}, quit_events(quit_events) {}
 
 			void on_frame();
 
@@ -43,12 +43,14 @@ namespace controller {
 			bool _attack;
 			bool _use;
 			int _weapon[weapon_count];
+
+			core::util::signal_source<Quit_event>& quit_events;
 	};
 
 
 	class Keyboard_controller : public Input_controller_base {
 		public:
-			Keyboard_controller(Mapping_ptr mapping, std::function<glm::vec2(glm::vec2)>& screen_to_world_coords,
+			Keyboard_controller(Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events, std::function<glm::vec2(glm::vec2)>& screen_to_world_coords,
 							   core::util::signal_source<SDL_KeyboardEvent>& keys,
 							   core::util::signal_source<SDL_MouseMotionEvent>& mouse,
 							   core::util::signal_source<SDL_MouseButtonEvent>& button);
@@ -71,7 +73,7 @@ namespace controller {
 
 	class Gamepad_controller : public Input_controller_base {
 		public:
-			Gamepad_controller(Mapping_ptr mapping, SDL_GameController* controller,
+			Gamepad_controller(Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events, SDL_GameController* controller,
 							  core::util::signal_source<Controller_added_event>& added_events,
 							  core::util::signal_source<Controller_removed_event>& removed_events);
 			~Gamepad_controller();

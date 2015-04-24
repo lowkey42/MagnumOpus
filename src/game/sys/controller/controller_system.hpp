@@ -42,6 +42,7 @@ namespace controller {
 
 			core::util::signal_source<Controller_added_event> join_events;
 			core::util::signal_source<Controller_removed_event> unjoin_events;
+			core::util::signal_source<Quit_event> quit_events;
 
 		private:
 			void _join(Controller_added_event e);

@@ -63,7 +63,7 @@ namespace controller {
 		_on_unjoined.connect(unjoin_events);
 
 		_keyboard_controller = std::make_unique<Keyboard_controller>(
-			_mapping, _screen_to_world_coords,
+			_mapping, quit_events, _screen_to_world_coords,
 			input.keyboard_events,
 			input.mouse_events,
 			input.button_events );
@@ -99,7 +99,7 @@ namespace controller {
 
 	void Controller_manager::_add_gamepad(SDL_GameController* c) {
 		_ready_gamepad_controller.emplace_back(std::make_unique<Gamepad_controller>(
-			_mapping, c, join_events, unjoin_events
+			_mapping, quit_events, c, join_events, unjoin_events
 		));
 	}
 
@@ -130,14 +130,12 @@ namespace controller {
 		}
 		void Controllable_interface_impl::move(glm::vec2 direction) {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
-//				auto directionLen = direction.length();
-//				if(directionLen>1)
-//					direction/=directionLen;
+				auto directionLen = glm::length(direction);
+				if(directionLen>1)
+					direction/=directionLen;
 
 				// TODO: StatsComponent.getMaxSpeed()
-
-			//	if(!comp.active())
-				//	comp.velocity(direction * (10_km/hour));
+				DEBUG("Move: "<<direction.x<<"/"<<direction.y);
 
 				Acceleration ac = direction * (20_m/second_2); // TODO: StatsComponent.getAcceleration()
 

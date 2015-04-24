@@ -52,6 +52,8 @@ namespace controller {
 		Controller& controller;
 	};
 
+	struct Quit_event {};
+
 }
 }
 }

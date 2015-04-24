@@ -10,12 +10,12 @@ namespace controller {
 
 
 	Keyboard_controller::Keyboard_controller(
-	        Mapping_ptr mapping,
+	        Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events,
 	        std::function<glm::vec2(glm::vec2)>& screen_to_world_coords,
 	        signal_source<SDL_KeyboardEvent>& keys,
 	        signal_source<SDL_MouseMotionEvent>& mouse,
 	        signal_source<SDL_MouseButtonEvent>& button)
-		: Input_controller_base(mapping),
+		: Input_controller_base(mapping, quit_events),
 	      _screen_to_world_coords(screen_to_world_coords),
 		  _key_events(&Keyboard_controller::_on_key, this),
 		  _mouse_events(&Keyboard_controller::_on_mouse_moved, this),
@@ -126,7 +126,9 @@ namespace controller {
 				break;
 
 			case Command::enter_leave_game:
+				break;
 			case Command::quit:
+				quit_events.inform(Quit_event{});
 				break;
 		}
 	}
@@ -143,10 +145,10 @@ namespace controller {
 		_on_command(iter->second, event.state==SDL_PRESSED);
 	}
 
-	Gamepad_controller::Gamepad_controller(Mapping_ptr mapping, SDL_GameController* controller,
+	Gamepad_controller::Gamepad_controller(Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events, SDL_GameController* controller,
 					  signal_source<Controller_added_event>& added_events,
 					  signal_source<Controller_removed_event>& removed_events)
-		: Input_controller_base(mapping), _controller(controller),
+		: Input_controller_base(mapping, quit_events), _controller(controller),
 		  _added_events(added_events), _removed_events(removed_events), _active(false), _pressed{0} {
 
 		auto name = SDL_GameControllerName(controller);
@@ -241,8 +243,9 @@ namespace controller {
 	}
 
 	void Gamepad_controller::operator()(Controllable_interface& c) {
-		if(_move.x!=0 && _move.y!=0)
+		if(_move.x!=0 && _move.y!=0) {
 			c.move(_move);
+		}
 
 		if(_look.x!=0 && _look.y!=0)
 			c.look_in_dir(_look);

@@ -25,7 +25,9 @@ class Game_engine : public core::Engine {
 	public:
 		Game_engine(const std::string& title, core::Configuration cfg)
 		    : Engine(title, std::move(cfg)),
-		      _controllers(assets(), input()) {
+		      _controllers(assets(), input()),
+		      _on_quit_slot(&Game_engine::_on_quit, this) {
+			_on_quit_slot.connect(_controllers.quit_events);
 		}
 
 		/// re-define enter_screen to inject Game_engine instead of Engine into screens
@@ -47,7 +49,11 @@ class Game_engine : public core::Engine {
 		void _on_frame(float dt) override {
 			_controllers.update(core::Time(dt));
 		}
+		void _on_quit(game::sys::controller::Quit_event) {
+			leave_screen();
+		}
 
 	private:
 		game::sys::controller::Controller_manager _controllers;
+		core::util::slot<game::sys::controller::Quit_event> _on_quit_slot;
 };
