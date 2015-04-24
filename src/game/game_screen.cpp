@@ -17,9 +17,11 @@ namespace game {
 	constexpr auto MaxEntityVelocity = 180_km/hour;
 
 
-	Meta_system::Meta_system(core::Engine& engine, level::Level& level)
+	Meta_system::Meta_system(Game_engine& engine, level::Level& level)
 		: em(), entity_store(em, engine.assets()),
+	      tilemap(engine, level),
 	      transform(em, MaxEntitySize, level.width(), level.height()),
+	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  spritesys(em, transform, engine.assets()),
 		  controller(em) {
@@ -31,10 +33,15 @@ namespace game {
 		controller.update(dt);
 		transform.update(dt);
 		physics.update(dt);
+		camera.update(dt);
 	}
-	void Meta_system::draw(const core::renderer::Camera& cam) {
-		// TODO: draw systems here
-		spritesys.draw(cam);
+	void Meta_system::draw() {
+
+		for(auto& cam : camera.cameras()) {
+			tilemap.draw(cam);
+			// TODO: draw systems here
+			spritesys.draw(cam);
+		}
 	}
 
 	namespace {
@@ -48,10 +55,8 @@ namespace game {
 	Game_screen::Game_screen(Game_engine& engine) :
 		core::Screen(engine), _engine(engine),
 		_gm(new Game_master(engine, load_save_game(engine))),
-		_state(engine, _gm->level()),
-	    _camera(engine, 16.f), _tilemap(engine, _gm->level())
+		_state(engine, _gm->level())
 	{
-		_camera.position({10,10});
 		_add_player(_engine.controllers().main_controller());
 
 		// TODO[foe]: remove debug code
@@ -82,8 +87,7 @@ namespace game {
 	class Camera {};
 
 	void Game_screen::_draw(float time) {
-		_tilemap.draw(_camera);
-		_state.draw(_camera);
+		_state.draw();
 
 		// TODO: draw ui
 	}

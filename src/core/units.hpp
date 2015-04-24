@@ -170,6 +170,7 @@ namespace core {
 
 
 	inline Velocity operator*(Acceleration a, Time t) noexcept { return Velocity(a.x*t, a.y*t); }
+	inline Velocity operator/(Position a, Time t) noexcept { return {a.x/t, a.y/t}; }
 	inline Position operator*(Velocity v, Time t) noexcept { return Position(v.x*t, v.y*t); }
 
 	constexpr Inv_mass operator/(float a, Mass b) noexcept { return Inv_mass(a/b.value()); }
@@ -178,6 +179,7 @@ namespace core {
 	constexpr Speed operator*(Force b, Inv_mass a) noexcept { return Speed(a.value()*b.value()); }
 	inline Acceleration operator*(Inv_mass a, Dir_force b) noexcept { return {a.value()*b.x.value(), a.value()*b.y.value()}; }
 	inline Acceleration operator*(Dir_force b, Inv_mass a) noexcept { return {a.value()*b.x.value(), a.value()*b.y.value()}; }
+	inline Acceleration operator/(Dir_force b, Mass a) noexcept { return {b.x.value()/a.value(), b.y.value()/a.value()}; }
 
 	inline Force operator*(Speed_per_time a, Mass b) noexcept { return Force(a.value()*b.value()); }
 	inline Force operator/(Speed_per_time a, Inv_mass b) noexcept { return Force(a.value()/b.value()); }

@@ -24,13 +24,13 @@
 #include "level/level.hpp"
 #include "level/tilemap.hpp"
 
-#include "../core/renderer/camera.hpp"
-
 #include "sys/physics/transform_system.hpp"
 #include "sys/physics/physics_system.hpp"
 #include "sys/sprite/sprite_system.hpp"
 #include "sys/controller/controller_system.hpp"
+#include "sys/cam/camera_system.hpp"
 
+namespace core{ namespace renderer{ class Camera; }}
 
 namespace game {
 	class Game_master;
@@ -38,16 +38,18 @@ namespace game {
 	struct Meta_system {
 		core::ecs::Entity_manager em;
 		core::ecs::Serializer entity_store;
+		level::Tilemap tilemap;
 
 		sys::physics::Transform_system transform;
+		sys::cam::Camera_system camera;
 		sys::physics::Physics_system physics;
 		sys::sprite::Sprite_system spritesys;
 		sys::controller::Controller_system controller;
 
-		Meta_system(core::Engine& engine, level::Level& level);
+		Meta_system(Game_engine& engine, level::Level& level);
 
 		void update(core::Time dt);
-		void draw(const core::renderer::Camera& cam);
+		void draw();
 	};
 
 	class Game_screen : public core::Screen {
@@ -74,9 +76,6 @@ namespace game {
 
 			std::unique_ptr<Game_master> _gm;
 			Meta_system _state;
-
-			core::renderer::Camera _camera;
-			level::Tilemap _tilemap;
 
 			core::ecs::Entity_ptr _main_player;
 			std::vector<core::ecs::Entity_ptr> _sec_players;

@@ -5,5 +5,10 @@
 		"mass": 60,
 		"restitution": 0.01,
 		"friction": 0.01
-	}
+	},
+    "Camera_target": {
+        "mass": 0.1,
+        "damping": 0.2
+        "stiffness": 0.8
+    }
 }
