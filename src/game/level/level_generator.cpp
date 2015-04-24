@@ -7,10 +7,14 @@ namespace level {
 								int depth, int difficulty) {
 		// TODO[foe]: impl me
 
-		auto l = Level{Tile_type::floor_tile, 64, 64};
+		constexpr auto size = 16;
 
-		for(int i=0; i<64; ++i)
-			l.get(i,0).type = l.get(0,i).type = l.get(63,i).type = l.get(i, 63).type = Tile_type::wall_dirt;
+		auto l = Level{Tile_type::floor_tile, size, size};
+
+		for(int i=0; i<size; ++i)
+			l.get(i,0).type = l.get(0,i).type = l.get(size-1,i).type = l.get(i, size-1).type = Tile_type::wall_dirt;
+
+		l.get(size/2, size/2).type = Tile_type::wall_dirt;
 
 		return l;
 	}

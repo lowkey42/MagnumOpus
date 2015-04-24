@@ -20,7 +20,7 @@
 #include "game_engine.hpp"
 #include "core/utils/log.hpp"
 
-#include "game/game_screen.hpp"
+#include "game/example_screen.hpp"
 
 
 #include <iostream>
@@ -67,7 +67,7 @@ void init(int argc, char** argv, char** env) {
 	try {
 		core::util::init_stacktrace(argv[0]);
 		engine.reset(new Game_engine("MagnumOpus", core::Configuration(argc, argv, env)));
-		engine->enter_screen<game::Game_screen>();
+		engine->enter_screen<game::Example_screen>();
 
 	} catch (const core::util::Error& ex) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in init", ex.what(), nullptr);

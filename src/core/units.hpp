@@ -181,6 +181,7 @@ namespace core {
 
 	inline Force operator*(Speed_per_time a, Mass b) noexcept { return Force(a.value()*b.value()); }
 	inline Force operator/(Speed_per_time a, Inv_mass b) noexcept { return Force(a.value()/b.value()); }
+	inline Dir_force operator/(Velocity a, Inv_mass b) noexcept { return {Force(a.x.value()/b.value()), Force(a.y.value()/b.value())}; }
 
 	template<typename T>
 	inline glm::vec2 remove_units(glm::detail::tvec2<T, glm::highp> v)noexcept {

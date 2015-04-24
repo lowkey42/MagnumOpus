@@ -14,19 +14,21 @@ namespace game {
 
 	constexpr auto MinEntitySize = 25_cm;
 	constexpr auto MaxEntitySize = 5_m;
-	constexpr auto MaxEntityVelocity = 90_km/hour;
+	constexpr auto MaxEntityVelocity = 180_km/hour;
 
 
 	Meta_system::Meta_system(core::Engine& engine, level::Level& level)
 		: em(), entity_store(em, engine.assets()),
 	      transform(em, MaxEntitySize, level.width(), level.height()),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
-		  spritesys(em, transform, engine.assets())	{
+		  spritesys(em, transform, engine.assets()),
+		  controller(em) {
 	}
 
 	void Meta_system::update(core::Time dt) {
 		em.process_queued_actions();
 
+		controller.update(dt);
 		transform.update(dt);
 		physics.update(dt);
 	}
@@ -50,7 +52,19 @@ namespace game {
 	    _camera(engine, 16.f), _tilemap(engine, _gm->level())
 	{
 		_camera.position({10,10});
-		_add_player();
+		_add_player(_engine.controllers().main_controller());
+
+		// TODO[foe]: remove debug code
+		for(int i=0; i<8; i++) {
+			core::ecs::Entity_ptr p = _state.entity_store.apply("blueprint:bullet"_aid, _state.em.emplace());
+
+			p->get<sys::physics::Transform_comp>().get_or_throw().position({5, 2+ 1.5*i});
+
+			float x = 32.0 / 255.0, y = 32.0 / 128.0;
+
+			p->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
+		}
+		// END TODO
 	}
 
 	Game_screen::~Game_screen()noexcept {
@@ -75,10 +89,10 @@ namespace game {
 	}
 
 
-	auto Game_screen::_add_player() -> core::ecs::Entity_ptr {
+	auto Game_screen::_add_player(sys::controller::Controller& controller) -> core::ecs::Entity_ptr {
 		core::ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
 
-		// TODO: assigne controller
+		p->emplace<sys::controller::Controllable_comp>(&controller);
 
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 					trans.position({10, 10});
@@ -94,6 +108,14 @@ namespace game {
 			_sec_players.emplace_back(p);
 
 		return p;
+	}
+
+	void Game_screen::_join(sys::controller::Controller_added_event e) {
+		// TODO
+	}
+
+	void Game_screen::_unjoin(sys::controller::Controller_removed_event e) {
+		// TODO
 	}
 
 	void Game_screen::_save()const {

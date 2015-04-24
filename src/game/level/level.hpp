@@ -113,8 +113,8 @@ namespace level {
 
 		min_x = std::max(0, min_x);
 		min_y = std::max(0, min_y);
-		max_x = std::min(_width,  max_x-1);
-		max_y = std::min(_height, max_y-1);
+		max_x = std::min(_width,  max_x)-1;
+		max_y = std::min(_height, max_y)-1;
 
 		for(auto y : range(min_y, max_y)) {
 			for(auto x : range(min_x, max_x)) {

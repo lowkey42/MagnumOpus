@@ -85,6 +85,8 @@ namespace physics {
 		if(!self.active())
 			return;
 
+		auto oldVelocity = self._velocity;
+
 		if(!is_zero(self._acceleration)) {
 			self._velocity+=self._acceleration*dt;
 			auto vx = self._velocity.x.value();
@@ -103,7 +105,7 @@ namespace physics {
 
 		transform.process([&](auto& tc){
 			auto pos = tc.position();
-			pos+=self._velocity*dt;
+			pos+=oldVelocity*dt;
 
 			tc.position(pos);
 
@@ -112,7 +114,9 @@ namespace physics {
 				int world_y = static_cast<int>(pos.y.value());
 
 				 // reset acceleration
-				self._acceleration=Acceleration{};
+				self._acceleration=self._acceleration*0.0f; // TODO[foe]
+				//auto fric_force = self._friction*_world.friction(world_x, world_y) * G;
+				//self.accelerate(glm::normalize(remove_units(self._velocity)) * -0.9f);
 
 				// apply friction
 				auto fric_speed = self._friction*_world.friction(world_x, world_y) *G;
@@ -130,8 +134,8 @@ namespace physics {
 
 		auto min_world_x = std::max(static_cast<int>(std::floor(pos.x.value()- radius)), 0);
 		auto min_world_y = std::max(static_cast<int>(std::floor(pos.y.value()- radius)), 0);
-		auto max_world_x = std::min(static_cast<int>(std::ceil(pos.x.value()+ radius)), _world.width());
-		auto max_world_y = std::min(static_cast<int>(std::ceil(pos.y.value()+ radius)), _world.height());
+		auto max_world_x = std::min(static_cast<int>(std::ceil(pos.x.value()+ radius)), _world.width()-1);
+		auto max_world_y = std::min(static_cast<int>(std::ceil(pos.y.value()+ radius)), _world.height()-1);
 
 		constexpr auto tile_min = -0.5f;
 		constexpr auto tile_max = 0.5f;
@@ -193,7 +197,7 @@ namespace physics {
 		if( dist_sqr <= (rs*rs)) {
 			float dist = glm::sqrt(dist_sqr);
 			return dist>0 ?
-						Manifold(a, b, abs(Distance(rs-dist)), diff/dist) :
+						Manifold(a, b, abs(Distance(rs-dist)), -diff/dist) :
 						Manifold(a, b, a.radius(), Position(1_m, 0_m));
 		} else
 			return util::nothing();
@@ -209,7 +213,7 @@ namespace physics {
 
 		if(m.is_with_object()) {
 			relVel+=m.b.comp->_velocity;
-			e = std::min(e, m.b.comp->_restitution);
+			e = std::max(e, m.b.comp->_restitution);
 			inv_mass_sum+=m.b.comp->_inv_mass;
 		}
 
@@ -234,8 +238,8 @@ namespace physics {
 		}
 
 		// positional correction
-		constexpr float percent = 0.8;
-		constexpr float slop = 0.005;
+		constexpr float percent = 0.2;
+		constexpr float slop = 0.1;
 		if(m.penetration.value() - slop > 0) {
 			auto correction = m.normal * ((m.penetration.value() - slop) / inv_mass_sum.value() * percent);
 
@@ -245,7 +249,8 @@ namespace physics {
 
 			if(m.is_with_object()) {
 				auto bPos = m.b.comp->owner().get<Transform_comp>().get_or_throw().position();
-				bPos-= correction*m.b.comp->_inv_mass.value();
+				bPos+= correction*m.b.comp->_inv_mass.value();
+				m.b.comp->owner().get<Transform_comp>().get_or_throw().position(bPos);
 			}
 		}
 	}

@@ -30,6 +30,8 @@ namespace game {
 
 	}
 
+	Text_ptr t;
+
 
 	Example_screen::Example_screen(core::Engine& engine) :
 		core::Screen(engine),
@@ -45,6 +47,17 @@ namespace game {
 		       .attach_shader(engine.assets().load<core::renderer::Shader>(("frag_shader:sprite"_aid)))
 		       .bind_all_attribute_locations(layout)
 		       .build();
+
+
+		std::string s;
+		for(int i=0; i<1000; i++){
+			for(int i=0; i<100; i++)
+				s+="X";
+
+			s+="\n";
+		}
+
+		t = _font->text(s);
 	}
 
 	void Example_screen::_update(float delta_time) {
@@ -62,12 +75,14 @@ namespace game {
 
 		_font->bind();
 		_text_shader.bind()
-		            .set_uniform("model",   glm::scale(glm::mat4(), glm::vec3(1.f, 1.f, 1.f)))
-		            .set_uniform("VP",      glm::ortho(-400.f,400.f,300.f,-300.f))
+		            .set_uniform("model",   glm::scale(glm::mat4(), glm::vec3(0.2f, 0.2f, 1.f)))
+		            .set_uniform("VP",      glm::ortho(-1000.f,1000.f,1000.f,-1000.f))
 		            .set_uniform("texture", 0)
 		            .set_uniform("layer",   0.f)
 		            .set_uniform("color",   glm::vec4(1,1,1,0.6));
-		_font->text("Test_\nSatz!")->draw();
+
+
+		t->draw();
 	}
 
 }

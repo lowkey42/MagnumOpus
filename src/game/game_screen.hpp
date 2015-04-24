@@ -29,6 +29,7 @@
 #include "sys/physics/transform_system.hpp"
 #include "sys/physics/physics_system.hpp"
 #include "sys/sprite/sprite_system.hpp"
+#include "sys/controller/controller_system.hpp"
 
 
 namespace game {
@@ -41,6 +42,7 @@ namespace game {
 		sys::physics::Transform_system transform;
 		sys::physics::Physics_system physics;
 		sys::sprite::Sprite_system spritesys;
+		sys::controller::Controller_system controller;
 
 		Meta_system(core::Engine& engine, level::Level& level);
 
@@ -61,7 +63,9 @@ namespace game {
 				return core::Prev_screen_policy::discard;
 			}
 
-			auto _add_player(/*TODO[foe]: pass controller id/ref*/) -> core::ecs::Entity_ptr;
+			auto _add_player(sys::controller::Controller& controller) -> core::ecs::Entity_ptr;
+			void _join(sys::controller::Controller_added_event e);
+			void _unjoin(sys::controller::Controller_removed_event e);
 
 			void _save()const;
 

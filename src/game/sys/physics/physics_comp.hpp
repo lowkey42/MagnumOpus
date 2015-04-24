@@ -106,6 +106,10 @@ namespace physics {
 					_active = true;
 			}
 			void impulse(core::Dir_force force)noexcept {
+				_velocity+=_inv_mass*force*core::unit_literals::second;
+				_active = true;
+			}
+			void apply_force(core::Dir_force force)noexcept {
 				accelerate(_inv_mass*force);
 			}
 			void velocity(core::Velocity velocity)noexcept {
