@@ -68,15 +68,13 @@ namespace game {
 		_add_player(_engine.controllers().main_controller(), start_position);
 
 		// TODO[foe]: remove debug code
-		for(int i=0; i<8; i++) {
-			core::ecs::Entity_ptr p = _state.entity_store.apply("blueprint:bullet"_aid, _state.em.emplace());
+		core::ecs::Entity_ptr e = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
 
-			p->get<sys::physics::Transform_comp>().get_or_throw().position({5, 2+ 1.5*i});
+		e->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(2,2));
 
-			float x = 32.0 / 255.0, y = 32.0 / 128.0;
+		float x = 32.0 / 255.0, y = 32.0 / 128.0;
 
-			p->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
-		}
+		e->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
 		// END TODO
 	}
 
