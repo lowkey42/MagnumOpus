@@ -26,8 +26,15 @@ namespace controller {
 		_button_events.connect(button);
 	}
 	void Keyboard_controller::operator()(Controllable_interface& c) {
-		if(_h_dir!=0 || _v_dir!=0) {
-			c.move({_h_dir, _v_dir});
+		auto move = glm::vec2 {0,0};
+
+		if(_move_up>0)    move.y--;
+		if(_move_down>0)  move.y++;
+		if(_move_left>0)  move.x--;
+		if(_move_right>0) move.x++;
+
+		if(move.x!=0 || move.y!=0) {
+			c.move(move);
 		}
 
 		if(_attack)
@@ -51,6 +58,7 @@ namespace controller {
 			return;
 
 		_on_command(iter->second, event.state==SDL_PRESSED);
+
 	}
 
 	void Input_controller_base::on_frame() {
@@ -62,31 +70,19 @@ namespace controller {
 	void Input_controller_base::_on_command(Command cmd, bool active) {
 		switch(cmd) {
 			case Command::move_up:
-				if(active && _v_dir>=0)
-					_v_dir -= 1;
-				else if(_v_dir<0)
-					_v_dir += 1;
+				_move_up+= active ? 1 : -1;
 				break;
 
 			case Command::move_down:
-				if(active && _v_dir<=0)
-					_v_dir += 1;
-				else if(_v_dir>0)
-					_v_dir -= 1;
+				_move_down+= active ? 1 : -1;
 				break;
 
 			case Command::move_left:
-				if(active && _h_dir>=0)
-					_h_dir -= 1;
-				else if(_h_dir<0)
-					_h_dir += 1;
+				_move_left+= active ? 1 : -1;
 				break;
 
 			case Command::move_right:
-				if(active && _h_dir<=0)
-					_h_dir += 1;
-				else if(_h_dir>0)
-					_h_dir -= 1;
+				_move_right+= active ? 1 : -1;
 				break;
 
 			case Command::attack:
