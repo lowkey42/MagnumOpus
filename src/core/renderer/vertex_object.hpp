@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <vector>
+#include <iterator>
 #include <string>
 #include <glm/glm.hpp>
 
@@ -72,6 +73,9 @@ namespace renderer {
 
 			template<class T>
 			void set(const std::vector<T>& container);
+
+			template<class T>
+			void set(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
 
 			Buffer& operator=(Buffer&& b)noexcept;
 
