@@ -65,7 +65,7 @@ namespace game {
 				return core::Prev_screen_policy::discard;
 			}
 
-			auto _add_player(sys::controller::Controller& controller) -> core::ecs::Entity_ptr;
+			auto _add_player(sys::controller::Controller& controller, core::Position pos) -> core::ecs::Entity_ptr;
 			void _join(sys::controller::Controller_added_event e);
 			void _unjoin(sys::controller::Controller_removed_event e);
 

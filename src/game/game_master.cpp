@@ -13,7 +13,14 @@ namespace game {
 									   state.current_difficulty)) {
 
 		auto& log_out = ::core::util::debug(__func__, __FILE__, __LINE__);
-		log_out<<"World "<<_level.width()<<"x"<<_level.height()<<" \n          ";
+		log_out<<"World "<<_level.width()<<"x"<<_level.height()
+		       <<"\nRooms:\n";
+
+		for(auto& r : _level._rooms) {
+			log_out<<"  "<<r.id<<". "<<r.top<<"/"<<r.left<<"/"<<r.bottom<<"/"<<r.right<<"\n";
+		}
+
+		log_out<<" \n          ";
 
 		for(auto y=0; y<_level.height(); y++) {
 			for(auto x=0; x<_level.width(); x++) {

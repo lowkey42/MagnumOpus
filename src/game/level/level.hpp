@@ -72,14 +72,22 @@ namespace level {
 	//	std::vector<Room*> connections;
 
 		Room() = default;
-		Room(int top, int left, int right, int bottom)
-		    : top(top), left(left), right(right), bottom(bottom) {}
+		Room(int top, int left, int right, int bottom, Room_type type = Room_type::normal, std::size_t id=0)
+		    : id(id), top(top), left(left), right(right), bottom(bottom), type(type) {}
+
+
+		auto height()const noexcept {return bottom-top;}
+		auto width()const noexcept {return right-left;}
+
+		glm::vec2 center()const {
+			return glm::vec2(left+width()/2.f, top+height()/2.f);
+		}
 	};
 
 	class Level : public sys::physics::World_interface {
 		public:
-			Level(Tile_type default_type, int width, int height);
-			Level(int width, int height, std::vector<Tile> data);
+			Level(Tile_type default_type, int width, int height, std::vector<Room> rooms=std::vector<Room>());
+			Level(int width, int height, std::vector<Tile> data, std::vector<Room> rooms=std::vector<Room>());
 			Level();
 
 			void store(std::ostream& stream)const;
@@ -92,11 +100,13 @@ namespace level {
 			template<typename F>
 			void foreach_tile(int min_x, int min_y, int max_x, int max_y, F handler)const;
 
-			auto solid   (int x, int y)const -> bool  override {return get(x,y).solid();}
-			auto friction(int x, int y)const -> float override {return get(x,y).friction();}
+			auto solid   (int x, int y)const -> bool  override {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid() : true;}
+			auto friction(int x, int y)const -> float override {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).friction() : 1.f;}
 
 			auto width()  const noexcept     -> int   override {return _width;}
 			auto height() const noexcept     -> int   override {return _height;}
+
+			auto find_room(Room_type type)const -> core::util::maybe<const Room&>;
 
 		protected:
 			virtual void _store(TiledLevel&)const {}
@@ -105,6 +115,7 @@ namespace level {
 			int _width;
 			int _height;
 			std::vector<Tile> _tiles;
+		public: std::vector<Room> _rooms;
 	};
 
 	template<typename F>

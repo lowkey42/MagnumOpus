@@ -28,8 +28,8 @@ namespace cam {
 			void load(core::ecs::Entity_state&)override;
 			void store(core::ecs::Entity_state&)override;
 
-			Camera_target_comp(core::ecs::Entity& owner, core::Mass mass=core::Mass(0.1), float damping=0.5, float stiffness=0.85)
-			    : Component(owner), _mass(mass), _damping(damping), _stiffness(stiffness) {}
+			Camera_target_comp(core::ecs::Entity& owner, core::Mass mass=core::Mass(0.1), float damping=0.5, float stiffness=0.85, float lazyness=2)
+			    : Component(owner), _mass(mass), _damping(damping), _stiffness(stiffness), _lazyness(lazyness) {}
 
 			void force_position(core::Position pos)noexcept {_cam_pos=pos;}
 
@@ -41,9 +41,11 @@ namespace cam {
 			friend struct Persisted_state;
 		private:
 			bool _unset=true;
+			bool _sleeping=true;
 			core::Mass _mass;
 			float _damping;
 			float _stiffness;
+			float _lazyness;
 			core::Velocity _velocity;
 
 			core::Position _cam_pos;

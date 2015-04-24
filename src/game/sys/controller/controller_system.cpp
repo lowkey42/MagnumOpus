@@ -135,7 +135,6 @@ namespace controller {
 					direction/=directionLen;
 
 				// TODO: StatsComponent.getMaxSpeed()
-				DEBUG("Move: "<<direction.x<<"/"<<direction.y);
 
 				Acceleration ac = direction * (20_m/second_2); // TODO: StatsComponent.getAcceleration()
 

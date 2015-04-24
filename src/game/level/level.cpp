@@ -37,15 +37,21 @@ namespace level {
 		return 1.0f;
 	}
 
-	Level::Level(Tile_type default_type, int width, int height)
-		: _width(width), _height(height), _tiles(width*height, Tile{default_type, Elements{}}) {
+	Level::Level(Tile_type default_type, int width, int height, std::vector<Room> rooms)
+		: _width(width), _height(height), _tiles(width*height, Tile{default_type, Elements{}}), _rooms(rooms) {
 	}
 
-	Level::Level(int width, int height, std::vector<Tile> data)
-		: _width(width), _height(height), _tiles(data) {
+	Level::Level(int width, int height, std::vector<Tile> data, std::vector<Room> rooms)
+		: _width(width), _height(height), _tiles(data), _rooms(rooms) {
 	}
 
 	Level::Level() : _width(0), _height(0) {
+	}
+
+	auto Level::find_room(Room_type type)const -> maybe<const Room&> {
+		auto found = std::find_if(_rooms.begin(), _rooms.end(), [type](auto& r){return r.type==type;});
+
+		return found!=_rooms.end() ? just(*found) : nothing();
 	}
 
 	void Level::load(std::istream& stream) {

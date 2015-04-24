@@ -9,6 +9,7 @@
 
 
 namespace game {
+	using namespace core;
 	using namespace core::util;
 	using namespace core::unit_literals;
 
@@ -57,7 +58,14 @@ namespace game {
 		_gm(new Game_master(engine, load_save_game(engine))),
 		_state(engine, _gm->level())
 	{
-		_add_player(_engine.controllers().main_controller());
+		auto start_room_m = _gm->level().find_room(game::level::Room_type::start);
+
+		INVARIANT(start_room_m.is_some(), "Generated room has no entry-point!?");
+		auto start_room = start_room_m.get_or_throw();
+
+		auto start_position = start_room.center() *1_m;
+
+		_add_player(_engine.controllers().main_controller(), start_position);
 
 		// TODO[foe]: remove debug code
 		for(int i=0; i<8; i++) {
@@ -93,13 +101,13 @@ namespace game {
 	}
 
 
-	auto Game_screen::_add_player(sys::controller::Controller& controller) -> core::ecs::Entity_ptr {
+	auto Game_screen::_add_player(sys::controller::Controller& controller, Position pos) -> core::ecs::Entity_ptr {
 		core::ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
 
 		p->emplace<sys::controller::Controllable_comp>(&controller);
 
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
-					trans.position({10, 10});
+					trans.position(pos);
 				});
 
 		float x = 16.0 / 255.0, y = 16.0 / 128.0;

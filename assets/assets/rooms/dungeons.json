@@ -1,0 +1,10 @@
+{
+    "levels":{
+        0:{
+            "room_size": {"min":10, "max": 20},
+            "rooms": {"min":10, "max": 20},
+            "max_width": 128,
+            "max_height": 128,
+            "split_prop_factor": 5
+    }
+}
