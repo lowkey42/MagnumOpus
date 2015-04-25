@@ -25,7 +25,8 @@ namespace core {
 		switch(event.type) {
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-				keyboard_events.inform(event.key);
+				if(event.key.repeat==0)
+					keyboard_events.inform(event.key);
 				break;
 
 			case SDL_MOUSEMOTION:

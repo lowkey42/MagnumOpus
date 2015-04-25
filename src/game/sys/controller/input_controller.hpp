@@ -27,7 +27,7 @@ namespace controller {
 	class Input_controller_base : public Controller, core::util::no_copy_move {
 		public:
 			Input_controller_base(Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events)
-				: _mapping(mapping), _h_dir(0), _v_dir(0), _attack(false), _use(false), _weapon{0}, quit_events(quit_events) {}
+				: _mapping(mapping), _weapon{0}, quit_events(quit_events) {}
 
 			void on_frame();
 
@@ -38,10 +38,13 @@ namespace controller {
 
 			Mapping_ptr _mapping;
 
-			int8_t _h_dir;
-			int8_t _v_dir;
-			bool _attack;
-			bool _use;
+			int8_t _move_up = 0;
+			int8_t _move_down = 0;
+			int8_t _move_left = 0;
+			int8_t _move_right = 0;
+
+			bool _attack = false;
+			bool _use = false;
 			int _weapon[weapon_count];
 
 			core::util::signal_source<Quit_event>& quit_events;
