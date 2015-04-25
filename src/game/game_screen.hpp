@@ -29,6 +29,7 @@
 #include "sys/sprite/sprite_system.hpp"
 #include "sys/controller/controller_system.hpp"
 #include "sys/cam/camera_system.hpp"
+#include "sys/ai/ai_system.hpp"
 
 namespace core{ namespace renderer{ class Camera; }}
 
@@ -45,6 +46,7 @@ namespace game {
 		sys::physics::Physics_system physics;
 		sys::sprite::Sprite_system spritesys;
 		sys::controller::Controller_system controller;
+		sys::ai::Ai_system ai;
 
 		Meta_system(Game_engine& engine, level::Level& level);
 

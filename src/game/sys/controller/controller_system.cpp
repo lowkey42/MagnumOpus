@@ -148,7 +148,7 @@ namespace controller {
 		}
 		void Controllable_interface_impl::look_in_dir(glm::vec2 direction) {
 			_entity.get<Transform_comp>().process([this, direction](auto& comp){
-				Angle target_rot = Angle(glm::atan(direction.x, direction.y));
+				Angle target_rot = Angle(glm::atan(direction.y, direction.x));
 				Angle rotation_diff = target_rot-comp.rotation();
 				if(rotation_diff>180_deg) rotation_diff-=360_deg;
 				if(rotation_diff<180_deg) rotation_diff+=360_deg;

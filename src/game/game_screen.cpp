@@ -25,12 +25,14 @@ namespace game {
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  spritesys(em, transform, engine.assets()),
-		  controller(em) {
+		  controller(em),
+		  ai(em, engine, transform) {
 	}
 
 	void Meta_system::update(core::Time dt) {
 		em.process_queued_actions();
 
+		ai.update(dt);
 		controller.update(dt);
 		transform.update(dt);
 		physics.update(dt);
