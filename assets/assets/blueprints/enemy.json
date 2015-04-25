@@ -1,0 +1,17 @@
+{
+    "Transform",
+	"Physics":{
+		"radius": 0.4,
+		"mass": 60,
+		"restitution": 0.03,
+		"friction": 0.01
+	},
+    "Simple_ai":{
+        "attack_distance": 1,
+        "near":2,
+        "max":10
+        "near_angle":360,
+        "far_angle":180,
+        "follow_time":0.5
+    }
+}

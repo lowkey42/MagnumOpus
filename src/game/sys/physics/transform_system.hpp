@@ -152,10 +152,7 @@ namespace physics {
 	void Transform_system::foreach_in_range(core::Position pos, core::Angle dir, core::Distance near,
 	                                        core::Distance max, core::Angle max_angle,
 											core::Angle near_angle, F func) {
-		auto in_cone = [](core::Angle dir, core::Position diff, float dist2, core::Angle a) {
-			auto da = core::Angle(glm::acos(diff.y.value()/glm::sqrt(dist2)));
-			return between(da, dir-a/2.f, dir+a/2.f);
-		};
+		using namespace core::unit_literals;
 
 		const auto max_p = core::Position{max, max};
 		const auto near_2 = near.value()*near.value();
@@ -164,14 +161,23 @@ namespace physics {
 		foreach_in_rect(pos-max_p, pos+max_p, [&](core::ecs::Entity& e){
 			e.get<Transform_comp>().process([&](const auto& trans){
 				auto p = trans.position();
-				auto diff = p-pos;
-				auto dist_2 = glm::length2(remove_units(diff));
+				auto diff = core::remove_units(p-pos);
+				auto distance = glm::length2(diff);
 
-				if(dist_2<=max_2) {
-					core::Angle a = dist_2<near_2 ? near_angle : max_angle;
+				auto target_dir = core::Angle(atan2(diff.y, diff.x));
 
-					// FIXME: check for occlusion
-					if(in_cone(dir, diff, dist_2, a))
+				auto dir_diff = std::abs(dir-target_dir);
+				if(dir_diff>180_deg)
+					dir_diff = 360_deg - dir_diff;
+
+
+				if(distance<0.1f)
+					func(e);
+
+				else if(distance<=max_2) {
+					core::Angle a = distance<near_2 ? near_angle : max_angle;
+
+					if(dir_diff<=a/2.f)
 						func(e);
 				}
 			});

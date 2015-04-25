@@ -212,8 +212,16 @@ namespace core {
 			        (a.y.value()-b.y.value())*(a.y.value()-b.y.value()) };
 	}
 
-	inline constexpr bool between(Angle a, Angle min, Angle max) {
-		return normalize(a)>=normalize(min) && normalize(a)<=normalize(max);
+	inline bool between(Angle a, Angle min, Angle max) {
+	//	a = normalize(a);
+	//	min = normalize(min);
+	//	max = normalize(max);
+
+		if(min < max)
+			return a>=min && a<=max;
+
+		else
+			return min<=a || a<=max;
 	}
 
 	namespace unit_literals {
