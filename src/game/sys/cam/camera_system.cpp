@@ -12,7 +12,7 @@ namespace cam {
 		: _engine(engine), _targets(entity_manager.list<Camera_target_comp>()) {
 		entity_manager.register_component_type<Camera_target_comp>();
 
-		_cameras.emplace_back(_engine, 16.f);
+		_cameras.emplace_back(_engine, 32.f);
 	}
 
 	void Camera_system::update(core::Time dt) {

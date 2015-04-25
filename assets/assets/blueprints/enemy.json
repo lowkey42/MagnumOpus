@@ -1,10 +1,10 @@
 {
     "Transform",
 	"Physics":{
-		"radius": 0.4,
-		"mass": 60,
-		"restitution": 0.03,
-		"friction": 0.01
+		"radius": 0.2,
+		"mass": 40,
+		"restitution": 0.5,
+		"friction": 0.001
 	},
     "Simple_ai":{
         "attack_distance": 1,
