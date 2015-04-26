@@ -44,16 +44,22 @@ namespace {
 	sf2_structDef(Dungeon_cfg_map, sf2_member(levels))
 }
 
-template<>
-struct core::asset::Loader<Dungeon_cfg_map> {
-	using T = Dungeon_cfg_map;
-	static auto load(istream in) throw(Loading_failed) -> std::shared_ptr<T> {
-		auto i = std::make_shared<T>();
-		sf2::parseStream(in, *i);
-		return i;
-	}
-	static void store(ostream out, T& asset) throw(Loading_failed);
-};
+namespace core {
+namespace asset {
+
+	template<>
+	struct Loader<Dungeon_cfg_map> {
+		using T = Dungeon_cfg_map;
+		static auto load(istream in) throw(Loading_failed) -> std::shared_ptr<T> {
+			auto i = std::make_shared<T>();
+			sf2::parseStream(in, *i);
+			return i;
+		}
+		static void store(ostream out, T& asset) throw(Loading_failed);
+	};
+
+}
+}
 
 
 namespace game {
