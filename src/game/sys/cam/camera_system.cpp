@@ -3,10 +3,13 @@
 #include "../../../game_engine.hpp"
 
 #include "../physics/transform_comp.hpp"
+#include "../physics/physics_comp.hpp"
 
 namespace game {
 namespace sys {
 namespace cam {
+
+	using namespace core::unit_literals;
 
 	Camera_system::Camera_system(core::ecs::Entity_manager& entity_manager, Game_engine& engine)
 		: _engine(engine), _targets(entity_manager.list<Camera_target_comp>()) {
@@ -18,8 +21,14 @@ namespace cam {
 	void Camera_system::update(core::Time dt) {
 		for(auto& target : _targets) {
 
-			target.owner().get<physics::Transform_comp>().process([&](auto& transform){
-				target.chase(transform.position(), dt);
+			target.owner().get<physics::Transform_comp>().process([&](auto& transform) {
+				auto target_pos = transform.position();
+
+				target.owner().get<physics::Physics_comp>().process([&](auto& p){
+					target_pos= target_pos + p.velocity()*500_ms;
+				});
+
+				target.chase(target_pos, dt);
 			});
 
 			// TODO: add support for multiple cameras

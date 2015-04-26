@@ -8,8 +8,8 @@
 	},
     "Camera_target": {
         "mass": 0.1,
-        "damping": 0.3
-        "stiffness": 0.9,
+        "damping": 0.5
+        "freq": 2.5,
         "lazyness":4
     },
     "Target_tag"

@@ -19,6 +19,7 @@
 #include <glm/gtc/constants.hpp>
 #include <glm/gtx/rotate_vector.hpp>
 #include <cmath>
+#include <type_traits>
 
 namespace core {
 	constexpr float PI = 3.14159265358979323846264338327950288f;
@@ -87,6 +88,10 @@ namespace core {
 			}
 	};
 
+	template<typename T>
+	struct is_value_type : std::is_base_of<Value_type<T>, T> {};
+
+
 	struct Distance : Value_type<Distance> {
 		constexpr explicit Distance(float meters) : Value_type(meters){}
 	};
@@ -145,9 +150,13 @@ namespace core {
 	using Acceleration = glm::detail::tvec2<Speed_per_time, glm::highp>;
 
 	inline Position operator*(Position a, float b)noexcept {return Position(a.x*b, a.y*b);}
+	inline Position operator*(float b, Position a)noexcept {return Position(a.x*b, a.y*b);}
 	inline Dir_force operator*(Dir_force a, float b)noexcept {return Dir_force(a.x*b, a.y*b);}
+	inline Dir_force operator*(float b, Dir_force a)noexcept {return Dir_force(a.x*b, a.y*b);}
 	inline Velocity operator*(Velocity a, float b)noexcept {return Velocity(a.x*b, a.y*b);}
+	inline Velocity operator*(float b, Velocity a)noexcept {return Velocity(a.x*b, a.y*b);}
 	inline Acceleration operator*(Acceleration a, float b)noexcept {return Acceleration(a.x*b, a.y*b);}
+	inline Acceleration operator*(float b, Acceleration a)noexcept {return Acceleration(a.x*b, a.y*b);}
 
 	inline Position operator*(Distance v, glm::vec2 normal)noexcept {return Position(normal.x*v, normal.y*v);}
 	inline Position operator*(glm::vec2 normal, Distance v)noexcept {return Position(normal.x*v, normal.y*v);}
@@ -172,6 +181,7 @@ namespace core {
 	inline Velocity operator*(Acceleration a, Time t) noexcept { return Velocity(a.x*t, a.y*t); }
 	inline Velocity operator/(Position a, Time t) noexcept { return {a.x/t, a.y/t}; }
 	inline Position operator*(Velocity v, Time t) noexcept { return Position(v.x*t, v.y*t); }
+	inline Position operator*(Time t, Velocity v) noexcept { return Position(v.x*t, v.y*t); }
 
 	constexpr Inv_mass operator/(float a, Mass b) noexcept { return Inv_mass(a/b.value()); }
 	constexpr Mass operator/(float a, Inv_mass b) noexcept { return Mass(a/b.value()); }
@@ -185,10 +195,20 @@ namespace core {
 	inline Force operator/(Speed_per_time a, Inv_mass b) noexcept { return Force(a.value()/b.value()); }
 	inline Dir_force operator/(Velocity a, Inv_mass b) noexcept { return {Force(a.x.value()/b.value()), Force(a.y.value()/b.value())}; }
 
+
+	template<typename T, typename = std::enable_if_t<!is_value_type<T>::value>>
+	inline auto remove_unit(T v)noexcept -> T {
+		return v;
+	}
+	template<typename T, typename = std::enable_if_t<is_value_type<T>::value>>
+	inline auto remove_unit(const Value_type<T>& v)noexcept -> decltype(v.value()) {
+		return v.value();
+	}
 	template<typename T>
 	inline glm::vec2 remove_units(glm::detail::tvec2<T, glm::highp> v)noexcept {
-		return glm::vec2(v.x.value(), v.y.value());
+		return glm::vec2(remove_unit(v.x), remove_unit(v.y));
 	}
+
 	template<typename T>
 	inline glm::detail::tvec2<T, glm::highp> clamp(glm::detail::tvec2<T, glm::highp> v, glm::detail::tvec2<T, glm::highp> min, glm::detail::tvec2<T, glm::highp> max)noexcept {
 		return glm::detail::tvec2<T, glm::highp>(clamp(v.x, min.x, max.x), clamp(v.y, min.y, max.y));
@@ -210,18 +230,6 @@ namespace core {
 		return Distance{
 		            (a.x.value()-b.x.value())*(a.x.value()-b.x.value()) +
 			        (a.y.value()-b.y.value())*(a.y.value()-b.y.value()) };
-	}
-
-	inline bool between(Angle a, Angle min, Angle max) {
-	//	a = normalize(a);
-	//	min = normalize(min);
-	//	max = normalize(max);
-
-		if(min < max)
-			return a>=min && a<=max;
-
-		else
-			return min<=a || a<=max;
 	}
 
 	namespace unit_literals {
@@ -258,6 +266,12 @@ namespace core {
 			return Distance(static_cast<float>(v*1000));
 		}
 
+		constexpr Time operator "" _ms(long double v) {
+			return Time(static_cast<float>(v/1000));
+		}
+		constexpr Time operator "" _ms(unsigned long long v) {
+			return Time(static_cast<float>(v/1000.f));
+		}
 		constexpr Time operator "" _s(long double v) {
 			return Time(static_cast<float>(v));
 		}

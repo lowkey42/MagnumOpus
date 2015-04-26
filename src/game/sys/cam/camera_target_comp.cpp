@@ -1,6 +1,7 @@
 #include "camera_target_comp.hpp"
 #include <sf2/sf2.hpp>
 #include "../../../core/ecs/serializer_impl.hpp"
+#include "../../../core/utils/math.hpp"
 
 namespace game {
 namespace sys {
@@ -12,16 +13,17 @@ namespace cam {
 
 
 	struct Camera_target_comp::Persisted_state {
-		float mass, damping, stiffness, lazyness;
+		float mass, damping, freq, lazyness;
 
 		Persisted_state(const Camera_target_comp& c)
-				: mass(c._mass.value()), damping(c._damping), stiffness(c._stiffness), lazyness(c._lazyness) {}
+				: mass(c._mass.value()), damping(c._damping),
+		          freq(c._freq), lazyness(c._lazyness) {}
 	};
 
 	sf2_structDef(Camera_target_comp::Persisted_state,
 		sf2_member(mass),
 		sf2_member(damping),
-		sf2_member(stiffness),
+		sf2_member(freq),
 		sf2_member(lazyness)
 	)
 
@@ -29,7 +31,7 @@ namespace cam {
 		auto s = state.read_to(Persisted_state{*this});
 		_mass = Mass(s.mass);
 		_damping = s.damping;
-		_stiffness = s.stiffness;
+		_freq = s.freq;
 		_lazyness = s.lazyness;
 	}
 	void Camera_target_comp::store(core::ecs::Entity_state& state) {
@@ -44,21 +46,20 @@ namespace cam {
 
 		auto diff = (target-_cam_pos);
 
-		if(_sleeping && glm::length(remove_units(diff))<=_lazyness)
+		if(_sleeping<=0_s && glm::length(remove_units(diff))<=_lazyness)
 			return;
 
-		_sleeping = false;
-
-		core::Dir_force force = remove_units((diff * _stiffness)/second - (_velocity*_damping)) * 1_N;
-
-		core::Acceleration accel = force / _mass;
-
-		_velocity += accel*dt;
+		std::tie(_cam_pos, _velocity) = core::util::spring(_cam_pos,
+		                                                   _velocity,
+		                                                   target,
+		                                                   _damping,
+		                                                   _freq,
+		                                                   dt);
 
 		if(glm::length(remove_units(_velocity))<0.1f)
-			_sleeping = true;
-
-		_cam_pos+= _velocity*dt;
+			_sleeping = _sleeping - dt;
+		else
+			_sleeping = dt*4;
 	}
 }
 }
