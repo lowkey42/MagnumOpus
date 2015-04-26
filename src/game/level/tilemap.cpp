@@ -72,9 +72,9 @@ namespace level {
 
 		// Updating MVP-Matrix and give it to the shader
 		glm::mat4 MVP = cam.vp();
-		_shader.set_uniform("MVP", MVP)
-		       .set_uniform("myTextureSampler", 0)
-		       .bind();
+		_shader.bind().set_uniform("MVP", MVP)
+			   .set_uniform("myTextureSampler", 0);
+
 		// Binding tilemap texture
 		_texture->bind();
 

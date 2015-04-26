@@ -35,7 +35,7 @@ namespace physics {
 		public:
 			Transform_system(
 					core::ecs::Entity_manager& entity_manager, core::Distance max_entity_size,
-					int world_height, int world_width);
+					int world_width, int world_height);
 
 			void update(core::Time dt);
 

@@ -1,23 +1,25 @@
 cmake_minimum_required(VERSION 2.6)
 
-
 # include core
 add_subdirectory(core)
 
 project(MagnumOpus)
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+
 include_directories(${ROOT_DIR}/src) # for core
 
 
 if(EMSCRIPTEN)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -std=c++14 -s USE_SDL=2 -Oz")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -O3 -s USE_SDL=2 -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_SDL=2 -Oz -s DEMANGLE_SUPPORT=1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s USE_SDL=2 -s DEMANGLE_SUPPORT=1")
 	set(ZLIB_LIBRARY "")
 	set(GLEW_LIBRARIES "")
 	set(OPENGL_LIBRARIES "")
 	set(SDL2_LIBRARY "")
 	
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -g -O1 -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O1")
 	
 	add_definitions(-DSTACKTRACE)
 	find_package(GLEW REQUIRED)
@@ -47,7 +49,6 @@ endif(EMSCRIPTEN)
 if(EMSCRIPTEN)
 	file(COPY ${ROOT_DIR}/assets/archives.lst DESTINATION "./")
 	file(COPY ${ROOT_DIR}/assets/assets DESTINATION "./")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CSS_FLAGS} -Oz")
 	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} --preload-file archives.lst --preload-file assets -o MagnumOpus.html")
 else()
 #	file(COPY ${ROOT_DIR}/assets/archives.lst DESTINATION ${BIN_DIR})

@@ -46,7 +46,7 @@ int main(int argc, char** argv, char** env) {
 	#ifdef EMSCRIPTEN
 		init(argc, argv, env);
 
-		emscripten_set_main_loop(onFrame, 0, 1);
+		emscripten_set_main_loop(onFrame, 30, 1);
 
 		shutdown();
 		emscripten_exit_with_live_runtime();

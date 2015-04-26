@@ -35,7 +35,7 @@ namespace physics {
 
 	Transform_system::Transform_system(
 			ecs::Entity_manager& entity_manager, Distance max_entity_size,
-			int world_height, int world_width)
+			int world_width, int world_height)
 		: util::slot<ecs::Component_event>(&Transform_system::_on_comp_event, this),
 	      _max_entity_size(max_entity_size),
 		  _cell_size(calc_cell_size(max_entity_size)),

@@ -53,9 +53,10 @@ namespace renderer {
 	void Sprite_batch::drawAll(const core::renderer::Camera& cam) noexcept {
 
 		glm::mat4 MVP = cam.vp();
-		_shader.set_uniform("MVP", MVP)
-		       .set_uniform("myTextureSampler", 0)
-		       .bind();
+		_shader.bind()
+			   .set_uniform("MVP", MVP)
+			   .set_uniform("myTextureSampler", 0);
+
 		if(_texture)
 			_texture->bind();
 
