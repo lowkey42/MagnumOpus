@@ -4,7 +4,9 @@
 		"radius": 0.2,
 		"mass": 40,
 		"restitution": 0.5,
-		"friction": 0.001
+        "friction": 0.001,
+        "max_active_velocity": 10,
+        "active_acceleration": 5
 	},
     "Simple_ai":{
         "attack_distance": 1,

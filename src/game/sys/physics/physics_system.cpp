@@ -113,17 +113,15 @@ namespace physics {
 				int world_x = static_cast<int>(pos.x.value());
 				int world_y = static_cast<int>(pos.y.value());
 
-				 // reset acceleration
-				self._acceleration=self._acceleration*0.0f; // TODO[foe]
-				//auto fric_force = self._friction*_world.friction(world_x, world_y) * G;
-				//self.accelerate(glm::normalize(remove_units(self._velocity)) * -0.9f);
-
 				// apply friction
 				auto fric_speed = self._friction*_world.friction(world_x, world_y) *G;
 				self._velocity+=Velocity{
 						-sign(self._velocity.x) * std::min(fric_speed, std::abs(self._velocity.x.value())),
 						-sign(self._velocity.y) * std::min(fric_speed, std::abs(self._velocity.y.value()))
 				};
+
+				// reset acceleration
+			   self._acceleration=self._acceleration*0.0f;
 			}
 		});
 	}

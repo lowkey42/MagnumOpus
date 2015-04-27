@@ -17,7 +17,10 @@
 
 #include <vector>
 #include <glm/glm.hpp>
+#include <glm/gtx/norm.hpp>
 #include "transform_comp.hpp"
+
+#include "manifold.hpp"
 
 #include "../../../core/ecs/ecs.hpp"
 #include "../../../core/units.hpp"
@@ -26,56 +29,7 @@ namespace game {
 namespace sys {
 namespace physics {
 
-	class Physics_comp;
 	struct World_position;
-
-	struct Manifold {
-		enum class Type {
-			none,
-			object,
-			environment
-		} type;
-
-		Physics_comp* a;
-
-		union B_obj_union {
-			Physics_comp* comp;
-			struct{int x,y;} pos;
-
-			B_obj_union(Physics_comp* b) : comp(b){}
-			B_obj_union(int x, int y) : pos{x,y}{}
-		} b;
-
-		core::Distance penetration;
-		core::Position normal;
-
-
-		Manifold()
-			: type(Type::none), a(nullptr), b(nullptr), penetration(0) {}
-
-		Manifold(Physics_comp& a, Physics_comp& b, core::Distance penetration, core::Position normal)
-			: type(Type::object), a(&a), b(&b), penetration(penetration), normal(normal) {}
-
-		Manifold(Physics_comp& a, int bx, int by, core::Distance penetration, core::Position normal)
-			: type(Type::environment), a(&a), b(bx,by), penetration(penetration), normal(normal) {}
-
-		Manifold inverse()const noexcept {
-			INVARIANT(type==Type::object, "inverse() makes no sense for environment collisions!");
-			return Manifold(*b.comp, *a, penetration, normal);
-		}
-		bool is_with_environment()const noexcept {
-			return type==Type::environment;
-		}
-		bool is_with_object()const noexcept {
-			return type==Type::object;
-		}
-		bool is_valid()const noexcept {
-			return type!=Type::none;
-		}
-		operator bool()const noexcept {
-			return is_valid();
-		}
-	};
 
 	class Physics_comp : public core::ecs::Component<Physics_comp> {
 		public:
@@ -83,39 +37,22 @@ namespace physics {
 			void load(core::ecs::Entity_state&)override;
 			void store(core::ecs::Entity_state&)override;
 
-			Physics_comp(core::ecs::Entity& owner, core::Distance body_radius=core::Distance(1),
-						core::Mass mass=core::Mass(1), float restitution=1, float friction=1, bool solid=true) noexcept
-				: Component(owner),
-				  _body_radius(body_radius),
-				  _inv_mass(1.f/mass),
-				  _restitution(restitution),
-				  _friction(friction),
-				  _solid(solid),
-				  _active(true) {}
+			Physics_comp(core::ecs::Entity& owner,
+						 core::Distance body_radius=core::Distance(1),
+						 core::Mass mass=core::Mass(1), float restitution=1,
+						 float friction=1, bool solid=true) noexcept;
+
+			void accelerate_active(glm::vec2 dir)noexcept;
+			void accelerate(core::Acceleration acc)noexcept;
+			void impulse(core::Dir_force force)noexcept;
+			void apply_force(core::Dir_force force)noexcept;
+			void velocity(core::Velocity velocity)noexcept;
 
 			void mass(core::Mass m) {
 				_inv_mass = 1.f/m;
 			}
 			auto mass()const -> core::Mass {
 				return 1.f/_inv_mass;
-			}
-
-			void accelerate(core::Acceleration acc)noexcept {
-				_acceleration+=acc;
-				if(!is_zero(acc))
-					_active = true;
-			}
-			void impulse(core::Dir_force force)noexcept {
-				_velocity+=_inv_mass*force*core::unit_literals::second;
-				_active = true;
-			}
-			void apply_force(core::Dir_force force)noexcept {
-				accelerate(_inv_mass*force);
-			}
-			void velocity(core::Velocity velocity)noexcept {
-				_velocity = velocity;
-				if(!is_zero(velocity))
-					_active = true;
 			}
 
 			auto radius()const noexcept {return _body_radius;}
@@ -134,6 +71,8 @@ namespace physics {
 			core::Inv_mass _inv_mass;
 			float _restitution;
 			float _friction;
+			core::Speed _max_active_velocity2 = core::Speed(0);
+			core::Speed_per_time _active_acceleration = core::Speed_per_time(0);
 
 			bool _solid;
 			bool _active;
