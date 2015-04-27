@@ -129,15 +129,10 @@ namespace controller {
 		}
 		void Controllable_interface_impl::move(glm::vec2 direction) {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
-				auto directionLen = glm::length(direction);
-				if(directionLen>1)
-					direction/=directionLen;
+				comp.accelerate_active(direction);
 
-				// TODO: StatsComponent.getMaxSpeed()
-
-				Acceleration ac = direction * (20_m/second_2); // TODO: StatsComponent.getAcceleration()
-
-				comp.accelerate(ac);
+				// TODO: strafing
+				this->look_in_dir(direction);
 			});
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {
