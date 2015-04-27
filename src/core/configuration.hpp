@@ -20,7 +20,7 @@
 #include <sstream>
 #include "utils/maybe.hpp"
 
-namespace core {
+namespace mo {
 
 	// use SF2 instead (cause everything is better with SF2)
 	class Configuration {

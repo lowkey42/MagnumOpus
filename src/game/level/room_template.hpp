@@ -23,7 +23,7 @@
 
 #include "../../core/asset/asset_manager.hpp"
 
-namespace game {
+namespace mo {
 namespace level {
 
 	enum class Room_obj_type {
@@ -46,7 +46,7 @@ namespace level {
 			Room_template(int width, int height, std::vector<Tile> data, std::vector<Room_tile_props> props, std::vector<Room_object_props> objs);
 
 			auto& get_prop(int x, int y) {return _props[y*_width + x];}
-			auto  get_objects()const {return core::util::range(_objs);}
+			auto  get_objects()const {return util::range(_objs);}
 
 		private:
 			virtual void _store(TiledLevel& l)const;
@@ -57,21 +57,19 @@ namespace level {
 	};
 
 }
-}
 
-namespace core {
 namespace asset {
 	template<>
-	struct Loader<game::level::Room_template> {
-		using RT = std::shared_ptr<const game::level::Room_template>;
+	struct Loader<level::Room_template> {
+		using RT = std::shared_ptr<const level::Room_template>;
 
 		RT operator()(istream in) throw(Loading_failed){
-			auto r = std::make_shared<game::level::Room_template>();
+			auto r = std::make_shared<level::Room_template>();
 			r->load(in);
 			return r;
 		}
 
-		void operator()(ostream out, const game::level::Room_template& asset) throw(Loading_failed) {
+		void operator()(ostream out, const level::Room_template& asset) throw(Loading_failed) {
 			asset.store(out);
 		}
 	};

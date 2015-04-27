@@ -22,7 +22,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_gamecontroller.h>
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
 
@@ -182,29 +182,29 @@ namespace controller {
 }
 
 namespace std {
-	template <> struct hash<game::sys::controller::Key> {
-		size_t operator()(game::sys::controller::Key ac)const noexcept {
+	template <> struct hash<mo::sys::controller::Key> {
+		size_t operator()(mo::sys::controller::Key ac)const noexcept {
 			return static_cast<size_t>(ac);
 		}
 	};
-	template <> struct hash<game::sys::controller::Command> {
-		size_t operator()(game::sys::controller::Command ac)const noexcept {
+	template <> struct hash<mo::sys::controller::Command> {
+		size_t operator()(mo::sys::controller::Command ac)const noexcept {
 			return static_cast<size_t>(ac);
 		}
 	};
-	template <> struct hash<game::sys::controller::Pad_button> {
-		size_t operator()(game::sys::controller::Pad_button ac)const noexcept {
+	template <> struct hash<mo::sys::controller::Pad_button> {
+		size_t operator()(mo::sys::controller::Pad_button ac)const noexcept {
 			return static_cast<size_t>(ac);
 		}
 	};
-	template <> struct hash<game::sys::controller::Pad_stick> {
-		size_t operator()(game::sys::controller::Pad_stick ac)const noexcept {
+	template <> struct hash<mo::sys::controller::Pad_stick> {
+		size_t operator()(mo::sys::controller::Pad_stick ac)const noexcept {
 			return static_cast<size_t>(ac);
 		}
 	};
 }
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
 
@@ -263,17 +263,14 @@ namespace controller {
 
 }
 }
-}
-
-namespace core {
 namespace asset {
 	template<>
-	struct Loader<game::sys::controller::Mapping> {
-		using RT = std::shared_ptr<game::sys::controller::Mapping>;
+	struct Loader<sys::controller::Mapping> {
+		using RT = std::shared_ptr<sys::controller::Mapping>;
 
 		static RT load(istream in) throw(Loading_failed);
 
-		static void store(ostream out, game::sys::controller::Mapping& asset) throw(Loading_failed);
+		static void store(ostream out, sys::controller::Mapping& asset) throw(Loading_failed);
 	};
 }
 }

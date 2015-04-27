@@ -22,24 +22,24 @@
 
 #include "camera_target_comp.hpp"
 
-class Game_engine;
+namespace mo {
+	class Game_engine;
 
-namespace game {
 namespace sys {
 namespace cam {
 
 	class Camera_system {
 		public:
-			Camera_system(core::ecs::Entity_manager& entity_manager, Game_engine& engine);
+			Camera_system(ecs::Entity_manager& entity_manager, Game_engine& engine);
 
-			void update(core::Time dt);
+			void update(Time dt);
 
-			auto cameras()const noexcept {return core::util::range(_cameras);}
+			auto cameras()const noexcept {return util::range(_cameras);}
 
 		private:
 			Game_engine& _engine;
 			Camera_target_comp::Pool& _targets;
-			std::vector<core::renderer::Camera> _cameras;
+			std::vector<renderer::Camera> _cameras;
 	};
 
 }

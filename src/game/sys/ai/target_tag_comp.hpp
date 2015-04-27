@@ -18,15 +18,15 @@
 #include "../../../core/ecs/ecs.hpp"
 #include "../../../core/units.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace ai {
 
-	class Target_tag_comp : public core::ecs::Component<Target_tag_comp> {
+	class Target_tag_comp : public ecs::Component<Target_tag_comp> {
 		public:
 			static constexpr const char* name() {return "Target_tag";}
 
-			Target_tag_comp(core::ecs::Entity& owner): Component(owner) {}
+			Target_tag_comp(ecs::Entity& owner): Component(owner) {}
 	};
 
 }

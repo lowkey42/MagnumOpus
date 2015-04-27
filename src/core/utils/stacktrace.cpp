@@ -21,7 +21,7 @@
 		#include <execinfo.h>
 	#endif
 
-	namespace core {
+	namespace mo {
 	namespace util {
 
 		namespace {
@@ -424,7 +424,7 @@
 	}
 
 #else
-	namespace core {
+	namespace mo {
 	namespace util {
 		void init_stacktrace(std::string exeName) {
 		}

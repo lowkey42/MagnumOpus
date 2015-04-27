@@ -3,12 +3,11 @@
 #include "../../../core/ecs/serializer_impl.hpp"
 #include "../../../core/utils/math.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace cam {
 
-	using namespace core;
-	using namespace core::unit_literals;
+	using namespace unit_literals;
 
 
 
@@ -27,18 +26,18 @@ namespace cam {
 		sf2_member(lazyness)
 	)
 
-	void Camera_target_comp::load(core::ecs::Entity_state& state) {
+	void Camera_target_comp::load(ecs::Entity_state& state) {
 		auto s = state.read_to(Persisted_state{*this});
 		_mass = Mass(s.mass);
 		_damping = s.damping;
 		_freq = s.freq;
 		_lazyness = s.lazyness;
 	}
-	void Camera_target_comp::store(core::ecs::Entity_state& state) {
+	void Camera_target_comp::store(ecs::Entity_state& state) {
 		state.write_from(Persisted_state{*this});
 	}
 
-	void Camera_target_comp::chase(Position target, core::Time dt) {
+	void Camera_target_comp::chase(Position target, Time dt) {
 		if(_unset) {
 			_cam_pos = target;
 			_unset = false;
@@ -49,12 +48,12 @@ namespace cam {
 		if(_sleeping<=0_s && glm::length(remove_units(diff))<=_lazyness)
 			return;
 
-		std::tie(_cam_pos, _velocity) = core::util::spring(_cam_pos,
-		                                                   _velocity,
-		                                                   target,
-		                                                   _damping,
-		                                                   _freq,
-		                                                   dt);
+		std::tie(_cam_pos, _velocity) = util::spring(_cam_pos,
+													 _velocity,
+													 target,
+													 _damping,
+													 _freq,
+													 dt);
 
 		if(glm::length(remove_units(_velocity))<0.1f)
 			_sleeping = _sleeping - dt;

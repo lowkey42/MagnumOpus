@@ -19,7 +19,7 @@
 #include <memory>
 #include "utils/maybe.hpp"
 
-namespace core {
+namespace mo {
 	namespace asset {class Asset_manager;}
 	namespace renderer {class Graphics_ctx;}
 	class Configuration;

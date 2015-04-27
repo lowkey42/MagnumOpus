@@ -5,10 +5,10 @@
 
 #include "tiled.hpp"
 
-namespace game {
+namespace mo {
 namespace level {
 
-	using namespace core::util;
+	using namespace mo::util;
 
 	bool Tile::solid()const {
 		switch(type) {

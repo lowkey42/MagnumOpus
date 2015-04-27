@@ -20,40 +20,40 @@
 
 #include "../controller/controller.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace ai {
 
-	class Simple_ai_comp : public core::ecs::Component<Simple_ai_comp>, public controller::Controller {
+	class Simple_ai_comp : public ecs::Component<Simple_ai_comp>, public controller::Controller {
 		public:
 			static constexpr const char* name() {return "Simple_ai";}
-			void load(core::ecs::Entity_state&)override;
-			void store(core::ecs::Entity_state&)override;
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			Simple_ai_comp(core::ecs::Entity& owner);
+			Simple_ai_comp(ecs::Entity& owner);
 
 			void operator()(controller::Controllable_interface&)override;
 
-			void target(core::ecs::Entity_ptr e)noexcept {
+			void target(ecs::Entity_ptr e)noexcept {
 				_target = e;
 				_follow_time_left = _follow_time;
 			}
-			void no_target(core::Time dt)noexcept;
+			void no_target(Time dt)noexcept;
 
-			core::Distance attack_distance;
-			core::Distance near;
-			core::Distance max;
-			core::Angle near_angle;
-			core::Angle far_angle;
+			Distance attack_distance;
+			Distance near;
+			Distance max;
+			Angle near_angle;
+			Angle far_angle;
 
 
 			struct Persisted_state;
 			friend struct Persisted_state;
 
 		private:
-			core::Time _follow_time;
-			core::Time _follow_time_left;
-			core::ecs::Entity_ptr _target;
+			Time _follow_time;
+			Time _follow_time_left;
+			ecs::Entity_ptr _target;
 	};
 
 }

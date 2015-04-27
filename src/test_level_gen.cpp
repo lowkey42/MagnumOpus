@@ -8,9 +8,11 @@
 #include "game_engine.hpp"
 #include "game/level/level_generator.hpp"
 
+using namespace mo;
+
 int main(int argc, char** argv) {
 
-	core::util::init_stacktrace(argv[0]);
+	util::init_stacktrace(argv[0]);
 
 	uint64_t nseed = 0;
 	if(argc>1) {
@@ -23,23 +25,23 @@ int main(int argc, char** argv) {
 
 	char* noEnv = nullptr;
 	char** env = &noEnv;
-	Game_engine engine("MagnumOpus", core::Configuration(argc, argv, env));
+	Game_engine engine("MagnumOpus", Configuration(argc, argv, env));
 
-	auto l = game::level::generate_level(engine.assets(), nseed, 0, 0);
+	auto l = level::generate_level(engine.assets(), nseed, 0, 0);
 
 	std::cout<<"World "<<l.width()<<"x"<<l.height()<<" seed="<<nseed<<std::endl;
 
 	for(auto y=0; y<l.height(); y++) {
 		for(auto x=0; x<l.width(); x++) {
 			switch(l.get(x,y).type) {
-				case game::level::Tile_type::wall_tile:
+				case level::Tile_type::wall_tile:
 					std::cout<<"#";
 					break;
-				case game::level::Tile_type::floor_tile:
+				case level::Tile_type::floor_tile:
 					std::cout<<".";
 					break;
-				case game::level::Tile_type::door_closed_ns:
-				case game::level::Tile_type::door_closed_we:
+				case level::Tile_type::door_closed_ns:
+				case level::Tile_type::door_closed_we:
 					std::cout<<"+";
 					break;
 				default:

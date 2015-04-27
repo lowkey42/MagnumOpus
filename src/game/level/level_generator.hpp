@@ -17,13 +17,13 @@
 
 #include "level.hpp"
 
-namespace core {
+namespace mo {
 namespace asset {
 	class Asset_manager;
 }
 }
 
-namespace game {
+namespace mo {
 namespace level {
 
 	/**
@@ -33,7 +33,7 @@ namespace level {
 	 * @param difficulty The base difficulty of the generated level (MIN_INT=treasure, MAX_INT="fun")
 	 * @return the generated level
 	 */
-	extern Level generate_level(core::asset::Asset_manager& assets, uint64_t seed,
+	extern Level generate_level(asset::Asset_manager& assets, uint64_t seed,
 	                            int depth, int difficulty=0);
 
 }

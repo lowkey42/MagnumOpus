@@ -19,23 +19,23 @@
 #include <core/renderer/texture.hpp>
 #include <core/renderer/sprite_batch.hpp>
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace sprite {
 
-	class Sprite_comp : public core::ecs::Component<Sprite_comp> {
+	class Sprite_comp : public ecs::Component<Sprite_comp> {
 
 	public:
 
 		static constexpr const char* name() {return "Sprite";}
-		void load(core::ecs::Entity_state&)override;
-		void store(core::ecs::Entity_state&)override;
+		void load(ecs::Entity_state&)override;
+		void store(ecs::Entity_state&)override;
 
-		Sprite_comp(core::ecs::Entity& owner, std::string aid = "", glm::vec4 uv = glm::vec4(0.0f)) :
+		Sprite_comp(ecs::Entity& owner, std::string aid = "", glm::vec4 uv = glm::vec4(0.0f)) :
 		    Component(owner), _texture(aid), _uv(uv){}
 
 		auto sprite() const noexcept {
-			struct core::renderer::Sprite_batch::Sprite sprite;
+			struct renderer::Sprite_batch::Sprite sprite;
 			sprite.texture = _texture;
 			sprite.uv = _uv;
 			return sprite;
@@ -46,7 +46,7 @@ namespace sprite {
 
 	private:
 
-		core::asset::AID _texture;
+		asset::AID _texture;
 		glm::vec4 _uv;
 
 	};

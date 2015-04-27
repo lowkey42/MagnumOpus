@@ -56,7 +56,7 @@
 
 	obj.draw(); //< draws updated data
  */
-namespace core {
+namespace mo {
 namespace renderer {
 
 	class Object;

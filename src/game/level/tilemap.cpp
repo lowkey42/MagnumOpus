@@ -8,34 +8,36 @@
 
 #include "level.hpp"
 
-namespace game {
+namespace mo {
 namespace level {
+
+	using namespace renderer;
 
 	bool talkative = false;
 
 	// layout description for vertices
-	core::renderer::Vertex_layout layout {
-		core::renderer::Vertex_layout::Mode::triangles,
-		core::renderer::vertex("position",	&Tilemap::TileVertex::pos),
-		core::renderer::vertex("uv",		&Tilemap::TileVertex::uv),
-		core::renderer::vertex("layer",		&Tilemap::TileVertex::layer)
+	Vertex_layout layout {
+		Vertex_layout::Mode::triangles,
+		vertex("position",	&Tilemap::TileVertex::pos),
+		vertex("uv",		&Tilemap::TileVertex::uv),
+		vertex("layer",		&Tilemap::TileVertex::layer)
 	};
 
-	Tilemap::Tilemap(core::Engine &engine, const game::level::Level &lev)
+	Tilemap::Tilemap(Engine &engine, const Level &lev)
 	    : _level(lev),
-	      _object(layout, core::renderer::create_buffer(_vertices, true)) {
+		  _object(layout, create_buffer(_vertices, true)) {
 		// Create and attach the Shader
-		_shader.attach_shader(engine.assets().load<core::renderer::Shader>("vert_shader:tilemap"_aid))
-		        .attach_shader(engine.assets().load<core::renderer::Shader>("frag_shader:tilemap"_aid))
+		_shader.attach_shader(engine.assets().load<Shader>("vert_shader:tilemap"_aid))
+				.attach_shader(engine.assets().load<Shader>("frag_shader:tilemap"_aid))
 		        .bind_all_attribute_locations(layout)
 		        .build();
 
 		// Load a predefined texture and bind it
-		_texture = engine.assets().load<core::renderer::Texture>("tex:tilemap_m"_aid);
+		_texture = engine.assets().load<Texture>("tex:tilemap_m"_aid);
 	}
 
 
-	void Tilemap::draw(const core::renderer::Camera& cam){
+	void Tilemap::draw(const Camera& cam){
 		auto cam_start = cam.screen_to_world(cam.viewport().xy()) - glm::vec2(1,1);
 		auto cam_end   = cam.screen_to_world(cam.viewport().xy() +
 		                                     cam.viewport().zw()) + glm::vec2(1,1);

@@ -1,7 +1,7 @@
 #include "room_template.hpp"
 
 
-namespace game {
+namespace mo {
 namespace level {
 
 	Room_template::Room_template(Tile_type default_type, int width, int height)

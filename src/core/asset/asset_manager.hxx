@@ -5,7 +5,7 @@
 #endif
 
 
-namespace core {
+namespace mo {
 namespace asset {
 
 	template<class T>

@@ -11,7 +11,7 @@
 #include <SDL2/SDL.h>
 
 
-namespace core {
+namespace mo {
 	namespace {
 		void init_sub_system(Uint32 f, const std::string& name, bool required=true) {
 			if(SDL_InitSubSystem(f)!=0) {

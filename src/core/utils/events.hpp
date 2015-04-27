@@ -19,7 +19,7 @@
 #include <vector>
 #include <algorithm>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	template<typename... ET>

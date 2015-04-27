@@ -4,12 +4,11 @@
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
-	using namespace core;
 	using namespace physics;
-	using namespace core::unit_literals;
+	using namespace unit_literals;
 
 	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
 	  : _controllables(entity_manager.list<Controllable_comp>()) {
@@ -48,7 +47,7 @@ namespace controller {
 
 	Controller_manager::Controller_manager(
 			asset::Asset_manager& assets,
-			core::Input_manager& input)
+			Input_manager& input)
 		: _screen_to_world_coords([](glm::vec2 v){return v;}),
 		  _mapping(assets.load<Mapping>("cfg:controlls"_aid)),
 		  _on_joined(&Controller_manager::_join, this),

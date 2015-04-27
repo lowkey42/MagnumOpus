@@ -2,10 +2,9 @@
 
 #include<glm/gtc/constants.hpp>
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace physics {
-	using namespace core;
 	using namespace std::placeholders;
 	using namespace unit_literals;
 

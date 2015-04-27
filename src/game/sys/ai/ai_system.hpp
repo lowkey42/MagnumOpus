@@ -21,26 +21,26 @@
 
 #include "simple_ai_comp.hpp"
 
-class Game_engine;
+namespace mo {
+	class Game_engine;
 
-namespace game {
 namespace sys {
 	namespace physics{ class Transform_system; }
 
-namespace ai {
+	namespace ai {
 
-	class Ai_system {
-		public:
-			Ai_system(core::ecs::Entity_manager& entity_manager, Game_engine& engine, physics::Transform_system& transform_system);
+		class Ai_system {
+			public:
+				Ai_system(ecs::Entity_manager& entity_manager, Game_engine& engine, physics::Transform_system& transform_system);
 
-			void update(core::Time dt);
+				void update(Time dt);
 
-		private:
-			Game_engine& _engine;
-			Simple_ai_comp::Pool& _simples;
-			physics::Transform_system& _transform_system;
-	};
+			private:
+				Game_engine& _engine;
+				Simple_ai_comp::Pool& _simples;
+				physics::Transform_system& _transform_system;
+		};
 
-}
+	}
 }
 }

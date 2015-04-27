@@ -24,15 +24,15 @@
 #include "controllable_comp.hpp"
 #include "input_controller.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
 
 	class Controller_manager {
 		public:
-			Controller_manager(core::asset::Asset_manager& assets, core::Input_manager& input);
+			Controller_manager(asset::Asset_manager& assets, Input_manager& input);
 
-			void update(core::Time dt);
+			void update(Time dt);
 
 			auto& main_controller(){return *_main_controller.get();}
 
@@ -40,9 +40,9 @@ namespace controller {
 				_screen_to_world_coords = func;
 			}
 
-			core::util::signal_source<Controller_added_event> join_events;
-			core::util::signal_source<Controller_removed_event> unjoin_events;
-			core::util::signal_source<Quit_event> quit_events;
+			util::signal_source<Controller_added_event> join_events;
+			util::signal_source<Controller_removed_event> unjoin_events;
+			util::signal_source<Quit_event> quit_events;
 
 		private:
 			void _join(Controller_added_event e);
@@ -55,11 +55,11 @@ namespace controller {
 			std::function<glm::vec2(glm::vec2)> _screen_to_world_coords;
 			Mapping_ptr _mapping;
 
-			core::util::slot<Controller_added_event> _on_joined;
-			core::util::slot<Controller_removed_event> _on_unjoined;
+			util::slot<Controller_added_event> _on_joined;
+			util::slot<Controller_removed_event> _on_unjoined;
 
-			core::util::slot<SDL_GameController*> _on_added;
-			core::util::slot<SDL_GameController*> _on_removed;
+			util::slot<SDL_GameController*> _on_added;
+			util::slot<SDL_GameController*> _on_removed;
 
 			std::unique_ptr<Controller> _main_controller;
 			std::unique_ptr<Keyboard_controller> _keyboard_controller;
@@ -70,9 +70,9 @@ namespace controller {
 
 	class Controller_system {
 		public:
-			Controller_system(core::ecs::Entity_manager& entity_manager);
+			Controller_system(ecs::Entity_manager& entity_manager);
 
-			void update(core::Time dt);
+			void update(Time dt);
 
 		private:
 			Controllable_comp::Pool& _controllables;

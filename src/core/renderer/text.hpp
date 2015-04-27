@@ -19,7 +19,7 @@
 #include "texture.hpp"
 #include "vertex_object.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	class Text;
@@ -75,7 +75,7 @@ namespace renderer {
 
 			mutable std::unordered_map<std::string, Text_ptr> _cache;
 	};
-	using Font_ptr = core::asset::Ptr<Font>;
+	using Font_ptr = asset::Ptr<Font>;
 
 	class Text {
 		public:

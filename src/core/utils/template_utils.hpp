@@ -19,7 +19,7 @@
 #include <algorithm>
 #include <functional>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	struct no_move {

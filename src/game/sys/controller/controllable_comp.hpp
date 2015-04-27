@@ -21,17 +21,17 @@
 
 #include "controller.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
 
-	class Controllable_comp : public core::ecs::Component<Controllable_comp> {
+	class Controllable_comp : public ecs::Component<Controllable_comp> {
 		public:
 			static constexpr const char* name() {return "Controllable";}
 			// static void load(sf2::io::CharSource& cs, ecs::ComponentBase& comp){}
 			// static void store(sf2::io::CharSink& cs, const ecs::ComponentBase& comp){}
 
-			Controllable_comp(core::ecs::Entity& owner, Controller* controller=nullptr) noexcept
+			Controllable_comp(ecs::Entity& owner, Controller* controller=nullptr) noexcept
 				: Component(owner), controller(controller) {}
 
 

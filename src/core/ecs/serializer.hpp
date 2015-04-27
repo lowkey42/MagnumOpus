@@ -20,7 +20,7 @@
 
 #include "ecs.hpp"
 
-namespace core {
+namespace mo {
 	namespace asset {
 		class AID;
 		class Asset_manager;

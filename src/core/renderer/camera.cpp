@@ -8,8 +8,8 @@
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
-namespace core{
-namespace renderer{
+namespace mo {
+namespace renderer {
 
 	namespace {
 		auto calc_viewport(int width, int height) -> glm::vec4 {
@@ -29,7 +29,7 @@ namespace renderer{
 	}
 
 	// Constructors
-	Camera::Camera(const core::Engine &engine, float world_scale,
+	Camera::Camera(const Engine &engine, float world_scale,
 	               const glm::vec2 position, float zoom) noexcept
 	    : _viewport(calc_viewport(engine.graphics_ctx().win_width(),
 	                              engine.graphics_ctx().win_height())),

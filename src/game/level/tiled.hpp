@@ -23,7 +23,7 @@
 #include "../../core/utils/string_utils.hpp"
 
 
-namespace game {
+namespace mo {
 namespace level {
 
 	struct TiledObject {

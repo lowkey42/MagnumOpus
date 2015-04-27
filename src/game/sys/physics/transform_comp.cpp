@@ -3,11 +3,9 @@
 #include <sf2/sf2.hpp>
 #include "../../../core/ecs/serializer_impl.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace physics {
-
-	using namespace core;
 
 	struct Transform_comp::Persisted_state {
 		float x, y, rot;

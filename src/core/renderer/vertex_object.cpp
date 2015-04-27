@@ -5,7 +5,7 @@
 
 #include "shader.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	namespace {

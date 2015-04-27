@@ -21,7 +21,7 @@
 #include "string_utils.hpp"
 #include "template_utils.hpp"
 
-namespace core {
+namespace mo {
 namespace util {
 
 	template<class POOL>

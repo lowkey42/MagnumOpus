@@ -34,7 +34,7 @@
  *		asset::Ptr itemTex = assetMgr.load<Texture>("tex:items/health/small"_aid);
  * }
  */
-namespace core {
+namespace mo {
 namespace asset {
 	class Asset_manager;
 

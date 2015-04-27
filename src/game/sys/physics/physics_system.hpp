@@ -23,7 +23,7 @@
 #include "physics_comp.hpp"
 #include "transform_system.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace physics {
 
@@ -38,12 +38,12 @@ namespace physics {
 	class Physics_system {
 		public:
 			Physics_system(
-					core::ecs::Entity_manager& entity_manager, Transform_system& ts,
-					core::Distance min_body_size, core::Speed max_body_velocity, World_interface& world);
+					ecs::Entity_manager& entity_manager, Transform_system& ts,
+					Distance min_body_size, Speed max_body_velocity, World_interface& world);
 
-			void update(core::Time dt);
+			void update(Time dt);
 
-			core::util::signal_source<Manifold&> collisions;
+			util::signal_source<Manifold&> collisions;
 
 		private:
 			void _step(bool lastStep);
@@ -51,22 +51,22 @@ namespace physics {
 
 			void _step_entity(Physics_comp& physics, bool last_step=true);
 			void _solve_collision(Manifold& m);
-			auto _check_collision(Physics_comp& a, Physics_comp& b) -> core::util::maybe<Manifold>;
+			auto _check_collision(Physics_comp& a, Physics_comp& b) -> util::maybe<Manifold>;
 			void _check_env_collisions(Physics_comp& a, std::vector<Manifold>& buffer);
 
 			const World_interface& _world;
 
-			const core::Distance _min_body_size;
-			const core::Speed _max_body_velocity;
+			const Distance _min_body_size;
+			const Speed _max_body_velocity;
 
-			const core::Time _sub_step_time; //< derived from minBodySize and maxBodyVelocity
+			const Time _sub_step_time; //< derived from minBodySize and maxBodyVelocity
 
 			const int _max_steps_per_frame;
 
 			Physics_comp::Pool& _physics_pool;
 			Transform_system& _transform_sys;
 
-			core::Time _dt_acc;
+			Time _dt_acc;
 			std::vector<Manifold> _manifold_buffer;
 	};
 

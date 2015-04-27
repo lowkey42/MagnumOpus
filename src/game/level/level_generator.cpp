@@ -12,7 +12,7 @@
 #include <random>
 #include <glm/glm.hpp>
 
-using namespace core::util;
+using namespace mo::util;
 
 namespace {
 	template<typename T>
@@ -44,7 +44,7 @@ namespace {
 	sf2_structDef(Dungeon_cfg_map, sf2_member(levels))
 }
 
-namespace core {
+namespace mo {
 namespace asset {
 
 	template<>
@@ -59,13 +59,10 @@ namespace asset {
 	};
 
 }
-}
 
-
-namespace game {
 namespace level {
 	namespace {
-		Dungeon_cfg load_cfg(core::asset::Asset_manager& assets, int depth) {
+		Dungeon_cfg load_cfg(asset::Asset_manager& assets, int depth) {
 			auto opts = assets.load<Dungeon_cfg_map>("cfg:dungeons"_aid);
 			auto cfg_iter = opts->levels.find(depth);
 			INVARIANT(cfg_iter!=opts->levels.end(), "You delved too greedily and too deep. Level="+to_string(depth));
@@ -75,7 +72,7 @@ namespace level {
 
 		struct Room_blueprint : public Room {
 			std::vector<std::size_t> connections;
-			core::asset::Ptr<Room_template> room_template;
+			asset::Ptr<Room_template> room_template;
 
 			Room_blueprint(int top, int left, int right, int bottom)
 				: Room(top, left, right, bottom) {}
@@ -116,7 +113,7 @@ namespace level {
 		void dig_corridors(Level& level, const Room_list& rooms);
 	}
 
-	Level generate_level(core::asset::Asset_manager& assets, uint64_t seed,
+	Level generate_level(asset::Asset_manager& assets, uint64_t seed,
 	                     int depth, int difficulty) {
 		const auto cfg = load_cfg(assets, depth);
 
@@ -315,7 +312,7 @@ namespace level {
 			return level;
 		}
 
-		void dig_path(Level& level, core::util::path&& path) {
+		void dig_path(Level& level, util::path&& path) {
 			for(const auto& node : path) {
 				auto& tile = level.get(node.x, node.y);
 
@@ -332,7 +329,7 @@ namespace level {
 		}
 
 		void dig_corridors(Level& level, const Room_list& rooms) {
-			using namespace core::util;
+			using namespace util;
 
 			auto path_scorer = [&](position pprev, position prev, position node, position goal) {
 				auto costs = std::sqrt((node.x-goal.x)*(node.x-goal.x) + (node.y-goal.y)*(node.y-goal.y));

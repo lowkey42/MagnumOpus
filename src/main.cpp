@@ -17,9 +17,9 @@
 #include <emscripten.h>
 #endif
 
-#include "game_engine.hpp"
 #include "core/utils/log.hpp"
 
+#include "game/game_engine.hpp"
 #include "game/game_screen.hpp"
 
 
@@ -27,8 +27,9 @@
 #include <exception>
 #include <SDL2/SDL.h>
 
+using namespace mo; // import game namespace
 
-std::unique_ptr<Game_engine> engine;
+std::unique_ptr<mo::Game_engine> engine;
 
 void init(int argc, char** argv, char** env);
 void onFrame();
@@ -65,11 +66,11 @@ int main(int argc, char** argv, char** env) {
 void init(int argc, char** argv, char** env) {
 	INFO("Nothing to see here!");
 	try {
-		core::util::init_stacktrace(argv[0]);
-		engine.reset(new Game_engine("MagnumOpus", core::Configuration(argc, argv, env)));
-		engine->enter_screen<game::Game_screen>();
+		util::init_stacktrace(argv[0]);
+		engine.reset(new mo::Game_engine("MagnumOpus", Configuration(argc, argv, env)));
+		engine->enter_screen<Game_screen>();
 
-	} catch (const core::util::Error& ex) {
+	} catch (const util::Error& ex) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in init", ex.what(), nullptr);
 		shutdown();
 		exit(1);
@@ -80,7 +81,7 @@ void onFrame() {
 	try {
 		engine->on_frame();
 
-	} catch (const core::util::Error& ex) {
+	} catch (const util::Error& ex) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in onFrame", ex.what(), nullptr);
 		shutdown();
 		exit(2);
@@ -91,7 +92,7 @@ void shutdown() {
 	try {
 		engine.reset();
 
-	} catch (const core::util::Error& ex) {
+	} catch (const util::Error& ex) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in shutdown", ex.what(), nullptr);
 		exit(3);
 	}

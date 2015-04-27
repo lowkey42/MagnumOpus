@@ -4,26 +4,26 @@
 #include <core/units.hpp>
 
 
-namespace game{
-namespace sys{
-namespace sprite{
+namespace mo {
+namespace sys {
+namespace sprite {
 
-	Sprite_system::Sprite_system(core::ecs::Entity_manager& entity_manager, game::sys::physics::Transform_system& ts,
-	                             core::asset::Asset_manager& asset_manager) noexcept :
+	Sprite_system::Sprite_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
+								 asset::Asset_manager& asset_manager) noexcept :
 	    _transform(ts), _sprite_batch(asset_manager) {
 		;
 	}
 
-	void Sprite_system::draw(const core::renderer::Camera& camera) noexcept{
+	void Sprite_system::draw(const renderer::Camera& camera) noexcept{
 		glm::vec2 upper_left = camera.screen_to_world({camera.viewport().x, camera.viewport().y});
 		glm::vec2 lower_right = camera.screen_to_world({camera.viewport().z, camera.viewport().w});
 
-		_transform.foreach_in_rect(upper_left, lower_right, [&](core::ecs::Entity& entity) {
+		_transform.foreach_in_rect(upper_left, lower_right, [&](ecs::Entity& entity) {
 			process(entity.get<sys::physics::Transform_comp>(),
 	                entity.get<sys::sprite::Sprite_comp>())
 	        >> [&](const auto& trans, const auto& sp) {
 				//std::cout << "There is something around!" << std::endl;
-				struct core::renderer::Sprite_batch::Sprite sprite;
+				renderer::Sprite_batch::Sprite sprite;
 				sprite.position = trans.position();
 				sprite.rotation = trans.rotation();
 				sprite.texture = sp.sprite().texture;
@@ -36,7 +36,7 @@ namespace sprite{
 
 	}
 
-	void Sprite_system::update(core::Time dt) noexcept{
+	void Sprite_system::update(Time dt) noexcept{
 		;
 	}
 

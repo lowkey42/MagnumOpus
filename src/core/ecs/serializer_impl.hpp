@@ -20,7 +20,7 @@
 #include "serializer.hpp"
 #include <sf2/sf2.hpp>
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 	class Entity_state {

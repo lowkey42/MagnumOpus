@@ -20,7 +20,7 @@
 #include <memory>
 #include "log.hpp"
 
-namespace core {
+namespace mo {
 namespace util {
 
 	template<typename T>

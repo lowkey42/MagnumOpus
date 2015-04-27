@@ -5,7 +5,7 @@
 
 #include <string>
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace sprite {
 
@@ -28,13 +28,13 @@ namespace sprite {
 	    sf2_member(uv_w)
 	)
 
-	void Sprite_comp::load(core::ecs::Entity_state &state){
+	void Sprite_comp::load(ecs::Entity_state &state){
 		auto s = state.read_to(Persisted_state{*this});
-		_texture = core::asset::AID(s.aid);
+		_texture = asset::AID(s.aid);
 		_uv = glm::vec4(s.uv_x, s.uv_y, s.uv_z, s.uv_w);
 	}
 
-	void Sprite_comp::store(core::ecs::Entity_state &state){
+	void Sprite_comp::store(ecs::Entity_state &state){
 		state.write_from(Persisted_state{*this});
 	}
 

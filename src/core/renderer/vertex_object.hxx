@@ -4,7 +4,7 @@
 #include "vertex_object.hpp"
 #endif
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	template<class T>

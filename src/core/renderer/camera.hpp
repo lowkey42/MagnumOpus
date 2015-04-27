@@ -19,7 +19,7 @@
 
 #include "../engine.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	class Camera {
@@ -27,7 +27,7 @@ namespace renderer {
 	public:
 
 		// Constructors
-		Camera(const core::Engine &engine, float world_scale=1.f,
+		Camera(const Engine &engine, float world_scale=1.f,
 		       const glm::vec2 position=glm::vec2(0.0f), float zoom=1.0f) noexcept;
 
 		// Methods

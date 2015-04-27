@@ -1,7 +1,7 @@
 #include "text.hpp"
 
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	Vertex_layout text_vertex_layout{

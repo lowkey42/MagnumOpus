@@ -6,9 +6,9 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-namespace game {
-	using namespace core::unit_literals;
-	using namespace core::renderer;
+namespace mo {
+	using namespace unit_literals;
+	using namespace renderer;
 
 	struct Test_vertex {
 		glm::vec2 pos;
@@ -33,18 +33,18 @@ namespace game {
 	Text_ptr t;
 
 
-	Example_screen::Example_screen(core::Engine& engine) :
-		core::Screen(engine),
+	Example_screen::Example_screen(Engine& engine) :
+		Screen(engine),
 	    _object(layout, create_buffer(triangle())),
-	    _font(engine.assets().load<core::renderer::Font>(("font:test"_aid)))
+		_font(engine.assets().load<Font>(("font:test"_aid)))
 	{
-		_text_shader.attach_shader(engine.assets().load<core::renderer::Shader>(("vert_shader:simple"_aid)))
-			 .attach_shader(engine.assets().load<core::renderer::Shader>(("frag_shader:simple"_aid)))
+		_text_shader.attach_shader(engine.assets().load<Shader>(("vert_shader:simple"_aid)))
+			 .attach_shader(engine.assets().load<Shader>(("frag_shader:simple"_aid)))
 			 .bind_all_attribute_locations(text_vertex_layout)
 			 .build();
 
-		_shader.attach_shader(engine.assets().load<core::renderer::Shader>(("vert_shader:sprite"_aid)))
-		       .attach_shader(engine.assets().load<core::renderer::Shader>(("frag_shader:sprite"_aid)))
+		_shader.attach_shader(engine.assets().load<Shader>(("vert_shader:sprite"_aid)))
+			   .attach_shader(engine.assets().load<Shader>(("frag_shader:sprite"_aid)))
 		       .bind_all_attribute_locations(layout)
 		       .build();
 

@@ -3,7 +3,7 @@
 #include "../utils/string_utils.hpp"
 #include "../utils/log.hpp"
 
-namespace core {
+namespace mo {
 namespace asset {
 
 	AID::AID(Asset_type t, std::string n)

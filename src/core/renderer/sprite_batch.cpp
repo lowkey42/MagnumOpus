@@ -1,25 +1,27 @@
 #include "sprite_batch.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
+
+	using namespace renderer;
 
 	bool talkative = false;
 
 	// layout description for vertices
-	core::renderer::Vertex_layout layout {
-		core::renderer::Vertex_layout::Mode::triangles,
-		core::renderer::vertex("position",  &Sprite_batch::TileVertex::pos),
-		core::renderer::vertex("uv",     &Sprite_batch::TileVertex::uv)
+	Vertex_layout layout {
+		Vertex_layout::Mode::triangles,
+		vertex("position",  &Sprite_batch::TileVertex::pos),
+		vertex("uv",        &Sprite_batch::TileVertex::uv)
 	};
 
-	Sprite_batch::Sprite_batch(core::asset::Asset_manager& asset_manager) : _object(layout, core::renderer::create_buffer(_vertices, true)){
-		_shader.attach_shader(asset_manager.load<core::renderer::Shader>("vert_shader:sprite_batch"_aid))
-		       .attach_shader(asset_manager.load<core::renderer::Shader>("frag_shader:sprite_batch"_aid))
+	Sprite_batch::Sprite_batch(asset::Asset_manager& asset_manager) : _object(layout, create_buffer(_vertices, true)){
+		_shader.attach_shader(asset_manager.load<Shader>("vert_shader:sprite_batch"_aid))
+			   .attach_shader(asset_manager.load<Shader>("frag_shader:sprite_batch"_aid))
 		       .bind_all_attribute_locations(layout)
 		       .build();
 	}
 
-	void Sprite_batch::draw(const core::renderer::Camera& cam, Sprite& sprite) noexcept {
+	void Sprite_batch::draw(const Camera& cam, Sprite& sprite) noexcept {
 
 		float x = sprite.position.x.value(), y = sprite.position.y.value();
 		glm::vec4 uv = glm::vec4(sprite.uv);
@@ -50,7 +52,7 @@ namespace renderer {
 	}
 
 
-	void Sprite_batch::drawAll(const core::renderer::Camera& cam) noexcept {
+	void Sprite_batch::drawAll(const Camera& cam) noexcept {
 
 		glm::mat4 MVP = cam.vp();
 		_shader.bind()

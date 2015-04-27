@@ -18,7 +18,7 @@
 #include <iostream>
 #include <vector>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	struct log_target {
@@ -64,10 +64,10 @@ namespace util {
 }
 }
 
-#define DEBUG(M) do{::core::util::debug(__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
-#define INFO(M)  do{::core::util::info (__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
-#define WARN(M)  do{::core::util::warn (__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
-#define ERROR(M) do{::core::util::error(__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
-#define FAIL(M)  do{::core::util::fail (__func__, __FILE__, __LINE__)<<M<<std::endl; __builtin_unreachable();}while(false)
-#define CRASH_REPORT(M) do{::core::util::crash_report()<<M<<std::endl;}while(false)
+#define DEBUG(M) do{::mo::util::debug(__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
+#define INFO(M)  do{::mo::util::info (__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
+#define WARN(M)  do{::mo::util::warn (__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
+#define ERROR(M) do{::mo::util::error(__func__, __FILE__, __LINE__)<<M<<std::endl;}while(false)
+#define FAIL(M)  do{::mo::util::fail (__func__, __FILE__, __LINE__)<<M<<std::endl; __builtin_unreachable();}while(false)
+#define CRASH_REPORT(M) do{::mo::util::crash_report()<<M<<std::endl;}while(false)
 #define INVARIANT(C, M) do{if(__builtin_expect(!(C), false)) FAIL(M);}while(false)

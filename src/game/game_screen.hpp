@@ -15,7 +15,7 @@
 
 #pragma once
 
-#include "../game_engine.hpp"
+#include "game_engine.hpp"
 
 #include "../core/units.hpp"
 #include "../core/ecs/ecs.hpp"
@@ -31,14 +31,14 @@
 #include "sys/cam/camera_system.hpp"
 #include "sys/ai/ai_system.hpp"
 
-namespace core{ namespace renderer{ class Camera; }}
+namespace mo {
+	namespace renderer{ class Camera; }
 
-namespace game {
 	class Game_master;
 
 	struct Meta_system {
-		core::ecs::Entity_manager em;
-		core::ecs::Serializer entity_store;
+		ecs::Entity_manager em;
+		ecs::Serializer entity_store;
 		level::Tilemap tilemap;
 
 		sys::physics::Transform_system transform;
@@ -50,11 +50,11 @@ namespace game {
 
 		Meta_system(Game_engine& engine, level::Level& level);
 
-		void update(core::Time dt);
+		void update(Time dt);
 		void draw();
 	};
 
-	class Game_screen : public core::Screen {
+	class Game_screen : public Screen {
 		public:
 			Game_screen(Game_engine& engine);
 			~Game_screen()noexcept;
@@ -63,11 +63,11 @@ namespace game {
 			void _update(float delta_time)override;
 			void _draw(float delta_time)override;
 
-			auto _prev_screen_policy()const noexcept -> core::Prev_screen_policy override {
-				return core::Prev_screen_policy::discard;
+			auto _prev_screen_policy()const noexcept -> Prev_screen_policy override {
+				return Prev_screen_policy::discard;
 			}
 
-			auto _add_player(sys::controller::Controller& controller, core::Position pos) -> core::ecs::Entity_ptr;
+			auto _add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr;
 			void _join(sys::controller::Controller_added_event e);
 			void _unjoin(sys::controller::Controller_removed_event e);
 
@@ -79,8 +79,8 @@ namespace game {
 			std::unique_ptr<Game_master> _gm;
 			Meta_system _state;
 
-			core::ecs::Entity_ptr _main_player;
-			std::vector<core::ecs::Entity_ptr> _sec_players;
+			ecs::Entity_ptr _main_player;
+			std::vector<ecs::Entity_ptr> _sec_players;
 	};
 
 }

@@ -24,7 +24,7 @@
 #include <glm/glm.hpp>
 #include "../asset/asset_manager.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	class Shader_program;

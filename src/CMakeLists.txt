@@ -7,7 +7,7 @@ project(MagnumOpus)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
 
-include_directories(${ROOT_DIR}/src) # for core
+include_directories(${ROOT_DIR}/src)
 
 
 if(EMSCRIPTEN)

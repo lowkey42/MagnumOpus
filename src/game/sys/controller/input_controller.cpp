@@ -1,16 +1,16 @@
 #include "input_controller.hpp"
 
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
 
-	using namespace core::util;
+	using namespace util;
 	using namespace std::placeholders;
 
 
 	Keyboard_controller::Keyboard_controller(
-	        Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events,
+			Mapping_ptr mapping, util::signal_source<Quit_event>& quit_events,
 	        std::function<glm::vec2(glm::vec2)>& screen_to_world_coords,
 	        signal_source<SDL_KeyboardEvent>& keys,
 	        signal_source<SDL_MouseMotionEvent>& mouse,
@@ -141,7 +141,7 @@ namespace controller {
 		_on_command(iter->second, event.state==SDL_PRESSED);
 	}
 
-	Gamepad_controller::Gamepad_controller(Mapping_ptr mapping, core::util::signal_source<Quit_event>& quit_events, SDL_GameController* controller,
+	Gamepad_controller::Gamepad_controller(Mapping_ptr mapping, util::signal_source<Quit_event>& quit_events, SDL_GameController* controller,
 					  signal_source<Controller_added_event>& added_events,
 					  signal_source<Controller_removed_event>& removed_events)
 		: Input_controller_base(mapping, quit_events), _controller(controller),

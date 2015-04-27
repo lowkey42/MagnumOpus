@@ -21,7 +21,7 @@
 #include <cmath>
 #include <type_traits>
 
-namespace core {
+namespace mo {
 	constexpr float PI = 3.14159265358979323846264338327950288f;
 
 	inline constexpr float clamp(float v, float min, float max)noexcept {

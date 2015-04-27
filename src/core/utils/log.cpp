@@ -7,7 +7,7 @@
 #include <sstream>
 #include <cstring>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	namespace {

@@ -18,7 +18,7 @@
 #include <tuple>
 #include "../units.hpp"
 
-namespace core {
+namespace mo {
 namespace util {
 
 	template<typename Pos, typename Vel>

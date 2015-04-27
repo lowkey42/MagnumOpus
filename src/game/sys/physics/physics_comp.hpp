@@ -22,7 +22,7 @@
 #include "../../../core/ecs/ecs.hpp"
 #include "../../../core/units.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace physics {
 
@@ -46,17 +46,17 @@ namespace physics {
 			B_obj_union(int x, int y) : pos{x,y}{}
 		} b;
 
-		core::Distance penetration;
-		core::Position normal;
+		Distance penetration;
+		Position normal;
 
 
 		Manifold()
 			: type(Type::none), a(nullptr), b(nullptr), penetration(0) {}
 
-		Manifold(Physics_comp& a, Physics_comp& b, core::Distance penetration, core::Position normal)
+		Manifold(Physics_comp& a, Physics_comp& b, Distance penetration, Position normal)
 			: type(Type::object), a(&a), b(&b), penetration(penetration), normal(normal) {}
 
-		Manifold(Physics_comp& a, int bx, int by, core::Distance penetration, core::Position normal)
+		Manifold(Physics_comp& a, int bx, int by, Distance penetration, Position normal)
 			: type(Type::environment), a(&a), b(bx,by), penetration(penetration), normal(normal) {}
 
 		Manifold inverse()const noexcept {
@@ -77,14 +77,14 @@ namespace physics {
 		}
 	};
 
-	class Physics_comp : public core::ecs::Component<Physics_comp> {
+	class Physics_comp : public ecs::Component<Physics_comp> {
 		public:
 			static constexpr const char* name() {return "Physics";}
-			void load(core::ecs::Entity_state&)override;
-			void store(core::ecs::Entity_state&)override;
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			Physics_comp(core::ecs::Entity& owner, core::Distance body_radius=core::Distance(1),
-						core::Mass mass=core::Mass(1), float restitution=1, float friction=1, bool solid=true) noexcept
+			Physics_comp(ecs::Entity& owner, Distance body_radius=Distance(1),
+						Mass mass=Mass(1), float restitution=1, float friction=1, bool solid=true) noexcept
 				: Component(owner),
 				  _body_radius(body_radius),
 				  _inv_mass(1.f/mass),
@@ -93,33 +93,33 @@ namespace physics {
 				  _solid(solid),
 				  _active(true) {}
 
-			void mass(core::Mass m) {
+			void mass(Mass m) {
 				_inv_mass = 1.f/m;
 			}
-			auto mass()const -> core::Mass {
+			auto mass()const -> Mass {
 				return 1.f/_inv_mass;
 			}
 
-			void accelerate(core::Acceleration acc)noexcept {
+			void accelerate(Acceleration acc)noexcept {
 				_acceleration+=acc;
 				if(!is_zero(acc))
 					_active = true;
 			}
-			void impulse(core::Dir_force force)noexcept {
-				_velocity+=_inv_mass*force*core::unit_literals::second;
+			void impulse(Dir_force force)noexcept {
+				_velocity+=_inv_mass*force*unit_literals::second;
 				_active = true;
 			}
-			void apply_force(core::Dir_force force)noexcept {
+			void apply_force(Dir_force force)noexcept {
 				accelerate(_inv_mass*force);
 			}
-			void velocity(core::Velocity velocity)noexcept {
+			void velocity(Velocity velocity)noexcept {
 				_velocity = velocity;
 				if(!is_zero(velocity))
 					_active = true;
 			}
 
 			auto radius()const noexcept {return _body_radius;}
-			void radius(core::Distance r)noexcept {_body_radius=r;}
+			void radius(Distance r)noexcept {_body_radius=r;}
 			auto velocity()const noexcept {return _velocity;}
 			auto acceleration()const noexcept {return _acceleration;}
 			auto active()const noexcept {return _active;}
@@ -130,16 +130,16 @@ namespace physics {
 			friend struct Persisted_state;
 			friend class Physics_system;
 
-			core::Distance _body_radius;
-			core::Inv_mass _inv_mass;
+			Distance _body_radius;
+			Inv_mass _inv_mass;
 			float _restitution;
 			float _friction;
 
 			bool _solid;
 			bool _active;
 
-			core::Velocity _velocity;
-			core::Acceleration _acceleration;
+			Velocity _velocity;
+			Acceleration _acceleration;
 	};
 
 }

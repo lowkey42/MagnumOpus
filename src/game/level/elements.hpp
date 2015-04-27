@@ -18,7 +18,8 @@
 #include <cstdint>
 #include <initializer_list>
 
-namespace game {
+namespace mo {
+namespace level {
 
 	enum class Element {
 		neutral=0,
@@ -89,4 +90,5 @@ namespace game {
 
 	// TODO: how to map interactions?
 
+}
 }

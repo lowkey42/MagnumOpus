@@ -4,7 +4,7 @@
 #include "ecs.hpp"
 #endif
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 	template<typename Comp>

@@ -19,7 +19,7 @@
 #include <core/renderer/sprite_batch.hpp>
 #include <core/renderer/camera.hpp>
 
-namespace game{
+namespace mo{
 namespace sys{
 namespace sprite{
 
@@ -28,17 +28,17 @@ namespace sprite{
 		public:
 
 			// Constructors
-			Sprite_system(core::ecs::Entity_manager& entity_manager, game::sys::physics::Transform_system& ts,
-			              core::asset::Asset_manager& asset_manager) noexcept;
+			Sprite_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
+						  asset::Asset_manager& asset_manager) noexcept;
 
 			// Methods
-			void draw(const core::renderer::Camera& camera) noexcept;
-			void update(core::Time dt) noexcept;
+			void draw(const renderer::Camera& camera) noexcept;
+			void update(Time dt) noexcept;
 
 		private:
 
-			sys::physics::Transform_system& _transform;
-			core::renderer::Sprite_batch _sprite_batch;
+			physics::Transform_system& _transform;
+			renderer::Sprite_batch _sprite_batch;
 
 	};
 

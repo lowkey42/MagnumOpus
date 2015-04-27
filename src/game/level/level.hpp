@@ -23,7 +23,7 @@
 #include "../../core/utils/template_utils.hpp"
 #include "../sys/physics/physics_system.hpp"
 
-namespace game {
+namespace mo {
 namespace level {
 	struct TiledLevel;
 
@@ -106,7 +106,7 @@ namespace level {
 			auto width()  const noexcept     -> int   override {return _width;}
 			auto height() const noexcept     -> int   override {return _height;}
 
-			auto find_room(Room_type type)const -> core::util::maybe<const Room&>;
+			auto find_room(Room_type type)const -> util::maybe<const Room&>;
 
 		protected:
 			virtual void _store(TiledLevel&)const {}
@@ -115,12 +115,12 @@ namespace level {
 			int _width;
 			int _height;
 			std::vector<Tile> _tiles;
-		public: std::vector<Room> _rooms;
+			std::vector<Room> _rooms;
 	};
 
 	template<typename F>
 	void Level::foreach_tile(int min_x, int min_y, int max_x, int max_y, F handler)const {
-		using core::util::range;
+		using util::range;
 
 		min_x = std::max(0, min_x);
 		min_y = std::max(0, min_y);
@@ -135,21 +135,19 @@ namespace level {
 	}
 
 }
-}
 
-namespace core {
 namespace asset {
 	template<>
-	struct Loader<game::level::Level> {
-		using RT = std::shared_ptr<const game::level::Level>;
+	struct Loader<level::Level> {
+		using RT = std::shared_ptr<const level::Level>;
 
 		RT operator()(istream in) throw(Loading_failed){
-			auto l = std::make_shared<game::level::Level>();
+			auto l = std::make_shared<level::Level>();
 			l->load(in);
 			return l;
 		}
 
-		void operator()(ostream out, const game::level::Level& level) throw(Loading_failed) {
+		void operator()(ostream out, const level::Level& level) throw(Loading_failed) {
 			level.store(out);
 		}
 	};

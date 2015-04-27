@@ -15,14 +15,14 @@
 
 #pragma once
 
-#include "../game_engine.hpp"
+#include "game_engine.hpp"
 #include "level/level.hpp"
 #include "level/level_generator.hpp"
 
 #include "../core/utils/maybe.hpp"
 
 
-namespace game {
+namespace mo {
 
 	struct Game_state;
 
@@ -30,7 +30,7 @@ namespace game {
 		uint64_t seed;
 		int current_level;
 		int current_difficulty;
-		core::util::maybe<level::Level> stored_level;
+		util::maybe<level::Level> stored_level;
 		// TODO: add ECS-save
 	};
 

@@ -25,7 +25,7 @@
 #include <vector>
 
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	class Sprite_batch {
@@ -38,25 +38,25 @@ namespace renderer {
 		};
 
 		struct Sprite{
-			core::Position position;
+			Position position;
 			float rotation;
-			core::asset::AID texture;
+			asset::AID texture;
 			glm::vec4 uv;
 		};
 
 		// Constructors
-		Sprite_batch(core::asset::Asset_manager& asset_manager);
+		Sprite_batch(asset::Asset_manager& asset_manager);
 
 		// Methods
-		void draw(const core::renderer::Camera& cam, Sprite& sprite) noexcept;
-		void drawAll(const core::renderer::Camera& cam) noexcept;
+		void draw(const renderer::Camera& cam, Sprite& sprite) noexcept;
+		void drawAll(const renderer::Camera& cam) noexcept;
 
 
 	private:
 
-		core::renderer::Object _object;
-		core::renderer::Shader_program _shader;
-		core::asset::Ptr<core::renderer::Texture> _texture;
+		renderer::Object _object;
+		renderer::Shader_program _shader;
+		asset::Ptr<renderer::Texture> _texture;
 
 		std::vector<TileVertex> _vertices;
 

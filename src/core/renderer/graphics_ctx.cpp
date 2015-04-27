@@ -27,7 +27,7 @@ namespace {
 #endif
 }
 
-namespace core {
+namespace mo {
 namespace renderer {
 	Graphics_ctx::Graphics_ctx(const std::string& name, int width, int height, bool fullscreen)
 	 : _name(name), _win_width(width), _win_height(height), _window(nullptr, SDL_DestroyWindow) {

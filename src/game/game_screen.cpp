@@ -8,10 +8,9 @@
 
 
 
-namespace game {
-	using namespace core;
-	using namespace core::util;
-	using namespace core::unit_literals;
+namespace mo {
+	using namespace util;
+	using namespace unit_literals;
 
 	constexpr auto MinEntitySize = 25_cm;
 	constexpr auto MaxEntitySize = 5_m;
@@ -29,7 +28,7 @@ namespace game {
 		  ai(em, engine, transform) {
 	}
 
-	void Meta_system::update(core::Time dt) {
+	void Meta_system::update(Time dt) {
 		em.process_queued_actions();
 
 		ai.update(dt);
@@ -56,11 +55,11 @@ namespace game {
 	}
 
 	Game_screen::Game_screen(Game_engine& engine) :
-		core::Screen(engine), _engine(engine),
+		Screen(engine), _engine(engine),
 		_gm(new Game_master(engine, load_save_game(engine))),
 		_state(engine, _gm->level())
 	{
-		auto start_room_m = _gm->level().find_room(game::level::Room_type::start);
+		auto start_room_m = _gm->level().find_room(level::Room_type::start);
 
 		INVARIANT(start_room_m.is_some(), "Generated room has no entry-point!?");
 		auto start_room = start_room_m.get_or_throw();
@@ -70,7 +69,7 @@ namespace game {
 		_add_player(_engine.controllers().main_controller(), start_position);
 
 		// TODO[foe]: remove debug code
-		core::ecs::Entity_ptr e = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
+		ecs::Entity_ptr e = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
 
 		e->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(2,2));
 
@@ -119,8 +118,8 @@ namespace game {
 	}
 
 
-	auto Game_screen::_add_player(sys::controller::Controller& controller, Position pos) -> core::ecs::Entity_ptr {
-		core::ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
+	auto Game_screen::_add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr {
+		ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
 
 		p->emplace<sys::controller::Controllable_comp>(&controller);
 

@@ -2,7 +2,7 @@
 
 #include <sf2/sf2.hpp>
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace controller {
 
@@ -170,23 +170,20 @@ namespace controller {
 	)
 }
 }
-}
-
-namespace core {
 namespace asset {
 
-	std::shared_ptr<game::sys::controller::Mapping> Loader<game::sys::controller::Mapping>::load(istream in) throw(Loading_failed){
-		auto r = std::make_shared<game::sys::controller::Mapping>();
+	std::shared_ptr<sys::controller::Mapping> Loader<sys::controller::Mapping>::load(istream in) throw(Loading_failed){
+		auto r = std::make_shared<sys::controller::Mapping>();
 
 		std::string data = in.content();
 		sf2::io::StringCharSource source(data);
 
-		sf2::ParserDefChooser<game::sys::controller::Mapping>::get().parse(source, *r.get());
+		sf2::ParserDefChooser<sys::controller::Mapping>::get().parse(source, *r.get());
 
 		return r;
 	}
 
-	void Loader<game::sys::controller::Mapping>::store(ostream out, game::sys::controller::Mapping& asset) throw(Loading_failed) {
+	void Loader<sys::controller::Mapping>::store(ostream out, sys::controller::Mapping& asset) throw(Loading_failed) {
 		std::string data = sf2::writeString(asset);
 		out.write(data.c_str(), data.length());
 	}

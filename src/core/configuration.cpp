@@ -30,7 +30,7 @@ namespace {
 	}
 }
 
-namespace core {
+namespace mo {
 
 Configuration::Configuration(int argc, char** argv, char** env) {
 	// read file

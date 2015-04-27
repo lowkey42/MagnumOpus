@@ -24,7 +24,7 @@
 #include <vector>
 #include <memory>
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 	class Entity;

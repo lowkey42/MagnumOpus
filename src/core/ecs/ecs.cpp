@@ -9,7 +9,7 @@
 
 #include "component.hpp"
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 

@@ -18,37 +18,37 @@
 #include "../../../core/ecs/ecs.hpp"
 #include "../../../core/units.hpp"
 
-namespace game {
+namespace mo {
 namespace sys {
 namespace cam {
 
-	class Camera_target_comp : public core::ecs::Component<Camera_target_comp> {
+	class Camera_target_comp : public ecs::Component<Camera_target_comp> {
 		public:
 			static constexpr const char* name() {return "Camera_target";}
-			void load(core::ecs::Entity_state&)override;
-			void store(core::ecs::Entity_state&)override;
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			Camera_target_comp(core::ecs::Entity& owner, core::Mass mass=core::Mass(0.1), float damping=0.5, float freq=3, float lazyness=2)
+			Camera_target_comp(ecs::Entity& owner, Mass mass=Mass(0.1), float damping=0.5, float freq=3, float lazyness=2)
 			    : Component(owner), _mass(mass), _damping(damping), _freq(freq), _lazyness(lazyness) {}
 
-			void force_position(core::Position pos)noexcept {_cam_pos=pos;}
+			void force_position(Position pos)noexcept {_cam_pos=pos;}
 
 			auto cam_position()const noexcept {return _cam_pos;}
 
-			void chase(core::Position target, core::Time dt);
+			void chase(Position target, Time dt);
 
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
 			bool _unset=true;
-			core::Time _sleeping = core::Time(0);
-			core::Mass _mass;
+			Time _sleeping = Time(0);
+			Mass _mass;
 			float _damping;
 			float _freq;
 			float _lazyness;
-			core::Velocity _velocity;
+			Velocity _velocity;
 
-			core::Position _cam_pos;
+			Position _cam_pos;
 	};
 
 }

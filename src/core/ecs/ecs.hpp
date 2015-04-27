@@ -37,7 +37,7 @@ namespace sf2 {
 	}
 }
 
-namespace core {
+namespace mo {
 namespace ecs {
 	class Entity_manager;
 

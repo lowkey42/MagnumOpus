@@ -2,7 +2,7 @@
 
 #include "ecs.hpp"
 
-namespace core {
+namespace mo {
 namespace ecs {
 namespace details {
 

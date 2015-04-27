@@ -23,7 +23,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	inline maybe<std::string> read_file_to_string(std::string path) {

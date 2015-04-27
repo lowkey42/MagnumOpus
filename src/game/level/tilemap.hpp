@@ -24,7 +24,7 @@
 #include <vector>
 #include <glm/glm.hpp>
 
-namespace game {
+namespace mo {
 namespace level {
 
 	class Level;
@@ -40,10 +40,10 @@ namespace level {
 		};
 
 		// Constructors
-		Tilemap(core::Engine &engine, const game::level::Level &lev);
+		Tilemap(Engine &engine, const Level &lev);
 
 		// Methods
-		void draw(const core::renderer::Camera& cam);
+		void draw(const renderer::Camera& cam);
 
 	private:
 
@@ -58,12 +58,12 @@ namespace level {
 		double _xTexTile = _tile_tex_width / static_cast<double>(_tex_width);
 		double _yTexTile = _tile_tex_height / static_cast<double>(_tex_height);
 
-		const game::level::Level &_level;
+		const Level &_level;
 		std::vector<TileVertex> _vertices;
 
-		core::renderer::Object _object;
-		core::renderer::Shader_program _shader;
-		core::asset::Ptr<core::renderer::Texture> _texture;
+		renderer::Object _object;
+		renderer::Shader_program _shader;
+		asset::Ptr<renderer::Texture> _texture;
 
 	};
 
