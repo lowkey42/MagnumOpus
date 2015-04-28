@@ -40,7 +40,7 @@ namespace renderer {
 		struct Sprite{
 			Position position;
 			float rotation;
-			asset::AID texture;
+            const renderer::Texture& texture;
 			glm::vec4 uv;
 		};
 
@@ -48,7 +48,7 @@ namespace renderer {
 		Sprite_batch(asset::Asset_manager& asset_manager);
 
 		// Methods
-		void draw(const renderer::Camera& cam, Sprite& sprite) noexcept;
+        void draw(const renderer::Camera& cam, const Sprite& sprite) noexcept;
 		void drawAll(const renderer::Camera& cam) noexcept;
 
 

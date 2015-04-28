@@ -21,13 +21,10 @@ namespace sprite {
 		_transform.foreach_in_rect(upper_left, lower_right, [&](ecs::Entity& entity) {
 			process(entity.get<sys::physics::Transform_comp>(),
 	                entity.get<sys::sprite::Sprite_comp>())
-	        >> [&](const auto& trans, const auto& sp) {
-				//std::cout << "There is something around!" << std::endl;
-				renderer::Sprite_batch::Sprite sprite;
+            >> [&](const auto& trans, const auto& sp) {
+                auto sprite = sp.sprite();
 				sprite.position = trans.position();
-				sprite.rotation = trans.rotation();
-				sprite.texture = sp.sprite().texture;
-				sprite.uv = sp.sprite().uv;
+                sprite.rotation = trans.rotation();
 				_sprite_batch.draw(camera, sprite);
 	        };
 		});

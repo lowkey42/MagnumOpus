@@ -21,7 +21,7 @@ namespace renderer {
 		       .build();
 	}
 
-	void Sprite_batch::draw(const Camera& cam, Sprite& sprite) noexcept {
+    void Sprite_batch::draw(const Camera& cam, const Sprite& sprite) noexcept {
 
 		float x = sprite.position.x.value(), y = sprite.position.y.value();
 		glm::vec4 uv = glm::vec4(sprite.uv);
@@ -45,9 +45,7 @@ namespace renderer {
 
 		_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}});
 		_vertices.push_back({{x, y}, {uv.x, uv.w}});
-		_vertices.push_back({{x+1.f, y}, {uv.z, uv.w}});
-
-//		std::cout << "vertices size: " << _vertices.size() << std::endl;
+        _vertices.push_back({{x+1.f, y}, {uv.z, uv.w}});
 
 	}
 
@@ -60,7 +58,7 @@ namespace renderer {
 			   .set_uniform("myTextureSampler", 0);
 
 		if(_texture)
-			_texture->bind();
+            _texture->bind();
 
 		_object.buffer().set(_vertices);
 		_object.draw();

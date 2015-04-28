@@ -3,6 +3,8 @@
 
 #include "game_master.hpp"
 
+#include <core/renderer/texture.hpp>
+
 #include "sys/physics/transform_comp.hpp"
 #include "sys/sprite/sprite_comp.hpp"
 
@@ -129,7 +131,8 @@ namespace mo {
 
 		float x = 16.0 / 255.0, y = 16.0 / 128.0;
 
-		p->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
+        auto tex = _engine.assets().load<renderer::Texture>("tex:player"_aid);
+        p->emplace<sys::sprite::Sprite_comp>("tex:tilemap_m", glm::vec4(0.0f, 1.0f, x, 1.0-y));
 
 		if(!_main_player)
 			_main_player = p;
