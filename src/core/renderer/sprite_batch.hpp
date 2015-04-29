@@ -33,6 +33,11 @@ namespace renderer {
 	public:
 
 		struct SpriteVertex {
+			SpriteVertex(glm::vec4 vec, glm::vec2 uv_coords, const renderer::Texture& t) : tex(t){
+				pos = glm::vec2(vec.x, vec.y);
+				uv = uv_coords;
+			}
+
 			glm::vec2 pos;
 			glm::vec2 uv;
 			const renderer::Texture& tex;
