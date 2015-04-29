@@ -34,9 +34,9 @@ namespace renderer {
 //		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
 //		std::cout << "rotation is: " << sprite.rotation << std::endl;
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.w}, sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y+1.f, 0.0f, 1.0f), {uv.x, uv.y}, sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.y}, sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.w}, &sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y+1.f, 0.0f, 1.0f), {uv.x, uv.y}, &sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.y}, &sprite.texture));
 
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
 		//_vertices.push_back({{x, y+1.f}, {uv.x, uv.y}, {sprite.texture}});
@@ -52,9 +52,9 @@ namespace renderer {
 			std::cout << "ux / uy -> " << uv.z << "/" << uv.y << std::endl;
 		}
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.y}, sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.w}, sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y, 0.0f, 1.0f), {uv.z, uv.w}, sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.y}, &sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.w}, &sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y, 0.0f, 1.0f), {uv.z, uv.w}, &sprite.texture));
 
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
@@ -70,10 +70,37 @@ namespace renderer {
 			   .set_uniform("MVP", MVP)
 			   .set_uniform("myTextureSampler", 0);
 
-		_vertices.at(0).tex.bind();
 
-		_object.buffer().set(_vertices);
-		_object.draw();
+		std::vector<unsigned int> iterPos;
+
+		// Sorting the vertices by used texture
+		// so that blocks of vertices are bound together
+		// where the textures match each other -> less switching in texture binding
+		std::stable_sort(_vertices.begin(), _vertices.end());
+
+		// Mark positions, where the texture references differ from the one before
+		const Texture* curTex = _vertices.at(0).tex;
+		for(unsigned int i = 0; i < _vertices.size(); i++){
+			if(curTex != _vertices.at(i).tex){
+				iterPos.push_back(i);
+				curTex = _vertices.at(i).tex;
+				//std::cout << "Other tex than before at pos: " << i << std::endl;
+			}
+		}
+
+		// Draw the vertices and bind the corresponding right texture
+		unsigned int begin = 0;
+		unsigned int end = iterPos.at(0);
+		for(unsigned int i = 0; i <= iterPos.size(); i++){
+			_object.buffer().set<SpriteVertex>(_vertices.begin() + begin, _vertices.begin() + end);
+			_vertices.at(begin).tex->bind();
+			_object.draw();
+			//std::cout << "Begin: " << begin << " & End: " << end << std::endl << std::endl;
+			begin = (i < iterPos.size()) ? iterPos.at(i) : iterPos.at(i-1);
+			end = (i+1 < iterPos.size()) ? iterPos.at(i+1) : _vertices.size();
+		}
+
+		// TODO: nullptr check
 
 		_vertices.clear();
 
