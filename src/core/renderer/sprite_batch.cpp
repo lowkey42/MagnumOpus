@@ -90,14 +90,18 @@ namespace renderer {
 
 		// Draw the vertices and bind the corresponding right texture
 		unsigned int begin = 0;
-		unsigned int end = iterPos.at(0);
-		for(unsigned int i = 0; i <= iterPos.size(); i++){
+		unsigned int end = (iterPos.size() > 0) ? iterPos.at(0) : _vertices.size();
+		_object.buffer().set<SpriteVertex>(_vertices.begin() + begin, _vertices.begin() + end);
+		_vertices.at(begin).tex->bind();
+		_object.draw();
+
+		for(unsigned int i = 0; i < iterPos.size(); i++){
+			begin = (i < iterPos.size()) ? iterPos.at(i) : iterPos.at(i-1);
+			end = (i+1 < iterPos.size()) ? iterPos.at(i+1) : _vertices.size();
 			_object.buffer().set<SpriteVertex>(_vertices.begin() + begin, _vertices.begin() + end);
 			_vertices.at(begin).tex->bind();
 			_object.draw();
 			//std::cout << "Begin: " << begin << " & End: " << end << std::endl << std::endl;
-			begin = (i < iterPos.size()) ? iterPos.at(i) : iterPos.at(i-1);
-			end = (i+1 < iterPos.size()) ? iterPos.at(i+1) : _vertices.size();
 		}
 
 		// TODO: nullptr check
