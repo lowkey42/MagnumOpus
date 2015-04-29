@@ -75,9 +75,10 @@ namespace mo {
 
 		e->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(2,2));
 
-		float x = 32.0 / 255.0, y = 32.0 / 128.0;
+		float x = 64.0f / 512.0f, y = 64.0f / 64.0f;
 
-		e->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
+		auto tex = _engine.assets().load<renderer::Texture>("tex:player_moving"_aid);
+		e->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x, 1.0-y));
 		// END TODO
 	}
 
@@ -129,10 +130,10 @@ namespace mo {
 					trans.position(pos);
 				});
 
-		float x = 16.0 / 255.0, y = 16.0 / 128.0;
+		float x = 64.0f / 512.0f, y = 64.0f / 64.0f;
 
-        auto tex = _engine.assets().load<renderer::Texture>("tex:player"_aid);
-        p->emplace<sys::sprite::Sprite_comp>("tex:tilemap_m", glm::vec4(0.0f, 1.0f, x, 1.0-y));
+		auto tex = _engine.assets().load<renderer::Texture>("tex:player_moving"_aid);
+		p->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x, 1.0-y));
 
 		if(!_main_player)
 			_main_player = p;

@@ -32,9 +32,10 @@ namespace renderer {
 
 	public:
 
-		struct TileVertex {
+		struct SpriteVertex {
 			glm::vec2 pos;
 			glm::vec2 uv;
+			const renderer::Texture& tex;
 		};
 
 		struct Sprite{
@@ -56,9 +57,10 @@ namespace renderer {
 
 		renderer::Object _object;
 		renderer::Shader_program _shader;
-		asset::Ptr<renderer::Texture> _texture;
+		renderer::Texture_ptr _texture;
+		//asset::Ptr<renderer::Texture> _texture;
 
-		std::vector<TileVertex> _vertices;
+		std::vector<SpriteVertex> _vertices;
 
 	};
 

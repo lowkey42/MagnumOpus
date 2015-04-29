@@ -31,8 +31,8 @@ namespace sprite {
 		void load(ecs::Entity_state&)override;
 		void store(ecs::Entity_state&)override;
 
-        Sprite_comp(ecs::Entity& owner, renderer::Texture_ptr tex, glm::vec4 uv = glm::vec4(0.0f)) :
-            Component(owner), _texture(tex), _uv(uv){}
+		Sprite_comp(ecs::Entity& owner, renderer::Texture_ptr tex = renderer::Texture_ptr(), glm::vec4 uv = glm::vec4(0.0f)) :
+			Component(owner), _texture(tex), _uv(uv){}
 
         auto sprite() const noexcept {
             return renderer::Sprite_batch::Sprite{{}, 0, *_texture, _uv};

@@ -3,4 +3,4 @@ tex:test = textures/test.tga
 tex:x_font = x.template_regular_48.tga
 tex:tilemap = textures/tilemap_base.png
 tex:tilemap_m = textures/tilemap_base_modded.png
-tex:player = textures/VictoriaSprites.png
+tex:player_moving = textures/Mage_move.png

@@ -24,7 +24,7 @@ namespace sprite {
             >> [&](const auto& trans, const auto& sp) {
                 auto sprite = sp.sprite();
 				sprite.position = trans.position();
-                sprite.rotation = trans.rotation();
+				sprite.rotation = trans.rotation();
 				_sprite_batch.draw(camera, sprite);
 	        };
 		});
