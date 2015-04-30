@@ -39,6 +39,7 @@ namespace renderer {
 		auto zoom() const noexcept { return _zoom; }
 		auto position() const noexcept { return _pos; }
 		auto viewport() const noexcept { return _viewport; }
+        auto world_scale() const noexcept { return _world_scale; }
 
 		auto vp() const noexcept -> const glm::mat4&;
 
