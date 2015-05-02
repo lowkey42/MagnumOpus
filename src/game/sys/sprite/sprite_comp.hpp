@@ -31,14 +31,12 @@ namespace sprite {
 		void load(ecs::Entity_state&)override;
 		void store(ecs::Entity_state&)override;
 
-		Sprite_comp(ecs::Entity& owner, std::string aid = "", glm::vec4 uv = glm::vec4(0.0f)) :
-		    Component(owner), _texture(aid), _uv(uv){}
+		// TODO: nullptr check
+		Sprite_comp(ecs::Entity& owner, renderer::Texture_ptr tex = renderer::Texture_ptr(), glm::vec4 uv = glm::vec4(0.0f)) :
+			Component(owner), _texture(tex), _uv(uv){}
 
-		auto sprite() const noexcept {
-			struct renderer::Sprite_batch::Sprite sprite;
-			sprite.texture = _texture;
-			sprite.uv = _uv;
-			return sprite;
+        auto sprite() const noexcept {
+			return renderer::Sprite_batch::Sprite{{}, 0, *_texture, _uv};
 		}
 
 		struct Persisted_state;
@@ -46,7 +44,7 @@ namespace sprite {
 
 	private:
 
-		asset::AID _texture;
+        renderer::Texture_ptr _texture;
 		glm::vec4 _uv;
 
 	};

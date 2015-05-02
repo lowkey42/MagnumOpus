@@ -44,6 +44,8 @@ namespace ecs {
 	class BlueprintComponent : public ecs::Component<BlueprintComponent> {
 		public:
 			static constexpr const char* name() {return "Blueprint";}
+
+            // FIXME[foe]: dead code
 			static void load(sf2::io::CharSource& cs, ecs::details::Component_base& comp){
 				std::string blueprintName;
 				sf2::details::fundamentals::_parseMember(cs, blueprintName);

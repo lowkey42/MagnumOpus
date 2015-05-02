@@ -32,15 +32,26 @@ namespace renderer {
 
 	public:
 
-		struct TileVertex {
+		struct SpriteVertex {
+			SpriteVertex(glm::vec4 vec, glm::vec2 uv_coords, const renderer::Texture* t) : tex(t){
+				pos = glm::vec2(vec.x, vec.y);
+				uv = uv_coords;
+			}
+
+			bool operator<(SpriteVertex const& other) const {
+				//std::cout << "this tex: " << this->tex << " | other tex: " << other.tex << std::endl;
+				return (this->tex < other.tex);
+			}
+
 			glm::vec2 pos;
 			glm::vec2 uv;
+			const renderer::Texture* tex;
 		};
 
 		struct Sprite{
 			Position position;
 			float rotation;
-			asset::AID texture;
+			const renderer::Texture& texture;
 			glm::vec4 uv;
 		};
 
@@ -48,7 +59,7 @@ namespace renderer {
 		Sprite_batch(asset::Asset_manager& asset_manager);
 
 		// Methods
-		void draw(const renderer::Camera& cam, Sprite& sprite) noexcept;
+        void draw(const renderer::Camera& cam, const Sprite& sprite) noexcept;
 		void drawAll(const renderer::Camera& cam) noexcept;
 
 
@@ -56,9 +67,10 @@ namespace renderer {
 
 		renderer::Object _object;
 		renderer::Shader_program _shader;
-		asset::Ptr<renderer::Texture> _texture;
+		renderer::Texture_ptr _texture;
+		//asset::Ptr<renderer::Texture> _texture;
 
-		std::vector<TileVertex> _vertices;
+		mutable std::vector<SpriteVertex> _vertices;
 
 	};
 

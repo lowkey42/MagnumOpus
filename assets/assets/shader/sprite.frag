@@ -5,7 +5,11 @@ in vec2 UV;
 uniform sampler2D myTextureSampler;
 
 void main() {
-	gl_FragColor.rgb = texture2D(myTextureSampler, UV).rgb;
-	gl_FragColor.a = 1.0;
+	
+	vec4 tex = texture2D(myTextureSampler, UV);
+	gl_FragColor = vec4(tex.r, tex.g, tex.b, tex.a);
+	
+	//gl_FragColor.rgb = texture2D(myTextureSampler, UV).rgb;
+	//gl_FragColor.a = 0.1;
 }
 
