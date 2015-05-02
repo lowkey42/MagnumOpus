@@ -1,5 +1,5 @@
 /**************************************************************************\
- *												                          *
+ * universal health-care & murder system                                  *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -7,7 +7,7 @@
  *  \/    \/\__,_|\__, |_| |_|\__,_|_| |_| |_| \___/ | .__/ \__,_|___/    *
  *                |___/                              |_|                  *
  *                                                                        *
- * Copyright (c) 2015 Florian Oetke & Sebastian Schalow                   *
+ * Copyright (c) 2014 Florian Oetke                                       *
  *                                                                        *
  *  This file is part of MagnumOpus and distributed under the MIT License *
  *  See LICENSE file for details.                                         *
@@ -16,37 +16,31 @@
 #pragma once
 
 #include <core/ecs/ecs.hpp>
-#include <core/renderer/texture.hpp>
-#include <core/renderer/sprite_batch.hpp>
+#include <core/units.hpp>
+
+#include "weapon_comp.hpp"
+#include "health_comp.hpp"
 
 namespace mo {
+	namespace asset {class Asset_manager;}
+
 namespace sys {
-namespace sprite {
+namespace combat {
 
-	class Sprite_comp : public ecs::Component<Sprite_comp> {
+	class Combat_system {
+		public:
+			Combat_system(ecs::Entity_manager& entity_manager, asset::Asset_manager& assets);
 
-	public:
+			void update(Time dt);
 
-		static constexpr const char* name() {return "Sprite";}
-		void load(ecs::Entity_state&)override;
-		void store(ecs::Entity_state&)override;
+		private:
+			void _health_care(Time dt);
+			void _shoot_something(Time dt);
 
-		// TODO: nullptr check
-		Sprite_comp(ecs::Entity& owner, renderer::Texture_ptr tex = renderer::Texture_ptr(), glm::vec4 uv = glm::vec4(0.0f)) :
-			Component(owner), _texture(tex), _uv(uv){}
-
-        auto sprite() const noexcept {
-			return renderer::Sprite_batch::Sprite{{}, 0, *_texture, _uv};
-		}
-
-		struct Persisted_state;
-		friend struct Persisted_state;
-
-	private:
-
-        renderer::Texture_ptr _texture;
-		glm::vec4 _uv;
-
+			ecs::Entity_manager&  _em;
+			asset::Asset_manager& _assets;
+			Weapon_comp::Pool& _weapons;
+			Health_comp::Pool& _healths;
 	};
 
 }

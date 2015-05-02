@@ -3,6 +3,8 @@
 
 #include "game_master.hpp"
 
+#include <core/renderer/texture.hpp>
+
 #include "sys/physics/transform_comp.hpp"
 #include "sys/sprite/sprite_comp.hpp"
 
@@ -18,14 +20,15 @@ namespace mo {
 
 
 	Meta_system::Meta_system(Game_engine& engine, level::Level& level)
-		: em(), entity_store(em, engine.assets()),
+		: em(engine.assets()),
 	      tilemap(engine, level),
 	      transform(em, MaxEntitySize, level.width(), level.height()),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  spritesys(em, transform, engine.assets()),
 		  controller(em),
-		  ai(em, engine, transform) {
+		  ai(em, engine, transform),
+		  combat(em, engine.assets()) {
 	}
 
 	void Meta_system::update(Time dt) {
@@ -33,6 +36,7 @@ namespace mo {
 
 		ai.update(dt);
 		controller.update(dt);
+		combat.update(dt);
 		transform.update(dt);
 		physics.update(dt);
 		camera.update(dt);
@@ -69,18 +73,54 @@ namespace mo {
 		_add_player(_engine.controllers().main_controller(), start_position);
 
 		// TODO[foe]: remove debug code
-		ecs::Entity_ptr e = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
+		ecs::Entity_ptr enemy1 = _state.em.emplace("blueprint:enemy"_aid);
 
-		e->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(2,2));
+		enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(4,2));
 
-		float x = 32.0 / 255.0, y = 32.0 / 128.0;
+		float x_enemy = 64.0f / 256.0f, y_enemy = 64.0f / 64.0f;
 
-		e->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
+		auto tex = _engine.assets().load<renderer::Texture>("tex:enemy_moving"_aid);
+		enemy1->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x_enemy, 1.0-y_enemy));
+
+
+		// TODO[foe]: remove debug code
+		ecs::Entity_ptr enemy2 = _state.em.emplace("blueprint:enemy"_aid);
+
+		enemy2->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(0,2));
+
+		auto tex2 = _engine.assets().load<renderer::Texture>("tex:tilemap_m"_aid);
+		enemy2->emplace<sys::sprite::Sprite_comp>(tex2, glm::vec4(0.0f, 1.0f, x_enemy, 1.0-y_enemy));
+
+
+		// TODO[foe]: remove debug code
+		ecs::Entity_ptr enemy3 = _state.em.emplace("blueprint:enemy"_aid);
+
+		enemy3->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(-4,0));
+
+		float x_enemy2 = 64.0f / 512.0f, y_enemy2 = 64.0f / 64.0f;
+
+		auto tex3 = _engine.assets().load<renderer::Texture>("tex:enemy2_moving"_aid);
+		enemy3->emplace<sys::sprite::Sprite_comp>(tex3, glm::vec4(0.0f, 1.0f, x_enemy2, 1.0-y_enemy2));
 		// END TODO
 	}
 
 	Game_screen::~Game_screen()noexcept {
 		_save();
+		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
+			return p;
+		});
+	}
+
+	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
+		auto& main_camera = _state.camera.main_camera();
+		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
+			return main_camera.screen_to_world(p);
+		});
+	}
+	void Game_screen::_on_leave(util::maybe<Screen&> next) {
+		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
+			return p;
+		});
 	}
 
 	void Game_screen::_update(float delta_time) {
@@ -119,7 +159,7 @@ namespace mo {
 
 
 	auto Game_screen::_add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr {
-		ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
+		ecs::Entity_ptr p = _state.em.emplace("blueprint:player"_aid);
 
 		p->emplace<sys::controller::Controllable_comp>(&controller);
 
@@ -127,9 +167,10 @@ namespace mo {
 					trans.position(pos);
 				});
 
-		float x = 16.0 / 255.0, y = 16.0 / 128.0;
+		float x = 64.0f / 512.0f, y = 64.0f / 64.0f;
 
-		p->emplace<sys::sprite::Sprite_comp>("tex:tilemap", glm::vec4(0.0f, 1.0f, x, 1.0-y));
+		auto tex = _engine.assets().load<renderer::Texture>("tex:player_moving"_aid);
+		p->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x, 1.0-y));
 
 		if(!_main_player)
 			_main_player = p;

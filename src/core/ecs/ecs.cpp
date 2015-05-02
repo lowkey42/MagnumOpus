@@ -8,6 +8,7 @@
 #include <iostream>
 
 #include "component.hpp"
+#include "serializer.hpp"
 
 namespace mo {
 namespace ecs {
@@ -18,12 +19,20 @@ namespace ecs {
 	};
 
 
-	Entity_manager::Entity_manager() : _unoptimized_deletions(0) {
+	Entity_manager::Entity_manager(asset::Asset_manager& asset_mgr)
+		: _unoptimized_deletions(0), _serializer(std::make_unique<Serializer>(*this,asset_mgr)) {
 	}
 
 	Entity_ptr Entity_manager::emplace()noexcept {
 		auto e = std::make_shared<Entity_constructor>(*this);
 		_entities.push_back(e);
+
+		return e;
+	}
+	Entity_ptr Entity_manager::emplace(const asset::AID& blueprint)noexcept {
+		auto e = emplace();
+
+		_serializer->apply(blueprint, e);
 
 		return e;
 	}

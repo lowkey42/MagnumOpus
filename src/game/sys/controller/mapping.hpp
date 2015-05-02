@@ -251,6 +251,7 @@ namespace controller {
 	}
 
 	struct Mapping {
+		bool mouse_look = true;
 		std::unordered_map<Key, Command> key_action;
 		std::unordered_map<Uint8, Command> mouse_button_action;
 		std::unordered_map<Pad_button, Command> pad_button_action;

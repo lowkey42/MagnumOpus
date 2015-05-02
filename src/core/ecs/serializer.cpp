@@ -21,7 +21,7 @@ namespace ecs {
 		public:
 			struct Data;
 
-			Blueprint(AID name, Data&& data);
+			Blueprint(asset::Asset_manager& assets, AID name, Data&& data);
 			~Blueprint()noexcept;
 			Blueprint& operator=(Blueprint&&);
 
@@ -32,6 +32,7 @@ namespace ecs {
 			const AID name;
 
 		private:
+			asset::Asset_manager& _assets;
 			struct PImpl;
 			std::unique_ptr<PImpl> _impl;
 
@@ -44,16 +45,16 @@ namespace ecs {
 	class BlueprintComponent : public ecs::Component<BlueprintComponent> {
 		public:
 			static constexpr const char* name() {return "Blueprint";}
-			static void load(sf2::io::CharSource& cs, ecs::details::Component_base& comp){
-				std::string blueprintName;
-				sf2::details::fundamentals::_parseMember(cs, blueprintName);
 
-				auto& self = static_cast<BlueprintComponent&>(comp);
-				self.blueprintId = AID{Asset_type::blueprint, blueprintName};
+			void load(ecs::Entity_state& state)override {
+				std::string blueprintName;
+				sf2::details::fundamentals::_parseMember(state.char_source(), blueprintName);
+
+				blueprintId = AID{Asset_type::blueprint, blueprintName};
+				blueprint = state.asset_mgr().load<Blueprint>(blueprintId);
 			};
-			static void store(sf2::io::CharSink& cs, const ecs::details::Component_base& comp){
-				auto& self = static_cast<const BlueprintComponent&>(comp);
-				sf2::details::fundamentals::_writeMember(cs, self.blueprintId.name());
+			void store(ecs::Entity_state& state)override {
+				sf2::details::fundamentals::_writeMember(state.char_sink(), blueprintId.name());
 			}
 
 			BlueprintComponent(ecs::Entity& owner, std::shared_ptr<const Blueprint> blueprint=std::shared_ptr<const Blueprint>())noexcept
@@ -94,7 +95,8 @@ namespace ecs {
 	};
 
 
-	Blueprint::Blueprint(AID name, Blueprint::Data&& data) : name(name), _impl(new PImpl{std::move(data), {}}) {
+	Blueprint::Blueprint(asset::Asset_manager& assets, AID name, Blueprint::Data&& data)
+		: name(name), _assets(assets), _impl(new PImpl{std::move(data), {}}) {
 	}
 	Blueprint::~Blueprint()noexcept {
 	}
@@ -106,7 +108,7 @@ namespace ecs {
 
 		template<class CompTypeRange>
 		void storeEntity(const CompTypeRange& comps,
-						 sf2::io::CharSink& sink, Entity& e) {
+						 sf2::io::CharSink& sink, Entity& e, asset::Asset_manager& assets) {
 			sink('{');
 
 			bool first=true;
@@ -120,7 +122,7 @@ namespace ecs {
 
 					sink<<compInfo.name;
 
-					Entity_state state {sink};
+					Entity_state state {assets, sink};
 					compPtr->store(state);
 				}
 			}
@@ -128,7 +130,7 @@ namespace ecs {
 			sink('}');
 		}
 
-		void restoreEntity(sf2::io::CharSource& cs, Entity& e) {
+		void restoreEntity(sf2::io::CharSource& cs, Entity& e, asset::Asset_manager& assets) {
 			char c=cs();
 
 			if(!skipComment(c,cs))	return;
@@ -168,7 +170,7 @@ namespace ecs {
 				}
 
 				if(c==':') {
-					Entity_state state{cs};
+					Entity_state state{assets, cs};
 					cPtr->load(state);
 					c = cs.prev();
 					if(c==':')
@@ -187,9 +189,9 @@ namespace ecs {
 			}
 		}
 
-		void applyBlueprint(const Blueprint::Data& data, Entity& e) {
+		void applyBlueprint(const Blueprint::Data& data, Entity& e, asset::Asset_manager& assets) {
 			StringCharSource cs(data.contentStr);
-			restoreEntity(cs, e);
+			restoreEntity(cs, e, assets);
 		}
 	}
 
@@ -199,7 +201,7 @@ namespace ecs {
 		_impl->users = std::move(o._impl->users);
 
 		for(auto&& u : _impl->users)
-			applyBlueprint(_impl->data, *u);
+			applyBlueprint(_impl->data, *u, _assets);
 
 		return *this;
 	}
@@ -214,7 +216,7 @@ namespace ecs {
 
 		_impl->users.push_back(target.get());
 
-		applyBlueprint(_impl->data, *target);
+		applyBlueprint(_impl->data, *target, _assets);
 	}
 	void Blueprint::detach(Entity_ptr target)const {
 		if(!_impl)return;
@@ -263,7 +265,7 @@ namespace ecs {
 			if(first) first=false;
 			else sink(',');
 
-			storeEntity(compTypes, sink, *e);
+			storeEntity(compTypes, sink, *e, _assets);
 		}
 
 		sink(']');
@@ -287,7 +289,7 @@ namespace ecs {
 
 		while( c!=']' ) {
 			auto entity = _entities.emplace();
-			restoreEntity(cs, *entity);
+			restoreEntity(cs, *entity, _assets);
 
 			c = cs();
 
@@ -310,7 +312,10 @@ namespace asset {
 		using RT = std::shared_ptr<ecs::Blueprint>;
 
 		static RT load(istream in) throw(Loading_failed){
-			return std::make_shared<ecs::Blueprint>(in.aid(), ecs::Blueprint::Data{in.content()});
+			return std::make_shared<ecs::Blueprint>(
+						in.manager(),
+						in.aid(),
+						ecs::Blueprint::Data{in.content()});
 		}
 
 		static void store(ostream out, ecs::Blueprint& asset) throw(Loading_failed) {

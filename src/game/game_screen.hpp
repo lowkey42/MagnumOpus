@@ -30,6 +30,7 @@
 #include "sys/controller/controller_system.hpp"
 #include "sys/cam/camera_system.hpp"
 #include "sys/ai/ai_system.hpp"
+#include "sys/combat/combat_system.hpp"
 
 namespace mo {
 	namespace renderer{ class Camera; }
@@ -38,7 +39,6 @@ namespace mo {
 
 	struct Meta_system {
 		ecs::Entity_manager em;
-		ecs::Serializer entity_store;
 		level::Tilemap tilemap;
 
 		sys::physics::Transform_system transform;
@@ -47,6 +47,7 @@ namespace mo {
 		sys::sprite::Sprite_system spritesys;
 		sys::controller::Controller_system controller;
 		sys::ai::Ai_system ai;
+		sys::combat::Combat_system combat;
 
 		Meta_system(Game_engine& engine, level::Level& level);
 
@@ -66,6 +67,9 @@ namespace mo {
 			auto _prev_screen_policy()const noexcept -> Prev_screen_policy override {
 				return Prev_screen_policy::discard;
 			}
+
+			void _on_enter(util::maybe<Screen&> prev) override;
+			void _on_leave(util::maybe<Screen&> next) override;
 
 			auto _add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr;
 			void _join(sys::controller::Controller_added_event e);

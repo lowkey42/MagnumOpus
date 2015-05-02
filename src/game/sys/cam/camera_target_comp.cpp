@@ -58,7 +58,7 @@ namespace cam {
 		if(glm::length(remove_units(_velocity))<0.1f)
 			_sleeping = _sleeping - dt;
 		else
-			_sleeping = dt*4;
+			_sleeping = 500_ms;
 	}
 }
 }

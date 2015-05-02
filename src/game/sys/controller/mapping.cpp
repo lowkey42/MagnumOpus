@@ -161,6 +161,7 @@ namespace controller {
 	)
 
 	sf2_structDef(Mapping,
+		sf2_member(mouse_look),
 		sf2_member(key_action),
 		sf2_member(mouse_button_action),
 		sf2_member(pad_button_action),

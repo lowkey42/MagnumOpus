@@ -92,6 +92,14 @@ namespace util {
 					f(_data);
 			}
 
+			template<typename RT, typename Func>
+			auto process(RT def, Func f) -> RT {
+				if(is_some())
+					return f(_data);
+
+				return def;
+			}
+
 		private:
 			maybe() : _valid(false) {}
 
@@ -180,6 +188,14 @@ namespace util {
 			void process(Func f) {
 				if(is_some())
 					f(get_or_throw());
+			}
+
+			template<typename RT, typename Func>
+			auto process(RT def, Func f) -> RT {
+				if(is_some())
+					return f(get_or_throw());
+
+				return def;
 			}
 
 		private:

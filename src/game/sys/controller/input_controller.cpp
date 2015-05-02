@@ -49,7 +49,8 @@ namespace controller {
 			if(_weapon[w]==1)
 				c.switch_weapon(w);
 
-		c.look_at(_screen_to_world_coords(_mouse_pos));
+		if(_mapping->mouse_look && _mouse_look)
+			c.look_at(_screen_to_world_coords(_mouse_pos));
 	}
 
 	void Keyboard_controller::_on_key(SDL_KeyboardEvent event) {
@@ -129,6 +130,9 @@ namespace controller {
 		}
 	}
 	void Keyboard_controller::_on_mouse_moved(SDL_MouseMotionEvent event) {
+		if(std::abs(_mouse_pos.x-event.x)>1 || std::abs(_mouse_pos.y-event.y)>1)
+			_mouse_look = true;
+
 		_mouse_pos.x = event.x;
 		_mouse_pos.y = event.y;
 	}
@@ -239,14 +243,12 @@ namespace controller {
 	}
 
 	void Gamepad_controller::operator()(Controllable_interface& c) {
-		if(_move.x!=0 && _move.y!=0) {
+		if(_move.x!=0 || _move.y!=0) {
 			c.move(_move);
 		}
 
-		if(_look.x!=0 && _look.y!=0)
+		if(_look.x!=0 || _look.y!=0)
 			c.look_in_dir(_look);
-		else if(_move.x!=0 && _move.y!=0)
-			c.look_in_dir(_move);
 
 		if(_attack)
 			c.attack();
@@ -286,10 +288,13 @@ namespace controller {
 	}
 
 	void Combined_controller::operator()(Controllable_interface& c) {
-		for(auto& gp : _gamepads)
-			(*gp)(c);
-
 		_keyboard(c);
+
+		for(auto& gp : _gamepads) {
+			(*gp)(c);
+			if(gp->look_used())
+				_keyboard.tmp_disable_mouse_look();
+		}
 	}
 	void Combined_controller::feedback(float force) {
 		for(auto& gp : _gamepads)

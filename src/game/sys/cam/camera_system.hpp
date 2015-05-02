@@ -36,6 +36,10 @@ namespace cam {
 
 			auto cameras()const noexcept {return util::range(_cameras);}
 
+			auto main_camera()const noexcept -> const auto& {
+				return _cameras.front();
+			}
+
 		private:
 			Game_engine& _engine;
 			Camera_target_comp::Pool& _targets;

@@ -29,11 +29,14 @@ namespace util {
 		auto ttff = remove_unit(t*tff);
 		auto detInv = 1.f / (f+ttff);
 		auto diff = remove_units(target-source);
-		return std::make_tuple(
-			(f * source + t*v+ttff*target) * detInv,
-			(v + tff * Vel{diff.x, diff.y}) * detInv
-		);
 
+		auto new_pos = (f * source + t*v+ttff*target) * detInv;
+		auto new_vel = (v + tff * Vel{diff.x, diff.y}) * detInv;
+
+		if((remove_unit(new_vel.x)*remove_unit(new_vel.x) + remove_unit(new_vel.y)*remove_unit(new_vel.y))<0.5f)
+			new_vel = new_vel * 0.f;
+
+		return std::make_tuple(new_pos, new_vel);
 	}
 
 }

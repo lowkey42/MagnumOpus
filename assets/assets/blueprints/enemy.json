@@ -15,5 +15,16 @@
         "near_angle":360,
         "far_angle":180,
         "follow_time":0.5
+    },
+    "State",
+    "Health":{
+        "max_hp": 10
+     },
+    "Weapon":{
+        "type": "melee",
+        "cooldown": 1.0,
+        "melee_damage": 5.0,
+        "melee_range": 1,
+        "melee_angle": 90
     }
 }
