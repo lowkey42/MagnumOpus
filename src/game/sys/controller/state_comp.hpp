@@ -1,5 +1,5 @@
 /**************************************************************************\
- * math helpers                                                           *
+ * stores the current state of an entity (e.g. walking, idle, attacking)  *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,29 +15,46 @@
 
 #pragma once
 
-#include <tuple>
-#include "../units.hpp"
+#include <core/ecs/ecs.hpp>
+#include <core/units.hpp>
 
 namespace mo {
-namespace util {
+namespace sys {
+namespace controller {
 
-	template<typename Pos, typename Vel>
-	auto spring(Pos source, Vel v, Pos target, float damping,
-	            float freq, Time t) -> std::tuple<Pos, Vel> {
-		auto f = remove_unit(1 + 2*t*damping*freq);
-		auto tff = remove_unit(t*freq*freq);
-		auto ttff = remove_unit(t*tff);
-		auto detInv = 1.f / (f+ttff);
-		auto diff = remove_units(target-source);
+	enum class Entity_state {
+		idle,
+		walking,
+		attacking_melee,
+		attacking_range,
+		attacked,
+		interacting,
+		taking,
+		change_weapon
+	};
 
-		auto new_pos = (f * source + t*v+ttff*target) * detInv;
-		auto new_vel = (v + tff * Vel{diff.x, diff.y}) * detInv;
+	// TODO: events for sounds
 
-		if((remove_unit(new_vel.x)*remove_unit(new_vel.x) + remove_unit(new_vel.y)*remove_unit(new_vel.y))<0.5f)
-			new_vel = new_vel * 0.f;
+	class State_comp : public ecs::Component<State_comp> {
+		public:
+			static constexpr const char* name() {return "State";}
 
-		return std::make_tuple(new_pos, new_vel);
-	}
+			State_comp(ecs::Entity& owner, Entity_state state = Entity_state::idle) noexcept
+				: Component(owner), _current_state(state), _time_left(_required_time_for(state)) {}
 
+			void state(Entity_state s)noexcept;
+			auto state()const noexcept {return _current_state;}
+
+			void update(Time dt)noexcept;
+
+		private:
+			Entity_state _current_state;
+			Entity_state _last_state;
+			Time _time_left;
+
+			Time _required_time_for(Entity_state state)const noexcept;
+	};
+
+}
 }
 }
