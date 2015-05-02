@@ -325,5 +325,12 @@ namespace mo {
 		constexpr Time_squared hour_2 = 1_h*1_h;
 	}
 
+	inline Angle normalize_to_half_rot(Angle a)noexcept {
+		using namespace unit_literals;
+		while(a <= -180_deg) a += 360_deg;
+		while(a > 180_deg)   a -= 360_deg;
+		return a;
+	}
+
 }
 

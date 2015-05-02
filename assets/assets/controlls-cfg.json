@@ -49,5 +49,6 @@
 	},
 	"aim_sticks": ["right"],
 	"move_sticks": ["left"],
-	"stick_dead_zone": 0.01
+    "stick_dead_zone": 0.2,
+    "mouse_look": true
 }

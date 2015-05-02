@@ -89,7 +89,7 @@ namespace ai {
 
 				auto distance = glm::length(dir) * 1_m;
 
-				c.look_in_dir(dir);
+				c.look_at(remove_units(tt.position()));
 
 				if(distance<=attack_distance)
 					c.attack();

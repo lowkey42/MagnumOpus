@@ -18,13 +18,15 @@ namespace controller {
 	}
 
 	namespace {
-		constexpr auto max_rotation_speed = 180_deg / second;
+		constexpr auto max_rotation_speed = 180_deg / 0.5_s;
 
 		struct Controllable_interface_impl : public Controllable_interface {
 			Controllable_interface_impl(Time dt, ecs::Entity& entity)
 				: _dt(dt), _entity(entity),
 				  _state(entity.get<State_comp>().process(Entity_state::idle,
-														   [](auto& s){return s.state();})) {}
+														   [](auto& s){return s.state();})),
+				  _target_rotation(entity.get<Transform_comp>().process(0_deg,
+																	[](auto& p){return p.rotation();})) {}
 
 			~Controllable_interface_impl()noexcept;
 
@@ -41,6 +43,7 @@ namespace controller {
 				const Time _dt;
 				ecs::Entity& _entity;
 				Entity_state _state;
+				Angle _target_rotation;
 		};
 	}
 	void Controller_system::update(Time dt) {
@@ -152,18 +155,11 @@ namespace controller {
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {
 			_entity.get<Transform_comp>().process([this, pos](auto& comp){
-				this->look_in_dir(remove_units(comp.position()) - pos);
+				this->look_in_dir(pos-remove_units(comp.position()));
 			});
 		}
 		void Controllable_interface_impl::look_in_dir(glm::vec2 direction) {
-			_entity.get<Transform_comp>().process([this, direction](auto& comp){
-				Angle target_rot = Angle(glm::atan(direction.y, direction.x));
-				Angle rotation_diff = target_rot-comp.rotation();
-				if(rotation_diff>180_deg) rotation_diff-=360_deg;
-				if(rotation_diff<180_deg) rotation_diff+=360_deg;
-
-				comp.rotation(comp.rotation() + std::min(rotation_diff, max_rotation_speed*_dt) );
-			});
+			_target_rotation = Angle(atan2(direction.y, direction.x));
 		}
 		void Controllable_interface_impl::attack() {
 			// TODO: AttackerComponent.attack(TransformComp.getPosition(), TransformComp.getRotation())
@@ -189,6 +185,17 @@ namespace controller {
 
 		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
 			_entity.get<State_comp>().process([&](auto& s){s.state(_state);});
+
+			_entity.get<Transform_comp>().process([&](auto& c){
+				auto rotation_diff = normalize_to_half_rot(_target_rotation-c.rotation());
+
+				auto max_rot = max_rotation_speed*_dt;
+
+				if(abs(rotation_diff)>max_rot)
+					rotation_diff = sign(rotation_diff).value() * max_rot;
+
+				c.rotation(c.rotation() + rotation_diff);
+			});
 		}
 	}
 

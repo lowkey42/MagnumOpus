@@ -67,6 +67,9 @@ namespace mo {
 				return Prev_screen_policy::discard;
 			}
 
+			void _on_enter(util::maybe<Screen&> prev) override;
+			void _on_leave(util::maybe<Screen&> next) override;
+
 			auto _add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr;
 			void _join(sys::controller::Controller_added_event e);
 			void _unjoin(sys::controller::Controller_removed_event e);

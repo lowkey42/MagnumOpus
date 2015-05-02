@@ -16,6 +16,7 @@
 #pragma once
 
 #include "../../../core/utils/events.hpp"
+#include <core/units.hpp>
 
 #include "controller.hpp"
 #include "mapping.hpp"
@@ -60,6 +61,8 @@ namespace controller {
 
 			void operator()(Controllable_interface&);
 
+			void tmp_disable_mouse_look()noexcept { _mouse_look=false; }
+
 		private:
 			void _on_key(SDL_KeyboardEvent event);
 			void _on_mouse_moved(SDL_MouseMotionEvent event);
@@ -72,6 +75,7 @@ namespace controller {
 			util::slot<SDL_MouseButtonEvent> _button_events;
 
 			glm::vec2 _mouse_pos;
+			bool _mouse_look = true;
 	};
 
 	class Gamepad_controller : public Input_controller_base {
@@ -91,6 +95,8 @@ namespace controller {
 
 			auto instance_id()const -> SDL_JoystickID;
 			auto jId()const -> int;
+
+			auto look_used()const noexcept{return _look.x!=0 || _look.y!=0;}
 
 		private:
 			SDL_GameController* _controller;
