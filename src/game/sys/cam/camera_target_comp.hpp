@@ -40,6 +40,8 @@ namespace cam {
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
+			friend class Camera_system;
+
 			bool _unset=true;
 			Time _sleeping = Time(0);
 			Mass _mass;
@@ -49,6 +51,11 @@ namespace cam {
 			Velocity _velocity;
 
 			Position _cam_pos;
+
+			// TODO[foe]: refactor
+			Angle _last_rotation = Angle{0};
+			Time _rotation_zoom_time_left = Time{0};
+			Time _rotation_zoom_time=Time{1.f};
 	};
 
 }

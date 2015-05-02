@@ -3,6 +3,7 @@
 
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
+#include "../combat/weapon_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -162,9 +163,13 @@ namespace controller {
 			_target_rotation = Angle(atan2(direction.y, direction.x));
 		}
 		void Controllable_interface_impl::attack() {
-			// TODO: AttackerComponent.attack(TransformComp.getPosition(), TransformComp.getRotation())
-
-			_state = Entity_state::attacking_range; // TODO: melee vs ranged
+			_entity.get<combat::Weapon_comp>().process([&](auto& w){
+				w.attack();
+				if(w.weapon_type()==combat::Weapon_type::melee)
+					_state = Entity_state::attacking_melee;
+				else
+					_state = Entity_state::attacking_range;
+			});
 		}
 		void Controllable_interface_impl::use() {
 			// TODO: UserComponent.use(map.get(TransformComp.getPosition(), TransformComp.getRotation()))

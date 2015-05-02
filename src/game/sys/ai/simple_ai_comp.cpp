@@ -23,8 +23,8 @@ namespace ai {
 		Persisted_state(const Simple_ai_comp& c)
 				: attack_distance(c.attack_distance.value()),
 		          near(c.near.value()), max(c.max.value()),
-		          near_angle(c.near_angle.value()),
-		          far_angle(c.far_angle.value()),
+				  near_angle(c.near_angle.value() / (1_deg).value()),
+				  far_angle(c.far_angle.value() / (1_deg).value()),
 		          follow_time(c._follow_time.value()) {}
 	};
 

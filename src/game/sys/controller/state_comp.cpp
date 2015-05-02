@@ -32,10 +32,13 @@ namespace controller {
 			case Entity_state::walking:			return  1_s;
 			case Entity_state::attacking_melee:	return  1_s;
 			case Entity_state::attacking_range:	return  1.5_s;
-			case Entity_state::attacked:		return  0.5_s;
 			case Entity_state::interacting:		return  2_s;
 			case Entity_state::taking:			return  1.5_s;
 			case Entity_state::change_weapon:	return  0.5_s;
+			case Entity_state::damaged:			return  0.5_s;
+			case Entity_state::healed:			return  0.5_s;
+			case Entity_state::died:			return  2.0_s;
+			case Entity_state::resurrected:		return  2.0_s;
 		}
 
 		INVARIANT(false, "Unexpected state "<<static_cast<int>(state));

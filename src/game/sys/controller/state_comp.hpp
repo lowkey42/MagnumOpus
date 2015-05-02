@@ -27,10 +27,13 @@ namespace controller {
 		walking,
 		attacking_melee,
 		attacking_range,
-		attacked,
 		interacting,
 		taking,
-		change_weapon
+		change_weapon,
+		damaged,
+		healed,
+		died,
+		resurrected
 	};
 
 	// TODO: events for sounds

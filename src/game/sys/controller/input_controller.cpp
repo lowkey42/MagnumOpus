@@ -243,11 +243,11 @@ namespace controller {
 	}
 
 	void Gamepad_controller::operator()(Controllable_interface& c) {
-		if(_move.x!=0 && _move.y!=0) {
+		if(_move.x!=0 || _move.y!=0) {
 			c.move(_move);
 		}
 
-		if(_look.x!=0 && _look.y!=0)
+		if(_look.x!=0 || _look.y!=0)
 			c.look_in_dir(_look);
 
 		if(_attack)

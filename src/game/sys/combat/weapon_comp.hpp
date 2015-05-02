@@ -1,5 +1,5 @@
 /**************************************************************************\
- * universal health-care & murder system                                  *
+ * markes entities that can attack others                                 *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,32 +15,48 @@
 
 #pragma once
 
+#include <core/asset/aid.hpp>
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
-#include "weapon_comp.hpp"
-#include "health_comp.hpp"
-
 namespace mo {
-	namespace asset {class Asset_manager;}
-
 namespace sys {
 namespace combat {
 
-	class Combat_system {
+	enum class Weapon_type {
+		range,
+		melee
+	};
+
+	class Weapon_comp : public ecs::Component<Weapon_comp> {
 		public:
-			Combat_system(ecs::Entity_manager& entity_manager, asset::Asset_manager& assets);
+			static constexpr const char* name() {return "Weapon";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			void update(Time dt);
+			Weapon_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
 
+			auto weapon_type()const noexcept{return _type;}
+
+			void attack()noexcept{_attack = true;}
+
+			struct Persisted_state;
+			friend struct Persisted_state;
 		private:
-			void _health_care(Time dt);
-			void _shoot_something(Time dt);
+			friend class Combat_system;
 
-			ecs::Entity_manager&  _em;
-			asset::Asset_manager& _assets;
-			Weapon_comp::Pool& _weapons;
-			Health_comp::Pool& _healths;
+			Weapon_type _type        = Weapon_type::melee;
+			asset::AID  _bullet_type = asset::AID{};
+			Speed       _bullet_vel  = Speed{0};
+
+			Time        _cooldown      = Time(1);
+			Time        _cooldown_left = Time(0);
+			bool        _attack        = false;
+
+			float       _melee_damage  = 5;
+			Distance    _melee_range   = Distance{1};
+			Angle       _melee_angle   = Angle{3};
 	};
 
 }

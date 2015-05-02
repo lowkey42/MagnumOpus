@@ -20,14 +20,15 @@ namespace mo {
 
 
 	Meta_system::Meta_system(Game_engine& engine, level::Level& level)
-		: em(), entity_store(em, engine.assets()),
+		: em(engine.assets()),
 	      tilemap(engine, level),
 	      transform(em, MaxEntitySize, level.width(), level.height()),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  spritesys(em, transform, engine.assets()),
 		  controller(em),
-		  ai(em, engine, transform) {
+		  ai(em, engine, transform),
+		  combat(em, engine.assets()) {
 	}
 
 	void Meta_system::update(Time dt) {
@@ -35,6 +36,7 @@ namespace mo {
 
 		ai.update(dt);
 		controller.update(dt);
+		combat.update(dt);
 		transform.update(dt);
 		physics.update(dt);
 		camera.update(dt);
@@ -71,7 +73,7 @@ namespace mo {
 		_add_player(_engine.controllers().main_controller(), start_position);
 
 		// TODO[foe]: remove debug code
-		ecs::Entity_ptr enemy1 = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
+		ecs::Entity_ptr enemy1 = _state.em.emplace("blueprint:enemy"_aid);
 
 		enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(4,2));
 
@@ -82,7 +84,7 @@ namespace mo {
 
 
 		// TODO[foe]: remove debug code
-		ecs::Entity_ptr enemy2 = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
+		ecs::Entity_ptr enemy2 = _state.em.emplace("blueprint:enemy"_aid);
 
 		enemy2->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(0,2));
 
@@ -91,7 +93,7 @@ namespace mo {
 
 
 		// TODO[foe]: remove debug code
-		ecs::Entity_ptr enemy3 = _state.entity_store.apply("blueprint:enemy"_aid, _state.em.emplace());
+		ecs::Entity_ptr enemy3 = _state.em.emplace("blueprint:enemy"_aid);
 
 		enemy3->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(-4,0));
 
@@ -157,7 +159,7 @@ namespace mo {
 
 
 	auto Game_screen::_add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr {
-		ecs::Entity_ptr p = _state.entity_store.apply("blueprint:player"_aid, _state.em.emplace());
+		ecs::Entity_ptr p = _state.em.emplace("blueprint:player"_aid);
 
 		p->emplace<sys::controller::Controllable_comp>(&controller);
 
