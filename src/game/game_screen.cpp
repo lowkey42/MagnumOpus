@@ -59,6 +59,11 @@ namespace mo {
 		_gm(new Game_master(engine, load_save_game(engine))),
 		_state(engine, _gm->level())
 	{
+		auto& main_camera = _state.camera.main_camera();
+		engine.controllers().screen_to_world_coords([main_camera](glm::vec2 p){
+			return main_camera.screen_to_world(p);
+		});
+
 		auto start_room_m = _gm->level().find_room(level::Room_type::start);
 
 		INVARIANT(start_room_m.is_some(), "Generated room has no entry-point!?");
@@ -81,6 +86,9 @@ namespace mo {
 
 	Game_screen::~Game_screen()noexcept {
 		_save();
+		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
+			return p;
+		});
 	}
 
 	void Game_screen::_update(float delta_time) {

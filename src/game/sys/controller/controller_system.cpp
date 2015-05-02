@@ -11,15 +11,22 @@ namespace controller {
 	using namespace unit_literals;
 
 	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
-	  : _controllables(entity_manager.list<Controllable_comp>()) {
+	  : _controllables(entity_manager.list<Controllable_comp>()),
+		_states(entity_manager.list<State_comp>()) {
 		entity_manager.register_component_type<Controllable_comp>();
+		entity_manager.register_component_type<State_comp>();
 	}
 
 	namespace {
 		constexpr auto max_rotation_speed = 180_deg / second;
 
 		struct Controllable_interface_impl : public Controllable_interface {
-			Controllable_interface_impl(Time dt, ecs::Entity& entity) : _dt(dt), _entity(entity){}
+			Controllable_interface_impl(Time dt, ecs::Entity& entity)
+				: _dt(dt), _entity(entity),
+				  _state(entity.get<State_comp>().process(Entity_state::idle,
+														   [](auto& s){return s.state();})) {}
+
+			~Controllable_interface_impl()noexcept;
 
 			auto entity()noexcept -> ecs::Entity& override;
 			void move(glm::vec2 target) override;
@@ -30,12 +37,17 @@ namespace controller {
 			void take() override;
 			void switch_weapon(uint32_t weapon_id) override;
 
-		private:
-			const Time _dt;
-			ecs::Entity& _entity;
+			private:
+				const Time _dt;
+				ecs::Entity& _entity;
+				Entity_state _state;
 		};
 	}
 	void Controller_system::update(Time dt) {
+		for(auto& state : _states) {
+			state.update(dt);
+		}
+
 		for(auto& controllable : _controllables) {
 			Controllable_interface_impl c(dt, controllable.owner());
 
@@ -131,8 +143,11 @@ namespace controller {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
 				comp.accelerate_active(direction);
 
-				// TODO: strafing
-				this->look_in_dir(direction);
+				if(_state!=Entity_state::attacking_melee && _state!=Entity_state::attacking_range)
+					this->look_in_dir(direction);
+
+				if(_state==Entity_state::idle)
+					_state = Entity_state::walking;
 			});
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {
@@ -152,15 +167,28 @@ namespace controller {
 		}
 		void Controllable_interface_impl::attack() {
 			// TODO: AttackerComponent.attack(TransformComp.getPosition(), TransformComp.getRotation())
+
+			_state = Entity_state::attacking_range; // TODO: melee vs ranged
 		}
 		void Controllable_interface_impl::use() {
 			// TODO: UserComponent.use(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
+
+			if(_state!=Entity_state::taking)
+				_state = Entity_state::interacting;
 		}
 		void Controllable_interface_impl::take() {
 			// TODO: InventoryComponent.take(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
+
+			_state = Entity_state::taking;
 		}
 		void Controllable_interface_impl::switch_weapon(uint32_t weapon_id) {
 			// TODO: WeaponComponent.set(weaponId)
+
+			_state = Entity_state::change_weapon;
+		}
+
+		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
+			_entity.get<State_comp>().process([&](auto& s){s.state(_state);});
 		}
 	}
 
