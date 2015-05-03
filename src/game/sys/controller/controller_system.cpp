@@ -4,18 +4,19 @@
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 #include "../combat/weapon_comp.hpp"
+#include "../state/state_comp.hpp"
 
 namespace mo {
 namespace sys {
 namespace controller {
 	using namespace physics;
+	using namespace state;
 	using namespace unit_literals;
 
 	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
-	  : _controllables(entity_manager.list<Controllable_comp>()),
-		_states(entity_manager.list<State_comp>()) {
+	  : _controllables(entity_manager.list<Controllable_comp>()) {
+
 		entity_manager.register_component_type<Controllable_comp>();
-		entity_manager.register_component_type<State_comp>();
 	}
 
 	namespace {
@@ -24,7 +25,7 @@ namespace controller {
 		struct Controllable_interface_impl : public Controllable_interface {
 			Controllable_interface_impl(Time dt, ecs::Entity& entity)
 				: _dt(dt), _entity(entity),
-				  _state(entity.get<State_comp>().process(Entity_state::idle,
+				  _state(entity.get<State_comp>().process(State_data{},
 														   [](auto& s){return s.state();})),
 				  _target_rotation(entity.get<Transform_comp>().process(0_deg,
 																	[](auto& p){return p.rotation();})) {}
@@ -40,18 +41,20 @@ namespace controller {
 			void take() override;
 			void switch_weapon(uint32_t weapon_id) override;
 
+			void set_state(Entity_state s, float magnitude=1.f) {
+				_entity.get<State_comp>().process([s,magnitude](auto& state){
+					state.state(s, magnitude);
+				});
+			}
+
 			private:
 				const Time _dt;
 				ecs::Entity& _entity;
-				Entity_state _state;
+				const State_data _state;
 				Angle _target_rotation;
 		};
 	}
 	void Controller_system::update(Time dt) {
-		for(auto& state : _states) {
-			state.update(dt);
-		}
-
 		for(auto& controllable : _controllables) {
 			Controllable_interface_impl c(dt, controllable.owner());
 
@@ -147,11 +150,10 @@ namespace controller {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
 				comp.accelerate_active(direction);
 
-				if(_state!=Entity_state::attacking_melee && _state!=Entity_state::attacking_range)
+				if(_state.s!=Entity_state::attacking_melee && _state.s!=Entity_state::attacking_range)
 					this->look_in_dir(direction);
 
-				if(_state==Entity_state::idle)
-					_state = Entity_state::walking;
+				this->set_state(Entity_state::walking, glm::length(direction));
 			});
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {
@@ -165,32 +167,26 @@ namespace controller {
 		void Controllable_interface_impl::attack() {
 			_entity.get<combat::Weapon_comp>().process([&](auto& w){
 				w.attack();
-				if(w.weapon_type()==combat::Weapon_type::melee)
-					_state = Entity_state::attacking_melee;
-				else
-					_state = Entity_state::attacking_range;
 			});
 		}
 		void Controllable_interface_impl::use() {
 			// TODO: UserComponent.use(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
 
-			if(_state!=Entity_state::taking)
-				_state = Entity_state::interacting;
+			// if there is something useable
+			set_state(Entity_state::interacting);
 		}
 		void Controllable_interface_impl::take() {
 			// TODO: InventoryComponent.take(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
 
-			_state = Entity_state::taking;
+			set_state(Entity_state::taking);
 		}
 		void Controllable_interface_impl::switch_weapon(uint32_t weapon_id) {
 			// TODO: WeaponComponent.set(weaponId)
 
-			_state = Entity_state::change_weapon;
+			set_state(Entity_state::change_weapon);
 		}
 
 		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
-			_entity.get<State_comp>().process([&](auto& s){s.state(_state);});
-
 			_entity.get<Transform_comp>().process([&](auto& c){
 				auto rotation_diff = normalize_to_half_rot(_target_rotation-c.rotation());
 

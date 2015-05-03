@@ -23,7 +23,6 @@
 #include "controller.hpp"
 #include "controllable_comp.hpp"
 #include "input_controller.hpp"
-#include "state_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -77,7 +76,6 @@ namespace controller {
 
 		private:
 			Controllable_comp::Pool& _controllables;
-			State_comp::Pool& _states;
 		};
 
 }

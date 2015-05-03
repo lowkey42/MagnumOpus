@@ -1,6 +1,6 @@
 #include "combat_system.hpp"
 
-#include "../controller/state_comp.hpp"
+#include "../state/state_comp.hpp"
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 
@@ -11,7 +11,7 @@ namespace mo {
 namespace sys {
 namespace combat {
 
-	using namespace controller;
+	using namespace state;
 	using namespace unit_literals;
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
@@ -61,6 +61,15 @@ namespace combat {
 
 	void Combat_system::_shoot_something(Time dt) {
 		for(auto& w : _weapons) {
+			if(w._attack) {
+				w.owner().get<State_comp>().process([&w](auto& s){
+					if(w.weapon_type()==combat::Weapon_type::melee)
+						s.state(Entity_state::attacking_melee);
+					else
+						s.state(Entity_state::attacking_range);
+				});
+			}
+
 			if(w._cooldown_left>0_s) {
 				w._cooldown_left = w._cooldown_left-dt;
 				if(w._cooldown_left<0_s)
