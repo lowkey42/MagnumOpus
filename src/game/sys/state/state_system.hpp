@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Manages enemy spawn-points, global behaivor, etc.                      *
+ * Manages the current state of all active entities                       *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,42 +15,27 @@
 
 #pragma once
 
-#include "game_engine.hpp"
-#include "level/level.hpp"
-#include "level/level_generator.hpp"
+#include <core/ecs/ecs.hpp>
+#include <core/utils/events.hpp>
 
-#include "../core/utils/maybe.hpp"
-
+#include "state_comp.hpp"
 
 namespace mo {
-	namespace ecs {
-		class Entity_manager;
-	}
+namespace sys {
+namespace state {
 
-	struct Game_state;
-
-	struct Saved_game_state {
-		uint64_t seed;
-		int current_level;
-		int current_difficulty;
-		util::maybe<level::Level> stored_level;
-		// TODO: add ECS-save
-	};
-
-
-	class Game_master {
+	class State_system {
 		public:
-			Game_master(Game_engine& engine, const Saved_game_state& state);
+			State_system(ecs::Entity_manager& em);
 
-			void spawn(Game_engine& engine, ecs::Entity_manager& em);
+			void update(Time dt);
 
-			void update();
-
-			auto& level()noexcept {return _level;}
-			auto& level()const noexcept {return _level;}
+			util::signal_source<ecs::Entity&, const State_data&> state_change_events;
 
 		private:
-			level::Level _level;
+			State_comp::Pool& _states;
 	};
 
+}
+}
 }

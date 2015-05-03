@@ -96,7 +96,7 @@ namespace controller {
 			auto instance_id()const -> SDL_JoystickID;
 			auto jId()const -> int;
 
-			auto look_used()const noexcept{return _look.x!=0 || _look.y!=0;}
+			auto is_used()const noexcept{return _look.x!=0 || _look.y!=0 || _move.x!=0 || _move.y!=0;}
 
 		private:
 			SDL_GameController* _controller;

@@ -28,7 +28,8 @@ namespace mo {
 		  spritesys(em, transform, engine.assets()),
 		  controller(em),
 		  ai(em, engine, transform),
-		  combat(em, engine.assets()) {
+		  combat(em, engine.assets()),
+		  state(em) {
 	}
 
 	void Meta_system::update(Time dt) {
@@ -40,6 +41,8 @@ namespace mo {
 		transform.update(dt);
 		physics.update(dt);
 		camera.update(dt);
+		state.update(dt);
+		// TODO: update sprites and tilemap
 	}
 	void Meta_system::draw() {
 
@@ -76,32 +79,9 @@ namespace mo {
 		ecs::Entity_ptr enemy1 = _state.em.emplace("blueprint:enemy"_aid);
 
 		enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(4,2));
-
-		float x_enemy = 64.0f / 256.0f, y_enemy = 64.0f / 64.0f;
-
-		auto tex = _engine.assets().load<renderer::Texture>("tex:enemy_moving"_aid);
-		enemy1->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x_enemy, 1.0-y_enemy));
-
-
-		// TODO[foe]: remove debug code
-		ecs::Entity_ptr enemy2 = _state.em.emplace("blueprint:enemy"_aid);
-
-		enemy2->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(0,2));
-
-		auto tex2 = _engine.assets().load<renderer::Texture>("tex:tilemap_m"_aid);
-		enemy2->emplace<sys::sprite::Sprite_comp>(tex2, glm::vec4(0.0f, 1.0f, x_enemy, 1.0-y_enemy));
-
-
-		// TODO[foe]: remove debug code
-		ecs::Entity_ptr enemy3 = _state.em.emplace("blueprint:enemy"_aid);
-
-		enemy3->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(-4,0));
-
-		float x_enemy2 = 64.0f / 512.0f, y_enemy2 = 64.0f / 64.0f;
-
-		auto tex3 = _engine.assets().load<renderer::Texture>("tex:enemy2_moving"_aid);
-		enemy3->emplace<sys::sprite::Sprite_comp>(tex3, glm::vec4(0.0f, 1.0f, x_enemy2, 1.0-y_enemy2));
 		// END TODO
+
+		_gm->spawn(engine, _state.em);
 	}
 
 	Game_screen::~Game_screen()noexcept {

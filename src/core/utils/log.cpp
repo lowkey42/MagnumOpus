@@ -18,7 +18,7 @@ namespace util {
 			struct tm  tstruct;
 			char       buf[80];
 			tstruct = *localtime(&now);
-			strftime(buf, sizeof(buf), "%Y%m%d_%H%M%S", &tstruct);
+			strftime(buf, sizeof(buf), "%Y%m%d", &tstruct); // _%H%M%S
 
 			return buf;
 		}
@@ -34,6 +34,11 @@ namespace util {
 
 		std::ostream& get_logfile() {
 			static std::ofstream file("mo_"+get_now_short()+".log", std::ofstream::app);
+			static bool first = true;
+			if(first) {
+				file<<std::endl<<std::endl<<"================"<<std::endl;
+				first = false;
+			}
 
 			return file;
 		}

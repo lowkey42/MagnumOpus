@@ -107,6 +107,8 @@ namespace level {
 			auto height() const noexcept     -> int   override {return _height;}
 
 			auto find_room(Room_type type)const -> util::maybe<const Room&>;
+			template<typename F>
+			void foreach_room(F handler);
 
 		protected:
 			virtual void _store(TiledLevel&)const {}
@@ -132,6 +134,11 @@ namespace level {
 				handler(x,y, _tiles[y*_width + x]);
 			}
 		}
+	}
+	template<typename F>
+	void Level::foreach_room(F handler) {
+		for(auto& r : _rooms)
+			handler(r);
 	}
 
 }

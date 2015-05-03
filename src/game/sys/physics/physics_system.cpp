@@ -47,13 +47,6 @@ namespace physics {
 	void Physics_system::_step(bool last_step) {
 		_manifold_buffer.clear();
 
-		for(auto& pc : _physics_pool) {
-			if(pc.active()) {
-				_step_entity(pc, last_step);
-				_check_env_collisions(pc, _manifold_buffer);
-			}
-		}
-
 		// collect all manifolds
 		_transform_sys.foreach_pair([&](ecs::Entity& a, ecs::Entity& b) {
 			auto apm = a.get<Physics_comp>();
@@ -71,6 +64,13 @@ namespace physics {
 				}
 			}
 		});
+
+		for(auto& pc : _physics_pool) {
+			if(pc.active()) {
+				_step_entity(pc, last_step);
+				_check_env_collisions(pc, _manifold_buffer);
+			}
+		}
 
 		for(auto& m : _manifold_buffer) {
 			_solve_collision(m);

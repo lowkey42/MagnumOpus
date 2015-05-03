@@ -20,7 +20,7 @@
 
 namespace mo {
 namespace sys {
-namespace controller {
+namespace state {
 
 	enum class Entity_state {
 		idle,
@@ -35,27 +35,35 @@ namespace controller {
 		died,
 		resurrected
 	};
+	struct State_data {
+		Entity_state s = Entity_state::idle;
+		float magnitude = 1.f;
+		Time left = Time(0);
 
-	// TODO: events for sounds
+		auto operator!=(const State_data& rhs)const noexcept {
+			return s!=rhs.s || magnitude!=rhs.magnitude;
+		}
+	};
 
 	class State_comp : public ecs::Component<State_comp> {
 		public:
 			static constexpr const char* name() {return "State";}
 
-			State_comp(ecs::Entity& owner, Entity_state state = Entity_state::idle) noexcept
-				: Component(owner), _current_state(state), _time_left(_required_time_for(state)) {}
+			State_comp(ecs::Entity& owner, Entity_state s = Entity_state::idle) noexcept
+				: Component(owner) {
+				state(s);
+			}
 
-			void state(Entity_state s)noexcept;
-			auto state()const noexcept {return _current_state;}
+			void state(Entity_state s, float magnitude = 1.f)noexcept;
+			auto state()const noexcept {return _state_last;}
 
-			void update(Time dt)noexcept;
+			auto update(Time dt)noexcept -> util::maybe<State_data>;
 
 		private:
-			Entity_state _current_state;
-			Entity_state _last_state;
-			Time _time_left;
 
-			Time _required_time_for(Entity_state state)const noexcept;
+			State_data _state_primary;
+			State_data _state_last;
+			State_data _state_background;
 	};
 
 }

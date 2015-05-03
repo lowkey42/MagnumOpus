@@ -292,7 +292,7 @@ namespace controller {
 
 		for(auto& gp : _gamepads) {
 			(*gp)(c);
-			if(gp->look_used())
+			if(gp->is_used())
 				_keyboard.tmp_disable_mouse_look();
 		}
 	}

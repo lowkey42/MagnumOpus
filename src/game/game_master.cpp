@@ -4,6 +4,12 @@
 
 #include <random>
 
+#include <core/renderer/texture.hpp>
+
+#include "sys/physics/transform_comp.hpp"
+#include "sys/sprite/sprite_comp.hpp"
+
+
 namespace mo {
 	Game_master::Game_master(Game_engine& engine, const Saved_game_state& state)
 		: _level(state.stored_level.is_some() ? state.stored_level.get_or_throw() :
@@ -39,7 +45,32 @@ namespace mo {
 		}
 
 		log_out<<std::endl; // end log-line
+	}
 
+	void Game_master::spawn(Game_engine& engine, ecs::Entity_manager& em) {
+
+		_level.foreach_room([&](const auto& room){
+			auto center = room.center();
+
+			if(room.type==level::Room_type::start) {
+				// TODO[foe]
+
+			} else {
+				for(int i=0; i<5; i++) {
+					ecs::Entity_ptr enemy1 = em.emplace("blueprint:enemy"_aid);
+					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+					float x_enemy = 64.0f / 256.0f, y_enemy = 64.0f / 64.0f;
+					auto tex = engine.assets().load<renderer::Texture>("tex:enemy_moving"_aid);
+					enemy1->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x_enemy, 1.0-y_enemy));
+
+					ecs::Entity_ptr enemy3 = em.emplace("blueprint:enemy"_aid);
+					enemy3->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+					float x_enemy2 = 64.0f / 512.0f, y_enemy2 = 64.0f / 64.0f;
+					auto tex3 = engine.assets().load<renderer::Texture>("tex:enemy2_moving"_aid);
+					enemy3->emplace<sys::sprite::Sprite_comp>(tex3, glm::vec4(0.0f, 1.0f, x_enemy2, 1.0-y_enemy2));
+				}
+			}
+		});
 	}
 
 	void Game_master::update() {
