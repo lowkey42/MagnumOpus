@@ -27,8 +27,6 @@ namespace renderer {
 		float width = sprite.anim->frame_width / 64.f, height = sprite.anim->frame_height / 64.f;
 		glm::vec4 uv = glm::vec4(sprite.uv);
 
-		std::cout << "World Scale: " << cam.world_scale() << std::endl;
-
 		// Rotation Matrix to be applied to coords of the Sprite
 		glm::mat4 rotMat = glm::translate(glm::vec3(x + width / 2, y + height / 2, 0.f)) *
 				glm::rotate(sprite.rotation -1.5707f, glm::vec3(0.f, 0.f, 1.f)) * glm::translate(-glm::vec3(x + width / 2, y + height / 2, 0.f));
