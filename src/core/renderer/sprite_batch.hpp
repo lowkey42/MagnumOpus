@@ -60,6 +60,7 @@ namespace renderer {
 
 		// Methods
         void draw(const renderer::Camera& cam, const Sprite& sprite) noexcept;
+		void draw_part(const std::vector<SpriteVertex>::const_iterator begin, const std::vector<SpriteVertex>::const_iterator end);
 		void drawAll(const renderer::Camera& cam) noexcept;
 
 

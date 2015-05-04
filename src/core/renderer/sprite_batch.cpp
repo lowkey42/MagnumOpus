@@ -63,6 +63,20 @@ namespace renderer {
 	}
 
 
+	void Sprite_batch::draw_part(std::vector<SpriteVertex>::const_iterator begin, std::vector<SpriteVertex>::const_iterator end){
+
+		// check for nullptr and begin != end
+		// bind the appropriate texture and set the object buffer to
+		// the corresponding positions that has to be drawn
+		if(begin!=end && begin->tex){
+			begin->tex->bind();
+			_object.buffer().set<SpriteVertex>(begin, end);
+			_object.draw();
+		}
+
+	}
+
+
 	void Sprite_batch::drawAll(const Camera& cam) noexcept {
 
 		glm::mat4 MVP = cam.vp();
@@ -70,41 +84,24 @@ namespace renderer {
 			   .set_uniform("MVP", MVP)
 			   .set_uniform("myTextureSampler", 0);
 
-
-		std::vector<unsigned int> iterPos;
-
 		// Sorting the vertices by used texture
 		// so that blocks of vertices are bound together
 		// where the textures match each other -> less switching in texture binding
 		std::stable_sort(_vertices.begin(), _vertices.end());
 
-		// Mark positions, where the texture references differ from the one before
-		const Texture* curTex = _vertices.at(0).tex;
-		for(unsigned int i = 0; i < _vertices.size(); i++){
-			if(curTex != _vertices.at(i).tex){
-				iterPos.push_back(i);
-				curTex = _vertices.at(i).tex;
-				//std::cout << "Other tex than before at pos: " << i << std::endl;
+		auto last = _vertices.begin();
+		for(auto curIter = _vertices.begin(); curIter != _vertices.end(); ++curIter){
+
+			// if texture reference at the current iterator position differs from the one before
+			// draw from the last marked iterator position to the current position
+			// and set the last marker to the current iterator position
+			if(curIter->tex != last->tex){
+				draw_part(last, curIter);
+				last = curIter;
 			}
 		}
 
-		// Draw the vertices and bind the corresponding right texture
-		unsigned int begin = 0;
-		unsigned int end = (iterPos.size() > 0) ? iterPos.at(0) : _vertices.size();
-		_object.buffer().set<SpriteVertex>(_vertices.begin() + begin, _vertices.begin() + end);
-		_vertices.at(begin).tex->bind();
-		_object.draw();
-
-		for(unsigned int i = 0; i < iterPos.size(); i++){
-			begin = (i < iterPos.size()) ? iterPos.at(i) : iterPos.at(i-1);
-			end = (i+1 < iterPos.size()) ? iterPos.at(i+1) : _vertices.size();
-			_object.buffer().set<SpriteVertex>(_vertices.begin() + begin, _vertices.begin() + end);
-			_vertices.at(begin).tex->bind();
-			_object.draw();
-			//std::cout << "Begin: " << begin << " & End: " << end << std::endl << std::endl;
-		}
-
-		// TODO: nullptr check
+		draw_part(last, _vertices.end());
 
 		_vertices.clear();
 
