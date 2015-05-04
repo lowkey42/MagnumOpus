@@ -24,19 +24,22 @@ namespace renderer {
 	void Sprite_batch::draw(const Camera& cam, const Sprite& sprite) noexcept {
 
 		float x = sprite.position.x.value(), y = sprite.position.y.value();
+		float width = sprite.anim->frame_width / 64.f, height = sprite.anim->frame_height / 64.f;
 		glm::vec4 uv = glm::vec4(sprite.uv);
 
+		std::cout << "World Scale: " << cam.world_scale() << std::endl;
+
 		// Rotation Matrix to be applied to coords of the Sprite
-		glm::mat4 rotMat = glm::translate(glm::vec3(x + 0.5f, y + 0.5f, 0.f)) *
-				glm::rotate(sprite.rotation -1.5707f, glm::vec3(0.f, 0.f, 1.f)) * glm::translate(-glm::vec3(x + 0.5f, y + 0.5f, 0.f));
+		glm::mat4 rotMat = glm::translate(glm::vec3(x + width / 2, y + height / 2, 0.f)) *
+				glm::rotate(sprite.rotation -1.5707f, glm::vec3(0.f, 0.f, 1.f)) * glm::translate(-glm::vec3(x + width / 2, y + height / 2, 0.f));
 
 //		std::cout << "Entity with Sprite Component at: " << x << "/" << y << std::endl;
 //		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
 //		std::cout << "rotation is: " << sprite.rotation << std::endl;
 
 		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y+1.f, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y + height, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x + width, y + height, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
 
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
 		//_vertices.push_back({{x, y+1.f}, {uv.x, uv.y}, {sprite.texture}});
@@ -52,9 +55,9 @@ namespace renderer {
 			std::cout << "ux / uy -> " << uv.z << "/" << uv.y << std::endl;
 		}
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x + width, y + height, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
 		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x + width, y, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture));
 
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});

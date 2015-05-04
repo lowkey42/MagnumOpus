@@ -109,7 +109,7 @@ namespace combat {
 
 							// TODO[foe]: remove after sprite_comp integration
 
-							auto anim = _assets.load<renderer::Animation>("anim:crawler"_aid);
+							auto anim = _assets.load<renderer::Animation>("anim:ball"_aid);
 							bullet->emplace<sys::sprite::Sprite_comp>(anim);
 							// END TODO
 						}
