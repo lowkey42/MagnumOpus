@@ -25,10 +25,12 @@ namespace ecs {
 
 	class Entity_state {
 		public:
-			Entity_state(sf2::io::CharSource& cs) : _char_source(cs) {}
-			Entity_state(sf2::io::CharSink& cs) : _char_sink(cs) {}
-			Entity_state(sf2::io::CharSource& source, sf2::io::CharSink& sink)
-				: _char_source(source), _char_sink(sink) {}
+			Entity_state(asset::Asset_manager& asset_mgr, sf2::io::CharSource& cs)
+				: _asset_mgr(asset_mgr), _char_source(cs) {}
+			Entity_state(asset::Asset_manager& asset_mgr, sf2::io::CharSink& cs)
+				: _asset_mgr(asset_mgr), _char_sink(cs) {}
+			Entity_state(asset::Asset_manager& asset_mgr, sf2::io::CharSource& source, sf2::io::CharSink& sink)
+				: _asset_mgr(asset_mgr), _char_source(source), _char_sink(sink) {}
 
 			template<class T>
 			T read_to(T&& t) {
@@ -67,7 +69,10 @@ namespace ecs {
 				return cs;
 			}
 
+			auto& asset_mgr()noexcept {return _asset_mgr;}
+
 		private:
+			asset::Asset_manager& _asset_mgr;
 			util::maybe<sf2::io::CharSource&> _char_source;
 			util::maybe<sf2::io::CharSink&> _char_sink;
 			bool _written = false;

@@ -30,6 +30,9 @@ namespace mo {
 				  _on_quit_slot(&Game_engine::_on_quit, this) {
 				_on_quit_slot.connect(_controllers.quit_events);
 			}
+			~Game_engine() {
+				_screen_stack.clear();
+			}
 
 			/// re-define enter_screen to inject Game_engine instead of Engine into screens
 			using Engine::enter_screen;

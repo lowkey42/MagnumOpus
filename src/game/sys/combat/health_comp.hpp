@@ -1,5 +1,5 @@
 /**************************************************************************\
- * target for camera following                       *
+ * stores the current health of an entity (+shield, ...)                  *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,47 +15,44 @@
 
 #pragma once
 
-#include "../../../core/ecs/ecs.hpp"
-#include "../../../core/units.hpp"
+#include <core/ecs/ecs.hpp>
+#include <core/units.hpp>
 
 namespace mo {
 namespace sys {
-namespace cam {
+namespace combat {
 
-	class Camera_target_comp : public ecs::Component<Camera_target_comp> {
+	class Health_comp : public ecs::Component<Health_comp> {
 		public:
-			static constexpr const char* name() {return "Camera_target";}
+			static constexpr const char* name() {return "Health";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Camera_target_comp(ecs::Entity& owner, Mass mass=Mass(0.1), float damping=0.5, float freq=3, float lazyness=2)
-			    : Component(owner), _mass(mass), _damping(damping), _freq(freq), _lazyness(lazyness) {}
+			Health_comp(ecs::Entity& owner, float max_hp=100) noexcept
+				: Component(owner), _max_hp(max_hp), _current_hp(max_hp) {}
 
-			void force_position(Position pos)noexcept {_cam_pos=pos;}
+			void update(Time dt)noexcept;
 
-			auto cam_position()const noexcept {return _cam_pos;}
+			void heal(float hp)noexcept {_heal+=hp;}
+			void damage(float hp)noexcept{_damage+=hp;}
 
-			void chase(Position target, Time dt);
+			auto hp()const noexcept {return _current_hp;}
+			auto max_hp()const noexcept {return _max_hp;}
+
+			auto damaged()const noexcept {return _current_hp<_max_hp;}
 
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
-			friend class Camera_system;
+			friend class Combat_system;
 
-			bool _unset=true;
-			Time _sleeping = Time(0);
-			Mass _mass;
-			float _damping;
-			float _freq;
-			float _lazyness;
-			Velocity _velocity;
+			float _auto_heal_max=0;
+			float _auto_heal=0;
 
-			Position _cam_pos;
+			float _max_hp;
+			float _current_hp;
 
-			// TODO[foe]: refactor
-			Angle _last_rotation = Angle{0};
-			Time _rotation_zoom_time_left = Time{0};
-			Time _rotation_zoom_time=Time{1.f};
+			float _damage=0, _heal=0;
 	};
 
 }

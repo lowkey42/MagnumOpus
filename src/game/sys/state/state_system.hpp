@@ -1,5 +1,5 @@
 /**************************************************************************\
- * math helpers                                                           *
+ * Manages the current state of all active entities                       *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,29 +15,27 @@
 
 #pragma once
 
-#include <tuple>
-#include "../units.hpp"
+#include <core/ecs/ecs.hpp>
+#include <core/utils/events.hpp>
+
+#include "state_comp.hpp"
 
 namespace mo {
-namespace util {
+namespace sys {
+namespace state {
 
-	template<typename Pos, typename Vel>
-	auto spring(Pos source, Vel v, Pos target, float damping,
-	            float freq, Time t) -> std::tuple<Pos, Vel> {
-		auto f = remove_unit(1 + 2*t*damping*freq);
-		auto tff = remove_unit(t*freq*freq);
-		auto ttff = remove_unit(t*tff);
-		auto detInv = 1.f / (f+ttff);
-		auto diff = remove_units(target-source);
+	class State_system {
+		public:
+			State_system(ecs::Entity_manager& em);
 
-		auto new_pos = (f * source + t*v+ttff*target) * detInv;
-		auto new_vel = (v + tff * Vel{diff.x, diff.y}) * detInv;
+			void update(Time dt);
 
-		if((remove_unit(new_vel.x)*remove_unit(new_vel.x) + remove_unit(new_vel.y)*remove_unit(new_vel.y))<0.5f)
-			new_vel = new_vel * 0.f;
+			util::signal_source<ecs::Entity&, const State_data&> state_change_events;
 
-		return std::make_tuple(new_pos, new_vel);
-	}
+		private:
+			State_comp::Pool& _states;
+	};
 
+}
 }
 }

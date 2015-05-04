@@ -79,11 +79,12 @@ void Engine::leave_screen(uint8_t depth) {
 	for(;depth>0; depth--)
 		_screen_stack.pop_back();
 
-	if(_screen_stack.empty())
+	if(_screen_stack.empty()) {
 		_quit=true;
+		last->_on_leave(util::nothing());
 
-	else {
-		last->_on_leave(*_screen_stack.back());
+	} else {
+		last->_on_leave(util::justPtr(_screen_stack.back().get()));
 		_screen_stack.back()->_on_enter(util::justPtr(last.get()));
 	}
 }

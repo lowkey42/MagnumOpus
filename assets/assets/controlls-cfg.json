@@ -47,7 +47,8 @@
 		"start": "enter_leave_game",
 		"back": "quit"
 	},
-	"aim_sticks": ["right"],
-	"move_sticks": ["left"],
-	"stick_dead_zone": 0.01
+    "aim_sticks": ["right"],
+    "move_sticks": ["left"],
+    "stick_dead_zone": 0.2,
+    "mouse_look": true
 }

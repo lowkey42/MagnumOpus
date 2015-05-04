@@ -9,10 +9,20 @@
         "active_acceleration": 5
 	},
     "Camera_target": {
-        "mass": 0.1,
+        "mass": 0.2,
         "damping": 0.5
-        "freq": 2.5,
-        "lazyness":4
+        "freq": 5.0,
+        "lazyness":1
     },
-    "Target_tag"
+    "Target_tag",
+    "State",
+    "Health":{
+        "max_hp": 50
+     },
+    "Weapon":{
+        "type": "range",
+        "bullet_type": "bullet",
+        "bullet_velocity": 60,
+        "cooldown": 0.5
+    }
 }

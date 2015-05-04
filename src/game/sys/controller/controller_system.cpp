@@ -3,23 +3,34 @@
 
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
+#include "../combat/weapon_comp.hpp"
+#include "../state/state_comp.hpp"
 
 namespace mo {
 namespace sys {
 namespace controller {
 	using namespace physics;
+	using namespace state;
 	using namespace unit_literals;
 
 	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
 	  : _controllables(entity_manager.list<Controllable_comp>()) {
+
 		entity_manager.register_component_type<Controllable_comp>();
 	}
 
 	namespace {
-		constexpr auto max_rotation_speed = 180_deg / second;
+		constexpr auto max_rotation_speed = 180_deg / 0.5_s;
 
 		struct Controllable_interface_impl : public Controllable_interface {
-			Controllable_interface_impl(Time dt, ecs::Entity& entity) : _dt(dt), _entity(entity){}
+			Controllable_interface_impl(Time dt, ecs::Entity& entity)
+				: _dt(dt), _entity(entity),
+				  _state(entity.get<State_comp>().process(State_data{},
+														   [](auto& s){return s.state();})),
+				  _target_rotation(entity.get<Transform_comp>().process(0_deg,
+																	[](auto& p){return p.rotation();})) {}
+
+			~Controllable_interface_impl()noexcept;
 
 			auto entity()noexcept -> ecs::Entity& override;
 			void move(glm::vec2 target) override;
@@ -30,9 +41,17 @@ namespace controller {
 			void take() override;
 			void switch_weapon(uint32_t weapon_id) override;
 
-		private:
-			const Time _dt;
-			ecs::Entity& _entity;
+			void set_state(Entity_state s, float magnitude=1.f) {
+				_entity.get<State_comp>().process([s,magnitude](auto& state){
+					state.state(s, magnitude);
+				});
+			}
+
+			private:
+				const Time _dt;
+				ecs::Entity& _entity;
+				const State_data _state;
+				Angle _target_rotation;
 		};
 	}
 	void Controller_system::update(Time dt) {
@@ -131,36 +150,53 @@ namespace controller {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
 				comp.accelerate_active(direction);
 
-				// TODO: strafing
-				this->look_in_dir(direction);
+				if(_state.s!=Entity_state::attacking_melee && _state.s!=Entity_state::attacking_range)
+					this->look_in_dir(direction);
+
+				this->set_state(Entity_state::walking, glm::length(direction));
 			});
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {
 			_entity.get<Transform_comp>().process([this, pos](auto& comp){
-				this->look_in_dir(remove_units(comp.position()) - pos);
+				this->look_in_dir(pos-remove_units(comp.position()));
 			});
 		}
 		void Controllable_interface_impl::look_in_dir(glm::vec2 direction) {
-			_entity.get<Transform_comp>().process([this, direction](auto& comp){
-				Angle target_rot = Angle(glm::atan(direction.y, direction.x));
-				Angle rotation_diff = target_rot-comp.rotation();
-				if(rotation_diff>180_deg) rotation_diff-=360_deg;
-				if(rotation_diff<180_deg) rotation_diff+=360_deg;
-
-				comp.rotation(comp.rotation() + std::min(rotation_diff, max_rotation_speed*_dt) );
-			});
+			_target_rotation = Angle(atan2(direction.y, direction.x));
 		}
 		void Controllable_interface_impl::attack() {
-			// TODO: AttackerComponent.attack(TransformComp.getPosition(), TransformComp.getRotation())
+			_entity.get<combat::Weapon_comp>().process([&](auto& w){
+				w.attack();
+			});
 		}
 		void Controllable_interface_impl::use() {
 			// TODO: UserComponent.use(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
+
+			// if there is something useable
+			set_state(Entity_state::interacting);
 		}
 		void Controllable_interface_impl::take() {
 			// TODO: InventoryComponent.take(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
+
+			set_state(Entity_state::taking);
 		}
 		void Controllable_interface_impl::switch_weapon(uint32_t weapon_id) {
 			// TODO: WeaponComponent.set(weaponId)
+
+			set_state(Entity_state::change_weapon);
+		}
+
+		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
+			_entity.get<Transform_comp>().process([&](auto& c){
+				auto rotation_diff = normalize_to_half_rot(_target_rotation-c.rotation());
+
+				auto max_rot = max_rotation_speed*_dt;
+
+				if(abs(rotation_diff)>max_rot)
+					rotation_diff = sign(rotation_diff).value() * max_rot;
+
+				c.rotation(c.rotation() + rotation_diff);
+			});
 		}
 	}
 

@@ -23,8 +23,8 @@ namespace ai {
 		Persisted_state(const Simple_ai_comp& c)
 				: attack_distance(c.attack_distance.value()),
 		          near(c.near.value()), max(c.max.value()),
-		          near_angle(c.near_angle.value()),
-		          far_angle(c.far_angle.value()),
+				  near_angle(c.near_angle.value() / (1_deg).value()),
+				  far_angle(c.far_angle.value() / (1_deg).value()),
 		          follow_time(c._follow_time.value()) {}
 	};
 
@@ -89,7 +89,7 @@ namespace ai {
 
 				auto distance = glm::length(dir) * 1_m;
 
-				c.look_in_dir(dir);
+				c.look_at(remove_units(tt.position()));
 
 				if(distance<=attack_distance)
 					c.attack();

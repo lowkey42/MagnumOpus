@@ -23,6 +23,9 @@
 
 
 namespace mo {
+	namespace ecs {
+		class Entity_manager;
+	}
 
 	struct Game_state;
 
@@ -38,6 +41,8 @@ namespace mo {
 	class Game_master {
 		public:
 			Game_master(Game_engine& engine, const Saved_game_state& state);
+
+			void spawn(Game_engine& engine, ecs::Entity_manager& em);
 
 			void update();
 
