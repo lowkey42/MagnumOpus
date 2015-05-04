@@ -4,6 +4,7 @@
 #include "game_master.hpp"
 
 #include <core/renderer/texture.hpp>
+#include <core/asset/aid.hpp>
 
 #include "sys/physics/transform_comp.hpp"
 #include "sys/sprite/sprite_comp.hpp"
@@ -149,7 +150,9 @@ namespace mo {
 
 		float x = 64.0f / 512.0f, y = 64.0f / 64.0f;
 
-		auto tex = _engine.assets().load<renderer::Texture>("tex:player_moving"_aid);
+		//auto anim = asset::Ptr<renderer::Animation_data>();
+
+		renderer::Texture_ptr tex = _engine.assets().load<renderer::Texture>("tex:player_moving"_aid);
 		p->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x, 1.0-y));
 
 		if(!_main_player)

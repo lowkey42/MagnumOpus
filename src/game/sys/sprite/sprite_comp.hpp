@@ -18,6 +18,7 @@
 #include <core/ecs/ecs.hpp>
 #include <core/renderer/texture.hpp>
 #include <core/renderer/sprite_batch.hpp>
+#include <core/renderer/animation_data.hpp>
 
 namespace mo {
 namespace sys {
@@ -32,11 +33,11 @@ namespace sprite {
 		void store(ecs::Entity_state&)override;
 
 		// TODO: nullptr check
-		Sprite_comp(ecs::Entity& owner, renderer::Texture_ptr tex = renderer::Texture_ptr(), glm::vec4 uv = glm::vec4(0.0f)) :
+		Sprite_comp(ecs::Entity& owner, /*asset::Ptr<renderer::Animation_data> animation = asset::Ptr<renderer::Animation_data>(),*/ renderer::Texture_ptr tex = renderer::Texture_ptr(), glm::vec4 uv = glm::vec4(0.0f)) :
 			Component(owner), _texture(tex), _uv(uv){}
 
         auto sprite() const noexcept {
-			return renderer::Sprite_batch::Sprite{{}, 0, *_texture, _uv};
+			return renderer::Sprite_batch::Sprite{{}, 0, _animation, *_texture, _uv};
 		}
 
 		struct Persisted_state;
@@ -44,6 +45,7 @@ namespace sprite {
 
 	private:
 
+		asset::Ptr<renderer::Animation_data> _animation;
         renderer::Texture_ptr _texture;
 		glm::vec4 _uv;
 

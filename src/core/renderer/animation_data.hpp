@@ -1,5 +1,5 @@
 /**************************************************************************\
- * camera.hpp - Defining a movable and scalable camera w viewport         *
+ * animation_data -													      *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -17,29 +17,56 @@
 
 #include <unordered_map>
 
-#include <core/renderer/texture.hpp>
+#include "../renderer/texture.hpp"
+#include "../../core/asset/asset_manager.hpp"
 
 namespace mo {
 namespace renderer {
 
-enum class Animation_type{
-    idle,
-    moving,
-    attack,
-};
+	enum class Animation_type{
+		idle,
+		moving,
+		attack
+	};
+}
+}
 
-struct Animation_frame_data{
-    int row;
-    float fps;
-    int frames;
-};
+namespace std {
+	template <> struct hash<mo::renderer::Animation_type> {
+		size_t operator()(mo::renderer::Animation_type ac)const noexcept {
+			return static_cast<size_t>(ac);
+		}
+	};
+}
 
-struct Animation_data{
-    int frame_width, frame_height;
-    Texture_ptr texture;
-    std::unordered_map<Animation_type, Animation_frame_data> animations;
-};
+namespace mo {
+namespace renderer {
 
+	struct Animation_frame_data{
+		int row;
+		float fps;
+		int frames;
+	};
+
+	struct Animation_data{
+		int frame_width;
+		int frame_height;
+		Texture_ptr texture;
+		std::string texName = texture.aid().name();
+		std::unordered_map<Animation_type, Animation_frame_data> animations;
+	};
+
+}
+
+namespace asset {
+	template<>
+	struct Loader<renderer::Animation_data> {
+		using RT = std::shared_ptr<renderer::Animation_data>;
+
+		static RT load(istream in) throw(Loading_failed);
+
+		static void store(ostream out, renderer::Animation_data& asset) throw(Loading_failed);
+	};
 }
 }
 

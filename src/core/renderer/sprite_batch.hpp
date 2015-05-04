@@ -19,6 +19,8 @@
 #include "shader.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
+#include "animation_data.hpp"
+#include "../asset/aid.hpp"
 
 #include "../../core/units.hpp"
 
@@ -51,6 +53,7 @@ namespace renderer {
 		struct Sprite{
 			Position position;
 			float rotation;
+			asset::Ptr<renderer::Animation_data> anim;
 			const renderer::Texture& texture;
 			glm::vec4 uv;
 		};

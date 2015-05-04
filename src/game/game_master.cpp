@@ -9,6 +9,9 @@
 #include "sys/physics/transform_comp.hpp"
 #include "sys/sprite/sprite_comp.hpp"
 
+#include "core/asset/aid.hpp"
+#include "core/renderer/animation_data.hpp"
+
 
 namespace mo {
 	Game_master::Game_master(Game_engine& engine, const Saved_game_state& state)
@@ -57,6 +60,7 @@ namespace mo {
 
 			} else {
 				for(int i=0; i<5; i++) {
+					//auto anim = asset::Ptr<renderer::Animation_data>();
 					ecs::Entity_ptr enemy1 = em.emplace("blueprint:enemy"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
 					float x_enemy = 64.0f / 256.0f, y_enemy = 64.0f / 64.0f;
