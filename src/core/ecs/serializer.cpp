@@ -70,7 +70,7 @@ namespace ecs {
 				ecs::Component<BlueprintComponent>::operator=(static_cast<Component&&>(o));
 
 				blueprint = std::move(o.blueprint); // deatch/attach not required, Comp-move accors entities is undefined
-				blueprintId = std::move(blueprintId);
+				blueprintId = std::move(o.blueprintId);
 				return *this;
 			}
 
