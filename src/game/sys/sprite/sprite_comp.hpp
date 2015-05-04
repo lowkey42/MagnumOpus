@@ -33,11 +33,18 @@ namespace sprite {
 		void store(ecs::Entity_state&)override;
 
 		// TODO: nullptr check
-		Sprite_comp(ecs::Entity& owner, /*asset::Ptr<renderer::Animation_data> animation = asset::Ptr<renderer::Animation_data>(),*/ renderer::Texture_ptr tex = renderer::Texture_ptr(), glm::vec4 uv = glm::vec4(0.0f)) :
-			Component(owner), _texture(tex), _uv(uv){}
+		Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
+			Component(owner), _animation(animation), _animType(renderer::Animation_type::idle){}
 
         auto sprite() const noexcept {
-			return renderer::Sprite_batch::Sprite{{}, 0, _animation, *_texture, _uv};
+			// Calculating corresponding uv-coords
+			// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
+			float width = _animation->frame_width / static_cast<float>(_animation->texture->width());
+			float height = _animation->frame_height / static_cast<float>(_animation->texture->height());
+			float startX = 0.0f;
+			float startY = 1.0f - height - (static_cast<int>(_animType) * height);
+			const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
+			return renderer::Sprite_batch::Sprite{{}, 0, uv, _animation};
 		}
 
 		struct Persisted_state;
@@ -45,9 +52,9 @@ namespace sprite {
 
 	private:
 
-		asset::Ptr<renderer::Animation_data> _animation;
-        renderer::Texture_ptr _texture;
-		glm::vec4 _uv;
+		asset::Ptr<renderer::Animation> _animation;
+		renderer::Texture_ptr _texture;
+		renderer::Animation_type _animType;
 
 	};
 

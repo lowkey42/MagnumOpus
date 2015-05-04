@@ -11,28 +11,19 @@ namespace sprite {
 
 	struct Sprite_comp::Persisted_state {
 		std::string aid;
-        // Animationdata
-        float uv_x;
-		float uv_y;
-		float uv_z;
-		float uv_w;
+		// add Animationdata to save
 		Persisted_state(const Sprite_comp& c) :
-            aid(c._texture.aid().str()), uv_x(c._uv.x), uv_y(c._uv.y), uv_z(c._uv.z), uv_w(c._uv.w){}
+			aid(c._texture.aid().str()){}
 
     };
 
 	sf2_structDef(Sprite_comp::Persisted_state,
-		sf2_member(aid),
-	    sf2_member(uv_x),
-	    sf2_member(uv_y),
-	    sf2_member(uv_z),
-	    sf2_member(uv_w)
+		sf2_member(aid)
 	)
 
 	void Sprite_comp::load(ecs::Entity_state &state){
 		auto s = state.read_to(Persisted_state{*this});
-        // TODO _texture = asset::AID(s.aid);
-		_uv = glm::vec4(s.uv_x, s.uv_y, s.uv_z, s.uv_w);
+		// TODO _texture = asset::AID(s.aid);
 	}
 
 	void Sprite_comp::store(ecs::Entity_state &state){

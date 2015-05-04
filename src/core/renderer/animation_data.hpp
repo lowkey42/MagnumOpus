@@ -48,7 +48,7 @@ namespace renderer {
 		int frames;
 	};
 
-	struct Animation_data{
+	struct Animation{
 		int frame_width;
 		int frame_height;
 		Texture_ptr texture;
@@ -60,12 +60,12 @@ namespace renderer {
 
 namespace asset {
 	template<>
-	struct Loader<renderer::Animation_data> {
-		using RT = std::shared_ptr<renderer::Animation_data>;
+	struct Loader<renderer::Animation> {
+		using RT = std::shared_ptr<renderer::Animation>;
 
 		static RT load(istream in) throw(Loading_failed);
 
-		static void store(ostream out, renderer::Animation_data& asset) throw(Loading_failed);
+		static void store(ostream out, renderer::Animation& asset) throw(Loading_failed);
 	};
 }
 }

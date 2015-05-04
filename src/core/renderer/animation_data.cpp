@@ -17,7 +17,7 @@ namespace renderer{
 		sf2_member(frames)
 	)
 
-	sf2_structDef(Animation_data,
+	sf2_structDef(Animation,
 		sf2_member(frame_width),
 		sf2_member(frame_height),
 		sf2_member(texName),
@@ -28,18 +28,21 @@ namespace renderer{
 
 namespace asset {
 
-	std::shared_ptr<renderer::Animation_data> Loader<renderer::Animation_data>::load(istream in) throw(Loading_failed){
-		auto r = std::make_shared<renderer::Animation_data>();
+	std::shared_ptr<renderer::Animation> Loader<renderer::Animation>::load(istream in) throw(Loading_failed){
+		auto r = std::make_shared<renderer::Animation>();
 
 		std::string data = in.content();
 		sf2::io::StringCharSource source(data);
 
-		sf2::ParserDefChooser<renderer::Animation_data>::get().parse(source, *r.get());
+		sf2::ParserDefChooser<renderer::Animation>::get().parse(source, *r.get());
+
+		r->texture = in.manager().load<renderer::Texture>(r->texName);
 
 		return r;
 	}
 
-	void Loader<renderer::Animation_data>::store(ostream out, renderer::Animation_data& asset) throw(Loading_failed) {
+	void Loader<renderer::Animation>::store(ostream out, renderer::Animation& asset) throw(Loading_failed) {
+		asset.texName = asset.texture.aid().name();
 		std::string data = sf2::writeString(asset);
 		out.write(data.c_str(), data.length());
 	}

@@ -34,9 +34,9 @@ namespace renderer {
 //		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
 //		std::cout << "rotation is: " << sprite.rotation << std::endl;
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.w}, &sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y+1.f, 0.0f, 1.0f), {uv.x, uv.y}, &sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.y}, &sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y+1.f, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
 
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
 		//_vertices.push_back({{x, y+1.f}, {uv.x, uv.y}, {sprite.texture}});
@@ -52,9 +52,9 @@ namespace renderer {
 			std::cout << "ux / uy -> " << uv.z << "/" << uv.y << std::endl;
 		}
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.y}, &sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.w}, &sprite.texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y, 0.0f, 1.0f), {uv.z, uv.w}, &sprite.texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y+1.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x+1.f, y, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture));
 
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});

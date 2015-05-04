@@ -53,9 +53,8 @@ namespace renderer {
 		struct Sprite{
 			Position position;
 			float rotation;
-			asset::Ptr<renderer::Animation_data> anim;
-			const renderer::Texture& texture;
-			glm::vec4 uv;
+			const glm::vec4 uv;
+			asset::Ptr<renderer::Animation> anim;
 		};
 
 		// Constructors

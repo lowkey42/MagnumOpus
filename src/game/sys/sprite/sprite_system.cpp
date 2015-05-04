@@ -22,7 +22,7 @@ namespace sprite {
 			process(entity.get<sys::physics::Transform_comp>(),
 	                entity.get<sys::sprite::Sprite_comp>())
             >> [&](const auto& trans, const auto& sp) {
-                auto sprite = sp.sprite();
+				auto sprite = sp.sprite();
 				sprite.position = trans.position();
 				sprite.rotation = trans.rotation();
 				_sprite_batch.draw(camera, sprite);

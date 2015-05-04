@@ -60,18 +60,15 @@ namespace mo {
 
 			} else {
 				for(int i=0; i<5; i++) {
-					//auto anim = asset::Ptr<renderer::Animation_data>();
 					ecs::Entity_ptr enemy1 = em.emplace("blueprint:enemy"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
-					float x_enemy = 64.0f / 256.0f, y_enemy = 64.0f / 64.0f;
-					auto tex = engine.assets().load<renderer::Texture>("tex:enemy_moving"_aid);
-					enemy1->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x_enemy, 1.0-y_enemy));
+					auto anim1 = engine.assets().load<renderer::Animation>("anim:scorpion"_aid);
+					enemy1->emplace<sys::sprite::Sprite_comp>(anim1);
 
 					ecs::Entity_ptr enemy3 = em.emplace("blueprint:enemy"_aid);
 					enemy3->get<sys::physics::Transform_comp>().get_or_throw().position(center);
-					float x_enemy2 = 64.0f / 512.0f, y_enemy2 = 64.0f / 64.0f;
-					auto tex3 = engine.assets().load<renderer::Texture>("tex:enemy2_moving"_aid);
-					enemy3->emplace<sys::sprite::Sprite_comp>(tex3, glm::vec4(0.0f, 1.0f, x_enemy2, 1.0-y_enemy2));
+					auto anim2 = engine.assets().load<renderer::Animation>("anim:crawler"_aid);
+					enemy3->emplace<sys::sprite::Sprite_comp>(anim2);
 				}
 			}
 		});

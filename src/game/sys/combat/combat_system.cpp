@@ -108,11 +108,9 @@ namespace combat {
 							});
 
 							// TODO[foe]: remove after sprite_comp integration
-							float x_enemy2 = 64.0f / 512.0f, y_enemy2 = 64.0f / 64.0f;
 
-							auto tex3 =  _assets.load<renderer::Texture>("tex:enemy2_moving"_aid);
-							//auto anim = asset::Ptr<renderer::Animation_data>();
-							bullet->emplace<sys::sprite::Sprite_comp>(tex3, glm::vec4(0.0f, 1.0f, x_enemy2, 1.0-y_enemy2));
+							auto anim = _assets.load<renderer::Animation>("anim:crawler"_aid);
+							bullet->emplace<sys::sprite::Sprite_comp>(anim);
 							// END TODO
 						}
 						break;

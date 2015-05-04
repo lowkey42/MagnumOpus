@@ -148,12 +148,8 @@ namespace mo {
 					trans.position(pos);
 				});
 
-		float x = 64.0f / 512.0f, y = 64.0f / 64.0f;
-
-		//auto anim = asset::Ptr<renderer::Animation_data>();
-
-		renderer::Texture_ptr tex = _engine.assets().load<renderer::Texture>("tex:player_moving"_aid);
-		p->emplace<sys::sprite::Sprite_comp>(tex, glm::vec4(0.0f, 1.0f, x, 1.0-y));
+		auto anim = _engine.assets().load<renderer::Animation>("anim:player"_aid);
+		p->emplace<sys::sprite::Sprite_comp>(anim);
 
 		if(!_main_player)
 			_main_player = p;

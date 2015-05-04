@@ -1,2 +1,4 @@
 anim: = animations/
 anim:player = animations/player_anim.json
+anim:scorpion = animations/scorpion_anim.json
+anim:crawler = animations/crawler_anim.json
