@@ -30,7 +30,8 @@ namespace asset {
 		music,
 		cfg,
 		blueprint,
-		font
+		font,
+		anim
 	};
 
 	/**

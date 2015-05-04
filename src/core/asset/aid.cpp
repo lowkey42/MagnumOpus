@@ -25,6 +25,7 @@ namespace asset {
 		else if("cfg"==r.first)          _type=Asset_type::cfg;
 		else if("blueprint"==r.first)    _type=Asset_type::blueprint;
 		else if("font"==r.first)         _type=Asset_type::font;
+		else if("anim"==r.first)         _type=Asset_type::anim;
 		else FAIL("Unknown AssetClass: "<<r.first);
 	}
 
@@ -41,6 +42,7 @@ namespace asset {
 			case Asset_type::cfg:         class_name="cfg";         break;
 			case Asset_type::blueprint:   class_name="blueprint";   break;
 			case Asset_type::font:        class_name="font";        break;
+			case Asset_type::anim:        class_name="anim";        break;
 			default: FAIL("Unknown AssetType: "<<static_cast<uint16_t>(_type));
 		}
 
