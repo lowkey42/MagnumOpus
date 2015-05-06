@@ -48,9 +48,9 @@ namespace mo {
 	void Meta_system::draw() {
 
 		for(auto& cam : camera.cameras()) {
-			tilemap.draw(cam);
+			tilemap.draw(cam.camera);
 			// TODO: draw systems here
-			spritesys.draw(cam);
+			spritesys.draw(cam.camera);
 		}
 	}
 
@@ -65,7 +65,8 @@ namespace mo {
 	Game_screen::Game_screen(Game_engine& engine) :
 		Screen(engine), _engine(engine),
 		_gm(new Game_master(engine, load_save_game(engine))),
-		_state(engine, _gm->level())
+		_state(engine, _gm->level()),
+	    _ui(engine)
 	{
 		auto start_room_m = _gm->level().find_room(level::Room_type::start);
 
@@ -117,25 +118,11 @@ namespace mo {
 	void Game_screen::_draw(float time) {
 		_state.draw();
 
-		// TODO: draw ui
-		/*
-		 *
-	auto _font = assets().load<renderer::Font>("font:test"_aid);
-	renderer::Shader_program _text_shader;
-	_text_shader.attach_shader(assets().load<core::renderer::Shader>(("vert_shader:simple"_aid)))
-		 .attach_shader(assets().load<core::renderer::Shader>(("frag_shader:simple"_aid)))
-		 .bind_all_attribute_locations(renderer::text_vertex_layout)
-		 .build();
-
-	_font->bind();
-	_text_shader.bind()
-				.set_uniform("model",   glm::scale(glm::mat4(), glm::vec3(1.f, 1.f, 1.f)))
-				.set_uniform("VP",      glm::ortho(-1000.f,1000.f,1000.f,-1000.f))
-				.set_uniform("texture", 0)
-				.set_uniform("layer",   0.9f)
-				.set_uniform("color",   glm::vec4(1,1,1,0.6));
-	_font->text("FRAMES: "+util::to_string(delta_time))->draw();
-	*/
+		_ui.pre_draw();
+		for(auto& cam : _state.camera.cameras()) {
+			for(auto& t : cam.targets)
+				_ui.draw(cam.camera, *t);
+		}
 	}
 
 

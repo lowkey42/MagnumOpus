@@ -153,23 +153,29 @@ namespace renderer {
 		}
 	}
 
-	auto Font::text(const std::string str)const -> Text_ptr {
+	void Font::calculate_vertices(const std::string& str,
+	                              std::vector<Font_vertex>& vertices)const {
+
+		vertices.reserve(str.length()*4);
+
+		parse(str, _height, _texture->width(), _texture->height(), _glyphs, [&](auto... args) {
+			create_quad(vertices, args...);
+		});
+	}
+
+	auto Font::text(const std::string& str)const -> Text_ptr {
 		auto& entry =_cache[str];
 
 		if(entry)
 			return entry;
 
 		std::vector<Font_vertex> vertices;
-		vertices.reserve(str.length()*4);
-
-		parse(str, _height, _texture->width(), _texture->height(), _glyphs, [&](auto... args) {
-			create_quad(vertices, args...);
-		});
+		calculate_vertices(str, vertices);
 
 		return entry=std::make_shared<Text>(vertices);
 	}
 
-	auto Font::calculate_size(const std::string str)const -> glm::vec2 {
+	auto Font::calculate_size(const std::string& str)const -> glm::vec2 {
 		glm::vec2 top_left, bottom_right;
 
 		parse(str, _height, _texture->width(), _texture->height(), _glyphs, [&](
@@ -197,6 +203,21 @@ namespace renderer {
 	}
 	void Text::draw()const {
 		_obj.draw();
+	}
+
+	Text_dynamic::Text_dynamic(Font_ptr font)
+	    : _font(font),
+	      _data(),
+	      _obj(text_vertex_layout, create_dynamic_buffer<Font_vertex>(4*5)) {
+	}
+
+	void Text_dynamic::draw()const {
+		_obj.draw();
+	}
+	void Text_dynamic::set(const std::string& str) {
+		_data.clear();
+		_font->calculate_vertices(str, _data);
+		_obj.buffer().set(_data);
 	}
 
 }

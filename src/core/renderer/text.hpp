@@ -61,12 +61,15 @@ namespace renderer {
 		public:
 			Font(asset::Asset_manager& assets, std::istream&);
 
-			auto text(const std::string str)const -> Text_ptr;
-			auto calculate_size(const std::string str)const -> glm::vec2;
+			auto text(const std::string& str)const -> Text_ptr;
+			auto calculate_size(const std::string& str)const -> glm::vec2;
 			void bind()const;
 
 		private:
 			friend class Text;
+			friend class Text_dynamic;
+
+			void calculate_vertices(const std::string& str, std::vector<Font_vertex>& out)const;
 
 			int _height = 0;
 			int _line_height = 0;
@@ -83,7 +86,20 @@ namespace renderer {
 
 			void draw()const;
 
-		private:
+		protected:
+			Object _obj;
+	};
+
+	class Text_dynamic {
+		public:
+			Text_dynamic(Font_ptr font);
+
+			void draw()const;
+			void set(const std::string& str);
+
+		protected:
+			Font_ptr _font;
+			std::vector<Font_vertex> _data;
 			Object _obj;
 	};
 

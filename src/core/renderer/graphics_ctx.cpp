@@ -116,5 +116,13 @@ namespace renderer {
 		glClearColor(r,g,b,1.f);
 	}
 
+
+	Disable_depthtest::Disable_depthtest() {
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	Disable_depthtest::~Disable_depthtest() {
+		glEnable(GL_DEPTH_TEST);
+	}
 }
 }

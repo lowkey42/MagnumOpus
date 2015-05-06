@@ -47,6 +47,11 @@ namespace renderer {
 			float _cpu_delta_time_smoothed = 0;
 			float _time_since_last_FPS_output = 0;
 	};
+
+	struct Disable_depthtest {
+		Disable_depthtest();
+		~Disable_depthtest();
+	};
 }
 }
 

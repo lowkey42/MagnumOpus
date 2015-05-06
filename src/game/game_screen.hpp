@@ -33,6 +33,8 @@
 #include "sys/combat/combat_system.hpp"
 #include "sys/state/state_system.hpp"
 
+#include "game_ui.hpp"
+
 namespace mo {
 	namespace renderer{ class Camera; }
 
@@ -84,6 +86,7 @@ namespace mo {
 
 			std::unique_ptr<Game_master> _gm;
 			Meta_system _state;
+			Game_ui _ui;
 
 			ecs::Entity_ptr _main_player;
 			std::vector<ecs::Entity_ptr> _sec_players;

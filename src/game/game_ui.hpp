@@ -1,5 +1,5 @@
 /**************************************************************************\
- * manages cameras                                                        *
+ * Ingame-UI renderer                                                     *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,46 +15,28 @@
 
 #pragma once
 
-#include "../../../core/ecs/ecs.hpp"
-#include "../../../core/units.hpp"
-#include "../../../core/utils/template_utils.hpp"
-#include "../../../core/renderer/camera.hpp"
-
-#include "camera_target_comp.hpp"
+#include <memory>
 
 namespace mo {
 	class Game_engine;
+	namespace renderer {
+		class Camera;
+	}
+	namespace ecs {
+		class Entity;
+	}
 
-namespace sys {
-namespace cam {
-
-	struct Camera_mapping {
-		renderer::Camera camera;
-		std::vector<ecs::Entity_ptr> targets;
-
-		Camera_mapping(const Engine &engine, float world_scale)
-		    : camera(engine, world_scale) {
-		}
-	};
-
-	class Camera_system {
+	class Game_ui {
 		public:
-			Camera_system(ecs::Entity_manager& entity_manager, Game_engine& engine);
+			Game_ui(Game_engine& engine);
+			~Game_ui()noexcept;
 
-			void update(Time dt);
-
-			auto cameras()const noexcept {return util::range(_cameras);}
-
-			auto main_camera()const noexcept -> const auto& {
-				return _cameras.front().camera;
-			}
+			void pre_draw();
+			void draw(const renderer::Camera& cam, ecs::Entity& entity, int offset=1);
 
 		private:
-			Game_engine& _engine;
-			Camera_target_comp::Pool& _targets;
-			std::vector<Camera_mapping> _cameras;
+			struct PImpl;
+			std::unique_ptr<PImpl> _impl;
 	};
 
-}
-}
 }

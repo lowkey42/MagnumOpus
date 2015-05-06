@@ -50,7 +50,9 @@ namespace cam {
 			});
 
 			// TODO: add support for multiple cameras
-			_cameras.back().position(remove_units(target.cam_position()));
+			_cameras.back().camera.position(remove_units(target.cam_position()));
+			_cameras.back().targets.clear();
+			_cameras.back().targets.push_back(target.owner_ptr());
 		}
 	}
 
