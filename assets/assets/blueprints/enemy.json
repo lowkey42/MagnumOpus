@@ -17,6 +17,9 @@
         "follow_time":0.5
     },
     "State",
+    "Friend":{
+        "group": 1
+    },
     "Health":{
         "max_hp": 10
      },

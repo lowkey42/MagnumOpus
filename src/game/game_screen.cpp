@@ -66,8 +66,11 @@ namespace mo {
 		Screen(engine), _engine(engine),
 		_gm(new Game_master(engine, load_save_game(engine))),
 		_state(engine, _gm->level()),
-	    _ui(engine)
+		_ui(engine),
+		_player_sc_slot(&Game_screen::_on_state_change, this)
 	{
+		_player_sc_slot.connect(_state.state.state_change_events);
+
 		auto start_room_m = _gm->level().find_room(level::Room_type::start);
 
 		INVARIANT(start_room_m.is_some(), "Generated room has no entry-point!?");
@@ -146,6 +149,14 @@ namespace mo {
 			_sec_players.emplace_back(p);
 
 		return p;
+	}
+
+	void Game_screen::_on_state_change(ecs::Entity& e, const sys::state::State_data& s) {
+		if(&e==_main_player.get()) {
+			if(s.s==sys::state::Entity_state::died) {
+				INFO("The segfault bites. You die!");
+			}
+		}
 	}
 
 	void Game_screen::_join(sys::controller::Controller_added_event e) {

@@ -1,5 +1,5 @@
 /**************************************************************************\
- * stores the current health of an entity (+shield, ...)                  *
+ * FRIENDSHIP IS MAGIC! and protects against friendly fire                *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -22,35 +22,22 @@ namespace mo {
 namespace sys {
 namespace combat {
 
-	class Health_comp : public ecs::Component<Health_comp> {
+	class Friend_comp : public ecs::Component<Friend_comp> {
 		public:
-			static constexpr const char* name() {return "Health";}
+			static constexpr const char* name() {return "Friend";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Health_comp(ecs::Entity& owner, float max_hp=100) noexcept
-				: Component(owner), _max_hp(max_hp), _current_hp(max_hp) {}
+			Friend_comp(ecs::Entity& owner, int group=0) noexcept
+				: Component(owner), _group(group) {}
 
-			void heal(float hp)noexcept {_heal+=hp;}
-			void damage(float hp)noexcept{_damage+=hp;}
-
-			auto hp()const noexcept {return _current_hp;}
-			auto max_hp()const noexcept {return _max_hp;}
-
-			auto damaged()const noexcept {return _current_hp<_max_hp;}
+			void group(int group)noexcept {_group=group;}
+			auto group()const noexcept {return _group;}
 
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
-			friend class Combat_system;
-
-			float _auto_heal_max=0;
-			float _auto_heal=0;
-
-			float _max_hp;
-			float _current_hp;
-
-			float _damage=0, _heal=0;
+			float _group;
 	};
 
 }

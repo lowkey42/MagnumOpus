@@ -9,6 +9,8 @@
 #include <core/asset/aid.hpp>
 #include "../sprite/sprite_comp.hpp"
 
+#include "friend_comp.hpp"
+
 namespace mo {
 namespace sys {
 namespace combat {
@@ -24,6 +26,9 @@ namespace combat {
 		  _healths(entity_manager.list<Health_comp>()),
 		  _ts(ts) {
 
+		_em.register_component_type<Friend_comp>();
+		_em.register_component_type<Weapon_comp>();
+		_em.register_component_type<Health_comp>();
 	}
 
 	void Combat_system::update(Time dt) {
@@ -34,7 +39,7 @@ namespace combat {
 	void Combat_system::_health_care(Time dt) {
 		for(auto& h : _healths) {
 			auto auto_heal = 0.f;
-			if(h.damaged())
+			if(h.damaged() && h._damage==0)
 				auto_heal = h._auto_heal * dt.value();
 
 			auto health_mod = h._heal+auto_heal - h._damage;
@@ -91,17 +96,26 @@ namespace combat {
 				auto& physics = w.owner().get<physics::Physics_comp>().get_or_throw();
 				auto radius = physics.radius();
 
+				auto group = w.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
+
 				switch(w._type) {
 					case Weapon_type::melee:
-						DEBUG("melee attack"<<(void*)&w.owner());
-						_ts.foreach_in_range(position, rotation, 1_m, 1.5_m, 90_deg, 100_deg,
+						_ts.foreach_in_range(position, rotation, w._melee_range,
+											 w._melee_range, w._melee_angle, w._melee_angle,
 						                     [&](ecs::Entity& t){
-							t.get<Health_comp>().process([&](Health_comp& h){
-								h.damage(10);
-								DEBUG("  damaged "<<(void*)&h.owner());
-							});
+							if(&t!=&w.owner()) {
+								t.get<Health_comp>().process([&](Health_comp& h){
+									if(group!=0) {
+										auto tgroup = t.get<Friend_comp>().process(0,
+														[](const auto& f){return f.group();});
+										if(group==tgroup)
+											return;
+									}
+
+									h.damage(w._melee_damage);
+								});
+							}
 						});
-						// TODO
 						break;
 
 					case Weapon_type::range:
