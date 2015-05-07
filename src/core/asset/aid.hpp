@@ -50,11 +50,11 @@ namespace asset {
 
 			auto str()const noexcept -> std::string;
 			auto type()const noexcept{return _type;}
-			auto name()const noexcept{return _name ? *_name : "";}
+			auto name()const noexcept{return _name;}
 
 		private:
 			Asset_type _type;
-			std::shared_ptr<const std::string> _name;
+			std::string _name;
 	};
 
 }

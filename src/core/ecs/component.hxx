@@ -17,7 +17,7 @@ namespace ecs {
 		_reg_self(T::type());
 	}
 	template<typename T>
-	Component<T>::Component(Component&& o)noexcept : Component_base(o) {
+	Component<T>::Component(Component&& o)noexcept : Component_base(std::move(o)) {
 		_reg_self(T::type());
 	}
 	template<typename T>
@@ -73,12 +73,12 @@ namespace ecs {
 		for(auto&& e : _delete_queue) {
 			INVARIANT(e->valid(), "double free");
 
-			e->~T();
-
 			T& back = *reinterpret_cast<T*>(_pool.back());
 			if(e!=&back) {
-				*e = std::move(back);
+				std::swap(*e, back);
+			//	*e = std::move(back);
 			}
+			back.~T();
 			_pool.pop_back();
 		}
 

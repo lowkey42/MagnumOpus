@@ -11,6 +11,11 @@ namespace details {
 	Component_base::Component_base(Component_base && o)noexcept : _owner(o._owner) {
 		o._owner = nullptr;
 	}
+	Component_base& Component_base::operator=(Component_base&& o)noexcept {
+		_owner = o._owner;
+		o._owner = nullptr;
+		return *this;
+	}
 
 	Entity_ptr Component_base::owner_ptr() const {
 		return get_entity(*_owner);

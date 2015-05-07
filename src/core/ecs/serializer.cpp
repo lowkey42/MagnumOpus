@@ -66,6 +66,10 @@ namespace ecs {
 				}
 			}
 
+			BlueprintComponent(BlueprintComponent&& o) noexcept
+				: Component(std::move(o)), blueprint(std::move(o.blueprint)), blueprintId(std::move(o.blueprintId)) {
+			}
+
 			BlueprintComponent& operator=(BlueprintComponent&& o) noexcept {
 				ecs::Component<BlueprintComponent>::operator=(static_cast<Component&&>(o));
 

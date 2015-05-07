@@ -18,6 +18,8 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
+#include "../physics/transform_system.hpp"
+
 #include "weapon_comp.hpp"
 #include "health_comp.hpp"
 
@@ -29,7 +31,8 @@ namespace combat {
 
 	class Combat_system {
 		public:
-			Combat_system(ecs::Entity_manager& entity_manager, asset::Asset_manager& assets);
+			Combat_system(ecs::Entity_manager& entity_manager, asset::Asset_manager& assets,
+			              physics::Transform_system& transform_system);
 
 			void update(Time dt);
 
@@ -41,6 +44,7 @@ namespace combat {
 			asset::Asset_manager& _assets;
 			Weapon_comp::Pool& _weapons;
 			Health_comp::Pool& _healths;
+			physics::Transform_system& _ts;
 	};
 
 }

@@ -28,14 +28,41 @@ namespace controller {
 	class Controllable_comp : public ecs::Component<Controllable_comp> {
 		public:
 			static constexpr const char* name() {return "Controllable";}
-			// static void load(sf2::io::CharSource& cs, ecs::ComponentBase& comp){}
-			// static void store(sf2::io::CharSink& cs, const ecs::ComponentBase& comp){}
 
-			Controllable_comp(ecs::Entity& owner, Controller* controller=nullptr) noexcept
-				: Component(owner), controller(controller) {}
+			Controllable_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
+
+			Controllable_comp(ecs::Entity& owner, Controller* controller) noexcept
+				: Component(owner), _controller(controller) {}
+
+			template<class T, typename = std::enable_if_t<ecs::is_component<T>::value>>
+			Controllable_comp(ecs::Entity& owner, T*) noexcept
+				: Component(owner), _controller_component(T::type()) {}
+
+			Controllable_comp(ecs::Entity& owner, ecs::Component_type controller) noexcept
+				: Component(owner), _controller_component(controller) {}
 
 
-			Controller* controller;
+			void set(Controller& controller) {
+				_controller = &controller;
+				_controller_component = 0;
+			}
+			template<class T, typename = std::enable_if_t<ecs::is_component<T>::value>>
+			void set(T&) {
+				set(T::type());
+			}
+
+
+			void set(ecs::Component_type controller) {
+				_controller = nullptr;
+				_controller_component = controller;
+			}
+
+		private:
+			friend class Controller_system;
+
+			Controller* _controller = nullptr;
+			ecs::Component_type _controller_component = 0;
 	};
 
 }

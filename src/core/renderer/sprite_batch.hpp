@@ -68,12 +68,12 @@ namespace renderer {
 
 	private:
 
+		mutable std::vector<SpriteVertex> _vertices;
 		renderer::Object _object;
 		renderer::Shader_program _shader;
 		renderer::Texture_ptr _texture;
 		//asset::Ptr<renderer::Texture> _texture;
 
-		mutable std::vector<SpriteVertex> _vertices;
 
 	};
 
