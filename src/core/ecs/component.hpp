@@ -45,6 +45,8 @@ namespace ecs {
 				Component_base(Entity& owner)noexcept;
 				Component_base(Component_base&& o)noexcept;
 
+				Component_base& operator=(Component_base&& o)noexcept;
+
 				auto owner_ptr()const -> Entity_ptr;
 				auto owner()const noexcept -> Entity& {return *_owner;}
 				bool valid()const noexcept {
@@ -57,7 +59,7 @@ namespace ecs {
 			protected:
 				static Component_type _next_type_id()noexcept;
 
-				~Component_base()=default;
+				virtual ~Component_base()noexcept=default;
 
 				void _reg_self(Component_type type);
 				void _unreg_self(Component_type type);
@@ -68,6 +70,9 @@ namespace ecs {
 		extern Component_base*& get_component(Entity& e, Component_type t);
 		extern Entity_ptr get_entity(Entity& e);
 	}
+
+	template<typename T>
+	using is_component = std::is_base_of<ecs::details::Component_base, T>;
 
 	template<typename T>
 	class Component : public details::Component_base {

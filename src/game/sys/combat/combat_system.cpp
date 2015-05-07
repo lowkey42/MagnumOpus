@@ -38,8 +38,6 @@ namespace combat {
 				auto_heal = h._auto_heal * dt.value();
 
 			auto health_mod = h._heal+auto_heal - h._damage;
-			if(health_mod<-h._max_hp/10.f)
-				health_mod = -h._max_hp/10.f;
 
 			h._current_hp = std::min(h._current_hp+health_mod, h._max_hp);
 

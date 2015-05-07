@@ -67,6 +67,9 @@ namespace ecs {
 			util::maybe<T&> get();
 
 			template<typename T>
+			util::maybe<T&> getByType(Component_type type);
+
+			template<typename T>
 			bool has();
 
 			template<typename T, typename... Args>

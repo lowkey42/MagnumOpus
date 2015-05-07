@@ -63,14 +63,14 @@ namespace ecs {
 				return remove;
 		} );
 
-		_entities.erase(new_end, _entities.end() );
-
-		_delete_queue.clear();
-
 		for(auto& cp : _pools) {
 			if(cp)
 				cp->process_queued_actions();
 		}
+
+		_entities.erase(new_end, _entities.end() );
+
+		_delete_queue.clear();
 
 		if(_unoptimized_deletions>=resize_after_n_deletions) {
 			shrink_to_fit();

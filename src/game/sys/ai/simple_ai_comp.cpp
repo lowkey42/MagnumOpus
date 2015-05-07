@@ -56,17 +56,14 @@ namespace ai {
 	    : Component(owner), attack_distance(2_m),
 	      near(2_m), max(10_m), near_angle(360_deg), far_angle(180_deg),
 	      _follow_time(0.5_s), _follow_time_left(0) {
-/*
-  TODO[foe]: DANGLING POINTER
 
 		auto controller_m = owner.get<controller::Controllable_comp>();
 
 		if(controller_m.is_nothing())
-			owner.emplace<controller::Controllable_comp>(this);
+			owner.emplace<controller::Controllable_comp>(type());
 
 		else
-			controller_m.get_or_throw().controller = this;
-*/
+			controller_m.get_or_throw().set(type());
 	}
 
 	void Simple_ai_comp::no_target(Time dt)noexcept {
