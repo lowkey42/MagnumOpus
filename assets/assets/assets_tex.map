@@ -1,6 +1,6 @@
 tex: = textures/
 tex:test = textures/test.tga
-tex:x_font = x.template_regular_48.tga
+tex:x_font = textures/x.template_regular_48.tga
 tex:tilemap = textures/tilemap_base.png
 tex:tilemap_m = textures/tilemap_base_modded.png
 tex:player = textures/player_tmp.png

@@ -38,13 +38,13 @@ namespace level {
 
 
 	void Tilemap::draw(const Camera& cam){
-		auto cam_start = cam.screen_to_world(cam.viewport().xy()) - glm::vec2(1,1);
+		auto cam_start = cam.screen_to_world(cam.viewport().xy()) + glm::vec2(0.5f, 0.5f);
 		auto cam_end   = cam.screen_to_world(cam.viewport().xy() +
-		                                     cam.viewport().zw()) + glm::vec2(1,1);
+											 cam.viewport().zw()) + glm::vec2(1.5f, 1.5f);
 
 		auto cam_range = glm::abs(cam_end-cam_start);
 		_vertices.clear();
-		_vertices.reserve(std::ceil(cam_range.x * cam_range.y)*6);
+		_vertices.reserve(std::ceil(cam_range.x * cam_range.y) * 6);
 
 		// Filling the vector with vertices of the displayed triangles and corresponding uv-data
 		_level.foreach_tile(cam_start.x, cam_start.y, cam_end.x, cam_end.y,
@@ -62,14 +62,14 @@ namespace level {
 				layer = 1;
 
 			// First triangle of the rectangle
-			_vertices.push_back({{ x, y }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
-			_vertices.push_back({{ x, 1 + y }, {tile_x*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)} , layer});
-			_vertices.push_back({{ 1 + x, 1 + y }, {(tile_x+1)*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)}, layer});
+			_vertices.push_back({{ x - 0.5f, y - 0.5f }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
+			_vertices.push_back({{ x - 0.5f, y + 0.5f }, {tile_x*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)} , layer});
+			_vertices.push_back({{ x + 0.5f, y + 0.5f }, {(tile_x+1)*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)}, layer});
 
 			// Second triangle of the rectangle
-			_vertices.push_back({{ 1 + x, 1 + y }, {(tile_x+1)*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)}, layer});
-			_vertices.push_back({{ x, y }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
-			_vertices.push_back({{ 1 + x, y }, {(tile_x+1)*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
+			_vertices.push_back({{ x + 0.5f, y + 0.5f }, {(tile_x+1)*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)}, layer});
+			_vertices.push_back({{ x - 0.5f, y - 0.5f }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
+			_vertices.push_back({{ x + 0.5f, y - 0.5f }, {(tile_x+1)*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
 		});
 
 		// Updating MVP-Matrix and give it to the shader
