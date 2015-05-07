@@ -5,6 +5,7 @@
 #include "../physics/physics_comp.hpp"
 
 #include <core/asset/asset_manager.hpp> // TODO[foe]: remove after sprite_comp integration
+#include "../controller/controllable_comp.hpp" // TODO[foe]: remove
 #include <core/asset/aid.hpp>
 #include "../sprite/sprite_comp.hpp"
 
@@ -16,10 +17,12 @@ namespace combat {
 	using namespace unit_literals;
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
-								 asset::Asset_manager& assets)
+								 asset::Asset_manager& assets,
+	                             physics::Transform_system& ts)
 		: _em(entity_manager), _assets(assets),
 		  _weapons(entity_manager.list<Weapon_comp>()),
-		  _healths(entity_manager.list<Health_comp>()) {
+		  _healths(entity_manager.list<Health_comp>()),
+		  _ts(ts) {
 
 	}
 
@@ -35,9 +38,10 @@ namespace combat {
 				auto_heal = h._auto_heal * dt.value();
 
 			auto health_mod = h._heal+auto_heal - h._damage;
+			if(health_mod<-h._max_hp/10.f)
+				health_mod = -h._max_hp/10.f;
 
 			h._current_hp = std::min(h._current_hp+health_mod, h._max_hp);
-
 
 			if(h._damage > h._heal+auto_heal) {
 				h.owner().get<State_comp>().process([](auto& s){
@@ -56,6 +60,7 @@ namespace combat {
 				h.owner().get<State_comp>().process([](auto& s){
 					s.state(Entity_state::died);
 				});
+				_em.erase(h.owner_ptr());
 			}
 		}
 	}
@@ -90,7 +95,14 @@ namespace combat {
 
 				switch(w._type) {
 					case Weapon_type::melee:
-						DEBUG("melee attack");
+						DEBUG("melee attack"<<(void*)&w.owner());
+						_ts.foreach_in_range(position, rotation, 1_m, 1.5_m, 90_deg, 100_deg,
+						                     [&](ecs::Entity& t){
+							t.get<Health_comp>().process([&](Health_comp& h){
+								h.damage(10);
+								DEBUG("  damaged "<<(void*)&h.owner());
+							});
+						});
 						// TODO
 						break;
 

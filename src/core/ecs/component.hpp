@@ -137,6 +137,9 @@ namespace ecs {
 			iterator end() {
 				return iterator(_pool.end());
 			}
+			std::size_t size()const noexcept {
+				return _pool.size();
+			}
 
 		private:
 			pool_type _pool;

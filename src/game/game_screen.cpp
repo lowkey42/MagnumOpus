@@ -29,7 +29,7 @@ namespace mo {
 		  spritesys(em, transform, engine.assets()),
 		  controller(em),
 		  ai(em, engine, transform),
-		  combat(em, engine.assets()),
+		  combat(em, engine.assets(), transform),
 		  state(em) {
 	}
 
@@ -82,6 +82,8 @@ namespace mo {
 
 		enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(start_position + Position(4,2));
 		// END TODO
+
+		_state.em.erase(enemy1);
 
 		_gm->spawn(engine, _state.em);
 	}
