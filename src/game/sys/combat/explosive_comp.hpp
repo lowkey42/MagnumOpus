@@ -32,7 +32,9 @@ namespace combat {
 						   Time delay=Time(0), bool on_contact=false, bool on_damage=false) noexcept
 				: Component(owner), _damage(damage), _range(range), _delay(delay),
 				  _activate_on_contact(on_contact), _activate_on_damage(on_damage) {}
-
+			Explosive_comp(Explosive_comp&&)noexcept = default;
+			~Explosive_comp()noexcept = default;
+			Explosive_comp& operator=(Explosive_comp&&)noexcept = default;
 
 			struct Persisted_state;
 			friend struct Persisted_state;
