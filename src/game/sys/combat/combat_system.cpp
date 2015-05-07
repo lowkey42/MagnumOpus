@@ -20,19 +20,27 @@ namespace combat {
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
 								 asset::Asset_manager& assets,
-	                             physics::Transform_system& ts)
+								 physics::Transform_system& ts,
+								 physics::Physics_system& physics_system)
 		: _em(entity_manager), _assets(assets),
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
-		  _ts(ts) {
+		  _explosives(entity_manager.list<Explosive_comp>()),
+		  _ts(ts),
+		  _collision_slot(&Combat_system::_on_collision, this)
+	{
+
+		_collision_slot.connect(physics_system.collisions);
 
 		_em.register_component_type<Friend_comp>();
 		_em.register_component_type<Weapon_comp>();
 		_em.register_component_type<Health_comp>();
+		_em.register_component_type<Explosive_comp>();
 	}
 
 	void Combat_system::update(Time dt) {
 		_shoot_something(dt);
+		_explode_explosives(dt);
 		_health_care(dt);
 	}
 
@@ -63,7 +71,18 @@ namespace combat {
 				h.owner().get<State_comp>().process([](auto& s){
 					s.state(Entity_state::died);
 				});
-				_em.erase(h.owner_ptr());
+
+				auto explosive = h.owner().get<Explosive_comp>();
+				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage;});
+
+				if(!explode)
+					_em.erase(h.owner_ptr());
+
+				else {
+					explosive.process([&](auto& e){
+						this->_explode(e);
+					});
+				}
 			}
 		}
 	}
@@ -104,16 +123,7 @@ namespace combat {
 											 w._melee_range, w._melee_angle, w._melee_angle,
 						                     [&](ecs::Entity& t){
 							if(&t!=&w.owner()) {
-								t.get<Health_comp>().process([&](Health_comp& h){
-									if(group!=0) {
-										auto tgroup = t.get<Friend_comp>().process(0,
-														[](const auto& f){return f.group();});
-										if(group==tgroup)
-											return;
-									}
-
-									h.damage(w._melee_damage);
-								});
+								_deal_damage(t, group, w._melee_damage);
 							}
 						});
 						break;
@@ -121,6 +131,10 @@ namespace combat {
 					case Weapon_type::range:
 						if(w._bullet_type) {
 							auto bullet = _em.emplace(w._bullet_type);
+							bullet->get<Friend_comp>().process([&](auto& f) {
+								f.group(group);
+							});
+
 							auto& bullet_phys = bullet->get<physics::Physics_comp>().get_or_throw();
 							auto bullet_radius = bullet_phys.radius();
 
@@ -144,6 +158,62 @@ namespace combat {
 				w._attack = false;
 			}
 		}
+	}
+
+	void Combat_system::_explode_explosives(Time dt) {
+		for(auto& e : _explosives) {
+			if(e._delay_left>0_s) {
+				e._delay_left-=dt;
+
+				if(e._delay_left<=0_s) {
+					_explode(e);
+				}
+			}
+		}
+	}
+
+	void Combat_system::_explode(Explosive_comp& e) {
+		if(e._exloded)
+			return;
+		e._exloded = true;
+
+		auto& transform = e.owner().get<physics::Transform_comp>().get_or_throw();
+		auto position = transform.position();
+		auto rotation = transform.rotation();
+		auto group = e.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
+
+		_ts.foreach_in_range(position, rotation, e._range, e._range, 360_deg, 360_deg,
+							 [&](auto& t){
+			if(&t!=&e.owner()) {
+				this->_deal_damage(t, group, e._damage);
+			}
+		});
+
+		_em.erase(e.owner_ptr());
+	}
+
+	void Combat_system::_deal_damage(ecs::Entity& target, int group, float damage) {
+		target.get<Health_comp>().process([&](Health_comp& h){
+			if(group!=0) {
+				auto tgroup = target.get<Friend_comp>().process(0,
+								[](const auto& f){return f.group();});
+				if(group==tgroup)
+					return;
+			}
+
+			h.damage(damage);
+		});
+	}
+
+	void Combat_system::_on_collision(physics::Manifold& m) {
+		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
+			if(e._activate_on_contact) {
+				if(e._delay>0_s)
+					e._delay_left = e._delay;
+				else
+					this->_explode(e);
+			}
+		});
 	}
 
 }
