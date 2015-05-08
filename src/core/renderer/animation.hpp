@@ -1,5 +1,5 @@
 /**************************************************************************\
- * animation_data -													      *
+ * Animation -														      *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -19,6 +19,8 @@
 
 #include "../renderer/texture.hpp"
 #include "../../core/asset/asset_manager.hpp"
+
+#include <glm/glm.hpp>
 
 namespace mo {
 namespace renderer {
@@ -42,6 +44,8 @@ namespace std {
 namespace mo {
 namespace renderer {
 
+	struct Animation_data;
+
 	struct Animation_frame_data{
 		int row;
 		float fps;
@@ -53,7 +57,24 @@ namespace renderer {
 		int frame_height;
 		Texture_ptr texture;
 		std::string texName = texture.aid().name();
+		Animation_type currentAnim = Animation_type::idle;
 		std::unordered_map<Animation_type, Animation_frame_data> animations;
+
+		auto uv() const noexcept{
+
+			// Calculating corresponding uv-coords
+			// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
+			int row = animations.find(currentAnim) -> second.row;
+
+			float width = frame_width / static_cast<float>(texture->width());
+			float height = frame_height / static_cast<float>(texture->height());
+			float startX = 0.0f;
+			float startY = 1 - height - (row * height);
+			const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
+
+			return uv;
+		}
+
 	};
 
 }

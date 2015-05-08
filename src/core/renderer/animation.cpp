@@ -5,6 +5,15 @@
 namespace mo{
 namespace renderer{
 
+	struct Animation_data{
+		int frame_width;
+		int frame_height;
+		Texture_ptr texture;
+		std::string texName = texture.aid().name();
+		Animation_type currentAnim = Animation_type::idle;
+		std::unordered_map<Animation_type, Animation_frame_data> animations;
+	};
+
 	sf2_enumDef(Animation_type,
 		sf2_value(idle),
 		sf2_value(moving),

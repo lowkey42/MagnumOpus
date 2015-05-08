@@ -37,17 +37,7 @@ namespace sprite {
 			Component(owner), _animation(animation), _animType(renderer::Animation_type::idle){}
 
         auto sprite() const noexcept {
-			// Calculating corresponding uv-coords
-			// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
-
-			int row = _animation->animations.find(_animType) -> second.row;
-
-			float width = _animation->frame_width / static_cast<float>(_animation->texture->width());
-			float height = _animation->frame_height / static_cast<float>(_animation->texture->height());
-			float startX = 0.0f;
-			float startY = _animation - height - (row * height);
-			const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
-			return renderer::Sprite_batch::Sprite{{}, 0, uv, _animation};
+			return renderer::Sprite_batch::Sprite{{}, 0, _animation->uv(), _animation};
 		}
 
 		struct Persisted_state;
