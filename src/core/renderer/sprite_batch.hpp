@@ -19,7 +19,7 @@
 #include "shader.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
-#include "animation_data.hpp"
+#include "animation.hpp"
 #include "../asset/aid.hpp"
 
 #include "../../core/units.hpp"
@@ -69,10 +69,9 @@ namespace renderer {
 	private:
 
 		mutable std::vector<SpriteVertex> _vertices;
+
 		renderer::Object _object;
 		renderer::Shader_program _shader;
-		renderer::Texture_ptr _texture;
-		//asset::Ptr<renderer::Texture> _texture;
 
 
 	};

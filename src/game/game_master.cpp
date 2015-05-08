@@ -10,7 +10,7 @@
 #include "sys/sprite/sprite_comp.hpp"
 
 #include "core/asset/aid.hpp"
-#include "core/renderer/animation_data.hpp"
+#include "core/renderer/animation.hpp"
 
 
 namespace mo {

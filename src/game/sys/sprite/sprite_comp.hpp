@@ -18,7 +18,7 @@
 #include <core/ecs/ecs.hpp>
 #include <core/renderer/texture.hpp>
 #include <core/renderer/sprite_batch.hpp>
-#include <core/renderer/animation_data.hpp>
+#include <core/renderer/animation.hpp>
 
 namespace mo {
 namespace sys {
@@ -39,10 +39,13 @@ namespace sprite {
         auto sprite() const noexcept {
 			// Calculating corresponding uv-coords
 			// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
+
+			int row = _animation->animations.find(_animType) -> second.row;
+
 			float width = _animation->frame_width / static_cast<float>(_animation->texture->width());
 			float height = _animation->frame_height / static_cast<float>(_animation->texture->height());
 			float startX = 0.0f;
-			float startY = 1.0f - height - (static_cast<int>(_animType) * height);
+			float startY = _animation - height - (row * height);
 			const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
 			return renderer::Sprite_batch::Sprite{{}, 0, uv, _animation};
 		}
@@ -53,7 +56,6 @@ namespace sprite {
 	private:
 
 		asset::Ptr<renderer::Animation> _animation;
-		renderer::Texture_ptr _texture;
 		renderer::Animation_type _animType;
 
 	};
