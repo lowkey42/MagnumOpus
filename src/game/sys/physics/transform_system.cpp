@@ -73,8 +73,8 @@ namespace physics {
 
 	void Transform_system::_on_comp_event(ecs::Component_event e) {
 		e.handle.get<Transform_comp>().process([&](Transform_comp& trans){
-			if(e.type!=ecs::Component_event_type::created) {
-				_get_cell_for(trans._position).remove(trans.owner());
+			if(e.type!=ecs::Component_event_type::created && trans._cell_idx>=0) {
+				_cells[trans._cell_idx].remove(trans.owner());
 			}
 		});
 	}

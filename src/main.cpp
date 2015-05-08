@@ -71,7 +71,7 @@ void init(int argc, char** argv, char** env) {
 		engine->enter_screen<Game_screen>();
 
 	} catch (const util::Error& ex) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in init", ex.what(), nullptr);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in init", nullptr);
 		shutdown();
 		exit(1);
 	}
@@ -82,7 +82,7 @@ void onFrame() {
 		engine->on_frame();
 
 	} catch (const util::Error& ex) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in onFrame", ex.what(), nullptr);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in onFrame", nullptr);
 		shutdown();
 		exit(2);
 	}
@@ -93,7 +93,7 @@ void shutdown() {
 		engine.reset();
 
 	} catch (const util::Error& ex) {
-		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Error in shutdown", ex.what(), nullptr);
+		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in shutdown", nullptr);
 		exit(3);
 	}
 }

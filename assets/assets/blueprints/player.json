@@ -25,7 +25,7 @@
     "Weapon":{
         "type": "range",
         "bullet_type": "bullet",
-        "bullet_velocity": 60,
-        "cooldown": 0.5
+        "bullet_velocity": 90,
+        "cooldown": 0.01
     }
 }
