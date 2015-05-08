@@ -16,6 +16,9 @@
     },
     "Target_tag",
     "State",
+    "Friend":{
+        "group": 2
+    },
     "Health":{
         "max_hp": 50
      },

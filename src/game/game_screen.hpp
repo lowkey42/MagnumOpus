@@ -72,6 +72,8 @@ namespace mo {
 				return Prev_screen_policy::discard;
 			}
 
+			void _on_state_change(ecs::Entity&, const sys::state::State_data&);
+
 			void _on_enter(util::maybe<Screen&> prev) override;
 			void _on_leave(util::maybe<Screen&> next) override;
 
@@ -90,6 +92,7 @@ namespace mo {
 
 			ecs::Entity_ptr _main_player;
 			std::vector<ecs::Entity_ptr> _sec_players;
+			util::slot<ecs::Entity&, const sys::state::State_data&> _player_sc_slot;
 	};
 
 }

@@ -31,8 +31,6 @@ namespace combat {
 			Health_comp(ecs::Entity& owner, float max_hp=100) noexcept
 				: Component(owner), _max_hp(max_hp), _current_hp(max_hp) {}
 
-			void update(Time dt)noexcept;
-
 			void heal(float hp)noexcept {_heal+=hp;}
 			void damage(float hp)noexcept{_damage+=hp;}
 
