@@ -16,7 +16,7 @@ namespace renderer {
 			return {0,0, width, height};
 		}
 		auto calc_projection(const glm::vec4& viewport) -> glm::mat4 {
-			constexpr auto base_height = 360;
+			constexpr auto base_height = 720;
 
 			auto height = viewport[3]/std::round(viewport[3]/base_height);
 			auto width = (viewport[2]/viewport[3])*height;
