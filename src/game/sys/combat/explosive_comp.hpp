@@ -1,5 +1,5 @@
 /**************************************************************************\
- * universal health-care & murder system                                  *
+ * The component that goes BOOM! (timed) area effects on contact/damage   *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -18,43 +18,39 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
-#include "../physics/transform_system.hpp"
-#include "../physics/physics_system.hpp"
-
-#include "weapon_comp.hpp"
-#include "health_comp.hpp"
-#include "explosive_comp.hpp"
-
 namespace mo {
-	namespace asset {class Asset_manager;}
-
 namespace sys {
 namespace combat {
 
-	class Combat_system {
+	class Explosive_comp : public ecs::Component<Explosive_comp> {
 		public:
-			Combat_system(ecs::Entity_manager& entity_manager, asset::Asset_manager& assets,
-						  physics::Transform_system& transform_system,
-						  physics::Physics_system& physics_system);
+			static constexpr const char* name() {return "Explosive";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			void update(Time dt);
+			Explosive_comp(ecs::Entity& owner, float damage=10, Distance range=Distance(2),
+						   Time delay=Time(0), bool on_contact=false, bool on_damage=false) noexcept
+				: Component(owner), _damage(damage), _range(range), _delay(delay),
+				  _activate_on_contact(on_contact), _activate_on_damage(on_damage) {}
+			Explosive_comp(Explosive_comp&&)noexcept = default;
+			~Explosive_comp()noexcept = default;
+			Explosive_comp& operator=(Explosive_comp&&)noexcept = default;
 
+			struct Persisted_state;
+			friend struct Persisted_state;
 		private:
-			void _health_care(Time dt);
-			void _shoot_something(Time dt);
-			void _explode_explosives(Time dt);
-			void _deal_damage(ecs::Entity& target, int group, float damage);
-			void _explode(Explosive_comp& e);
+			friend class Combat_system;
 
-			void _on_collision(physics::Manifold& m);
+			float _damage;
+			Distance _range;
+			Time _delay;
+			bool _activate_on_contact;
+			bool _activate_on_damage;
 
-			ecs::Entity_manager&  _em;
-			asset::Asset_manager& _assets;
-			Weapon_comp::Pool& _weapons;
-			Health_comp::Pool& _healths;
-			Explosive_comp::Pool& _explosives;
-			physics::Transform_system& _ts;
-			util::slot<physics::Manifold&> _collision_slot;
+			Time _delay_left = Time(0);
+			bool _exloded = false;
+
+			// TODO{foe]: add other effects
 	};
 
 }

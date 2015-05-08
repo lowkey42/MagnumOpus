@@ -1,9 +1,16 @@
 {
     "Transform",
 	"Physics":{
-        "radius": 0.25,
+        "radius": 0.2,
         "mass": 1,
         "restitution": 0.9,
 		"friction": 0.0001
-	}
+    },
+    "Explosive": {
+        "damage": 5,
+        "range": 2,
+        "delay":0,
+        "on_contact": true
+    }
+    "Friend"
 }
