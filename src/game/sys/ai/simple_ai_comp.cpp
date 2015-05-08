@@ -60,11 +60,10 @@ namespace ai {
 		auto controller_m = owner.get<controller::Controllable_comp>();
 
 		if(controller_m.is_nothing())
-			owner.emplace<controller::Controllable_comp>(this);
+			owner.emplace<controller::Controllable_comp>(type());
 
 		else
-			controller_m.get_or_throw().controller = this;
-
+			controller_m.get_or_throw().set(type());
 	}
 
 	void Simple_ai_comp::no_target(Time dt)noexcept {

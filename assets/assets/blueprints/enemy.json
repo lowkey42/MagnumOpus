@@ -22,7 +22,7 @@
      },
     "Weapon":{
         "type": "melee",
-        "cooldown": 1.0,
+        "cooldown": 3.0,
         "melee_damage": 5.0,
         "melee_range": 1,
         "melee_angle": 90

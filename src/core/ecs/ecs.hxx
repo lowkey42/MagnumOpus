@@ -59,6 +59,15 @@ namespace ecs {
 	}
 
 	template<typename T>
+	util::maybe<T&> Entity::getByType(Component_type type) {
+		auto comp = details::get_component(*this, type);
+		if(!comp)
+			return util::nothing();
+
+		return util::justPtr(dynamic_cast<T*>(comp));
+	}
+
+	template<typename T>
 	bool Entity::has() {
 		INVARIANT(T::type()<details::max_comp_type, "Access to unregistered component "<<T::name());
 		return details::get_component(*this, T::type())!=nullptr;

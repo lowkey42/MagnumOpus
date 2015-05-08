@@ -58,8 +58,14 @@ namespace controller {
 		for(auto& controllable : _controllables) {
 			Controllable_interface_impl c(dt, controllable.owner());
 
-			if(controllable.controller)
-				(*controllable.controller)(c);
+			if(controllable._controller)
+				(*controllable._controller)(c);
+
+			else if(controllable._controller_component)
+				controllable.owner().getByType<Controller>(controllable._controller_component)
+						.process([&c](auto& controller){
+					controller(c);
+				} );
 		}
 	}
 

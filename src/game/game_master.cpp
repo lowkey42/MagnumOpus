@@ -59,7 +59,7 @@ namespace mo {
 				// TODO[foe]
 
 			} else {
-				for(int i=0; i<5; i++) {
+				for(int i=0; i<2; i++) {
 					ecs::Entity_ptr enemy1 = em.emplace("blueprint:enemy"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
 					auto anim1 = engine.assets().load<renderer::Animation>("anim:scorpion"_aid);
