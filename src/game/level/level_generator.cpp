@@ -182,8 +182,10 @@ namespace level {
 			auto target_room_count = std::uniform_int_distribution<std::size_t>(cfg.rooms.min, cfg.rooms.max)(rng);
 
 			while(rooms.size()>target_room_count) {
-				auto i = std::uniform_int_distribution<std::size_t>(0, rooms.size())(rng);
-				rooms[i] = rooms.back();
+                auto i = std::uniform_int_distribution<std::size_t>(0, rooms.size()-1)(rng);
+                if(i<rooms.size()-1)
+                    rooms[i] = rooms.back();
+
 				rooms.pop_back();
 			}
 
