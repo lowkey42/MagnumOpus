@@ -5,8 +5,6 @@ namespace renderer {
 
 	using namespace renderer;
 
-	bool talkative = false;
-
 	// layout description for vertices
 	Vertex_layout layout {
 		Vertex_layout::Mode::triangles,
@@ -14,7 +12,7 @@ namespace renderer {
 		vertex("uv",        &Sprite_batch::SpriteVertex::uv)
 	};
 
-	Sprite_batch::Sprite_batch(asset::Asset_manager& asset_manager) : _object(layout, create_buffer(_vertices, true)){
+	Sprite_batch::Sprite_batch(asset::Asset_manager& asset_manager) : _object(layout, create_dynamic_buffer<SpriteVertex>(64)){
 		_shader.attach_shader(asset_manager.load<Shader>("vert_shader:sprite_batch"_aid))
 			   .attach_shader(asset_manager.load<Shader>("frag_shader:sprite_batch"_aid))
 		       .bind_all_attribute_locations(layout)
@@ -24,38 +22,27 @@ namespace renderer {
 	void Sprite_batch::draw(const Camera& cam, const Sprite& sprite) noexcept {
 
 		float x = sprite.position.x.value(), y = sprite.position.y.value();
-		float width = sprite.anim->frame_width / 64.f, height = sprite.anim->frame_height / 64.f;
+		float width = sprite.anim->frame_width / cam.world_scale(), height = sprite.anim->frame_height / cam.world_scale();
 		glm::vec4 uv = glm::vec4(sprite.uv);
 
 		// Rotation Matrix to be applied to coords of the Sprite
-		glm::mat4 rotMat = glm::translate(glm::vec3(x + width / 2, y + height / 2, 0.f)) *
-				glm::rotate(sprite.rotation -1.5707f, glm::vec3(0.f, 0.f, 1.f)) * glm::translate(-glm::vec3(x + width / 2, y + height / 2, 0.f));
+		glm::mat4 rotMat = glm::translate(glm::vec3(x, y, 0.f)) * glm::rotate(sprite.rotation -1.5707f, glm::vec3(0.f, 0.f, 1.f));
 
 //		std::cout << "Entity with Sprite Component at: " << x << "/" << y << std::endl;
 //		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
 //		std::cout << "rotation is: " << sprite.rotation << std::endl;
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y + height, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x + width, y + height, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(-width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(-width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
 
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
 		//_vertices.push_back({{x, y+1.f}, {uv.x, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 
-		if(talkative){
-			// DEBUG CODE TO CHECK GIVEN UV DATA AND POS OF FIRST TRIANGLE
-			std::cout << "x / y -> " << x << "/" << y << std::endl;
-			std::cout << "ux / uy -> " << uv.x << "/" << uv.w << std::endl;
-			std::cout << "x / y -> " << x << "/" << y+1 << std::endl;
-			std::cout << "ux / uy -> " << uv.x << "/" << uv.y << std::endl;
-			std::cout << "x / y -> " << x+1 << "/" << y+1 << std::endl;
-			std::cout << "ux / uy -> " << uv.z << "/" << uv.y << std::endl;
-		}
-
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x + width, y + height, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x, y, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(x + width, y, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(-width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture));
+		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture));
 
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
