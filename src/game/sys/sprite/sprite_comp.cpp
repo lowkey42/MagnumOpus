@@ -23,7 +23,7 @@ namespace sprite {
 
 	void Sprite_comp::load(ecs::Entity_state &state){
 		auto s = state.read_to(Persisted_state{*this});
-		// TODO _texture = asset::AID(s.aid);
+		_animation = state.asset_mgr().load<renderer::Animation>(asset::AID(s.aid));
 	}
 
 	void Sprite_comp::store(ecs::Entity_state &state){

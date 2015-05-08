@@ -10,6 +10,7 @@
 #include "../sprite/sprite_comp.hpp"
 
 #include "friend_comp.hpp"
+#include "score_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -19,10 +20,9 @@ namespace combat {
 	using namespace unit_literals;
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
-								 asset::Asset_manager& assets,
 								 physics::Transform_system& ts,
 								 physics::Physics_system& physics_system)
-		: _em(entity_manager), _assets(assets),
+		: _em(entity_manager),
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
 		  _explosives(entity_manager.list<Explosive_comp>()),
@@ -36,6 +36,7 @@ namespace combat {
 		_em.register_component_type<Weapon_comp>();
 		_em.register_component_type<Health_comp>();
 		_em.register_component_type<Explosive_comp>();
+		_em.register_component_type<Score_comp>();
 	}
 
 	void Combat_system::update(Time dt) {
@@ -70,6 +71,16 @@ namespace combat {
 			if(h._current_hp<=0) {
 				h.owner().get<State_comp>().process([](auto& s){
 					s.state(Entity_state::died);
+				});
+
+				h.owner().get<physics::Transform_comp>().process([&](const auto& transform){
+					h.owner().get<Score_comp>().process([&](auto& s){
+						s._collectable = true;
+						for(int i=0; i<s._value; ++i) {
+							auto coin = _em.emplace("blueprint:coin"_aid);
+							coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
+						}
+					});
 				});
 
 				auto explosive = h.owner().get<Explosive_comp>();
@@ -144,12 +155,6 @@ namespace combat {
 								t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, rotation));
 								t.rotation(rotation);
 							});
-
-							// TODO[foe]: remove after sprite_comp integration
-
-							auto anim = _assets.load<renderer::Animation>("anim:ball"_aid);
-							bullet->emplace<sys::sprite::Sprite_comp>(anim);
-							// END TODO
 						}
 						break;
 				}
@@ -206,6 +211,20 @@ namespace combat {
 	}
 
 	void Combat_system::_on_collision(physics::Manifold& m) {
+		if(m.is_with_object()) {
+			m.a->owner().get<Score_comp>().process([&](auto& s){
+				if(s._collectable && !s._collected) {
+					m.b.comp->owner().get<Score_comp>().process([&](auto& os) {
+						if(!os._collectable) {
+							os._value+=s._value;
+							s._collected = true;
+							_em.erase(s.owner_ptr());
+						}
+					});
+				}
+			});
+		}
+
 		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
 			if(e._activate_on_contact) {
 				if(e._delay>0_s)

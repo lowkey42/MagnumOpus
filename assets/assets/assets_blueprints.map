@@ -2,3 +2,4 @@ blueprint: = blueprints/
 blueprint:player = blueprints/player.json
 blueprint:enemy = blueprints/enemy.json
 blueprint:bullet = blueprints/bullet.json
+blueprint:coin = blueprints/coin.json

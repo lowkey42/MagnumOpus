@@ -29,7 +29,7 @@ namespace mo {
 		  spritesys(em, transform, engine.assets()),
 		  controller(em),
 		  ai(em, engine, transform),
-		  combat(em, engine.assets(), transform, physics),
+		  combat(em, transform, physics),
 		  state(em) {
 	}
 

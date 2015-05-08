@@ -12,5 +12,8 @@
         "delay":0,
         "on_contact": true
     }
-    "Friend"
+    "Friend",
+    "Sprite": {
+        "aid": "anim:ball"
+    }
 }
