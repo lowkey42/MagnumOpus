@@ -78,6 +78,7 @@ namespace combat {
 				h.owner().get<physics::Transform_comp>().process([&](const auto& transform){
 					h.owner().get<Score_comp>().process([&](auto& s){
 						s._collectable = true;
+						s._collected = true;
 						for(int i=0; i<s._value; ++i) {
 							auto coin = _em.emplace("blueprint:coin"_aid);
 							coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
@@ -88,10 +89,10 @@ namespace combat {
 				auto explosive = h.owner().get<Explosive_comp>();
 				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage;});
 
-				if(!explode)
+				if(!explode) {
 					_em.erase(h.owner_ptr());
 
-				else {
+				} else {
 					explosive.process([&](auto& e){
 						this->_explode(e);
 					});

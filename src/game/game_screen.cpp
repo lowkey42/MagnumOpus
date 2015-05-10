@@ -38,9 +38,9 @@ namespace mo {
 
 		ai.update(dt);
 		controller.update(dt);
-		combat.update(dt);
 		transform.update(dt);
 		physics.update(dt);
+		combat.update(dt);
 		camera.update(dt);
 		state.update(dt);
 		// TODO: update sprites and tilemap
