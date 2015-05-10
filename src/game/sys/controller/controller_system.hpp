@@ -26,6 +26,8 @@
 
 namespace mo {
 namespace sys {
+namespace physics{class Transform_system;}
+
 namespace controller {
 
 	class Controller_manager {
@@ -70,12 +72,13 @@ namespace controller {
 
 	class Controller_system {
 		public:
-			Controller_system(ecs::Entity_manager& entity_manager);
+			Controller_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts);
 
 			void update(Time dt);
 
 		private:
 			Controllable_comp::Pool& _controllables;
+			physics::Transform_system& _ts;
 		};
 
 }

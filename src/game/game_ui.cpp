@@ -60,7 +60,7 @@ namespace mo {
 
 			_impl->hud_text_shader.set_uniform("model",
 			                                   glm::scale(glm::translate(glm::mat4(),
-			                                                  glm::vec3(-380,-260,0)), glm::vec3(0.5f, 0.5f, 1)));
+			                                                  glm::vec3(-380,-240,0)), glm::vec3(0.5f, 0.5f, 1)));
 			_impl->hud_text.draw();
 		});
 
@@ -69,7 +69,7 @@ namespace mo {
 
 			_impl->hud_text_shader.set_uniform("model",
 			                                   glm::scale(glm::translate(glm::mat4(),
-			                                                  glm::vec3(-380,-230,0)), glm::vec3(0.5f, 0.5f, 1)));
+			                                                  glm::vec3(-380,-210,0)), glm::vec3(0.5f, 0.5f, 1)));
 			_impl->hud_text.draw();
 		});
 

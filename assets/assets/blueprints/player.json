@@ -28,5 +28,6 @@
         "bullet_velocity": 90,
         "cooldown": 0.01
     },
-    "Score"
+    "Score",
+    "Collector"
 }

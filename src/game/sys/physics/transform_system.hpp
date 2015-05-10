@@ -166,12 +166,12 @@ namespace physics {
 
 				auto target_dir = Angle(atan2(diff.y, diff.x));
 
-				auto dir_diff = std::abs(dir-target_dir);
+				auto dir_diff = std::abs(normalize(dir-target_dir));
 				if(dir_diff>180_deg)
 					dir_diff = 360_deg - dir_diff;
+				dir_diff = std::abs(dir_diff);
 
-
-				if(distance<0.1f)
+				if(distance<0.01f)
 					func(e);
 
 				else if(distance<=max_2) {

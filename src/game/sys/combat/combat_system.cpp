@@ -11,6 +11,7 @@
 
 #include "friend_comp.hpp"
 #include "score_comp.hpp"
+#include "collector_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -37,6 +38,7 @@ namespace combat {
 		_em.register_component_type<Health_comp>();
 		_em.register_component_type<Explosive_comp>();
 		_em.register_component_type<Score_comp>();
+		_em.register_component_type<Collector_comp>();
 	}
 
 	void Combat_system::update(Time dt) {

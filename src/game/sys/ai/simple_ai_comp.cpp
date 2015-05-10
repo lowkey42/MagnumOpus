@@ -93,7 +93,7 @@ namespace ai {
 				if(distance<=attack_distance)
 					c.attack();
 
-				else
+				if(distance>attack_distance/2)
 					c.move(dir);
 			});
 		}

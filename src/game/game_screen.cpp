@@ -27,7 +27,7 @@ namespace mo {
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  spritesys(em, transform, engine.assets()),
-		  controller(em),
+		  controller(em, transform),
 		  ai(em, engine, transform),
 		  combat(em, transform, physics),
 		  state(em) {
