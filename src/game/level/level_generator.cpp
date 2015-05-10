@@ -309,6 +309,14 @@ namespace level {
 				r.top-=min_y-border;
 				r.right-=min_x-border;
 				r.bottom-=min_y-border;
+
+				if(r.type==Room_type::start) {
+					auto center = r.center();
+					level.get(center.x, center.y).type = Tile_type::stairs_up;
+				}else if(r.type==Room_type::end) {
+					auto center = r.center();
+					level.get(center.x, center.y).type = Tile_type::stairs_down;
+				}
 			}
 
 			return level;
