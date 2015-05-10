@@ -4,6 +4,7 @@
 
 #include "../../core/utils/astar.hpp"
 #include "../../core/utils/string_utils.hpp"
+#include <core/utils/random.hpp>
 
 #include <sf2/sf2.hpp>
 #include <sf2/FileParser.hpp>
@@ -105,10 +106,9 @@ namespace level {
 		using Room_list = std::vector<Room_blueprint>;
 
 		auto process_room(int depth, Room_blueprint room,
-		                  std::bernoulli_distribution& split_dist,
-		                  std::mt19937& rng, const Dungeon_cfg& cfg) -> Room_list;
-		auto filter_rooms(Room_list rooms, std::mt19937& rng, const Dungeon_cfg& cfg) -> Room_list;
-		void connect_rooms(Room_list& rooms, std::mt19937& rng, const Dungeon_cfg& cfg);
+		                  random_generator& rng, const Dungeon_cfg& cfg) -> Room_list;
+		auto filter_rooms(Room_list rooms, random_generator& rng, const Dungeon_cfg& cfg) -> Room_list;
+		void connect_rooms(Room_list& rooms, random_generator& rng, const Dungeon_cfg& cfg);
 		auto build_level(Room_list& rooms, int width, int height) -> Level;
 		void dig_corridors(Level& level, const Room_list& rooms);
 	}
@@ -117,12 +117,11 @@ namespace level {
 	                     int depth, int difficulty) {
 		const auto cfg = load_cfg(assets, depth);
 
-		std::mt19937 rng(seed+depth*7+difficulty*31);
+		auto rng = random_generator{seed+depth*7+difficulty*31};
 
 
 		// 1. map zufällig an größter Achse trennen (rekursiv für die beiden neuen Zellen wiederholen)
-		std::bernoulli_distribution split_dist(0.1);
-		auto rooms = process_room(1, Room_blueprint{0,0, cfg.max_width, cfg.max_height}, split_dist, rng, cfg);
+		auto rooms = process_room(1, Room_blueprint{0,0, cfg.max_width, cfg.max_height}, rng, cfg);
 
 
 		// 2. zufällig Zellen verwerfen bis nur noch N übrig
@@ -150,23 +149,23 @@ namespace level {
 
 	namespace {
 
-		auto process_room(int depth, Room_blueprint room, std::bernoulli_distribution& split_dist,
-									  std::mt19937& rng, const Dungeon_cfg& cfg) -> Room_list {
+		auto process_room(int depth, Room_blueprint room,
+									  random_generator& rng, const Dungeon_cfg& cfg) -> Room_list {
 			bool split = (room.height()>=cfg.room_size.min || room.width()>=cfg.room_size.min) &&
 						 (room.height()>cfg.room_size.max  || room.width()>cfg.room_size.max ||
-							std::bernoulli_distribution(std::min(std::max(cfg.split_prop_factor/depth, 0.1f), 1.f))(rng));
+							random_bool(rng, std::min(std::max(cfg.split_prop_factor/depth, 0.1f), 1.f)));
 
 			if(split) {
 				bool split_x = room.width() >= room.height();
 
 				auto b = room.split(
-					!split_x ? 0 : std::uniform_int_distribution<int>(1, room.width() -1)(rng),
-					split_x  ? 0 : std::uniform_int_distribution<int>(1, room.height()-1)(rng)
+					!split_x ? 0 : random_int(rng, 1, room.width() -1),
+					split_x  ? 0 : random_int(rng, 1, room.height()-1)
 				);
 
 				return join(
-					process_room(depth+1, room, split_dist, rng, cfg),
-					process_room(depth+1, b, split_dist, rng, cfg)
+					process_room(depth+1, room, rng, cfg),
+					process_room(depth+1, b, rng, cfg)
 				);
 
 			} else {
@@ -174,15 +173,15 @@ namespace level {
 			}
 		}
 
-		auto filter_rooms(Room_list rooms, std::mt19937& rng, const Dungeon_cfg& cfg) -> Room_list {
+		auto filter_rooms(Room_list rooms, random_generator& rng, const Dungeon_cfg& cfg) -> Room_list {
 			rooms.erase(std::remove_if(rooms.begin(), rooms.end(), [&](auto& r){
 				return r.height()<=cfg.room_size.min || r.width()<cfg.room_size.min;
 			}), rooms.end());
 
-			auto target_room_count = std::uniform_int_distribution<std::size_t>(cfg.rooms.min, cfg.rooms.max)(rng);
+			auto target_room_count = random_int<std::size_t>(rng, cfg.rooms.min, cfg.rooms.max);
 
 			while(rooms.size()>target_room_count) {
-                auto i = std::uniform_int_distribution<std::size_t>(0, rooms.size()-1)(rng);
+                auto i = random_int<std::size_t>(rng, 0, rooms.size()-1);
                 if(i<rooms.size()-1)
                     rooms[i] = rooms.back();
 
@@ -225,11 +224,11 @@ namespace level {
 			return fast_erase(c, find_min(c, weight_func));
 		}
 		template<class T>
-		T pop_random(std::vector<T>& c, std::mt19937& rng) {
-			return fast_erase(c, std::uniform_int_distribution<std::size_t>(0, c.size()-1)(rng));
+		T pop_random(std::vector<T>& c, random_generator& rng) {
+			return fast_erase(c, random_int<std::size_t>(rng, 0, c.size()-1));
 		}
 
-		void connect_rooms(Room_list& rooms, std::mt19937& rng, const Dungeon_cfg& cfg) {
+		void connect_rooms(Room_list& rooms, random_generator& rng, const Dungeon_cfg& cfg) {
 			std::vector<std::size_t> open_list(rooms.size());
 			std::iota(open_list.begin(), open_list.end(), 0);
 
