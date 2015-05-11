@@ -63,7 +63,7 @@ namespace util {
 		}
 	}
 
-	using random_generator = std::mt19937;
+	using random_generator = std::mt19937_64;
 
 	template<class T, class Generator>
 	auto random_real(Generator& gen, T min, T max) -> T {
