@@ -28,6 +28,9 @@ namespace mo {
 
 	namespace ecs {
 
+		// entity transfer object
+		using ETO = std::string;
+
 		class Serializer {
 			public:
 				Serializer(Entity_manager& entityMgr, asset::Asset_manager& assetMgr);

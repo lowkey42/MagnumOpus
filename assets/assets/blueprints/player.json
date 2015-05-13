@@ -8,6 +8,9 @@
         "max_active_velocity": 30,
         "active_acceleration": 5
 	},
+    "Sprite": {
+        "aid": "anim:player"
+    },
     "Camera_target": {
         "mass": 0.2,
         "damping": 0.5
@@ -25,8 +28,8 @@
     "Weapon":{
         "type": "range",
         "bullet_type": "bullet",
-        "bullet_velocity": 90,
-        "cooldown": 0.01
+        "bullet_velocity": 60,
+        "cooldown": 0.5
     },
     "Score",
     "Collector"

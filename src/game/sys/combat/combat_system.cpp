@@ -144,6 +144,7 @@ namespace combat {
 
 					case Weapon_type::range:
 						if(w._bullet_type) {
+							physics.impulse(rotate(glm::vec2(-1,0), rotation) * 50_N); // TODO[foe]: 50N should be a parameter
 							auto bullet = _em.emplace(w._bullet_type);
 							bullet->get<Friend_comp>().process([&](auto& f) {
 								f.group(group);
@@ -191,9 +192,14 @@ namespace combat {
 		auto group = e.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
 
 		_ts.foreach_in_range(position, rotation, e._range, e._range, 360_deg, 360_deg,
-							 [&](auto& t){
+							 [&](ecs::Entity& t){
 			if(&t!=&e.owner()) {
 				this->_deal_damage(t, group, e._damage);
+				t.get<physics::Physics_comp>().process([&](auto& p){
+					auto dir = remove_units(t.get<physics::Transform_comp>().get_or_throw().position()-position);
+					glm::normalize(dir);
+					p.impulse(dir * 100_N); // TODO[foe]: should be a parameter
+				});
 			}
 		});
 
