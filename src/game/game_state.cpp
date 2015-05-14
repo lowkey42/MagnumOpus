@@ -134,6 +134,10 @@ namespace mo {
 		});
 	}
 
+	void Game_state::delete_savegame() {
+		im_a_savegame = Profile_data{"default", 42,0,0};
+	}
+
 	namespace {
 		void move_level(Game_state& state, int offset) {
 			auto players = std::vector<ecs::ETO>{

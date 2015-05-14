@@ -5,7 +5,7 @@
 		"mass": 60,
 		"restitution": 0.01,
         "friction": 0.01,
-        "max_active_velocity": 30,
+        "max_active_velocity": 45,
         "active_acceleration": 5
 	},
     "Sprite": {

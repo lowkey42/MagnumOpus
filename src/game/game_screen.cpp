@@ -65,6 +65,8 @@ namespace mo {
 		if(&e==_state->main_player.get()) {
 			if(s.s==sys::state::Entity_state::died) {
 				INFO("The segfault bites. You die!");
+				_state->delete_savegame();
+				_engine.enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
 			}
 		}
 	}

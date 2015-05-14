@@ -76,6 +76,8 @@ namespace mo {
 
 		auto add_player(sys::controller::Controller& controller, Position pos,
 		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;
+
+		void delete_savegame();
 	};
 
 }
