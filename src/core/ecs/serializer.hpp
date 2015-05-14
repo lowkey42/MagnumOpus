@@ -35,13 +35,16 @@ namespace mo {
 			public:
 				Serializer(Entity_manager& entityMgr, asset::Asset_manager& assetMgr);
 
-				Entity_ptr apply(const asset::AID& blueprint, Entity_ptr target)const;
+				auto apply(const asset::AID& blueprint, Entity_ptr target)const -> Entity_ptr;
 				void detach(Entity_ptr target)const;
 
-				std::string write();
+				auto write() -> std::string;
 				void read(const std::string& c);
 
 				void on_reload();
+
+				auto export_entity(Entity& e)const -> ETO;
+				auto import_entity(const ETO& eto) -> Entity_ptr;
 
 			private:
 				Entity_manager& _entities;

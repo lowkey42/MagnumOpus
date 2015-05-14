@@ -38,6 +38,7 @@ namespace mo {
 	namespace renderer{ class Camera; }
 
 	struct Profile_data {
+		std::string name;
 		uint64_t seed;
 		int difficulty;
 		int depth;
@@ -73,7 +74,8 @@ namespace mo {
 		void update(Time dt);
 		void draw();
 
-		auto add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr;
+		auto add_player(sys::controller::Controller& controller, Position pos,
+		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;
 	};
 
 }

@@ -22,13 +22,14 @@ namespace mo {
 	constexpr auto MaxEntitySize = 5_m;
 	constexpr auto MaxEntityVelocity = 180_km/hour;
 
+	static Profile_data im_a_savegame{"default", 42,0,0};
 
 	Game_state::Game_state(Game_engine& engine,
 	                       std::string profile_name,
 				           std::vector<ecs::ETO> players,
 				           util::maybe<int> depth)
 		: engine(engine),
-	      profile{42,0,0},
+	      profile(im_a_savegame),
 	      level(level::generate_level(engine.assets(),
 									  profile.seed,
 									  depth.get_or_other(profile.depth),
@@ -44,37 +45,39 @@ namespace mo {
 		  combat(em, transform, physics),
 		  state(em) {
 
-		depth.process([&](auto d){
-			if(d<profile.depth) {
-				auto start_room_m = level.find_room(level::Room_type::end);
+		auto d = depth.get_or_other(profile.depth);
 
-				INVARIANT(start_room_m.is_some(), "Generated room has no exit-point!?");
-				auto start_room = start_room_m.get_or_throw();
+		auto room_m = level.find_room(d<profile.depth ? level::Room_type::end :
+		                                                level::Room_type::start);
 
-				auto start_position = start_room.center() *1_m
-				                      + Position{1_m,0_m};
+		INVARIANT(room_m.is_some(), "Generated room has no exit/entry-point!?");
+		auto room = room_m.get_or_throw();
 
-				add_player(engine.controllers().main_controller(),
-				           start_position);
+		auto start_position = room.center() *1_m
+		                      + Position{1_m,0_m};
+		profile.depth = d;
 
+		if(!players.empty()) {
+			bool first = true;
+			for(auto& p : players) {
+				if(!first)
+					break;
+				else
+					first = false;
 
-			} else {
-				auto start_room_m = level.find_room(level::Room_type::start);
+				auto& controller = engine.controllers().main_controller();
 
-				INVARIANT(start_room_m.is_some(), "Generated room has no entry-point!?");
-				auto start_room = start_room_m.get_or_throw();
-
-				auto start_position = start_room.center() *1_m
-				                      + Position{1_m,0_m};
-
-				add_player(engine.controllers().main_controller(),
-				           start_position);
+				add_player(controller,
+				           start_position, em.serializer().import_entity(p));
 			}
 
-			profile.depth = d;
-		});
+		} else {
+			add_player(engine.controllers().main_controller(),
+			           start_position);
+		}
 
 		// TODO[foe]: save profile
+		im_a_savegame = profile;
 
 // TODO[foe]: remove
 		auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);
@@ -131,6 +134,26 @@ namespace mo {
 		});
 	}
 
+	namespace {
+		void move_level(Game_state& state, int offset) {
+			auto players = std::vector<ecs::ETO>{
+				state.em.serializer().export_entity(*state.main_player)
+			};
+
+			for(auto& p : state.sec_players) {
+				players.push_back(state.em.serializer().export_entity(*p));
+			}
+
+			for(auto& p : players)
+				DEBUG("PLAYER: "<<p);
+
+			state.engine.enter_screen<Game_screen>(
+			            state.profile.name,
+			            players,
+			            util::just(state.profile.depth+offset));
+		}
+	}
+
 	void Game_state::update(Time dt) {
 		em.process_queued_actions();
 
@@ -150,28 +173,20 @@ namespace mo {
 
 				auto& tile = level.get(x,y);
 				if(tile.type==level::Tile_type::stairs_down) {
-					// TODO[foe]: transfer players, too
-
 					if(this->profile.depth>=2) {
 						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the bottom", "You delved too greedily and too deep", nullptr);
 						this->engine.leave_screen();
-					} else
 
-					this->engine.enter_screen<Game_screen>(
-					            "default",
-					            std::vector<ecs::ETO>{},
-					            util::just(this->profile.depth+1));
+					} else
+						move_level(*this, 1);
 
 				}else if(tile.type==level::Tile_type::stairs_up) {
 					if(this->profile.depth==0) {
 						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the top", "You have reached the top", nullptr);
 						this->engine.leave_screen();
-					} else
 
-					this->engine.enter_screen<Game_screen>(
-					            "default",
-					            std::vector<ecs::ETO>{},
-					            util::just(this->profile.depth-1));
+					} else
+						move_level(*this, -1);
 				}
 		});
 	}
@@ -184,10 +199,17 @@ namespace mo {
 		}
 	}
 
-	auto Game_state::add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr {
-		ecs::Entity_ptr p = em.emplace("blueprint:player"_aid);
+	auto Game_state::add_player(sys::controller::Controller& controller,
+	                            Position pos,
+	                            ecs::Entity_ptr p) -> ecs::Entity_ptr {
+		if(!p)
+			p = em.emplace("blueprint:player"_aid);
 
-		p->emplace<sys::controller::Controllable_comp>(&controller);
+		if(p->has<sys::controller::Controllable_comp>())
+			p->get<sys::controller::Controllable_comp>()
+			        .get_or_throw().set(controller);
+		else
+			p->emplace<sys::controller::Controllable_comp>(&controller);
 
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 			trans.position(pos);

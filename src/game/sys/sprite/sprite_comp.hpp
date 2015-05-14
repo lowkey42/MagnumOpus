@@ -53,7 +53,6 @@ namespace sprite {
 	private:
 
 		asset::Ptr<renderer::Animation> _animation;
-		renderer::Texture_ptr _texture;
 		renderer::Animation_type _animType;
 
 	};

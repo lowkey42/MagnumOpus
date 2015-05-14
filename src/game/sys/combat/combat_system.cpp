@@ -236,9 +236,11 @@ namespace combat {
 
 		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
 			if(e._activate_on_contact) {
-				if(e._delay>0_s)
-					e._delay_left = e._delay;
-				else
+				if(e._delay>0_s) {
+					if(e._delay_left<=0_s)
+						e._delay_left = e._delay;
+
+				} else
 					this->_explode(e);
 			}
 		});

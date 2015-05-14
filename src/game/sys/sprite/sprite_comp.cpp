@@ -13,7 +13,7 @@ namespace sprite {
 		std::string aid;
 		// add Animationdata to save
 		Persisted_state(const Sprite_comp& c) :
-			aid(c._texture.aid().str()){}
+			aid(c._animation.aid().str()){}
 
     };
 
