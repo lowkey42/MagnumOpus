@@ -21,6 +21,8 @@
 #include "../controller/controller.hpp"
 
 namespace mo {
+	namespace level{class Level;}
+
 namespace sys {
 namespace ai {
 
@@ -38,7 +40,7 @@ namespace ai {
 				_target = e;
 				_follow_time_left = _follow_time;
 			}
-			void no_target(Time dt)noexcept;
+			void no_target(Time dt, level::Level& level)noexcept;
 
 			Distance attack_distance;
 			Distance near;
@@ -54,6 +56,8 @@ namespace ai {
 			Time _follow_time;
 			Time _follow_time_left;
 			ecs::Entity_ptr _target;
+			Angle _wander_dir;
+			Time _rot_delay;
 	};
 
 }

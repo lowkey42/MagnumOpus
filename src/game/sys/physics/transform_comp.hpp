@@ -32,12 +32,20 @@ namespace physics {
 
 			Transform_comp(ecs::Entity& owner, Distance x=Distance(0),
 						   Distance y=Distance(0), Angle rotation=Angle(0))noexcept
-			  : Component(owner), _position(x, y), _rotation(rotation) {}
+			  : Component(owner), _position(x, y), _rotation(rotation), _max_rotation_speed(0) {}
 
 			auto position()const noexcept {return _position;}
 			void position(Position pos)noexcept {_position=pos; _dirty=true;}
 			auto rotation()const noexcept {return _rotation;}
 			void rotation(Angle a)noexcept {_rotation = a;}
+			void rotate(Angle offset, Time dt) noexcept{
+				auto max_rot = _max_rotation_speed*dt;
+
+				if(abs(offset)>max_rot)
+					offset = sign(offset).value() * max_rot;
+
+				rotation(rotation() + offset);
+			}
 
 			struct Persisted_state;
 			friend struct Persisted_state;
@@ -46,6 +54,7 @@ namespace physics {
 
 			Position _position;
 			Angle _rotation;
+			Angle_per_time _max_rotation_speed;
 			int32_t _cell_idx = -1;
 			bool _dirty = true;
 	};

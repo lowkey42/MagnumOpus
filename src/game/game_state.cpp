@@ -36,12 +36,12 @@ namespace mo {
 									  profile.difficulty)),
 	      em(engine.assets()),
 	      tilemap(engine, level),
-	      transform(em, MaxEntitySize, level.width(), level.height()),
+	      transform(em, MaxEntitySize, level.width(), level.height(), level),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  spritesys(em, transform, engine.assets()),
 		  controller(em, transform),
-		  ai(em, engine, transform),
+		  ai(em, engine, transform, level),
 		  combat(em, transform, physics),
 		  state(em) {
 

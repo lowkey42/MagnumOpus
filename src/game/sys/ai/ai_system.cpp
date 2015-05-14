@@ -3,6 +3,8 @@
 #include "target_tag_comp.hpp"
 #include "../physics/transform_system.hpp"
 
+#include "../../level/level.hpp"
+
 #include <game/game_engine.hpp>
 
 #include <core/units.hpp>
@@ -13,8 +15,10 @@ namespace ai {
 
 	using namespace unit_literals;
 
-	Ai_system::Ai_system(ecs::Entity_manager& entity_manager, Game_engine& engine, physics::Transform_system& transform_system)
-	    : _engine(engine), _simples(entity_manager.list<Simple_ai_comp>()), _transform_system(transform_system) {
+	Ai_system::Ai_system(ecs::Entity_manager& entity_manager, Game_engine& engine,
+	                     physics::Transform_system& transform_system, level::Level& level)
+	    : _engine(engine), _simples(entity_manager.list<Simple_ai_comp>()),
+	      _transform_system(transform_system), _level(level) {
 
 		entity_manager.register_component_type<Simple_ai_comp>();
 		entity_manager.register_component_type<Target_tag_comp>();
@@ -37,7 +41,7 @@ namespace ai {
 					e.target(target_entity->shared_from_this());
 
 				}else{
-					e.no_target(dt);
+					e.no_target(dt, _level);
 				}
 			});
 		}

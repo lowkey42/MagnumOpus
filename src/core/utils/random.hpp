@@ -65,6 +65,11 @@ namespace util {
 
 	using random_generator = std::mt19937_64;
 
+	inline auto create_random_generator() -> random_generator {
+		static std::random_device rd;
+		return random_generator{rd()};
+	}
+
 	template<class T, class Generator>
 	auto random_real(Generator& gen, T min, T max) -> T {
 	    return (max - min)

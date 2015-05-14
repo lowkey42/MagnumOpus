@@ -24,22 +24,16 @@
 #include "transform_system.hpp"
 
 namespace mo {
+	namespace level{class Level;}
+
 namespace sys {
 namespace physics {
-
-	struct World_interface {
-		virtual auto solid(int x, int y)const -> bool =0;
-		virtual auto friction(int x, int y)const -> float =0;
-
-		virtual auto width()const -> int =0;
-		virtual auto height()const -> int =0;
-	};
 
 	class Physics_system {
 		public:
 			Physics_system(
 					ecs::Entity_manager& entity_manager, Transform_system& ts,
-					Distance min_body_size, Speed max_body_velocity, World_interface& world);
+					Distance min_body_size, Speed max_body_velocity, const level::Level& world);
 
 			void update(Time dt);
 
@@ -54,7 +48,7 @@ namespace physics {
 			auto _check_collision(Physics_comp& a, Physics_comp& b) -> util::maybe<Manifold>;
 			void _check_env_collisions(Physics_comp& a, std::vector<Manifold>& buffer);
 
-			const World_interface& _world;
+			const level::Level& _world;
 
 			const Distance _min_body_size;
 			const Speed _max_body_velocity;

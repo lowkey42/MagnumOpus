@@ -34,13 +34,14 @@ namespace physics {
 
 	Transform_system::Transform_system(
 			ecs::Entity_manager& entity_manager, Distance max_entity_size,
-			int world_width, int world_height)
+			int world_width, int world_height, const level::Level& world)
 		: util::slot<ecs::Component_event>(&Transform_system::_on_comp_event, this),
 	      _max_entity_size(max_entity_size),
 		  _cell_size(calc_cell_size(max_entity_size)),
 		  _cells_x(divide_ceil(world_width, _cell_size)), _cells_y(divide_ceil(world_height, _cell_size)),
 		  _em(entity_manager), _pool(_em.list<Transform_comp>()),
-		  _cells(_cells_y*_cells_x) {
+		  _cells(_cells_y*_cells_x),
+		  _world(world) {
 
 		_em.register_component_type<physics::Transform_comp>();
 

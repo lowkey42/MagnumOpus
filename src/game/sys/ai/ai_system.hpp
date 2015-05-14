@@ -23,6 +23,7 @@
 
 namespace mo {
 	class Game_engine;
+	namespace level{class Level;}
 
 namespace sys {
 	namespace physics{ class Transform_system; }
@@ -31,7 +32,8 @@ namespace sys {
 
 		class Ai_system {
 			public:
-				Ai_system(ecs::Entity_manager& entity_manager, Game_engine& engine, physics::Transform_system& transform_system);
+				Ai_system(ecs::Entity_manager& entity_manager, Game_engine& engine,
+				          physics::Transform_system& transform_system, level::Level& level);
 
 				void update(Time dt);
 
@@ -39,6 +41,7 @@ namespace sys {
 				Game_engine& _engine;
 				Simple_ai_comp::Pool& _simples;
 				physics::Transform_system& _transform_system;
+				level::Level& _level;
 		};
 
 	}

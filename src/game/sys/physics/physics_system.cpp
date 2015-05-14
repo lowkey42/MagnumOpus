@@ -14,7 +14,7 @@ namespace physics {
 	Physics_system::Physics_system(
 			ecs::Entity_manager& entity_manager, Transform_system& ts,
 			Distance min_body_size, Speed max_body_velocity,
-			World_interface& world)
+			const level::Level& world)
 		: _world(world), _min_body_size(min_body_size),
 		  _max_body_velocity(max_body_velocity),
 		  _sub_step_time(std::min(min_body_size.value()/(2*max_body_velocity.value()), 1.f/60)),

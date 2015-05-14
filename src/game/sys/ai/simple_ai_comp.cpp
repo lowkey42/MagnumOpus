@@ -8,6 +8,8 @@
 #include <sf2/sf2.hpp>
 #include "../../../core/ecs/serializer_impl.hpp"
 
+#include <core/utils/random.hpp>
+#include "../../level/level.hpp"
 
 namespace mo {
 namespace sys {
@@ -52,10 +54,19 @@ namespace ai {
 	}
 
 
+	namespace {
+		auto rng = util::create_random_generator();
+
+		Angle random_angle(Angle min, Angle max) {
+			return Angle{util::random_real(rng, remove_unit(min), remove_unit(max))};
+		}
+	}
+
 	Simple_ai_comp::Simple_ai_comp(ecs::Entity& owner)
 	    : Component(owner), attack_distance(2_m),
 	      near(2_m), max(10_m), near_angle(360_deg), far_angle(180_deg),
-	      _follow_time(0.5_s), _follow_time_left(0) {
+	      _follow_time(0.5_s), _follow_time_left(0),
+	      _wander_dir(static_cast<float>(util::random_int(rng, 0,4))*90_deg), _rot_delay(0_s) {
 
 		auto controller_m = owner.get<controller::Controllable_comp>();
 
@@ -66,11 +77,45 @@ namespace ai {
 			controller_m.get_or_throw().set(type());
 	}
 
-	void Simple_ai_comp::no_target(Time dt)noexcept {
+	void Simple_ai_comp::no_target(Time dt, level::Level& level)noexcept {
 		if(_target) {
 			_follow_time_left-=dt;
 			if(_follow_time_left<=0_s)
 				_target.reset();
+
+		} else {
+			auto pos = owner().get<physics::Transform_comp>()
+			            .process(Position{0,0}, [&](auto& t){return t.position();});
+
+			auto is_solid = [&](Angle a, float o=1){
+				auto dest = pos+rotate(Position{1_m*o,0_m}, a);
+				return level.solid(dest.x.value(),dest.y.value());
+			};
+
+			_rot_delay+=dt;
+			if(_rot_delay>2_s) {
+				_wander_dir+=random_angle(-90_deg, 90_deg);
+				_rot_delay = 0_s;
+			}
+
+			if(is_solid(_wander_dir) || is_solid(_wander_dir, 2.f)) {
+				Angle a = util::random_bool(rng, 0.5) ? -90_deg : 90_deg;
+				_rot_delay = 0_s;
+
+				do {
+					if(!is_solid(_wander_dir+a)) {
+						_wander_dir+=a;
+						break;
+
+					} else if(!is_solid(_wander_dir-a)) {
+						_wander_dir-=a;
+						break;
+
+					} else {
+						a*=2;
+					}
+				} while(abs(a)<=180_deg);
+			}
 		}
 	}
 
@@ -95,6 +140,15 @@ namespace ai {
 
 				if(distance>attack_distance/2)
 					c.move(dir);
+			});
+
+		} else {
+			owner().get<physics::Transform_comp>().process([&](auto& t){
+				auto dir = rotate(glm::vec2(1,0), _wander_dir);
+
+				c.look_at(dir);
+
+				c.move(dir);
 			});
 		}
 	}

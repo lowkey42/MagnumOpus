@@ -22,7 +22,6 @@ namespace controller {
 	}
 
 	namespace {
-		constexpr auto max_rotation_speed = 180_deg / 0.5_s;
 
 		struct Controllable_interface_impl : public Controllable_interface {
 			Controllable_interface_impl(Time dt, ecs::Entity& entity,
@@ -203,14 +202,7 @@ namespace controller {
 
 		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
 			_entity.get<Transform_comp>().process([&](auto& c){
-				auto rotation_diff = normalize_to_half_rot(_target_rotation-c.rotation());
-
-				auto max_rot = max_rotation_speed*_dt;
-
-				if(abs(rotation_diff)>max_rot)
-					rotation_diff = sign(rotation_diff).value() * max_rot;
-
-				c.rotation(c.rotation() + rotation_diff);
+				c.rotate( normalize_to_half_rot(_target_rotation-c.rotation()), _dt );
 			});
 		}
 	}
