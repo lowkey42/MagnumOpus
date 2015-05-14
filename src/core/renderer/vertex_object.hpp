@@ -85,6 +85,7 @@ namespace renderer {
 			unsigned int _id;
 			std::size_t _element_size;
 			std::size_t _elements;
+			std::size_t _max_elements;
 			bool _dynamic;
 
 			void _set_raw(std::size_t element_size, std::size_t size, const void* data);
