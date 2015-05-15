@@ -5,7 +5,7 @@
 #endif
 
 
-namespace core {
+namespace mo {
 namespace asset {
 
 	template<class T>
@@ -49,6 +49,17 @@ namespace asset {
 	template<class R>
 	Ptr<R>::Ptr(Asset_manager& mgr, const AID& id, std::shared_ptr<const R> res)
 	    : _mgr(&mgr), _ptr(res), _aid(id) {}
+
+    template<class R>
+    const R& Ptr<R>::operator*(){
+        load();
+        return *_ptr.get();
+    }
+    template<class R>
+    const R& Ptr<R>::operator*()const {
+        INVARIANT(*this, "Access to unloaded resource");
+        return *_ptr.get();
+    }
 
 	template<class R>
 	const R* Ptr<R>::operator->(){

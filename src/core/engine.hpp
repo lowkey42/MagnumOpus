@@ -19,7 +19,7 @@
 #include <memory>
 #include "utils/maybe.hpp"
 
-namespace core {
+namespace mo {
 	namespace asset {class Asset_manager;}
 	namespace renderer {class Graphics_ctx;}
 	class Configuration;
@@ -44,7 +44,7 @@ namespace core {
 			friend class Engine;
 
 			virtual void _on_enter(util::maybe<Screen&> prev){}
-			virtual void _on_leave(Screen& next){}
+			virtual void _on_leave(util::maybe<Screen&> next){}
 			virtual void _update(float delta_time) = 0;
 			virtual void _draw(float delta_time) = 0;
 			virtual auto _prev_screen_policy()const noexcept -> Prev_screen_policy = 0;
@@ -94,14 +94,14 @@ namespace core {
 		protected:
 			virtual void _on_frame(float dt) {};
 
-		private:
+		protected:
 			bool _quit = false;
 			std::unique_ptr<asset::Asset_manager> _asset_manager;
 			std::unique_ptr<Configuration> _configuration;
 			Sdl_wrapper _sdl;
 			std::unique_ptr<renderer::Graphics_ctx> _graphics_ctx;
 			std::unique_ptr<Input_manager> _input_manager;
-			std::vector<std::unique_ptr<Screen>> _screen_stack;
+			std::vector<std::shared_ptr<Screen>> _screen_stack;
 
 			float _current_time = 0;
 			float _last_time = 0;

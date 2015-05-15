@@ -17,6 +17,7 @@
 
 #include <cinttypes>
 #include <vector>
+#include <iterator>
 #include <string>
 #include <glm/glm.hpp>
 
@@ -55,7 +56,7 @@
 
 	obj.draw(); //< draws updated data
  */
-namespace core {
+namespace mo {
 namespace renderer {
 
 	class Object;
@@ -73,6 +74,9 @@ namespace renderer {
 			template<class T>
 			void set(const std::vector<T>& container);
 
+			template<class T>
+			void set(typename std::vector<T>::const_iterator begin, typename std::vector<T>::const_iterator end);
+
 			Buffer& operator=(Buffer&& b)noexcept;
 
 			std::size_t size()const noexcept{return _elements;}
@@ -81,6 +85,7 @@ namespace renderer {
 			unsigned int _id;
 			std::size_t _element_size;
 			std::size_t _elements;
+			std::size_t _max_elements;
 			bool _dynamic;
 
 			void _set_raw(std::size_t element_size, std::size_t size, const void* data);

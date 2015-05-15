@@ -4,7 +4,7 @@
 #include <GL/glew.h>
 #include <soil/SOIL.h>
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 Texture::Texture(const std::string& path) throw(Texture_loading_failed) {

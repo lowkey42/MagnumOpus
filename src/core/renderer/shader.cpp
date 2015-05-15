@@ -8,7 +8,7 @@
 
 #include "vertex_object.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	namespace {

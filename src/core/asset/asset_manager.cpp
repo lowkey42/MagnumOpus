@@ -78,7 +78,7 @@ namespace {
 	}
 }
 
-namespace core {
+namespace mo {
 namespace asset {
 
 	Asset_manager::Asset_manager(const std::string& exe_name, const std::string& app_name) {

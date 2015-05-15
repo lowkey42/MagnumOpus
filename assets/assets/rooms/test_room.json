@@ -1,0 +1,50 @@
+{ "height":10,
+ "layers":[
+        {
+         "data":[5, 5, 10, 5, 5, 5, 10, 5, 5, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 5, 8, 2, 2, 12, 2, 2, 2, 2, 2, 5, 5, 2, 2, 13, 2, 2, 2, 2, 2, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 8, 5, 2, 2, 2, 2, 2, 2, 2, 2, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 5, 5, 2, 2, 2, 2, 2, 2, 2, 2, 5, 5, 5, 10, 5, 5, 5, 5, 10, 5, 5],
+         "height":10,
+         "name":"main",
+         "opacity":1,
+         "type":"tilelayer",
+         "visible":true,
+         "width":10,
+         "x":0,
+         "y":0
+        }, 
+        {
+         "draworder":"topdown",
+         "height":10,
+         "name":"Objektebene 1",
+         "objects":[
+                {
+                 "height":16,
+                 "name":"",
+                 "properties":
+                    {
+
+                    },
+                 "rotation":0,
+                 "type":"gold",
+                 "visible":true,
+                 "width":16,
+                 "x":96,
+                 "y":32
+                }],
+         "opacity":1,
+         "type":"objectgroup",
+         "visible":true,
+         "width":10,
+         "x":0,
+         "y":0
+        }],
+ "orientation":"orthogonal",
+ "properties":
+    {
+
+    },
+ "renderorder":"right-down",
+ "tileheight":16,
+ "tilewidth":16,
+ "version":1,
+ "width":10
+}

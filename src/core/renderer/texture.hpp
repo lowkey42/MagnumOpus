@@ -21,7 +21,7 @@
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	struct Texture_loading_failed : public asset::Loading_failed {
@@ -51,7 +51,7 @@ namespace renderer {
 			unsigned int _handle;
 			int _width=1, _height=1;
 	};
-	using Texture_ptr = core::asset::Ptr<Texture>;
+	using Texture_ptr = asset::Ptr<Texture>;
 
 } /* namespace renderer */
 

@@ -21,7 +21,7 @@
 		#include <execinfo.h>
 	#endif
 
-	namespace core {
+	namespace mo {
 	namespace util {
 
 		namespace {
@@ -52,9 +52,6 @@
 				pclose(fp);
 
 				return buffer.str();
-			}
-			void printStackTrace(std::string error) {
-				CRASH_REPORT("\n"<<error);
 			}
 		}
 
@@ -277,6 +274,10 @@
 		}
 
 		namespace {
+			void printStackTrace(std::string error) {
+				CRASH_REPORT("\n"<<error);
+			}
+
 			void posix_signal_handler(int sig, siginfo_t *siginfo, void *context) {
 			  (void)context;
 			  switch(sig) {
@@ -423,7 +424,7 @@
 	}
 
 #else
-	namespace core {
+	namespace mo {
 	namespace util {
 		void init_stacktrace(std::string exeName) {
 		}

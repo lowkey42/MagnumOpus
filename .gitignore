@@ -36,4 +36,9 @@ MagnumOpus-build/
 MagnumOpus/CMakeLists.txt.user
 .idea
 
+magnum_opus.config
+magnum_opus.creator
+magnum_opus.files
+magnum_opus.includes
+
 assets/*.log

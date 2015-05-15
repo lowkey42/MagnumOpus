@@ -37,9 +37,15 @@ namespace sf2 {
 	}
 }
 
-namespace core {
+namespace mo {
+	namespace asset {
+		class AID;
+		class Asset_manager;
+	}
+
 namespace ecs {
 	class Entity_manager;
+	class Serializer;
 
 	namespace details {
 		using Comp_add_function = std::function<void(Entity& e)>;
@@ -59,6 +65,9 @@ namespace ecs {
 		public:
 			template<typename T>
 			util::maybe<T&> get();
+
+			template<typename T>
+			util::maybe<T&> getByType(Component_type type);
 
 			template<typename T>
 			bool has();
@@ -85,9 +94,10 @@ namespace ecs {
 
 	class Entity_manager : util::no_copy_move {
 		public:
-			Entity_manager();
+			Entity_manager(asset::Asset_manager& asset_mgr);
 
 			auto emplace()noexcept -> Entity_ptr;
+			auto emplace(const asset::AID& blueprint)noexcept -> Entity_ptr;
 			void erase(Entity_ptr entity);
 			auto list_entities()const {return util::range(_entities);}
 			void clear(); //< "Please do not press this button again."
@@ -103,6 +113,8 @@ namespace ecs {
 			void process_queued_actions();
 			void shrink_to_fit();
 
+			auto serializer()noexcept -> Serializer& {return *_serializer;}
+
 		private:
 			std::vector<Entity_ptr> _entities;
 			std::vector<Entity_ptr> _delete_queue;
@@ -110,6 +122,7 @@ namespace ecs {
 
 			std::unique_ptr<Component_pool_base> _pools[details::max_comp_type];
 			std::unordered_map<std::string, details::Component_type_info> _types;
+			std::unique_ptr<Serializer> _serializer;
 	};
 
 } /* namespace ecs */

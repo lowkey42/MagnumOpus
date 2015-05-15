@@ -5,7 +5,7 @@
 #include <sf2/sf2.hpp>
 #include <sf2/FileParser.hpp>
 
-namespace core {
+namespace mo {
 	using namespace std::placeholders;
 
 
@@ -25,7 +25,8 @@ namespace core {
 		switch(event.type) {
 			case SDL_KEYDOWN:
 			case SDL_KEYUP:
-				keyboard_events.inform(event.key);
+				if(event.key.repeat==0)
+					keyboard_events.inform(event.key);
 				break;
 
 			case SDL_MOUSEMOTION:

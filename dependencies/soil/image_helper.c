@@ -14,17 +14,21 @@
 #include <string.h>
 
 int query_gl_extension( const char *extension) {
-		GLint num_extensions, i;
+#ifdef EMSCRIPTEN
+	return 1; // workaround for EMSCRIPTEN
+#else
+	GLint num_extensions, i;
 
-		glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
-		for(i = 0; i < num_extensions; ++i)
-		{
-				const GLubyte *ext = glGetStringi(GL_EXTENSIONS, i);
-				if(strcmp((const char*)ext, extension) == 0)
-						return 1;
-		}
+	glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
+	for(i = 0; i < num_extensions; ++i)
+	{
+			const GLubyte *ext = glGetStringi(GL_EXTENSIONS, i);
+			if(strcmp((const char*)ext, extension) == 0)
+					return 1;
+	}
 
-		return 0;
+	return 0;
+#endif
 }
 
 /*	Upscaling the image uses simple bilinear interpolation	*/

@@ -4,12 +4,17 @@
 #include "vertex_object.hpp"
 #endif
 
-namespace core {
+namespace mo {
 namespace renderer {
 
 	template<class T>
 	void Buffer::set(const std::vector<T>& container) {
 		_set_raw(sizeof(T), container.size(), &container[0]);
+	}
+	template<class T>
+	void Buffer::set(typename std::vector<T>::const_iterator begin,
+	                 typename std::vector<T>::const_iterator end) {
+		_set_raw(sizeof(T), std::distance(begin, end), &*begin);
 	}
 
 	template<class T>

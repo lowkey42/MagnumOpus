@@ -20,7 +20,7 @@
 #include <memory>
 #include "log.hpp"
 
-namespace core {
+namespace mo {
 namespace util {
 
 	template<typename T>
@@ -90,6 +90,14 @@ namespace util {
 			void process(Func f) {
 				if(is_some())
 					f(_data);
+			}
+
+			template<typename RT, typename Func>
+			auto process(RT def, Func f) -> RT {
+				if(is_some())
+					return f(_data);
+
+				return def;
 			}
 
 		private:
@@ -182,6 +190,14 @@ namespace util {
 					f(get_or_throw());
 			}
 
+			template<typename RT, typename Func>
+			auto process(RT def, Func f) -> RT {
+				if(is_some())
+					return f(get_or_throw());
+
+				return def;
+			}
+
 		private:
 			T* _ref;
 	};
@@ -198,7 +214,6 @@ namespace util {
 		  typedef seq<S...> type;
 		};
 
-		// FIXME: broken
 		template<typename... T>
 		struct processor {
 			std::tuple<T&&...> args;
@@ -214,10 +229,11 @@ namespace util {
 					call(std::forward<Func>(f), std::forward<decltype(std::get<S>(args))>(std::get<S>(args))...);
 				}
 
-				template<typename Func>
-				void call(Func&& f, T&&... m) {
+				template<typename Func, typename... Args>
+				void call(Func&& f, Args&&... m) {
 					for(bool b : {m.is_some()...})
 						if(!b)
+							return;
 
 					f(m.get_or_throw()...);
 				}

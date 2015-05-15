@@ -4,7 +4,7 @@
 #include "component.hpp"
 #endif
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 	template<typename T>
@@ -17,7 +17,7 @@ namespace ecs {
 		_reg_self(T::type());
 	}
 	template<typename T>
-	Component<T>::Component(Component&& o)noexcept : Component_base(o) {
+	Component<T>::Component(Component&& o)noexcept : Component_base(std::move(o)) {
 		_reg_self(T::type());
 	}
 	template<typename T>
@@ -56,30 +56,26 @@ namespace ecs {
 	template<typename T>
 	void Component_pool<T>::free(Entity& owner) {
 		this->inform(Component_event{Component_event_type::freed, owner});
-
-		auto comp = details::get_component(owner, T::type());
-
-		if(comp) {
-			T& cptr = *static_cast<T*>(comp);
-
-			INVARIANT(cptr.valid(), "double free");
-
-			_delete_queue.push_back(&cptr);
-		};
+		_delete_queue.push_back(&owner);
 	}
 
 	template<typename T>
 	void Component_pool<T>::process_queued_actions() {
-		for(auto&& e : _delete_queue) {
-			INVARIANT(e->valid(), "double free");
+		for(auto&& owner : _delete_queue) {
 
-			e->~T();
+			auto comp = details::get_component(*owner, T::type());
+			if(comp) {
+				T& e = *static_cast<T*>(comp);
 
-			T& back = *reinterpret_cast<T*>(_pool.back());
-			if(e!=&back) {
-				*e = std::move(back);
+				INVARIANT(e.valid(), "double free");
+
+				T& back = *reinterpret_cast<T*>(_pool.back());
+				if(&e!=&back) {
+					std::swap(e, back);
+				}
+				back.~T();
+				_pool.pop_back();
 			}
-			_pool.pop_back();
 		}
 
 		_delete_queue.clear();

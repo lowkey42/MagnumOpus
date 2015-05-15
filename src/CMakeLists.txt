@@ -1,21 +1,26 @@
 cmake_minimum_required(VERSION 2.6)
 
-
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -g -O1 -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
-
 # include core
 add_subdirectory(core)
 
 project(MagnumOpus)
-include_directories(${ROOT_DIR}/src) # for core
+
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+
+include_directories(${ROOT_DIR}/src)
 
 
 if(EMSCRIPTEN)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_SDL=2")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s USE_SDL=2")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_SDL=2 -Oz -s DEMANGLE_SUPPORT=1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s USE_SDL=2 -s DEMANGLE_SUPPORT=1")
+	set(ZLIB_LIBRARY "")
+	set(GLEW_LIBRARIES "")
+	set(OPENGL_LIBRARIES "")
 	set(SDL2_LIBRARY "")
 	
 else()
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O1")
+	
 	add_definitions(-DSTACKTRACE)
 	find_package(GLEW REQUIRED)
 
@@ -59,7 +64,12 @@ file(GLOB_RECURSE MAGNUM_SRCS
 add_executable(MagnumOpus main.cpp ${MAGNUM_SRCS})
 target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
 
-if(NOT EMSCRIPTEN)
+
+option(BUILD_TESTS "Build tests" OFF)
+
+if(BUILD_TESTS AND NOT EMSCRIPTEN)
 # Tests
+add_executable(TestLevelGen test_level_gen.cpp ${MAGNUM_SRCS})
+target_link_libraries(TestLevelGen ${SDL2_LIBRARY} core)
 endif()
 

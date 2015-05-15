@@ -21,27 +21,27 @@
 #include "../core/renderer/vertex_object.hpp"
 #include "../core/renderer/text.hpp"
 
-namespace game {
+namespace mo {
 
-	class Example_screen : public core::Screen {
+	class Example_screen : public Screen {
 		public:
-			Example_screen(core::Engine& engine);
+			Example_screen(Engine& engine);
 			~Example_screen()noexcept = default;
 
 		protected:
 			void _update(float delta_time)override;
 			void _draw(float delta_time)override;
 
-			auto _prev_screen_policy()const noexcept -> core::Prev_screen_policy override {
-				return core::Prev_screen_policy::discard;
+			auto _prev_screen_policy()const noexcept -> Prev_screen_policy override {
+				return Prev_screen_policy::discard;
 			}
 
 		private:
-			core::renderer::Shader_program _shader;
-			core::renderer::Object _object;
+			renderer::Shader_program _shader;
+			renderer::Object _object;
 
-			core::renderer::Shader_program _text_shader;
-			core::renderer::Font_ptr _font;
+			renderer::Shader_program _text_shader;
+			renderer::Font_ptr _font;
 	};
 
 }

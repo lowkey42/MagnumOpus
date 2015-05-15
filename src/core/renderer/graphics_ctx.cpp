@@ -27,7 +27,7 @@ namespace {
 #endif
 }
 
-namespace core {
+namespace mo {
 namespace renderer {
 	Graphics_ctx::Graphics_ctx(const std::string& name, int width, int height, bool fullscreen)
 	 : _name(name), _win_width(width), _win_height(height), _window(nullptr, SDL_DestroyWindow) {
@@ -116,5 +116,13 @@ namespace renderer {
 		glClearColor(r,g,b,1.f);
 	}
 
+
+	Disable_depthtest::Disable_depthtest() {
+		glDisable(GL_DEPTH_TEST);
+	}
+
+	Disable_depthtest::~Disable_depthtest() {
+		glEnable(GL_DEPTH_TEST);
+	}
 }
 }

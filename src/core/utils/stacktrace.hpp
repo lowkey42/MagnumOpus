@@ -18,7 +18,7 @@
 #include <string>
 #include <stdexcept>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	extern void init_stacktrace(std::string exe_path);

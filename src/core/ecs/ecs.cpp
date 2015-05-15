@@ -8,8 +8,9 @@
 #include <iostream>
 
 #include "component.hpp"
+#include "serializer.hpp"
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 
@@ -18,12 +19,20 @@ namespace ecs {
 	};
 
 
-	Entity_manager::Entity_manager() : _unoptimized_deletions(0) {
+	Entity_manager::Entity_manager(asset::Asset_manager& asset_mgr)
+		: _unoptimized_deletions(0), _serializer(std::make_unique<Serializer>(*this,asset_mgr)) {
 	}
 
 	Entity_ptr Entity_manager::emplace()noexcept {
 		auto e = std::make_shared<Entity_constructor>(*this);
 		_entities.push_back(e);
+
+		return e;
+	}
+	Entity_ptr Entity_manager::emplace(const asset::AID& blueprint)noexcept {
+		auto e = emplace();
+
+		_serializer->apply(blueprint, e);
 
 		return e;
 	}
@@ -54,14 +63,14 @@ namespace ecs {
 				return remove;
 		} );
 
-		_entities.erase(new_end, _entities.end() );
-
-		_delete_queue.clear();
-
 		for(auto& cp : _pools) {
 			if(cp)
 				cp->process_queued_actions();
 		}
+
+		_entities.erase(new_end, _entities.end() );
+
+		_delete_queue.clear();
 
 		if(_unoptimized_deletions>=resize_after_n_deletions) {
 			shrink_to_fit();

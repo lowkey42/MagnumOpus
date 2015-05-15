@@ -1,0 +1,54 @@
+{
+	"key_action": {
+		"T_1": "weapon_0",
+		"T_2": "weapon_1",
+		"T_3": "weapon_2",
+		"T_4": "weapon_3",
+		"W": "move_up",
+		"S": "move_down",
+		"A": "move_left",
+		"D": "move_right",
+		"Space": "attack",
+
+		"KP_8": "weapon_0",
+		"KP_6": "weapon_1",
+		"KP_2": "weapon_2",
+		"KP_4": "weapon_3",
+		"Up": "move_up",
+		"Down": "move_down",
+		"Left": "move_left",
+		"Right": "move_right",
+		"RControl": "attack",
+		"KP_0": "use_or_take",
+		
+		"Escape": "quit"
+	},
+	"mouse_button_action": {
+		1: "attack",
+		3: "use_or_take"
+	},
+
+	"pad_button_action": {
+		"y": "weapon_0",
+		"b": "weapon_1",
+		"a": "weapon_2",
+		"x": "weapon_3",
+		"left_trigger": "attack",
+		"left_shoulder": "use_or_take",
+
+		"d_pad_up": "weapon_0",
+		"d_pad_right": "weapon_1",
+		"d_pad_down": "weapon_2",
+		"d_pad_left": "weapon_3",
+		"right_trigger": "attack",
+		"right_shoulder": "use_or_take",
+
+		"guide": "enter_leave_game",
+		"start": "enter_leave_game",
+		"back": "quit"
+	},
+    "aim_sticks": ["right"],
+    "move_sticks": ["left"],
+    "stick_dead_zone": 0.2,
+    "mouse_look": true
+}

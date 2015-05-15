@@ -21,7 +21,7 @@
 #include <cassert>
 #include <iostream>
 
-namespace core {
+namespace mo {
 namespace util {
 	struct position {
 		int x, y;
@@ -43,14 +43,14 @@ namespace util {
 }
 
 namespace std {
-	template <> struct hash<core::util::position> {
-		size_t operator()(const core::util::position& p)const noexcept {
+	template <> struct hash<mo::util::position> {
+		size_t operator()(const mo::util::position& p)const noexcept {
 			return p.x + p.y*71;
 		}
 	};
 }
 
-namespace core {
+namespace mo {
 namespace util {
 
 	template<class CostCalculatorType>

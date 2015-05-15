@@ -26,7 +26,7 @@
 #include "aid.hpp"
 
 
-namespace core {
+namespace mo {
 namespace asset {
 	struct File_handle;
 	class Asset_manager;

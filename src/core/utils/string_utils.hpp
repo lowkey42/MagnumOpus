@@ -23,7 +23,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace core {
+namespace mo {
 namespace util {
 
 	inline maybe<std::string> read_file_to_string(std::string path) {
@@ -111,6 +111,15 @@ namespace util {
 	inline std::string to_lower(std::string str) {
 		std::transform(str.begin(), str.end(), str.begin(), ::tolower);
 		return str;
+	}
+
+	inline bool starts_with(const std::string& str, const std::string& pattern) {
+		if(pattern.length()>str.length())
+		for(auto i=0ul; i<pattern.length(); ++i)
+			if(pattern[i]!=str[i])
+				return false;
+
+		return true;
 	}
 
 }

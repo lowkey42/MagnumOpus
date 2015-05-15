@@ -21,7 +21,7 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_gamecontroller.h>
 
-namespace core {
+namespace mo {
 
 	class Input_manager {
 		public:
@@ -49,4 +49,4 @@ namespace core {
 			std::vector<SDL_GameController*> _gamepads;
 	};
 
-} /* namespace input */
+}

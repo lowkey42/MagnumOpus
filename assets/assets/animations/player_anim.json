@@ -1,0 +1,12 @@
+﻿{
+	"animations": {
+		"idle": {"row":0, "fps":60, "frames":8},
+		"moving": {"row":0, "fps":60, "frames":8},
+		"attack": {"row":0, "fps":60, "frames":8}
+	},
+	
+	"texName": "tex:player",
+	
+	"frame_width": 64,
+	"frame_height": 64
+}

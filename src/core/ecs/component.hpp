@@ -24,7 +24,7 @@
 #include <vector>
 #include <memory>
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 	class Entity;
@@ -38,12 +38,14 @@ namespace ecs {
 
 
 	namespace details {
-		constexpr Component_type max_comp_type = 8;
+		constexpr Component_type max_comp_type = 16;
 
 		class Component_base : public util::no_copy {
 			public:
 				Component_base(Entity& owner)noexcept;
 				Component_base(Component_base&& o)noexcept;
+
+				Component_base& operator=(Component_base&& o)noexcept;
 
 				auto owner_ptr()const -> Entity_ptr;
 				auto owner()const noexcept -> Entity& {return *_owner;}
@@ -57,7 +59,7 @@ namespace ecs {
 			protected:
 				static Component_type _next_type_id()noexcept;
 
-				~Component_base()=default;
+				virtual ~Component_base()noexcept=default;
 
 				void _reg_self(Component_type type);
 				void _unreg_self(Component_type type);
@@ -68,6 +70,9 @@ namespace ecs {
 		extern Component_base*& get_component(Entity& e, Component_type t);
 		extern Entity_ptr get_entity(Entity& e);
 	}
+
+	template<typename T>
+	using is_component = std::is_base_of<ecs::details::Component_base, T>;
 
 	template<typename T>
 	class Component : public details::Component_base {
@@ -137,10 +142,13 @@ namespace ecs {
 			iterator end() {
 				return iterator(_pool.end());
 			}
+			std::size_t size()const noexcept {
+				return _pool.size();
+			}
 
 		private:
 			pool_type _pool;
-			std::vector<T*> _delete_queue;
+			std::vector<Entity*> _delete_queue;
 	};
 
 } /* namespace ecs */

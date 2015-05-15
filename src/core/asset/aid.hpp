@@ -18,7 +18,7 @@
 #include <string>
 #include <memory>
 
-namespace core {
+namespace mo {
 namespace asset {
 
 	enum class Asset_type : uint8_t {
@@ -30,7 +30,8 @@ namespace asset {
 		music,
 		cfg,
 		blueprint,
-		font
+		font,
+		anim
 	};
 
 	/**
@@ -49,28 +50,28 @@ namespace asset {
 
 			auto str()const noexcept -> std::string;
 			auto type()const noexcept{return _type;}
-			auto name()const noexcept{return _name ? *_name : "";}
+			auto name()const noexcept{return _name;}
 
 		private:
 			Asset_type _type;
-			std::shared_ptr<const std::string> _name;
+			std::string _name;
 	};
 
 }
 }
 
-inline core::asset::AID operator "" _aid(const char* str, std::size_t) {
-	return core::asset::AID(str);
+inline mo::asset::AID operator "" _aid(const char* str, std::size_t) {
+	return mo::asset::AID(str);
 }
 
 namespace std {
-	template <> struct hash<core::asset::Asset_type> {
-		size_t operator()(core::asset::Asset_type ac)const noexcept {
+	template <> struct hash<mo::asset::Asset_type> {
+		size_t operator()(mo::asset::Asset_type ac)const noexcept {
 			return static_cast<uint8_t>(ac);
 		}
 	};
-	template <> struct hash<core::asset::AID> {
-		size_t operator()(const core::asset::AID& aid)const noexcept {
+	template <> struct hash<mo::asset::AID> {
+		size_t operator()(const mo::asset::AID& aid)const noexcept {
 			auto classPart = static_cast<uint8_t>(aid.type());
 			hash<string> hs;
 			return classPart + hs(aid.name())*71;

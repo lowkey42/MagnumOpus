@@ -8,7 +8,7 @@
 #include "../utils/log.hpp"
 #include "../utils/string_utils.hpp"
 
-namespace core {
+namespace mo {
 namespace asset {
 
 

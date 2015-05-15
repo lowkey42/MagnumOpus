@@ -4,7 +4,7 @@
 #include "ecs.hpp"
 #endif
 
-namespace core {
+namespace mo {
 namespace ecs {
 
 	template<typename Comp>
@@ -56,6 +56,15 @@ namespace ecs {
 	util::maybe<T&> Entity::get() {
 		INVARIANT(T::type()<details::max_comp_type, "Access to unregistered component "<<T::name());
 		return util::justPtr(static_cast<T*>(details::get_component(*this, T::type())));
+	}
+
+	template<typename T>
+	util::maybe<T&> Entity::getByType(Component_type type) {
+		auto comp = details::get_component(*this, type);
+		if(!comp)
+			return util::nothing();
+
+		return util::justPtr(dynamic_cast<T*>(comp));
 	}
 
 	template<typename T>

@@ -11,7 +11,7 @@
 #include <SDL2/SDL.h>
 
 
-namespace core {
+namespace mo {
 	namespace {
 		void init_sub_system(Uint32 f, const std::string& name, bool required=true) {
 			if(SDL_InitSubSystem(f)!=0) {
@@ -72,18 +72,19 @@ auto Engine::enter_screen(std::unique_ptr<Screen> screen) -> Screen& {
 void Engine::leave_screen(uint8_t depth) {
 	if(depth<=0) return;
 
-	auto last = std::unique_ptr<Screen>{};
+	auto last = std::shared_ptr<Screen>{};
 	if(!_screen_stack.empty())
 		last = std::move(_screen_stack.back());
 
 	for(;depth>0; depth--)
 		_screen_stack.pop_back();
 
-	if(_screen_stack.empty())
+	if(_screen_stack.empty()) {
 		_quit=true;
+		last->_on_leave(util::nothing());
 
-	else {
-		last->_on_leave(*_screen_stack.back());
+	} else {
+		last->_on_leave(util::justPtr(_screen_stack.back().get()));
 		_screen_stack.back()->_on_enter(util::justPtr(last.get()));
 	}
 }
@@ -102,12 +103,14 @@ void Engine::on_frame() {
 
 	_on_frame(delta_time);
 
-	const int screen_stack_size = _screen_stack.size();
+	auto screen_stack = _screen_stack;
+
+	const int screen_stack_size = screen_stack.size();
 	int screen_index=screen_stack_size-1; //< has to be signed
 
 	// update all screens until we reached one with PrevScreenPolicy < Update
 	for(; screen_index>=0; screen_index--) {
-		auto& s = _screen_stack.at(screen_index);
+		auto& s = screen_stack.at(screen_index);
 
 		s->_update(delta_time);
 
@@ -117,14 +120,14 @@ void Engine::on_frame() {
 
 	// find last screen to draw (PrevScreenPolicy >= Draw)
 	for(; screen_index>=0; screen_index--)
-		if(_screen_stack.at(screen_index)->_prev_screen_policy()!=Prev_screen_policy::draw)
+		if(screen_stack.at(screen_index)->_prev_screen_policy()!=Prev_screen_policy::draw)
 			break;
 
 	screen_index=std::max(screen_index, 0);
 
 	// draw all screens in reverse order
 	for(; screen_index<screen_stack_size; screen_index++)
-		_screen_stack.at(screen_index)->_draw(delta_time);
+		screen_stack.at(screen_index)->_draw(delta_time);
 
 	_graphics_ctx->end_frame(delta_time);
 }

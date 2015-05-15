@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Game-specific engine                                                   *
+ * Ingame-UI renderer                                                     *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,19 +15,28 @@
 
 #pragma once
 
-#include "core/engine.hpp"
-#include "core/configuration.hpp"
+#include <memory>
 
-class Game_engine : public core::Engine {
-	public:
-		Game_engine(const std::string& title, core::Configuration cfg)
-		    : Engine(title, std::move(cfg)) {
-		}
+namespace mo {
+	class Game_engine;
+	namespace renderer {
+		class Camera;
+	}
+	namespace ecs {
+		class Entity;
+	}
 
+	class Game_ui {
+		public:
+			Game_ui(Game_engine& engine);
+			~Game_ui()noexcept;
 
-	protected:
-		void _on_frame(float dt) {
-		}
+			void pre_draw();
+			void draw(const renderer::Camera& cam, ecs::Entity& entity, int offset=1);
 
-	private:
-};
+		private:
+			struct PImpl;
+			std::unique_ptr<PImpl> _impl;
+	};
+
+}
