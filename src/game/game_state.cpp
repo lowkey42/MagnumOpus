@@ -119,16 +119,9 @@ namespace mo {
 				// TODO[foe]
 
 			} else {
-				for(int i=0; i<2; i++) {
+				for(int i=0; i<6; i++) {
 					ecs::Entity_ptr enemy1 = em.emplace("blueprint:enemy"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
-					auto anim1 = engine.assets().load<renderer::Animation>("anim:scorpion"_aid);
-					enemy1->emplace<sys::sprite::Sprite_comp>(anim1);
-
-					ecs::Entity_ptr enemy3 = em.emplace("blueprint:enemy"_aid);
-					enemy3->get<sys::physics::Transform_comp>().get_or_throw().position(center);
-					auto anim2 = engine.assets().load<renderer::Animation>("anim:crawler"_aid);
-					enemy3->emplace<sys::sprite::Sprite_comp>(anim2);
 				}
 			}
 		});
