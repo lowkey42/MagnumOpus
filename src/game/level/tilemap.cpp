@@ -25,7 +25,7 @@ namespace level {
 
 	Tilemap::Tilemap(Engine &engine, const Level &lev)
 	    : _level(lev),
-		  _object(layout, create_buffer(_vertices, true)) {
+		  _object(layout, create_dynamic_buffer<TileVertex>(16*16*6)) {
 		// Create and attach the Shader
 		_shader.attach_shader(engine.assets().load<Shader>("vert_shader:tilemap"_aid))
 				.attach_shader(engine.assets().load<Shader>("frag_shader:tilemap"_aid))

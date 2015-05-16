@@ -17,51 +17,24 @@
 
 #include "game_engine.hpp"
 
-#include "../core/units.hpp"
-#include "../core/ecs/ecs.hpp"
-#include "../core/ecs/serializer.hpp"
-
-#include "level/level.hpp"
-#include "level/tilemap.hpp"
-
-#include "sys/physics/transform_system.hpp"
-#include "sys/physics/physics_system.hpp"
-#include "sys/sprite/sprite_system.hpp"
-#include "sys/controller/controller_system.hpp"
-#include "sys/cam/camera_system.hpp"
-#include "sys/ai/ai_system.hpp"
-#include "sys/combat/combat_system.hpp"
+#include <core/ecs/serializer.hpp>
 #include "sys/state/state_system.hpp"
+
+#include "../core/units.hpp"
 
 #include "game_ui.hpp"
 
 namespace mo {
 	namespace renderer{ class Camera; }
 
-	class Game_master;
-
-	struct Meta_system {
-		ecs::Entity_manager em;
-		level::Tilemap tilemap;
-
-		sys::physics::Transform_system transform;
-		sys::cam::Camera_system camera;
-		sys::physics::Physics_system physics;
-		sys::sprite::Sprite_system spritesys;
-		sys::controller::Controller_system controller;
-		sys::ai::Ai_system ai;
-		sys::combat::Combat_system combat;
-		sys::state::State_system state;
-
-		Meta_system(Game_engine& engine, level::Level& level);
-
-		void update(Time dt);
-		void draw();
-	};
+	struct Game_state;
 
 	class Game_screen : public Screen {
 		public:
-			Game_screen(Game_engine& engine);
+			Game_screen(Game_engine& engine, std::string profile="default",
+			            std::vector<ecs::ETO> players=
+			                 std::vector<ecs::ETO>(),
+			            util::maybe<int> depth=util::nothing());
 			~Game_screen()noexcept;
 
 		protected:
@@ -77,7 +50,6 @@ namespace mo {
 			void _on_enter(util::maybe<Screen&> prev) override;
 			void _on_leave(util::maybe<Screen&> next) override;
 
-			auto _add_player(sys::controller::Controller& controller, Position pos) -> ecs::Entity_ptr;
 			void _join(sys::controller::Controller_added_event e);
 			void _unjoin(sys::controller::Controller_removed_event e);
 
@@ -86,12 +58,9 @@ namespace mo {
 		private:
 			Game_engine& _engine;
 
-			std::unique_ptr<Game_master> _gm;
-			Meta_system _state;
+			std::unique_ptr<Game_state> _state;
 			Game_ui _ui;
 
-			ecs::Entity_ptr _main_player;
-			std::vector<ecs::Entity_ptr> _sec_players;
 			util::slot<ecs::Entity&, const sys::state::State_data&> _player_sc_slot;
 	};
 

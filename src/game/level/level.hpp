@@ -17,11 +17,11 @@
 
 #include <vector>
 #include <iostream>
+#include <glm/vec2.hpp>
 
 #include "elements.hpp"
 #include "../../core/asset/asset_manager.hpp"
 #include "../../core/utils/template_utils.hpp"
-#include "../sys/physics/physics_system.hpp"
 
 namespace mo {
 namespace level {
@@ -84,7 +84,7 @@ namespace level {
 		}
 	};
 
-	class Level : public sys::physics::World_interface {
+	class Level {
 		public:
 			Level(Tile_type default_type, int width, int height, std::vector<Room> rooms=std::vector<Room>());
 			Level(int width, int height, std::vector<Tile> data, std::vector<Room> rooms=std::vector<Room>());
@@ -100,11 +100,11 @@ namespace level {
 			template<typename F>
 			void foreach_tile(int min_x, int min_y, int max_x, int max_y, F handler)const;
 
-			auto solid   (int x, int y)const -> bool  override {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid() : true;}
-			auto friction(int x, int y)const -> float override {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).friction() : 1.f;}
+			auto solid   (int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid() : true;}
+			auto friction(int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).friction() : 1.f;}
 
-			auto width()  const noexcept     -> int   override {return _width;}
-			auto height() const noexcept     -> int   override {return _height;}
+			auto width()  const noexcept     {return _width;}
+			auto height() const noexcept     {return _height;}
 
 			auto find_room(Room_type type)const -> util::maybe<const Room&>;
 			template<typename F>

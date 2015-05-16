@@ -7,3 +7,7 @@ tex:player = textures/player_tmp.png
 tex:enemy_moving = textures/scorpion_move.png
 tex:enemy2_moving = textures/crawler_move.png
 tex:ball = textures/ball.png
+tex:coin = textures/coin.tga
+tex:zombie = textures/zombie.png
+tex:soldier = textures/soldier.png
+tex:fireball = textures/fireball.png

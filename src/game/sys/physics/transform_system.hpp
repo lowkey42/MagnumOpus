@@ -23,6 +23,7 @@
 #include "../../../core/utils/template_utils.hpp"
 #include "transform_comp.hpp"
 #include "physics_comp.hpp"
+#include "../../level/level.hpp"
 
 
 namespace mo {
@@ -35,7 +36,8 @@ namespace physics {
 		public:
 			Transform_system(
 					ecs::Entity_manager& entity_manager, Distance max_entity_size,
-					int world_width, int world_height);
+					int world_width, int world_height,
+			        const level::Level& world);
 
 			void update(Time dt);
 
@@ -96,7 +98,7 @@ namespace physics {
 			Transform_comp::Pool& _pool;
 
 			std::vector<Cell_data> _cells;
-
+			const level::Level& _world;
 	};
 
 	template<typename F>
@@ -162,23 +164,30 @@ namespace physics {
 			e.get<Transform_comp>().process([&](const auto& trans){
 				auto p = trans.position();
 				auto diff = remove_units(p-pos);
-				auto distance = glm::length2(diff);
+				auto distance_2 = glm::length2(diff);
 
 				auto target_dir = Angle(atan2(diff.y, diff.x));
 
-				auto dir_diff = std::abs(dir-target_dir);
+				auto dir_diff = std::abs(normalize(dir-target_dir));
 				if(dir_diff>180_deg)
 					dir_diff = 360_deg - dir_diff;
+				dir_diff = std::abs(dir_diff);
 
+				if(distance_2<=max_2) {
+					Angle a = distance_2<near_2 ? near_angle : max_angle;
 
-				if(distance<0.1f)
-					func(e);
+					if(dir_diff<=a/2.f) {
+						auto distance = glm::sqrt(distance_2);
+						auto step = diff / distance;
+						auto mp = pos;
+						for(float d=0; d<=distance; d++) {
+							mp+=step;
+							if(this->_world.solid(mp.x.value(), mp.y.value()))
+								return;
+						}
 
-				else if(distance<=max_2) {
-					Angle a = distance<near_2 ? near_angle : max_angle;
-
-					if(dir_diff<=a/2.f)
 						func(e);
+					}
 				}
 			});
 		});

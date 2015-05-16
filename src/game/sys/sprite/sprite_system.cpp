@@ -11,7 +11,7 @@ namespace sprite {
 	Sprite_system::Sprite_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
 								 asset::Asset_manager& asset_manager) noexcept :
 	    _transform(ts), _sprite_batch(asset_manager) {
-		;
+		entity_manager.register_component_type<Sprite_comp>();
 	}
 
 	void Sprite_system::draw(const renderer::Camera& camera) noexcept{

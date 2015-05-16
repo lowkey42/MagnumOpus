@@ -234,11 +234,7 @@ namespace ecs {
 
 	Serializer::Serializer(Entity_manager& entityMgr, asset::Asset_manager& assetMgr)
 		: _entities(entityMgr), _assets(assetMgr) {
-		static bool initialized = false;
-		if(!initialized) {
-			initialized = true;
-			entityMgr.register_component_type<BlueprintComponent>();
-		}
+		entityMgr.register_component_type<BlueprintComponent>();
 	}
 
 	Entity_ptr Serializer::apply(const asset::AID& blueprint, Entity_ptr target)const {
@@ -308,6 +304,22 @@ namespace ecs {
 			return;
 		}
 	}
+
+	auto Serializer::export_entity(Entity& e)const -> ETO {
+		const auto compTypes = _entities.list_comp_infos();
+
+		io::StrCharSink sink;
+		storeEntity(compTypes, sink, e, _assets);
+
+		return sink.extractString();
+	}
+	auto Serializer::import_entity(const ETO& eto) -> Entity_ptr {
+		StringCharSource cs(eto);
+		auto entity = _entities.emplace();
+		restoreEntity(cs, *entity, _assets);
+		return entity;
+	}
+
 }
 
 namespace asset {

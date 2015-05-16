@@ -148,7 +148,7 @@ namespace ecs {
 
 		private:
 			pool_type _pool;
-			std::vector<T*> _delete_queue;
+			std::vector<Entity*> _delete_queue;
 	};
 
 } /* namespace ecs */

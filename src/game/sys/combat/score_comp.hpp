@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Manages enemy spawn-points, global behaivor, etc.                      *
+ * Stores coins                                                           *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,42 +15,35 @@
 
 #pragma once
 
-#include "game_engine.hpp"
-#include "level/level.hpp"
-#include "level/level_generator.hpp"
-
-#include "../core/utils/maybe.hpp"
-
+#include <core/ecs/ecs.hpp>
+#include <core/units.hpp>
 
 namespace mo {
-	namespace ecs {
-		class Entity_manager;
-	}
+namespace sys {
+namespace combat {
 
-	struct Game_state;
-
-	struct Saved_game_state {
-		uint64_t seed;
-		int current_level;
-		int current_difficulty;
-		util::maybe<level::Level> stored_level;
-		// TODO: add ECS-save
-	};
-
-
-	class Game_master {
+	class Score_comp : public ecs::Component<Score_comp> {
 		public:
-			Game_master(Game_engine& engine, const Saved_game_state& state);
+			static constexpr const char* name() {return "Score";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			void spawn(Game_engine& engine, ecs::Entity_manager& em);
+			Score_comp(ecs::Entity& owner, int value=0) noexcept
+				: Component(owner), _value(value) {}
 
-			void update();
+			void value(int value)noexcept {_value=value;}
+			auto value()const noexcept {return _value;}
 
-			auto& level()noexcept {return _level;}
-			auto& level()const noexcept {return _level;}
-
+			struct Persisted_state;
+			friend struct Persisted_state;
 		private:
-			level::Level _level;
+			friend class Combat_system;
+
+			int _value;
+			bool _collectable;
+			bool _collected = false;
 	};
 
+}
+}
 }

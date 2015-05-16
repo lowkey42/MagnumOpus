@@ -1,16 +1,21 @@
 {
-    "Transform",
+    "Transform":{
+        "rot_speed": 360
+    },
 	"Physics":{
-		"radius": 0.25,
+		"radius": 0.4,
 		"mass": 60,
 		"restitution": 0.01,
         "friction": 0.01,
-        "max_active_velocity": 30,
+        "max_active_velocity": 45,
         "active_acceleration": 5
 	},
+    "Sprite": {
+        "aid": "anim:soldier"
+    },
     "Camera_target": {
         "mass": 0.2,
-        "damping": 0.5
+        "damping": 0.3,
         "freq": 5.0,
         "lazyness":1
     },
@@ -26,6 +31,8 @@
         "type": "range",
         "bullet_type": "bullet",
         "bullet_velocity": 60,
-        "cooldown": 0.5
-    }
+        "cooldown": 0.3
+    },
+    "Score",
+    "Collector"
 }

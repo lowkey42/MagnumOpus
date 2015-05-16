@@ -1,5 +1,9 @@
 anim: = animations/
 anim:player = animations/player_anim.json
+anim:soldier = animations/soldier.json
 anim:scorpion = animations/scorpion_anim.json
 anim:crawler = animations/crawler_anim.json
+anim:zombie = animations/zombie.json
 anim:ball = animations/ball_anim.json
+anim:coin = animations/coin_anim.json
+anim:fireball = animations/fireball.json

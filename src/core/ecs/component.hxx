@@ -56,30 +56,26 @@ namespace ecs {
 	template<typename T>
 	void Component_pool<T>::free(Entity& owner) {
 		this->inform(Component_event{Component_event_type::freed, owner});
-
-		auto comp = details::get_component(owner, T::type());
-
-		if(comp) {
-			T& cptr = *static_cast<T*>(comp);
-
-			INVARIANT(cptr.valid(), "double free");
-
-			_delete_queue.push_back(&cptr);
-		};
+		_delete_queue.push_back(&owner);
 	}
 
 	template<typename T>
 	void Component_pool<T>::process_queued_actions() {
-		for(auto&& e : _delete_queue) {
-			INVARIANT(e->valid(), "double free");
+		for(auto&& owner : _delete_queue) {
 
-			T& back = *reinterpret_cast<T*>(_pool.back());
-			if(e!=&back) {
-				std::swap(*e, back);
-			//	*e = std::move(back);
+			auto comp = details::get_component(*owner, T::type());
+			if(comp) {
+				T& e = *static_cast<T*>(comp);
+
+				INVARIANT(e.valid(), "double free");
+
+				T& back = *reinterpret_cast<T*>(_pool.back());
+				if(&e!=&back) {
+					std::swap(e, back);
+				}
+				back.~T();
+				_pool.pop_back();
 			}
-			back.~T();
-			_pool.pop_back();
 		}
 
 		_delete_queue.clear();

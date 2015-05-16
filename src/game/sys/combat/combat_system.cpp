@@ -10,6 +10,8 @@
 #include "../sprite/sprite_comp.hpp"
 
 #include "friend_comp.hpp"
+#include "score_comp.hpp"
+#include "collector_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -19,10 +21,9 @@ namespace combat {
 	using namespace unit_literals;
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
-								 asset::Asset_manager& assets,
 								 physics::Transform_system& ts,
 								 physics::Physics_system& physics_system)
-		: _em(entity_manager), _assets(assets),
+		: _em(entity_manager),
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
 		  _explosives(entity_manager.list<Explosive_comp>()),
@@ -36,6 +37,8 @@ namespace combat {
 		_em.register_component_type<Weapon_comp>();
 		_em.register_component_type<Health_comp>();
 		_em.register_component_type<Explosive_comp>();
+		_em.register_component_type<Score_comp>();
+		_em.register_component_type<Collector_comp>();
 	}
 
 	void Combat_system::update(Time dt) {
@@ -72,13 +75,24 @@ namespace combat {
 					s.state(Entity_state::died);
 				});
 
+				h.owner().get<physics::Transform_comp>().process([&](const auto& transform){
+					h.owner().get<Score_comp>().process([&](auto& s){
+						s._collectable = true;
+						s._collected = true;
+						for(int i=0; i<s._value; ++i) {
+							auto coin = _em.emplace("blueprint:coin"_aid);
+							coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
+						}
+					});
+				});
+
 				auto explosive = h.owner().get<Explosive_comp>();
 				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage;});
 
-				if(!explode)
+				if(!explode) {
 					_em.erase(h.owner_ptr());
 
-				else {
+				} else {
 					explosive.process([&](auto& e){
 						this->_explode(e);
 					});
@@ -130,6 +144,7 @@ namespace combat {
 
 					case Weapon_type::range:
 						if(w._bullet_type) {
+							physics.impulse(rotate(glm::vec2(-1,0), rotation) * 50_N); // TODO[foe]: 50N should be a parameter
 							auto bullet = _em.emplace(w._bullet_type);
 							bullet->get<Friend_comp>().process([&](auto& f) {
 								f.group(group);
@@ -144,12 +159,6 @@ namespace combat {
 								t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, rotation));
 								t.rotation(rotation);
 							});
-
-							// TODO[foe]: remove after sprite_comp integration
-
-							auto anim = _assets.load<renderer::Animation>("anim:ball"_aid);
-							bullet->emplace<sys::sprite::Sprite_comp>(anim);
-							// END TODO
 						}
 						break;
 				}
@@ -183,9 +192,14 @@ namespace combat {
 		auto group = e.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
 
 		_ts.foreach_in_range(position, rotation, e._range, e._range, 360_deg, 360_deg,
-							 [&](auto& t){
+							 [&](ecs::Entity& t){
 			if(&t!=&e.owner()) {
 				this->_deal_damage(t, group, e._damage);
+				t.get<physics::Physics_comp>().process([&](auto& p){
+					auto dir = remove_units(t.get<physics::Transform_comp>().get_or_throw().position()-position);
+					glm::normalize(dir);
+					p.impulse(dir * 100_N); // TODO[foe]: should be a parameter
+				});
 			}
 		});
 
@@ -206,11 +220,27 @@ namespace combat {
 	}
 
 	void Combat_system::_on_collision(physics::Manifold& m) {
+		if(m.is_with_object()) {
+			m.a->owner().get<Score_comp>().process([&](auto& s){
+				if(s._collectable && !s._collected) {
+					m.b.comp->owner().get<Score_comp>().process([&](auto& os) {
+						if(!os._collectable) {
+							os._value+=s._value;
+							s._collected = true;
+							_em.erase(s.owner_ptr());
+						}
+					});
+				}
+			});
+		}
+
 		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
 			if(e._activate_on_contact) {
-				if(e._delay>0_s)
-					e._delay_left = e._delay;
-				else
+				if(e._delay>0_s) {
+					if(e._delay_left<=0_s)
+						e._delay_left = e._delay;
+
+				} else
 					this->_explode(e);
 			}
 		});

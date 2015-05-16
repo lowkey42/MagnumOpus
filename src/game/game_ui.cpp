@@ -9,6 +9,7 @@
 #include "game_engine.hpp"
 
 #include "sys/combat/health_comp.hpp"
+#include "sys/combat/score_comp.hpp"
 
 
 namespace mo {
@@ -59,7 +60,16 @@ namespace mo {
 
 			_impl->hud_text_shader.set_uniform("model",
 			                                   glm::scale(glm::translate(glm::mat4(),
-			                                                  glm::vec3(-190,-130,0)), glm::vec3(0.25f, 0.25f, 1)));
+			                                                  glm::vec3(-380,-240,0)), glm::vec3(0.5f, 0.5f, 1)));
+			_impl->hud_text.draw();
+		});
+
+		entity.get<sys::combat::Score_comp>().process([&](const auto& s){
+			_impl->hud_text.set("Score: "+util::to_string(s.value()));
+
+			_impl->hud_text_shader.set_uniform("model",
+			                                   glm::scale(glm::translate(glm::mat4(),
+			                                                  glm::vec3(-380,-210,0)), glm::vec3(0.5f, 0.5f, 1)));
 			_impl->hud_text.draw();
 		});
 

@@ -43,14 +43,16 @@ namespace renderer {
 	    : _id(0),
 	      _element_size(element_size),
 	      _elements(elements),
+	      _max_elements(elements),
 	      _dynamic(dynamic) {
 		glGenBuffers(1, &_id);
 		glBindBuffer(GL_ARRAY_BUFFER, _id);
 		glBufferData(GL_ARRAY_BUFFER, _elements*_element_size, data,
-		             _dynamic ? GL_DYNAMIC_DRAW : GL_STATIC_DRAW);
+		             _dynamic ? GL_STREAM_DRAW : GL_STATIC_DRAW);
 	}
 	Buffer::Buffer(Buffer&& b)noexcept
-	    : _id(b._id), _element_size(b._element_size), _elements(b._elements), _dynamic(b._dynamic) {
+	    : _id(b._id), _element_size(b._element_size),
+	      _elements(b._elements), _max_elements(b._elements), _dynamic(b._dynamic) {
 		b._id = 0;
 	}
 
@@ -80,8 +82,18 @@ namespace renderer {
 		INVARIANT(_id!=0, "Can't access invalid buffer!");
 
 		glBindBuffer(GL_ARRAY_BUFFER, _id);
-		glBufferData(GL_ARRAY_BUFFER, elements*_element_size, data, GL_DYNAMIC_DRAW);
+
 		_elements = elements;
+
+		if(_max_elements>=elements)
+			glBufferSubData(GL_ARRAY_BUFFER, 0,
+							elements*_element_size,
+							data);
+		else {
+			_max_elements = elements;
+			glBufferData(GL_ARRAY_BUFFER, elements*_element_size, data,
+			             GL_STREAM_DRAW);
+		}
 	}
 
 	void Buffer::_bind()const {
