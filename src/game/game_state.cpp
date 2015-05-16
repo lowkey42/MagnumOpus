@@ -119,9 +119,20 @@ namespace mo {
 				// TODO[foe]
 
 			} else {
-				for(int i=0; i<6; i++) {
-					ecs::Entity_ptr enemy1 = em.emplace("blueprint:enemy"_aid);
+				for(int i=0; i<5; i++) {
+					ecs::Entity_ptr enemy1 = em.emplace("blueprint:zombie"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+				}
+				for(int i=0; i<10; i++) {
+					ecs::Entity_ptr enemy1 = em.emplace("blueprint:crow"_aid);
+					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+				}
+
+				if(room.type==level::Room_type::end) {
+					for(int i=0; i<3; i++) {
+						ecs::Entity_ptr enemy1 = em.emplace("blueprint:vomit_zombie"_aid);
+						enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+					}
 				}
 			}
 		});

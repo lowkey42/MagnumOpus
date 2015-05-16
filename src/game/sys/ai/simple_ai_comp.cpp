@@ -20,14 +20,15 @@ namespace ai {
 
 	struct Simple_ai_comp::Persisted_state {
 		float attack_distance, near, max, near_angle,
-		      far_angle, follow_time;
+		      far_angle, follow_time, swarm_id;
 
 		Persisted_state(const Simple_ai_comp& c)
 				: attack_distance(c.attack_distance.value()),
 		          near(c.near.value()), max(c.max.value()),
 				  near_angle(c.near_angle.value() / (1_deg).value()),
 				  far_angle(c.far_angle.value() / (1_deg).value()),
-		          follow_time(c._follow_time.value()) {}
+		          follow_time(c._follow_time.value()),
+		          swarm_id(c._swarm_id){}
 	};
 
 	sf2_structDef(Simple_ai_comp::Persisted_state,
@@ -36,7 +37,8 @@ namespace ai {
 		sf2_member(max),
 		sf2_member(near_angle),
 		sf2_member(far_angle),
-		sf2_member(follow_time)
+		sf2_member(follow_time),
+		sf2_member(swarm_id)
 	)
 
 	void Simple_ai_comp::load(ecs::Entity_state& state) {
@@ -47,6 +49,7 @@ namespace ai {
 		near_angle=s.near_angle * 1_deg;
 		far_angle=s.far_angle* 1_deg;
 		_follow_time=Time(s.follow_time);
+		_swarm_id=s.swarm_id;
 	}
 
 	void Simple_ai_comp::store(ecs::Entity_state& state) {
@@ -94,7 +97,7 @@ namespace ai {
 
 			_rot_delay+=dt;
 			if(_rot_delay>2_s) {
-				_wander_dir+=random_angle(-90_deg, 90_deg);
+				_wander_dir+=random_angle(-20_deg, 20_deg);
 				_rot_delay = 0_s;
 			}
 
