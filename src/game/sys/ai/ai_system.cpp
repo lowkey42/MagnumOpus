@@ -32,7 +32,7 @@ namespace ai {
 
 				auto flocking = e._wander_dir;
 				auto flocking_count = 1.f;
-				constexpr auto target_weight = 5.f;
+
 
 				// TODO: keep distance; use target_pos instead of direction
 
@@ -46,6 +46,7 @@ namespace ai {
 						if(e._swarm_id>=0 && e._swarm_id==ai._swarm_id) {
 							flocking+=ai._wander_dir;
 							flocking_count++;
+							constexpr auto target_weight = 5.f;
 							if(ai._target) {
 								flocking+=ai._wander_dir * target_weight;
 								flocking_count+=target_weight;

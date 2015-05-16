@@ -90,7 +90,7 @@ namespace ai {
 			auto pos = owner().get<physics::Transform_comp>()
 			            .process(Position{0,0}, [&](auto& t){return t.position();});
 
-			auto is_solid = [&](Angle a, float o=1){
+			auto is_solid = [&](Angle a, float o){
 				auto dest = pos+rotate(Position{1_m*o,0_m}, a);
 				return level.solid(dest.x.value(),dest.y.value());
 			};
@@ -101,16 +101,16 @@ namespace ai {
 				_rot_delay = 0_s;
 			}
 
-			if(is_solid(_wander_dir) || is_solid(_wander_dir, 2.f)) {
+			if(is_solid(_wander_dir, 1) || is_solid(_wander_dir, 2.f)) {
 				Angle a = util::random_bool(rng, 0.5) ? -90_deg : 90_deg;
 				_rot_delay = 0_s;
 
 				do {
-					if(!is_solid(_wander_dir+a)) {
+					if(!is_solid(_wander_dir+a, 1)) {
 						_wander_dir+=a;
 						break;
 
-					} else if(!is_solid(_wander_dir-a)) {
+					} else if(!is_solid(_wander_dir-a, 1)) {
 						_wander_dir-=a;
 						break;
 
