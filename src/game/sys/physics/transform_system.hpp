@@ -182,7 +182,7 @@ namespace physics {
 						auto mp = pos;
 						for(float d=0; d<=distance; d++) {
 							mp+=step;
-							if(this->_world.solid(mp.x.value(), mp.y.value()))
+							if(this->_world.solid(mp.x.value()+0.5f, mp.y.value()+0.5f))
 								return;
 						}
 

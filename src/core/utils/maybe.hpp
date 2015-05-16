@@ -82,7 +82,13 @@ namespace util {
 
 				return _data;
 			}
-			T& get_or_other(T& other)const noexcept {
+			T& get_ref_or_other(T& other)noexcept {
+				return is_some() ? _data : other;
+			}
+			const T& get_ref_or_other(const T& other)const noexcept {
+				return is_some() ? _data : other;
+			}
+			T get_or_other(T other)const noexcept {
 				return is_some() ? _data : other;
 			}
 

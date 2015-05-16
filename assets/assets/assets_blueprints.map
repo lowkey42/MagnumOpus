@@ -1,5 +1,8 @@
 blueprint: = blueprints/
 blueprint:player = blueprints/player.json
-blueprint:enemy = blueprints/enemy.json
+blueprint:zombie = blueprints/zombie.json
+blueprint:vomit_zombie = blueprints/vomit_zombie.json
+blueprint:crow = blueprints/crow.json
 blueprint:bullet = blueprints/bullet.json
+blueprint:vomit_bullet = blueprints/vomit_bullet.json
 blueprint:coin = blueprints/coin.json

@@ -30,12 +30,31 @@ namespace ai {
 			e.owner().get<physics::Transform_comp>().process([&](auto& trans){
 				ecs::Entity* target_entity = nullptr;
 
+				auto flocking = e._wander_dir;
+				auto flocking_count = 1.f;
+				constexpr auto target_weight = 5.f;
+
+				// TODO: keep distance; use target_pos instead of direction
+
 				_transform_system.foreach_in_range(trans.position(), trans.rotation(), e.near, e.max, e.far_angle, e.near_angle,
 						[&](ecs::Entity& target){
 
 					if(target.has<Target_tag_comp>())
 						target_entity = &target;
+
+					target.get<Simple_ai_comp>().process([&](auto& ai){
+						if(e._swarm_id>=0 && e._swarm_id==ai._swarm_id) {
+							flocking+=ai._wander_dir;
+							flocking_count++;
+							if(ai._target) {
+								flocking+=ai._wander_dir * target_weight;
+								flocking_count+=target_weight;
+							}
+						}
+					});
 				});
+
+				e._wander_dir = e._wander_dir*0.5f + (flocking/flocking_count)*0.5f;
 
 				if(target_entity) {
 					e.target(target_entity->shared_from_this());

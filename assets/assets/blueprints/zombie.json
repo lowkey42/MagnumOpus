@@ -1,0 +1,42 @@
+{
+    "Transform":{
+        "rot_speed": 180
+    },
+	"Physics":{
+		"radius": 0.3,
+		"mass": 80,
+		"restitution": 0.8,
+        "friction": 0.001,
+        "max_active_velocity": 5,
+        "active_acceleration": 2
+	},
+    "Sprite": {
+        "aid": "anim:zombie"
+    },
+    "Simple_ai":{
+        "attack_distance": 1,
+        "near":5,
+        "max":10,
+        "near_angle":300,
+        "far_angle":180,
+        "follow_time":2.0,
+        "swarm_id":1
+    },
+    "State",
+    "Friend":{
+        "group": 1
+    },
+    "Health":{
+        "max_hp": 10
+     },
+    "Weapon":{
+        "type": "melee",
+        "cooldown": 3.0,
+        "melee_damage": 5.0,
+        "melee_range": 1,
+        "melee_angle": 90
+    },
+    "Score": {
+        "value": 5
+    }
+}

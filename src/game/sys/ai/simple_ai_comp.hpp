@@ -53,11 +53,13 @@ namespace ai {
 			friend struct Persisted_state;
 
 		private:
+			friend class Ai_system;
 			Time _follow_time;
 			Time _follow_time_left;
 			ecs::Entity_ptr _target;
 			Angle _wander_dir;
 			Time _rot_delay;
+			int _swarm_id = -1;
 	};
 
 }
