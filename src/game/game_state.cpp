@@ -182,6 +182,7 @@ namespace mo {
 				auto& tile = level.get(x,y);
 				if(tile.type==level::Tile_type::stairs_down) {
 					if(this->profile.depth>=2) {
+						INFO("You delved too greedily and too deep");
 						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the bottom", "You delved too greedily and too deep", nullptr);
 						this->engine.leave_screen();
 
@@ -190,6 +191,7 @@ namespace mo {
 
 				}else if(tile.type==level::Tile_type::stairs_up) {
 					if(this->profile.depth==0) {
+						INFO("You have reached the top");
 						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the top", "You have reached the top", nullptr);
 						this->engine.leave_screen();
 
