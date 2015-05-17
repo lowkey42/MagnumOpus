@@ -5,11 +5,28 @@
 namespace mo{
 namespace renderer{
 
+	struct Animation_frame_data{
+		int row;
+		float fps;
+		int frames;
+	};
+
 	struct Animation_data{
+		Animation_data(){}
+
+		/*Animation_data(int fwidth, int fheight, Texture_ptr tex, Animation_type anim = Animation_type::idle){
+			frame_width = fwidth;
+			frame_height = fheight;
+			texture = tex;
+			currentAnim = anim;
+		}*/
+
+		~Animation_data() = default;
+
 		int frame_width;
 		int frame_height;
 		Texture_ptr texture;
-		std::string texName = texture.aid().name();
+		std::string texName;
 		Animation_type currentAnim = Animation_type::idle;
 		std::unordered_map<Animation_type, Animation_frame_data> animations;
 	};
@@ -27,31 +44,76 @@ namespace renderer{
 	)
 
 	sf2_structDef(Animation,
+		sf2_member(_data)
+	)
+
+	sf2_structDef(Animation_data,
 		sf2_member(frame_width),
 		sf2_member(frame_height),
 		sf2_member(texName),
-		sf2_member(animations)
+		sf2_member(animations),
 	)
+
+	Animation::~Animation(){
+		_data.release();
+	}
+
+	Animation& Animation::operator=(Animation&& rhs) noexcept {
+		_data = std::move(rhs._data);
+		return *this;
+	 }
+
+	int Animation::frame_width() const noexcept{
+		return _data->frame_width;
+	}
+
+	int Animation::frame_height() const noexcept{
+		return _data->frame_height;
+	}
+
+	Texture_ptr Animation::texture() const noexcept{
+		return _data->texture;
+	}
+
+	glm::vec4 Animation::uv() const noexcept{
+
+		// Calculating corresponding uv-coords
+		// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
+
+		int row = _data->animations.find(_data->currentAnim) -> second.row;
+
+		float width = _data->frame_width / static_cast<float>(_data->texture->width());
+		float height = _data->frame_height / static_cast<float>(_data->texture->height());
+		float startX = 0.0f;
+		float startY = 1 - height - (row * height);
+		const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
+
+		return uv;
+	}
 
 }
 
 namespace asset {
 
 	std::shared_ptr<renderer::Animation> Loader<renderer::Animation>::load(istream in) throw(Loading_failed){
-		auto r = std::make_shared<renderer::Animation>();
+		auto r = std::make_unique<renderer::Animation_data>();
 
 		std::string data = in.content();
 		sf2::io::StringCharSource source(data);
 
-		sf2::ParserDefChooser<renderer::Animation>::get().parse(source, *r.get());
+		sf2::ParserDefChooser<renderer::Animation_data>::get().parse(source, *r.get());
 
 		r->texture = in.manager().load<renderer::Texture>(r->texName);
 
-		return r;
+		// Generating new Animation-Shared-Ptr and set _data-ptr to what r pointed to
+		auto anim = std::make_shared<renderer::Animation>();
+		anim->_data.reset(r.release());
+
+		return anim;
 	}
 
 	void Loader<renderer::Animation>::store(ostream out, renderer::Animation& asset) throw(Loading_failed) {
-		asset.texName = asset.texture.aid().name();
+		asset._data->texName = asset._data->texture.aid().name();
 		std::string data = sf2::writeString(asset);
 		out.write(data.c_str(), data.length());
 	}

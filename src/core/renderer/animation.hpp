@@ -46,34 +46,23 @@ namespace renderer {
 
 	struct Animation_data;
 
-	struct Animation_frame_data{
-		int row;
-		float fps;
-		int frames;
-	};
+	struct Animation_frame_data;
 
 	struct Animation{
-		int frame_width;
-		int frame_height;
-		Texture_ptr texture;
-		std::string texName = texture.aid().name();
-		Animation_type currentAnim = Animation_type::idle;
-		std::unordered_map<Animation_type, Animation_frame_data> animations;
 
-		auto uv() const noexcept{
+		Animation() = default;
+		~Animation();
 
-			// Calculating corresponding uv-coords
-			// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
-			int row = animations.find(currentAnim) -> second.row;
+		Animation& operator=(Animation&& rhs)noexcept;
 
-			float width = frame_width / static_cast<float>(texture->width());
-			float height = frame_height / static_cast<float>(texture->height());
-			float startX = 0.0f;
-			float startY = 1 - height - (row * height);
-			const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
+		// Attributes
+		std::unique_ptr<Animation_data> _data;
 
-			return uv;
-		}
+		// Methods
+		auto frame_width() const noexcept -> int;
+		auto frame_height() const noexcept -> int;
+		auto texture() const noexcept -> Texture_ptr;
+		auto uv() const noexcept -> glm::vec4;
 
 	};
 
