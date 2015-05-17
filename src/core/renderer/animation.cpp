@@ -74,6 +74,7 @@ namespace renderer{
 		return _data->texture;
 	}
 
+	// Converting float frame to int frame --> 0.9 = 0 or 1.3 = 1
 	glm::vec4 Animation::uv(int frame, Animation_type type) const noexcept{
 
 		// Calculating corresponding uv-coords
@@ -91,8 +92,18 @@ namespace renderer{
 		return uv;
 	}
 
-	int Animation::next_frame(Animation_type type, int frame, float deltaTime, bool repeat) const noexcept{
-		return (frame + 1 < _data->animations.find(type)->second.frames) ? frame + 1: 0;
+	float Animation::next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept{
+		int frames = _data->animations.find(type)->second.frames;
+		int fps = _data->animations.find(type)->second.fps;
+		float ret = cur_frame;
+		// checking if cur_frame + change is in max_frames bounding for cur Animation
+		// if not but repeat is set -> set Animation back to 0 else keep last frame
+		if(cur_frame + fps/1000.f * deltaTime < frames){
+			ret = cur_frame + fps/1000.f * deltaTime;
+		} else if(repeat){
+			ret = 0;
+		}
+		return ret;
 	}
 
 }

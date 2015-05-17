@@ -45,7 +45,7 @@ namespace sprite {
 	private:
 
 		// Why mutable?
-		mutable int _currentFrame;
+		mutable float _currentFrame;
 
 		asset::Ptr<renderer::Animation> _animation;
 		mutable renderer::Animation_type _animType;

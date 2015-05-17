@@ -63,7 +63,7 @@ namespace renderer {
 		auto frame_height() const noexcept -> int;
 		auto texture() const noexcept -> Texture_ptr;
 		auto uv(int frame, Animation_type type = Animation_type::idle) const noexcept -> glm::vec4;
-		auto next_frame(Animation_type type, int frame, float deltaTime, bool repeat) const noexcept -> int ;
+		auto next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept -> float ;
 
 	};
 
