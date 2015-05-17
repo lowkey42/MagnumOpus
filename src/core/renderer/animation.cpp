@@ -12,15 +12,8 @@ namespace renderer{
 	};
 
 	struct Animation_data{
+
 		Animation_data(){}
-
-		/*Animation_data(int fwidth, int fheight, Texture_ptr tex, Animation_type anim = Animation_type::idle){
-			frame_width = fwidth;
-			frame_height = fheight;
-			texture = tex;
-			currentAnim = anim;
-		}*/
-
 		~Animation_data() = default;
 
 		int frame_width;
@@ -53,6 +46,10 @@ namespace renderer{
 		sf2_member(texName),
 		sf2_member(animations),
 	)
+
+	Animation::Animation(std::unique_ptr<Animation_data> data){
+		_data = std::move(data);
+	}
 
 	Animation::~Animation(){
 		_data.release();
@@ -106,8 +103,7 @@ namespace asset {
 		r->texture = in.manager().load<renderer::Texture>(r->texName);
 
 		// Generating new Animation-Shared-Ptr and set _data-ptr to what r pointed to
-		auto anim = std::make_shared<renderer::Animation>();
-		anim->_data.reset(r.release());
+		auto anim = std::make_shared<renderer::Animation>(std::move(r));
 
 		return anim;
 	}

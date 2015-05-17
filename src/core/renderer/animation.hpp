@@ -50,7 +50,7 @@ namespace renderer {
 
 	struct Animation{
 
-		Animation() = default;
+		Animation(std::unique_ptr<Animation_data> data);
 		~Animation();
 
 		Animation& operator=(Animation&& rhs)noexcept;
