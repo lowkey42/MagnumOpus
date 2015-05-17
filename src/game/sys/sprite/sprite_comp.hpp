@@ -34,16 +34,16 @@ namespace sprite {
 
 		// TODO: nullptr check
 		Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
-			Component(owner), _animation(animation), _animType(renderer::Animation_type::idle){}
+			Component(owner), _currentFrame(0), _animation(animation), _animType(renderer::Animation_type::idle){}
 
-        auto sprite() const noexcept {
-			return renderer::Sprite_batch::Sprite{{}, 0, _animation->uv(), _animation};
-		}
+		auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
 
 		struct Persisted_state;
 		friend struct Persisted_state;
 
 	private:
+
+		int _currentFrame;
 
 		asset::Ptr<renderer::Animation> _animation;
 		renderer::Animation_type _animType;

@@ -48,10 +48,12 @@ namespace renderer{
 	)
 
 	Animation::Animation(std::unique_ptr<Animation_data> data){
+		// TODO --> is double moving neccesary?
 		_data = std::move(data);
 	}
 
 	Animation::~Animation(){
+		// TODO --> right solution?
 		_data.release();
 	}
 
@@ -72,20 +74,25 @@ namespace renderer{
 		return _data->texture;
 	}
 
-	glm::vec4 Animation::uv() const noexcept{
+	glm::vec4 Animation::uv(int frame, Animation_type type) const noexcept{
 
 		// Calculating corresponding uv-coords
 		// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
 
-		int row = _data->animations.find(_data->currentAnim) -> second.row;
+		_data->currentAnim = type;
+		int row = _data->animations.find(type) -> second.row;
 
 		float width = _data->frame_width / static_cast<float>(_data->texture->width());
 		float height = _data->frame_height / static_cast<float>(_data->texture->height());
-		float startX = 0.0f;
+		float startX = frame * width;
 		float startY = 1 - height - (row * height);
 		const glm::vec4 uv = glm::vec4(startX, startY, startX + width, startY + height);
 
 		return uv;
+	}
+
+	int Animation::next_frame(Animation_type type, int frame, float deltaTime, bool repeat) const noexcept{
+		return (frame + 1 < _data->animations.find(type)->second.frames) ? frame + 1: 0;
 	}
 
 }
