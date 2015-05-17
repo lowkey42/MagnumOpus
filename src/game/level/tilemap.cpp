@@ -59,7 +59,7 @@ namespace level {
 
 			float layer = 0;
 			if(tile_type == 0 || (tile_type >= 4 && tile_type <= 6))
-				layer = 1;
+				layer = 0.99;
 
 			// First triangle of the rectangle
 			_vertices.push_back({{ x - 0.5f, y - 0.5f }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});

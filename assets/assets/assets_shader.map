@@ -9,3 +9,6 @@ frag_shader:simple = shader/simple.frag
 
 vert_shader:sprite_batch = shader/sprite.vert
 frag_shader:sprite_batch = shader/sprite.frag
+
+vert_shader:ray = shader/ray.vert
+frag_shader:ray = shader/ray.frag

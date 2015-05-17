@@ -52,7 +52,9 @@ namespace physics {
 			void foreach_in_cell(Position pos, F func);
 
 			auto raycast_nearest_entity(Position pos, Angle dir,
-										Distance max_distance) -> util::maybe<ecs::Entity&>;
+										Distance max_distance,
+										util::maybe<ecs::Entity&> ignore=util::nothing())
+					-> std::tuple<util::maybe<ecs::Entity&>, Distance>;
 
 			template<typename FE, typename FW>
 			void raycast(Position pos, Angle dir, Distance max_distance, FE on_entity, FW on_wall);
@@ -132,20 +134,59 @@ namespace physics {
 	void Transform_system::raycast(Position start, Angle dir,
 								   Distance max_distance, FE on_entity, FW on_wall) {
 		using namespace unit_literals;
+		using namespace util;
+		using namespace glm;
 
-		Position end = rotate(Position{0_m, max_distance}, dir);
+		auto step = rotate(Position{0.5_m, 0_m}, dir);
+
+		auto p=start;
+		auto dist=0_m;
+		for(; dist<=max_distance; dist+=0.5_m, p+=step) {
+			auto x = static_cast<int32_t>(p.x.value()+0.5f);
+			auto y = static_cast<int32_t>(p.y.value()+0.5f);
+			if(_world.solid(x, y)) {
+				on_wall(x,y,dist.value());
+				break;
+			}
+		}
+
+		auto dist_2 = dist.value() * dist.value();
+		auto end = step * dist.value();
 
 		auto b = Position{min(start.x, end.x), min(start.y, end.y)};
 		auto e = Position{max(start.x, end.x), max(start.y, end.y)};
 
 		foreach_in_rect(b, e, [&](ecs::Entity& e){
-		//	doIf(e.get<TransformComp>(), e.get<PhysicsComp>(),
-		//	     [&](TransformComp& t, PhysicsComp& p){
+			process(e.get<Transform_comp>(), e.get<Physics_comp>())
+				>> [&](Transform_comp& trans, Physics_comp& phy) {
 
-				// TODO
-		//	});
-		//	e.get<TransformComp>().doIf([&](const TransformComp& trans){
+				auto s = remove_units(start);
+				auto d = rotate(vec2{1,0}, dir);
+				auto c = remove_units(trans.position());
+				auto r = phy.radius().value();
 
+				if(glm::length2(s-c)-r*r<=dist_2) {
+					auto p = (dot(d, s-c) + dot(s-c, d))
+							/ dot(d,d);
+					auto q = (dot(s-c, s-c) - r)
+							/ dot(d,d);
+
+					auto in_root = (p*p)/4 - q;
+
+					if(in_root>=0) {
+						auto rv = glm::sqrt(in_root);
+						auto dist1 = -p/2 + rv;
+						auto dist2 = -p/2 - rv;
+
+						if(dist2>0 && dist2<dist1)
+							dist1 = dist2;
+
+						if(dist1>0) {
+							on_entity(e, dist1);
+						}
+					}
+				}
+			};
 		});
 	}
 

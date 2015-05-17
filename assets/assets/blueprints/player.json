@@ -1,6 +1,6 @@
 {
     "Transform":{
-        "rot_speed": 360
+        "rot_speed": 720
     },
 	"Physics":{
 		"radius": 0.4,

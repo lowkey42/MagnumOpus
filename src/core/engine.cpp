@@ -49,9 +49,9 @@ Engine::Engine(const std::string& title, Configuration cfg)
   : _asset_manager(std::make_unique<asset::Asset_manager>(cfg.get("exe").get_or_throw(), title)),
     _configuration(std::make_unique<Configuration>(std::move(cfg))),
     _sdl(),
-    _graphics_ctx(std::make_unique<renderer::Graphics_ctx>(title, _configuration->get_as("g.width", 800),
-                                                           _configuration->get_as("g.height", 600),
-                                                           _configuration->get_as("g.fullscreen", false))),
+	_graphics_ctx(std::make_unique<renderer::Graphics_ctx>(title, _configuration->get_as("g.width", 800),
+														   _configuration->get_as("g.height", 600),
+														   _configuration->get_as("g.fullscreen", false))),
      _input_manager(std::make_unique<Input_manager>()), _current_time(SDL_GetTicks() / 1000.0f) {
 }
 Engine::~Engine() noexcept = default;

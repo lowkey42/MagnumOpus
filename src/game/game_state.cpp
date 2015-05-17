@@ -43,7 +43,8 @@ namespace mo {
 		  controller(em, transform),
 		  ai(em, engine, transform, level),
 		  combat(em, transform, physics),
-		  state(em) {
+		  state(em),
+		  ray_renderer(engine.assets()) {
 
 		auto d = depth.get_or_other(profile.depth);
 
@@ -200,10 +201,34 @@ namespace mo {
 				}
 		});
 	}
-	void Game_state::draw() {
 
+	void Game_state::draw() {
 		for(auto& cam : camera.cameras()) {
 			tilemap.draw(cam.camera);
+
+			ray_renderer.set_vp(cam.camera.vp());
+			for(auto& p : cam.targets) {
+				p->get<sys::physics::Transform_comp>().process(
+					[&](sys::physics::Transform_comp& t) {
+						Distance dist = 20_m;
+						util::maybe<ecs::Entity&> entity = util::nothing();
+
+						std::tie(entity, dist) =
+								transform.raycast_nearest_entity(t.position(),
+																 t.rotation(),
+																 20_m,
+																 util::justPtr(p.get()));
+
+						auto p = remove_units(t.position());
+
+						entity.process([&](ecs::Entity& e){
+							dist = Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position())));
+						});
+
+						ray_renderer.draw(glm::vec3(p.x,p.y,0.1), t.rotation(), dist.value(), 0.03);
+				});
+			}
+
 			// TODO: draw systems here
 			spritesys.draw(cam.camera);
 		}

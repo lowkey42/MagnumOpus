@@ -85,11 +85,14 @@ namespace renderer {
 
 		_elements = elements;
 
-		if(_max_elements>=elements)
+		if(_max_elements>=elements) {
+			glBufferData(GL_ARRAY_BUFFER, _max_elements*_element_size, nullptr,
+						 GL_STREAM_DRAW);
+
 			glBufferSubData(GL_ARRAY_BUFFER, 0,
 							elements*_element_size,
 							data);
-		else {
+		} else {
 			_max_elements = elements;
 			glBufferData(GL_ARRAY_BUFFER, elements*_element_size, data,
 			             GL_STREAM_DRAW);
