@@ -171,7 +171,9 @@ namespace mo {
 		physics.update(dt);
 		combat.update(dt);
 		camera.update(dt);
+		spritesys.update(dt);
 		state.update(dt);
+
 		// TODO: update sprites and tilemap
 
 		main_player->get<sys::physics::Transform_comp>().process(

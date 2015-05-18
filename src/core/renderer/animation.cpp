@@ -98,8 +98,8 @@ namespace renderer{
 		float ret = cur_frame;
 		// checking if cur_frame + change is in max_frames bounding for cur Animation
 		// if not but repeat is set -> set Animation back to 0 else keep last frame
-		if(cur_frame + fps/1000.f * deltaTime < frames){
-			ret = cur_frame + fps/1000.f * deltaTime;
+		if(cur_frame + fps * deltaTime < frames){
+			ret = cur_frame + fps * deltaTime;
 		} else if(repeat){
 			ret = 0;
 		}

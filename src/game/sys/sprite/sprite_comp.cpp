@@ -30,12 +30,7 @@ namespace sprite {
 	}
 
 	renderer::Sprite_batch::Sprite Sprite_comp::sprite() const noexcept{
-		_currentFrame = _animation->next_frame(_animType, _currentFrame, 20, true);
 		return renderer::Sprite_batch::Sprite{{}, 0, _animation->uv(_currentFrame, _animType), _animation};
-	}
-
-	void Sprite_comp::animation_type(renderer::Animation_type type) const noexcept{
-		_animType = type;
 	}
 
 }

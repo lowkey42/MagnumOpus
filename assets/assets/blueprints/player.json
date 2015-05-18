@@ -11,7 +11,7 @@
         "active_acceleration": 5
 	},
     "Sprite": {
-        "aid": "anim:player"
+        "aid": "anim:soldier"
     },
     "Camera_target": {
         "mass": 0.2,

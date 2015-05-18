@@ -37,15 +37,18 @@ namespace sprite {
 			Component(owner), _currentFrame(0), _animation(animation), _animType(renderer::Animation_type::idle){}
 
 		auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
-		void animation_type(renderer::Animation_type type) const noexcept;
+		auto currentFrame() const noexcept { return _currentFrame; }
+		auto animation_type() const noexcept { return _animType; }
+
+		void currentFrame(float frame) noexcept { _currentFrame = frame; }
+		void animation_type(renderer::Animation_type type) noexcept { _animType = type; }
 
 		struct Persisted_state;
 		friend struct Persisted_state;
 
 	private:
 
-		// Why mutable?
-		mutable float _currentFrame;
+		float _currentFrame;
 
 		asset::Ptr<renderer::Animation> _animation;
 		mutable renderer::Animation_type _animType;

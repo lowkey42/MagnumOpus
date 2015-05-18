@@ -19,6 +19,8 @@
 #include <core/renderer/sprite_batch.hpp>
 #include <core/renderer/camera.hpp>
 
+#include "sprite_comp.hpp"
+
 namespace mo{
 namespace sys{
 namespace sprite{
@@ -37,8 +39,10 @@ namespace sprite{
 
 		private:
 
+
 			physics::Transform_system& _transform;
 			renderer::Sprite_batch _sprite_batch;
+			Sprite_comp::Pool& _sprites;
 
 	};
 
