@@ -45,7 +45,7 @@ namespace ai {
 						if(e._swarm_id>=0 && e._swarm_id==ai._swarm_id) {
 							flocking+=ai._wander_dir;
 							flocking_count++;
-							constexpr auto target_weight = 5.f;
+							//constexpr auto target_weight = 5.f;
 							if(ai._target) {
 								constexpr auto target_weight = 5.f;
 								flocking+=ai._wander_dir * target_weight;

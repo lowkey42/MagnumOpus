@@ -34,6 +34,13 @@ namespace level {
 
 		// Load a predefined texture and bind it
 		_texture = engine.assets().load<Texture>("tex:tilemap_m"_aid);
+
+		_tex_width = _texture->width();
+		_tex_height = _texture->height();
+		_tpl = _tex_width / _tile_tex_width;
+
+		_xTexTile = _tile_tex_width / static_cast<double>(_tex_width);
+		_yTexTile = _tile_tex_height / static_cast<double>(_tex_height);
 	}
 
 

@@ -36,9 +36,9 @@ namespace sprite {
 	void Sprite_system::update(Time dt) noexcept{
 		for(auto& sprite : _sprites) {
 
-			sprite.currentFrame(
+			sprite.current_frame(
 				sprite.sprite().anim->next_frame(
-					sprite.animation_type(), sprite.currentFrame(), dt.value(), true
+					sprite.animation_type(), sprite.current_frame(), dt.value(), true
 				)
 			);
 

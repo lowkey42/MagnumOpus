@@ -47,16 +47,15 @@ namespace level {
 
 	private:
 
-		// TODO automatic calculation with texture width & height
-		uint16_t _tex_width = 256;
-		uint16_t _tex_height = 128;
+		uint16_t _tex_width;
+		uint16_t _tex_height;
+		// TODO -> Automatic tile size?
 		uint16_t _tile_tex_width = 16;
 		uint16_t _tile_tex_height = 16;
 		// texture tiles per line (width / tile width)
-		uint16_t _tpl = _tex_width / _tile_tex_width;
+		uint16_t _tpl;
 
-		double _xTexTile = _tile_tex_width / static_cast<double>(_tex_width);
-		double _yTexTile = _tile_tex_height / static_cast<double>(_tex_height);
+		double _xTexTile, _yTexTile;
 
 		const Level &_level;
 		std::vector<TileVertex> _vertices;

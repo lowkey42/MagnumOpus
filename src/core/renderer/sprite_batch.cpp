@@ -8,11 +8,11 @@ namespace renderer {
 	// layout description for vertices
 	Vertex_layout layout {
 		Vertex_layout::Mode::triangles,
-		vertex("position",  &Sprite_batch::SpriteVertex::pos),
-		vertex("uv",        &Sprite_batch::SpriteVertex::uv)
+		vertex("position",  &Sprite_batch::Sprite_vertex::pos),
+		vertex("uv",        &Sprite_batch::Sprite_vertex::uv)
 	};
 
-	Sprite_batch::Sprite_batch(asset::Asset_manager& asset_manager) : _object(layout, create_dynamic_buffer<SpriteVertex>(64)){
+	Sprite_batch::Sprite_batch(asset::Asset_manager& asset_manager) : _object(layout, create_dynamic_buffer<Sprite_vertex>(64)){
 		_shader.attach_shader(asset_manager.load<Shader>("vert_shader:sprite_batch"_aid))
 			   .attach_shader(asset_manager.load<Shader>("frag_shader:sprite_batch"_aid))
 		       .bind_all_attribute_locations(layout)
@@ -32,17 +32,17 @@ namespace renderer {
 //		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;
 //		std::cout << "rotation is: " << sprite.rotation << std::endl;
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(-width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture()));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(-width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture()));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture()));
+		_vertices.push_back(Sprite_vertex(rotMat * glm::vec4(-width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture()));
+		_vertices.push_back(Sprite_vertex(rotMat * glm::vec4(-width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.x, uv.w}, &*sprite.anim->texture()));
+		_vertices.push_back(Sprite_vertex(rotMat * glm::vec4(width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture()));
 
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
 		//_vertices.push_back({{x, y+1.f}, {uv.x, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture()));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(-width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture()));
-		_vertices.push_back(SpriteVertex(rotMat * glm::vec4(width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture()));
+		_vertices.push_back(Sprite_vertex(rotMat * glm::vec4(width / 2.f, height / 2.f, 0.0f, 1.0f), {uv.z, uv.w}, &*sprite.anim->texture()));
+		_vertices.push_back(Sprite_vertex(rotMat * glm::vec4(-width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.x, uv.y}, &*sprite.anim->texture()));
+		_vertices.push_back(Sprite_vertex(rotMat * glm::vec4(width / 2.f, -height / 2.f, 0.0f, 1.0f), {uv.z, uv.y}, &*sprite.anim->texture()));
 
 		//_vertices.push_back({{x+1.f, y+1.f}, {uv.z, uv.y}, {sprite.texture}});
 		//_vertices.push_back({{x, y}, {uv.x, uv.w}, {sprite.texture}});
@@ -51,14 +51,14 @@ namespace renderer {
 	}
 
 
-	void Sprite_batch::draw_part(std::vector<SpriteVertex>::const_iterator begin, std::vector<SpriteVertex>::const_iterator end){
+	void Sprite_batch::draw_part(std::vector<Sprite_vertex>::const_iterator begin, std::vector<Sprite_vertex>::const_iterator end){
 
 		// check for nullptr and begin != end
 		// bind the appropriate texture and set the object buffer to
 		// the corresponding positions that has to be drawn
 		if(begin!=end && begin->tex){
 			begin->tex->bind();
-			_object.buffer().set<SpriteVertex>(begin, end);
+			_object.buffer().set<Sprite_vertex>(begin, end);
 			_object.draw();
 		}
 
