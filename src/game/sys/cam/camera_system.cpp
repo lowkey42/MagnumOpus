@@ -42,9 +42,11 @@ namespace cam {
 					target._last_rotation=target_rot;
 				}
 
+/*
 				float p = target._rotation_zoom_time_left / target._rotation_zoom_time;
 
 				target_pos += rotate(Position{3_m*p, 0_m}, transform.rotation());
+				*/
 
 				target.chase(target_pos, dt);
 			});

@@ -33,7 +33,6 @@ namespace ai {
 				auto flocking = e._wander_dir;
 				auto flocking_count = 1.f;
 
-
 				// TODO: keep distance; use target_pos instead of direction
 
 				_transform_system.foreach_in_range(trans.position(), trans.rotation(), e.near, e.max, e.far_angle, e.near_angle,
@@ -48,6 +47,7 @@ namespace ai {
 							flocking_count++;
 							constexpr auto target_weight = 5.f;
 							if(ai._target) {
+								constexpr auto target_weight = 5.f;
 								flocking+=ai._wander_dir * target_weight;
 								flocking_count+=target_weight;
 							}

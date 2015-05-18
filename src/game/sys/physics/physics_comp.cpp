@@ -62,7 +62,8 @@ namespace physics{
 		mass(Mass(s.mass));
 		_restitution = s.restitution;
 		_friction = s.friction;
-		_max_active_velocity2 = (s.max_active_velocity * s.max_active_velocity) * (1_km/hour);
+		_max_active_velocity2 = Speed((s.max_active_velocity * (1_km/hour).value()) *
+								 (s.max_active_velocity * (1_km/hour).value()));
 		_active_acceleration = Speed_per_time(s.active_acceleration),
 		_solid = s.solid;
 		_velocity = {Speed(s.velocity.x), Speed(s.velocity.y)};

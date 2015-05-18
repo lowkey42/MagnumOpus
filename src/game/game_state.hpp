@@ -20,6 +20,7 @@
 #include "../core/units.hpp"
 #include "../core/ecs/ecs.hpp"
 #include "../core/ecs/serializer.hpp"
+#include <core/renderer/primitives.hpp>
 
 #include "level/level.hpp"
 #include "level/tilemap.hpp"
@@ -65,6 +66,7 @@ namespace mo {
 		ecs::Entity_ptr main_player;
 		std::vector<ecs::Entity_ptr> sec_players;
 
+		renderer::Ray_renderer ray_renderer;
 
 		Game_state(Game_engine& engine,
 		           std::string profile,
