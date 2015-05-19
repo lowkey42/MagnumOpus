@@ -47,11 +47,11 @@ namespace sprite {
 		friend struct Persisted_state;
 
 	private:
-
+		friend class Sprite_system;
 		float _currentFrame;
 
 		asset::Ptr<renderer::Animation> _animation;
-		mutable renderer::Animation_type _animType;
+		renderer::Animation_type _animType;
 
 	};
 

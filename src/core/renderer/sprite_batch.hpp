@@ -32,6 +32,8 @@ namespace renderer {
 
 	class Sprite_batch {
 
+	friend class Sprite_system;
+
 	public:
 
 		struct Sprite_vertex {
@@ -54,7 +56,7 @@ namespace renderer {
 			Position position;
 			float rotation;
 			const glm::vec4 uv;
-			asset::Ptr<renderer::Animation> anim;
+			const renderer::Texture* texture;
 		};
 
 		// Constructors

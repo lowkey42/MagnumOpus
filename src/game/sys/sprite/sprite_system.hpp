@@ -39,7 +39,6 @@ namespace sprite{
 
 		private:
 
-
 			physics::Transform_system& _transform;
 			renderer::Sprite_batch _sprite_batch;
 			Sprite_comp::Pool& _sprites;

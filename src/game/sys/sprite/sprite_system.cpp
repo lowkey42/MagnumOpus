@@ -37,7 +37,7 @@ namespace sprite {
 		for(auto& sprite : _sprites) {
 
 			sprite.current_frame(
-				sprite.sprite().anim->next_frame(
+				sprite._animation->next_frame(
 					sprite.animation_type(), sprite.current_frame(), dt.value(), true
 				)
 			);
