@@ -172,7 +172,9 @@ namespace mo {
 		physics.update(dt);
 		combat.update(dt);
 		camera.update(dt);
+		spritesys.update(dt);
 		state.update(dt);
+
 		// TODO: update sprites and tilemap
 
 		main_player->get<sys::physics::Transform_comp>().process(
@@ -245,6 +247,11 @@ namespace mo {
 			        .get_or_throw().set(controller);
 		else
 			p->emplace<sys::controller::Controllable_comp>(&controller);
+
+		// [Sebastian]: changing Animation type for player to another Animation
+		p->get<sys::sprite::Sprite_comp>().process([&](sys::sprite::Sprite_comp& sprite){
+			sprite.animation_type(renderer::Animation_type::moving);
+		});
 
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 			trans.position(pos);

@@ -10,7 +10,7 @@ namespace sprite {
 
 	Sprite_system::Sprite_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
 								 asset::Asset_manager& asset_manager) noexcept :
-	    _transform(ts), _sprite_batch(asset_manager) {
+		_transform(ts), _sprite_batch(asset_manager), _sprites(entity_manager.list<Sprite_comp>()) {
 		entity_manager.register_component_type<Sprite_comp>();
 	}
 
@@ -34,7 +34,15 @@ namespace sprite {
 	}
 
 	void Sprite_system::update(Time dt) noexcept{
-		;
+		for(auto& sprite : _sprites) {
+
+			sprite.current_frame(
+				sprite._animation->next_frame(
+					sprite.animation_type(), sprite.current_frame(), dt.value(), true
+				)
+			);
+
+		}
 	}
 
 

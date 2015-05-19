@@ -11,7 +11,6 @@ namespace sprite {
 
 	struct Sprite_comp::Persisted_state {
 		std::string aid;
-		// add Animationdata to save
 		Persisted_state(const Sprite_comp& c) :
 			aid(c._animation.aid().str()){}
 
@@ -30,6 +29,9 @@ namespace sprite {
 		state.write_from(Persisted_state{*this});
 	}
 
+	renderer::Sprite_batch::Sprite Sprite_comp::sprite() const noexcept{
+		return renderer::Sprite_batch::Sprite{{}, 0, _animation->uv(_currentFrame, _animType), &*_animation->texture()};
+	}
 
 }
 }

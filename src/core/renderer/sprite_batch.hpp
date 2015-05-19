@@ -19,7 +19,7 @@
 #include "shader.hpp"
 #include "camera.hpp"
 #include "texture.hpp"
-#include "animation_data.hpp"
+#include "animation.hpp"
 #include "../asset/aid.hpp"
 
 #include "../../core/units.hpp"
@@ -32,15 +32,17 @@ namespace renderer {
 
 	class Sprite_batch {
 
+	friend class Sprite_system;
+
 	public:
 
-		struct SpriteVertex {
-			SpriteVertex(glm::vec4 vec, glm::vec2 uv_coords, const renderer::Texture* t) : tex(t){
+		struct Sprite_vertex {
+			Sprite_vertex(glm::vec4 vec, glm::vec2 uv_coords, const renderer::Texture* t) : tex(t){
 				pos = glm::vec2(vec.x, vec.y);
 				uv = uv_coords;
 			}
 
-			bool operator<(SpriteVertex const& other) const {
+			bool operator<(Sprite_vertex const& other) const {
 				//std::cout << "this tex: " << this->tex << " | other tex: " << other.tex << std::endl;
 				return (this->tex < other.tex);
 			}
@@ -54,7 +56,7 @@ namespace renderer {
 			Position position;
 			float rotation;
 			const glm::vec4 uv;
-			asset::Ptr<renderer::Animation> anim;
+			const renderer::Texture* texture;
 		};
 
 		// Constructors
@@ -62,17 +64,16 @@ namespace renderer {
 
 		// Methods
         void draw(const renderer::Camera& cam, const Sprite& sprite) noexcept;
-		void draw_part(const std::vector<SpriteVertex>::const_iterator begin, const std::vector<SpriteVertex>::const_iterator end);
+		void draw_part(const std::vector<Sprite_vertex>::const_iterator begin, const std::vector<Sprite_vertex>::const_iterator end);
 		void drawAll(const renderer::Camera& cam) noexcept;
 
 
 	private:
 
-		mutable std::vector<SpriteVertex> _vertices;
+		mutable std::vector<Sprite_vertex> _vertices;
+
 		renderer::Object _object;
 		renderer::Shader_program _shader;
-		renderer::Texture_ptr _texture;
-		//asset::Ptr<renderer::Texture> _texture;
 
 
 	};
