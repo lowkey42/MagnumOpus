@@ -103,28 +103,6 @@ namespace physics {
 	void Transform_system::post_reload() {
 	}
 
-	auto Transform_system::raycast_nearest_entity(Position pos, Angle dir,
-												  Distance max_distance,
-												  util::maybe<ecs::Entity&> ignore)
-					-> std::tuple<util::maybe<ecs::Entity&>, Distance> {
-		auto ret = util::maybe<ecs::Entity&>{};
-		auto dist = max_distance.value();
-
-		raycast(pos, dir, max_distance, [&](ecs::Entity& e, float d) {
-			if(d<=dist && (ignore.is_nothing() || &ignore.get_or_throw()!=&e)) {
-				dist = d;
-				ret = e;
-			}
-		}, [&](int32_t x, int32_t y, float d) {
-			if(d<=dist) {
-				dist = d;
-				ret = util::nothing();
-			}
-		});
-
-		return std::make_pair(ret, Distance(dist));
-	}
-
 }
 }
 }

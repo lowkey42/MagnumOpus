@@ -219,15 +219,17 @@ namespace mo {
 								transform.raycast_nearest_entity(t.position(),
 																 t.rotation(),
 																 20_m,
-																 util::justPtr(p.get()));
+						                                         [&](ecs::Entity& e){
+							return p.get()!=&e && e.get<sys::physics::Transform_comp>().get_or_throw().layer()>=0.5;
+						});
 
 						auto p = remove_units(t.position());
 
 						entity.process([&](ecs::Entity& e){
-							dist = Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position())));
+							dist = std::max(dist,Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position()))));
 						});
 
-						ray_renderer.draw(glm::vec3(p.x,p.y,0.1), t.rotation(), dist.value(), 0.03);
+						ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), 0.03);
 				});
 			}
 

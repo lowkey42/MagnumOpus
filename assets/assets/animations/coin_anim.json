@@ -1,6 +1,6 @@
 ﻿{
 	"animations": {
-		"idle": {"row":0, "fps":2, "frames":4}
+		"idle": {"row":0, "fps":10, "frames":4}
 	},
 	
 	"texName": "tex:coin",
