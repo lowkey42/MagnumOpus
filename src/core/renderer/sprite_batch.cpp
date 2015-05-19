@@ -29,8 +29,7 @@ namespace renderer {
 			  height = (uv.w - uv.y) * sprite.texture->height() / cam.world_scale();
 
 		// Rotation Matrix to be applied to coords of the Sprite
-		// TODO [foe]: removing -1.5707f neccesary? Would affect to rework every single sprite-map also in future
-		glm::mat4 rotMat = glm::translate(glm::vec3(x, y, sprite.layer)) * glm::rotate(sprite.rotation -1.5707f, glm::vec3(0.f, 0.f, 1.f));
+		glm::mat4 rotMat = glm::translate(glm::vec3(x, y, sprite.layer)) * glm::rotate(sprite.rotation, glm::vec3(0.f, 0.f, 1.f));
 
 //		std::cout << "Entity with Sprite Component at: " << x << "/" << y << std::endl;
 //		std::cout << "Name of attached texture: " << sprite.texture.str() << std::endl;

@@ -1,7 +1,7 @@
 {
 	"animations": {
-		"idle": {"row":0, "fps":60, "frames":1}
-		"moving": {"row":0, "fps":60, "frames":1}
+		"idle": {"row":1, "fps":6, "frames":8}
+		"moving": {"row":1, "fps":6, "frames":8}
 		"attack": {"row":0, "fps":60, "frames":1}
 	},
 	
