@@ -48,14 +48,10 @@ namespace renderer{
 	)
 
 	Animation::Animation(std::unique_ptr<Animation_data> data){
-		// TODO --> is double moving neccesary?
 		_data = std::move(data);
 	}
 
-	Animation::~Animation(){
-		// TODO --> right solution?
-		_data.release();
-	}
+	Animation::~Animation() = default;
 
 	Animation& Animation::operator=(Animation&& rhs) noexcept {
 		_data = std::move(rhs._data);

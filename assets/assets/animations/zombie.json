@@ -1,6 +1,8 @@
 {
 	"animations": {
-		"idle": {"row":0, "fps":60, "frames":1}
+		"idle": {"row":0, "fps":2, "frames":4}
+		"moving": {"row":0, "fps":60, "frames":1}
+		"attack": {"row":0, "fps":60, "frames":1}
 	},
 	
 	"texName": "tex:zombie",
