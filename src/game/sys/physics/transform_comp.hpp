@@ -47,12 +47,19 @@ namespace physics {
 				rotation(rotation() + offset);
 			}
 
+			auto layer()const noexcept {return _layer;}
+			void layer(float layer)noexcept {
+				INVARIANT(layer>=0 && layer<=1,"layer out of bounds!");
+				_layer=layer;
+			}
+
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
 			friend class Transform_system;
 
 			Position _position;
+			float _layer = 0.5f;
 			Angle _rotation;
 			Angle_per_time _max_rotation_speed;
 			int32_t _cell_idx = -1;

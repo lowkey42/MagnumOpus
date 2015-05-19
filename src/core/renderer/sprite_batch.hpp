@@ -38,7 +38,7 @@ namespace renderer {
 
 		struct Sprite_vertex {
 			Sprite_vertex(glm::vec4 vec, glm::vec2 uv_coords, const renderer::Texture* t) : tex(t){
-				pos = glm::vec2(vec.x, vec.y);
+				pos = glm::vec3(vec.x, vec.y, vec.z);
 				uv = uv_coords;
 			}
 
@@ -47,13 +47,14 @@ namespace renderer {
 				return (this->tex < other.tex);
 			}
 
-			glm::vec2 pos;
+			glm::vec3 pos;
 			glm::vec2 uv;
 			const renderer::Texture* tex;
 		};
 
 		struct Sprite{
 			Position position;
+			float layer;
 			float rotation;
 			const glm::vec4 uv;
 			const renderer::Texture* texture;

@@ -51,9 +51,10 @@ namespace physics {
 			template<typename F>
 			void foreach_in_cell(Position pos, F func);
 
+			template<typename Pred>
 			auto raycast_nearest_entity(Position pos, Angle dir,
 										Distance max_distance,
-										util::maybe<ecs::Entity&> ignore=util::nothing())
+										Pred pred)
 					-> std::tuple<util::maybe<ecs::Entity&>, Distance>;
 
 			template<typename FE, typename FW>
@@ -188,6 +189,29 @@ namespace physics {
 				}
 			};
 		});
+	}
+
+	template<typename Pred>
+	auto Transform_system::raycast_nearest_entity(Position pos, Angle dir,
+												  Distance max_distance,
+												  Pred pred)
+					-> std::tuple<util::maybe<ecs::Entity&>, Distance> {
+		auto ret = util::maybe<ecs::Entity&>{};
+		auto dist = max_distance.value();
+
+		raycast(pos, dir, max_distance, [&](ecs::Entity& e, float d) {
+			if(d<=dist && pred(e)) {
+				dist = d;
+				ret = e;
+			}
+		}, [&](int32_t x, int32_t y, float d) {
+			if(d<=dist) {
+				dist = d;
+				ret = util::nothing();
+			}
+		});
+
+		return std::make_pair(ret, Distance(dist));
 	}
 
 
