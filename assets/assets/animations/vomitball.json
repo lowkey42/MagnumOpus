@@ -1,6 +1,8 @@
 {
 	"animations": {
-		"idle": {"row":0, "fps":60, "frames":1}
+		"idle": {"row":0, "fps":18, "frames":6},
+		"moving": {"row":0, "fps":9, "frames":9},
+		"attack": {"row":0, "fps":60, "frames":1}
 	},
 	
 	"texName": "tex:vomitball",
