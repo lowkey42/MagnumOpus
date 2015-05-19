@@ -28,8 +28,8 @@ namespace combat {
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Health_comp(ecs::Entity& owner, float max_hp=100) noexcept
-				: Component(owner), _max_hp(max_hp), _current_hp(max_hp) {}
+			Health_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
 
 			void heal(float hp)noexcept {_heal+=hp;}
 			void damage(float hp)noexcept{_damage+=hp;}
@@ -47,8 +47,8 @@ namespace combat {
 			float _auto_heal_max=0;
 			float _auto_heal=0;
 
-			float _max_hp;
-			float _current_hp;
+			float _max_hp = 0;
+			float _current_hp = 0;
 
 			float _damage=0, _heal=0;
 	};

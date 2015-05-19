@@ -209,6 +209,9 @@ namespace physics {
 		auto inv_mass_sum = m.a->_inv_mass;
 
 		if(m.is_with_object()) {
+			if(m.a->_solid!=m.b.comp->_solid)
+				return;
+
 			relVel+=m.b.comp->_velocity;
 			e = std::max(e, m.b.comp->_restitution);
 			inv_mass_sum+=m.b.comp->_inv_mass;

@@ -29,7 +29,7 @@ namespace combat {
 		_auto_heal_max = s.auto_heal_max;
 		_auto_heal = s.auto_heal;
 		_max_hp = s.max_hp;
-		_current_hp = s.current_hp;
+		_current_hp = s.current_hp==0 ? s.max_hp : s.current_hp;
 	}
 	void Health_comp::store(ecs::Entity_state& state) {
 		state.write_from(Persisted_state{*this});

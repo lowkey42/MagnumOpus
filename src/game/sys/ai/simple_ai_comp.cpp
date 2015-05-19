@@ -150,11 +150,8 @@ namespace ai {
 
 		} else {
 			owner().get<physics::Transform_comp>().process([&](auto& t){
-				auto dir = rotate(glm::vec2(1,0), _wander_dir);
-
-				c.look_at(dir);
-
-				c.move(dir);
+				c.move(rotate(glm::vec2(1,0), t.rotation()));
+				c.look_in_dir(rotate(glm::vec2(1,0), _wander_dir));
 			});
 		}
 	}

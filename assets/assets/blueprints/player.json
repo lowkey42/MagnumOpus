@@ -25,7 +25,7 @@
         "group": 2
     },
     "Health":{
-        "max_hp": 50
+        "max_hp": 100
      },
     "Weapon":{
         "type": "range",

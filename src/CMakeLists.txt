@@ -7,6 +7,10 @@ project(MagnumOpus)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
 
+if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftrapv -fslp-vectorize-aggressive -ffast-math")
+endif()
+
 include_directories(${ROOT_DIR}/src)
 
 
