@@ -204,14 +204,11 @@ namespace mo {
 		});
 	}
 
-	auto Game_state::draw() -> util::cvector_range<sys::cam::VScreen> {
-		camera.draw(
-			[&](const renderer::Camera& cam,
-				const std::vector<ecs::Entity_ptr>& targets) {
+	namespace {
+		void render_rays(const std::vector<ecs::Entity_ptr>& targets,
+						renderer::Ray_renderer& ray_renderer,
+						sys::physics::Transform_system& transform) {
 
-			tilemap.draw(cam);
-
-			ray_renderer.set_vp(cam.vp());
 			for(auto& p : targets) {
 				p->get<sys::physics::Transform_comp>().process(
 					[&](sys::physics::Transform_comp& t) {
@@ -232,9 +229,21 @@ namespace mo {
 							dist = std::max(dist,Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position()))));
 						});
 
-						ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), 0.03);
+						ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), 0.04);
 				});
 			}
+		}
+	}
+
+	auto Game_state::draw() -> util::cvector_range<sys::cam::VScreen> {
+		camera.draw(
+			[&](const renderer::Camera& cam,
+				const std::vector<ecs::Entity_ptr>& targets) {
+
+			tilemap.draw(cam);
+
+			ray_renderer.set_vp(cam.vp());
+			render_rays(targets, ray_renderer, transform);
 
 			spritesys.draw(cam);
 		});

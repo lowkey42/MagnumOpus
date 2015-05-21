@@ -59,7 +59,7 @@ namespace renderer {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-		glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+		glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	}
 
 	Texture::Texture(int width, int height, std::vector<uint8_t> rgbaData) : _width(width), _height(height) {
@@ -97,10 +97,16 @@ namespace renderer {
 	}
 
 
-	void Texture::bind()const {
+	void Texture::bind(int index)const {
+		auto tex = GL_TEXTURE0+index;
+		INVARIANT(tex<GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "to many textures");
+		glActiveTexture(tex);
 		glBindTexture(GL_TEXTURE_2D, _handle);
 	}
-	void Texture::unbind()const {
+	void Texture::unbind(int index)const {
+		auto tex = GL_TEXTURE0+index;
+		INVARIANT(tex<GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "to many textures");
+		glActiveTexture(tex);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -110,6 +116,8 @@ namespace renderer {
 		glGenFramebuffers(1, &_fb_handle);
 		glBindFramebuffer(GL_FRAMEBUFFER, _fb_handle);
 
+		glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, _handle, 0);
+
 		if(depth_buffer) {
 			glGenRenderbuffers(1, &_db_handle);
 			glBindRenderbuffer(GL_RENDERBUFFER, _db_handle);
@@ -117,11 +125,6 @@ namespace renderer {
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 									  GL_RENDERBUFFER, _db_handle);
 		}
-
-		glFramebufferTexture(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, _handle, 0);
-
-		GLenum draw_buffers[1] = {GL_COLOR_ATTACHMENT0};
-		glDrawBuffers(1, draw_buffers);
 
 		INVARIANT(glCheckFramebufferStatus(GL_FRAMEBUFFER)==GL_FRAMEBUFFER_COMPLETE, "Couldn't create framebuffer!");
 
@@ -158,10 +161,15 @@ namespace renderer {
 		return *this;
 	}
 
-	void Framebuffer::bind_target()const {
+	void Framebuffer::clear(glm::vec3 color) {
+		glClearColor(color.r, color.g, color.b, 0.f);
+		glClear(GL_COLOR_BUFFER_BIT | (_db_handle ? GL_DEPTH_BUFFER_BIT : 0));
+	}
+
+	void Framebuffer::bind_target() {
 		glBindFramebuffer(GL_FRAMEBUFFER, _fb_handle);
 	}
-	void Framebuffer::unbind_target()const {
+	void Framebuffer::unbind_target() {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 	}
 

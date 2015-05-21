@@ -24,6 +24,14 @@
 namespace mo {
 namespace renderer {
 
+	struct Simple_vertex {
+		glm::vec2 xy;
+		glm::vec2 uv;
+		Simple_vertex(glm::vec2 xy, glm::vec2 uv) : xy(xy), uv(uv) {}
+	};
+	extern Vertex_layout simple_vertex_layout;
+
+
 	class Ray_renderer {
 		public:
 			Ray_renderer(asset::Asset_manager& assets);

@@ -20,6 +20,7 @@
 #include <memory>
 #include <string>
 #include <SDL2/SDL.h>
+#include <glm/vec3.hpp>
 
 namespace mo {
 namespace renderer {
@@ -41,6 +42,7 @@ namespace renderer {
 
 			std::unique_ptr<SDL_Window,void(*)(SDL_Window*)> _window;
 			SDL_GLContext _gl_ctx;
+			glm::vec3 _clear_color;
 
 			float _frame_start_time = 0;
 			float _delta_time_smoothed = 0;

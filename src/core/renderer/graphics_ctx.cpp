@@ -91,7 +91,9 @@ namespace renderer {
 	}
 
 	void Graphics_ctx::start_frame() {
+		glClearColor(_clear_color.r, _clear_color.g, _clear_color.b,1.f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);
+
 		_frame_start_time = SDL_GetTicks() / 1000.0f;
 	}
 	void Graphics_ctx::end_frame(float delta_time) {
@@ -113,7 +115,7 @@ namespace renderer {
 		SDL_GL_SwapWindow(_window.get());
 	}
 	void Graphics_ctx::set_clear_color(float r, float g, float b) {
-		glClearColor(r,g,b,1.f);
+		_clear_color = glm::vec3(r,g,b);
 	}
 
 

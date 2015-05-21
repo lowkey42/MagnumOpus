@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <glm/vec3.hpp>
+
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
 
@@ -38,8 +40,8 @@ namespace renderer {
 			Texture& operator=(Texture&&)noexcept;
 			Texture(Texture&& s)noexcept;
 
-			void bind()const; // TODO: allow mutliple textures
-			void unbind()const;
+			void bind(int index=0)const;
+			void unbind(int index=0)const;
 
 			auto width()const noexcept {return _width;}
 			auto height()const noexcept {return _height;}
@@ -56,7 +58,7 @@ namespace renderer {
 	using Texture_ptr = asset::Ptr<Texture>;
 
 
-	class Framebuffer : Texture {
+	class Framebuffer : public Texture {
 		public:
 			Framebuffer(int width, int height, bool depth_buffer);
 			~Framebuffer()noexcept;
@@ -65,8 +67,9 @@ namespace renderer {
 			Framebuffer(Framebuffer&& s)noexcept;
 
 
-			void bind_target()const;
-			void unbind_target()const;
+			void clear(glm::vec3 color=glm::vec3(0,0,0));
+			void bind_target();
+			void unbind_target();
 
 		private:
 			unsigned int _fb_handle;
@@ -74,7 +77,7 @@ namespace renderer {
 	};
 
 
-	inline auto bind_target(const Framebuffer& fb) {
+	inline auto bind_target(Framebuffer& fb) {
 		auto c = util::cleanup_later([&fb](){fb.unbind_target();});
 		fb.bind_target();
 		return c;

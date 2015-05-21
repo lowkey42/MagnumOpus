@@ -4,6 +4,12 @@
 namespace mo {
 namespace renderer {
 
+	Vertex_layout simple_vertex_layout {
+		Vertex_layout::Mode::triangles,
+		vertex("position", &Simple_vertex::xy),
+		vertex("uv", &Simple_vertex::uv)
+	};
+
 	namespace {
 		struct Ray_vertex {
 			glm::vec2 pos;
@@ -26,7 +32,7 @@ namespace renderer {
 			 .bind_all_attribute_locations(ray_layout)
 			 .build()
 			 .bind()
-			 .set_uniform("color", glm::vec4(1,0,0,1));
+			 .set_uniform("color", glm::vec4(1,0,0,0.5));
 	}
 
 	void Ray_renderer::set_vp(const glm::mat4& vp) {

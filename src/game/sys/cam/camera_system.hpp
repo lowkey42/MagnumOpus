@@ -36,7 +36,6 @@ namespace cam {
 
 		renderer::Framebuffer vscreen;
 
-		// private:
 		VScreen(glm::vec2 size, float world_scale);
 		VScreen(VScreen&&) = default;
 	};
@@ -53,6 +52,7 @@ namespace cam {
 				for(auto& c : _cameras) {
 					auto vsb = renderer::bind_target(c.vscreen);
 					(void)vsb;
+					c.vscreen.clear();
 
 					c.camera.bind_viewport();
 
