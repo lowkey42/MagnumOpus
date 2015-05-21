@@ -65,6 +65,7 @@ namespace renderer {
 
 	class Buffer : util::no_copy {
 		friend class Object;
+		friend class Vertex_layout;
 		public:
 			Buffer(std::size_t element_size, std::size_t elements,
 			       bool dynamic, const void* data=nullptr);
@@ -121,6 +122,8 @@ namespace renderer {
 				Element_type type;
 				bool normalized;
 				const void* offset;
+				std::size_t buffer;
+				uint8_t divisor;
 			};
 
 		public:
@@ -135,37 +138,42 @@ namespace renderer {
 			const Mode _mode;
 			const std::vector<Element> _elements;
 
-			void _build(std::size_t stride)const;
+			/// returns ture for instanced rendering
+			bool _build(const std::vector<Buffer>& buffers)const;
 	};
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, int8_t    Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, uint8_t   Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, int16_t   Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, uint16_t  Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, int32_t   Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, uint32_t  Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, float     Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, double    Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, glm::vec2 Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, glm::vec3 Base::* value, bool normalized=false);
-	template<class Base> Vertex_layout::Element vertex(const std::string& name, glm::vec4 Base::* value, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, int8_t    Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, uint8_t   Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, int16_t   Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, uint16_t  Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, int32_t   Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, uint32_t  Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, float     Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, double    Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, glm::vec2 Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, glm::vec3 Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
+	template<class Base> Vertex_layout::Element vertex(const std::string& name, glm::vec4 Base::* value, std::size_t buffer=0, uint8_t divisor=0, bool normalized=false);
 
 
 	class Object : util::no_copy {
 		public:
-			Object(const Vertex_layout& layout, Buffer&& data);
+			template<class... B>
+			Object(const Vertex_layout& layout, B&&... data);
 			Object(Object&&)noexcept;
 			~Object()noexcept;
 
 			void draw()const;
 
-			Buffer& buffer(){return _data;}
+			Buffer& buffer(std::size_t i=0){return _data.at(i);}
 
 			Object& operator=(Object&&)noexcept;
 
 		private:
+			void _init(const Vertex_layout& layout);
+
 			Vertex_layout::Mode _mode;
-			Buffer _data;
+			std::vector<Buffer> _data;
 			unsigned int _vao_id;
+			bool _instanced;
 	};
 
 }

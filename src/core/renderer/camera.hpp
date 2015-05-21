@@ -22,42 +22,43 @@
 namespace mo {
 namespace renderer {
 
+	extern glm::vec2 calculate_vscreen(const Engine &engine, int target_height);
+
 	class Camera {
+		public:
+			// Constructors
+			Camera(glm::vec2 size, float world_scale=1.f,
+				   const glm::vec2 position=glm::vec2(0.0f), float zoom=1.0f) noexcept;
 
-	public:
+			// Methods
+			void position(glm::vec2 pos) noexcept {_pos = pos; _dirty = true;}
+			void move(glm::vec2 offset) noexcept {_pos+=offset; _dirty = true;}
+			void zoom(float z) noexcept {_zoom=z; _dirty=true;}
+			void viewport(glm::vec4 viewport)noexcept;
 
-		// Constructors
-		Camera(const Engine &engine, float world_scale=1.f,
-		       const glm::vec2 position=glm::vec2(0.0f), float zoom=1.0f) noexcept;
+			auto zoom() const noexcept { return _zoom; }
+			auto position() const noexcept { return _pos; }
+			auto viewport() const noexcept { return _viewport; }
+			auto world_scale() const noexcept { return _world_scale; }
 
-		// Methods
-		void position(glm::vec2 pos) noexcept {_pos = pos; _dirty = true;}
-		void move(glm::vec2 offset) noexcept {_pos+=offset; _dirty = true;}
-		void zoom(float z) noexcept {_zoom=z; _dirty=true;}
-		void viewport(glm::vec4 viewport)noexcept;
+			auto vp() const noexcept -> const glm::mat4&;
 
-		auto zoom() const noexcept { return _zoom; }
-		auto position() const noexcept { return _pos; }
-		auto viewport() const noexcept { return _viewport; }
-        auto world_scale() const noexcept { return _world_scale; }
+			auto screen_to_world(const glm::vec2 screen_pos) const noexcept -> glm::vec2;
+			auto world_to_screen(const glm::vec2 world_pos) const noexcept -> glm::vec2;
 
-		auto vp() const noexcept -> const glm::mat4&;
+			void bind_viewport()const noexcept;
 
-		auto screen_to_world(const glm::vec2 screen_pos) const noexcept -> glm::vec2;
-		auto world_to_screen(const glm::vec2 world_pos) const noexcept -> glm::vec2;
+		private:
+			void recalc_vp()const noexcept;
 
-	private:
-		void recalc_vp()const noexcept;
+			glm::vec4 _viewport; //< x,y,w,h
+			glm::mat4 _projection;
 
-		glm::vec4 _viewport; //< x,y,w,h
-		glm::mat4 _projection;
-
-		const float _world_scale;
-		float _zoom;
-		glm::vec2 _pos;
-		mutable glm::mat4 _vp;
-		mutable bool _dirty;
-
+			const float _world_scale;
+			float _zoom;
+			glm::vec2 _pos;
+			mutable glm::mat4 _vp;
+			mutable bool _dirty;
 	};
 }
 }

@@ -111,23 +111,36 @@ namespace renderer {
 			shader.bind_attribute_location(e.name, index++);
 		}
 	}
-	void Vertex_layout::_build(std::size_t stride)const {
+	bool Vertex_layout::_build(const std::vector<Buffer>& buffers)const {
+		bool instanced = false;
+
+		std::size_t bound_buffer =-1;
+		const Buffer* buffer=nullptr;
 		int index = 0;
 		for(auto& e : _elements) {
+			if(bound_buffer!=e.buffer) {
+				bound_buffer = e.buffer;
+				buffer = &buffers.at(e.buffer);
+				buffer->_bind();
+			}
+
 			glEnableVertexAttribArray(index);
-			glVertexAttribPointer(index,e.size,to_gl(e.type),e.normalized, stride, e.offset);
+			glVertexAttribPointer(index,e.size,to_gl(e.type),e.normalized, buffer->_element_size, e.offset);
+			glVertexAttribDivisor(index, e.divisor);
+			instanced |= e.divisor>0;
+
 			index++;
 		}
+
+		return instanced;
 	}
 
 
-	Object::Object(const Vertex_layout& layout, Buffer&& d)
-	    : _mode(layout._mode), _data(std::move(d)), _vao_id(0) {
+	void Object::_init(const Vertex_layout& layout) {
 		glGenVertexArrays(1, &_vao_id);
 
 		glBindVertexArray(_vao_id);
-		_data._bind();
-		layout._build(_data._element_size);
+		_instanced = layout._build(_data);
 		glBindVertexArray(0);
 	}
 	Object::Object(Object&& o)noexcept
@@ -141,7 +154,11 @@ namespace renderer {
 
 	void Object::draw()const {
 		glBindVertexArray(_vao_id);
-		glDrawArrays(to_gl(_mode), 0, _data.size());
+		if(!_instanced)
+			glDrawArrays(to_gl(_mode), 0, _data.at(0).size());
+		else
+			glDrawArraysInstanced(to_gl(_mode), 0, _data.at(0).size(), _data.at(1).size());
+
 		glBindVertexArray(0);
 	}
 

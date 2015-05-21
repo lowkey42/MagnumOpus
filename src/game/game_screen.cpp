@@ -50,12 +50,14 @@ namespace mo {
 	class Camera {};
 
 	void Game_screen::_draw(float time) {
-		_state->draw();
+		auto vscreens = _state->draw();
 
 		_ui.pre_draw();
-		for(auto& cam : _state->camera.cameras()) {
-			for(auto& t : cam.targets)
-				_ui.draw(cam.camera, *t);
+		for(auto& screen : vscreens) {
+			// TODO: draw screen.framebuffer
+
+			for(auto& t : screen.targets)
+				_ui.draw(screen.camera, *t);
 		}
 	}
 

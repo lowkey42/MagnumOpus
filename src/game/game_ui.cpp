@@ -22,7 +22,7 @@ namespace mo {
 		// TODO
 
 		PImpl(Game_engine& engine)
-		    : ui_cam(engine),
+			: ui_cam(renderer::calculate_vscreen(engine, 720)),
 		      hud_font(engine.assets().load<renderer::Font>("font:test"_aid)),
 		      hud_text(hud_font) {
 			  hud_text_shader.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:simple"_aid))

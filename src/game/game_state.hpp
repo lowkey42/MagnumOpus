@@ -74,7 +74,7 @@ namespace mo {
 		           util::maybe<int> depth);
 
 		void update(Time dt);
-		void draw();
+		auto draw() -> util::cvector_range<sys::cam::VScreen>;
 
 		auto add_player(sys::controller::Controller& controller, Position pos,
 		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;

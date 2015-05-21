@@ -11,11 +11,21 @@ namespace cam {
 
 	using namespace unit_literals;
 
+	constexpr auto world_scale = 48.f; // pixel/meter
+	constexpr auto vscreen_height = 720;
+
+	VScreen::VScreen(glm::vec2 size, float world_scale)
+		: camera(size, world_scale), vscreen(size.x, size.y, true) {
+	}
+
 	Camera_system::Camera_system(ecs::Entity_manager& entity_manager, Game_engine& engine)
-		: _engine(engine), _targets(entity_manager.list<Camera_target_comp>()) {
+		: _engine(engine),
+		  _targets(entity_manager.list<Camera_target_comp>()),
+		  _vscreen_size(renderer::calculate_vscreen(engine, vscreen_height)) {
+
 		entity_manager.register_component_type<Camera_target_comp>();
 
-		_cameras.emplace_back(_engine, 48.f);
+		_cameras.emplace_back(_vscreen_size, 48.f);
 	}
 
 	void Camera_system::update(Time dt) {

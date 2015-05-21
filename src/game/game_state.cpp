@@ -204,12 +204,15 @@ namespace mo {
 		});
 	}
 
-	void Game_state::draw() {
-		for(auto& cam : camera.cameras()) {
-			tilemap.draw(cam.camera);
+	auto Game_state::draw() -> util::cvector_range<sys::cam::VScreen> {
+		camera.draw(
+			[&](const renderer::Camera& cam,
+				const std::vector<ecs::Entity_ptr>& targets) {
 
-			ray_renderer.set_vp(cam.camera.vp());
-			for(auto& p : cam.targets) {
+			tilemap.draw(cam);
+
+			ray_renderer.set_vp(cam.vp());
+			for(auto& p : targets) {
 				p->get<sys::physics::Transform_comp>().process(
 					[&](sys::physics::Transform_comp& t) {
 						Distance dist = 20_m;
@@ -219,7 +222,7 @@ namespace mo {
 								transform.raycast_nearest_entity(t.position(),
 																 t.rotation(),
 																 20_m,
-						                                         [&](ecs::Entity& e){
+																 [&](ecs::Entity& e){
 							return p.get()!=&e && e.get<sys::physics::Transform_comp>().get_or_throw().layer()>=0.5;
 						});
 
@@ -233,9 +236,10 @@ namespace mo {
 				});
 			}
 
-			// TODO: draw systems here
-			spritesys.draw(cam.camera);
-		}
+			spritesys.draw(cam);
+		});
+
+		return camera.vscreens();
 	}
 
 	auto Game_state::add_player(sys::controller::Controller& controller,

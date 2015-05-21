@@ -33,9 +33,10 @@ namespace renderer {
 			explicit Texture(const std::string& path) throw(Texture_loading_failed);
 			explicit Texture(std::vector<uint8_t> buffer) throw(Texture_loading_failed);
 			Texture(int width, int height, std::vector<uint8_t> rgba_data);
-			~Texture()noexcept;
+			virtual ~Texture()noexcept;
 
-			Texture& operator=(Texture&&);
+			Texture& operator=(Texture&&)noexcept;
+			Texture(Texture&& s)noexcept;
 
 			void bind()const; // TODO: allow mutliple textures
 			void unbind()const;
@@ -44,14 +45,46 @@ namespace renderer {
 			auto height()const noexcept {return _height;}
 
 			Texture(const Texture&) = delete;
-			Texture(Texture&& s) = delete;
 			Texture& operator=(const Texture&) = delete;
 
-		private:
+		protected:
+			Texture(int width, int height);
+
 			unsigned int _handle;
 			int _width=1, _height=1;
 	};
 	using Texture_ptr = asset::Ptr<Texture>;
+
+
+	class Framebuffer : Texture {
+		public:
+			Framebuffer(int width, int height, bool depth_buffer);
+			~Framebuffer()noexcept;
+
+			Framebuffer& operator=(Framebuffer&&)noexcept;
+			Framebuffer(Framebuffer&& s)noexcept;
+
+
+			void bind_target()const;
+			void unbind_target()const;
+
+		private:
+			unsigned int _fb_handle;
+			unsigned int _db_handle;
+	};
+
+
+	inline auto bind_target(const Framebuffer& fb) {
+		auto c = util::cleanup_later([&fb](){fb.unbind_target();});
+		fb.bind_target();
+		return c;
+	}
+	inline auto bind(const Texture& tex) {
+		auto c = util::cleanup_later([&tex](){tex.unbind();});
+		tex.bind();
+		return c;
+	}
+
 
 } /* namespace renderer */
 
