@@ -21,6 +21,7 @@
 #include "../../../core/renderer/camera.hpp"
 #include <core/renderer/texture.hpp>
 #include <core/renderer/vertex_object.hpp>
+#include <core/renderer/graphics_ctx.hpp>
 
 #include "camera_target_comp.hpp"
 
@@ -52,25 +53,28 @@ namespace cam {
 				for(auto& c : _cameras) {
 					auto vsb = renderer::bind_target(c.vscreen);
 					(void)vsb;
-					c.vscreen.clear();
-
 					c.camera.bind_viewport();
+
+					c.vscreen.clear();
 
 					f(c.camera, c.targets);
 				}
+
+				_gctx.reset_viewport();
 			}
 
 			auto vscreens()const noexcept {return util::range(_cameras);}
 
 			auto main_camera()const noexcept -> const auto& {
-				return _cameras.front().camera;
+				return _main_camera;
 			}
 
 		private:
-			Game_engine& _engine;
+			renderer::Graphics_ctx& _gctx;
 			Camera_target_comp::Pool& _targets;
 			const glm::vec2 _vscreen_size;
 
+			renderer::Camera _main_camera;
 			std::vector<VScreen> _cameras;
 	};
 

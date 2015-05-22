@@ -19,13 +19,15 @@ namespace cam {
 	}
 
 	Camera_system::Camera_system(ecs::Entity_manager& entity_manager, Game_engine& engine)
-		: _engine(engine),
-		  _targets(entity_manager.list<Camera_target_comp>()),
-		  _vscreen_size(renderer::calculate_vscreen(engine, vscreen_height)) {
+		: _gctx(engine.graphics_ctx()),
+	      _targets(entity_manager.list<Camera_target_comp>()),
+		  _vscreen_size(renderer::calculate_vscreen(engine, vscreen_height)),
+	      _main_camera({engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height()}, world_scale) {
 
 		entity_manager.register_component_type<Camera_target_comp>();
 
-		_cameras.emplace_back(_vscreen_size, 48.f);
+		_cameras.emplace_back(_vscreen_size, world_scale);
+		_cameras.back().camera.zoom(1.f);
 	}
 
 	void Camera_system::update(Time dt) {
@@ -66,6 +68,9 @@ namespace cam {
 			_cameras.back().targets.clear();
 			_cameras.back().targets.push_back(target.owner_ptr());
 		}
+
+		_main_camera.position(_cameras.front().camera.position());
+		_main_camera.zoom(_cameras.front().camera.zoom());
 	}
 
 }

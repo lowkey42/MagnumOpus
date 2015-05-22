@@ -90,6 +90,10 @@ namespace renderer {
 		SDL_GL_DeleteContext(_gl_ctx);
 	}
 
+	void Graphics_ctx::reset_viewport()const noexcept {
+		glViewport(0,0, win_width(), win_height());
+	}
+
 	void Graphics_ctx::start_frame() {
 		glClearColor(_clear_color.r, _clear_color.g, _clear_color.b,1.f);
 		glClear(GL_COLOR_BUFFER_BIT|GL_DEPTH_BUFFER_BIT);

@@ -33,6 +33,8 @@ namespace renderer {
 			void end_frame(float delta_time);
 			void set_clear_color(float r, float g, float b);
 
+			void reset_viewport()const noexcept;
+
 			auto win_width()const noexcept{return _win_width;}
 			auto win_height()const noexcept{return _win_height;}
 
