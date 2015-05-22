@@ -39,11 +39,11 @@ namespace mo {
 	      transform(em, MaxEntitySize, level.width(), level.height(), level),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
-		  spritesys(em, transform, engine.assets()),
 		  controller(em, transform),
 		  ai(em, engine, transform, level),
 		  combat(em, transform, physics),
 		  state(em),
+		  spritesys(em, transform, engine.assets(), state),
 		  ray_renderer(engine.assets()) {
 
 		auto d = depth.get_or_other(profile.depth);
