@@ -40,12 +40,12 @@ namespace sprite{
 
 		private:
 
-			void _on_state_change(ecs::Entity& e, const state::State_data& data);
+			void _on_state_change(ecs::Entity& e, state::State_data& data);
 
 			physics::Transform_system& _transform;
 			renderer::Sprite_batch _sprite_batch;
 			Sprite_comp::Pool& _sprites;
-			util::slot<ecs::Entity&, const state::State_data&> _state_change_slot;
+			util::slot<ecs::Entity&, state::State_data&> _state_change_slot;
 	};
 
 }

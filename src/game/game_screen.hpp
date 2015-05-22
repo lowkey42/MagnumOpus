@@ -45,7 +45,7 @@ namespace mo {
 				return Prev_screen_policy::discard;
 			}
 
-			void _on_state_change(ecs::Entity&, const sys::state::State_data&);
+			void _on_state_change(ecs::Entity&, sys::state::State_data&);
 
 			void _on_enter(util::maybe<Screen&> prev) override;
 			void _on_leave(util::maybe<Screen&> next) override;
@@ -61,7 +61,7 @@ namespace mo {
 			std::unique_ptr<Game_state> _state;
 			Game_ui _ui;
 
-			util::slot<ecs::Entity&, const sys::state::State_data&> _player_sc_slot;
+			util::slot<ecs::Entity&, sys::state::State_data&> _player_sc_slot;
 	};
 
 }

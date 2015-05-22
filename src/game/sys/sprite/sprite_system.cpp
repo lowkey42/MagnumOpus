@@ -8,6 +8,8 @@ namespace mo {
 namespace sys {
 namespace sprite {
 
+	using namespace unit_literals;
+
 	Sprite_system::Sprite_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
 								 asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept
 		: _transform(ts),
@@ -52,11 +54,12 @@ namespace sprite {
 		}
 	}
 
-	void Sprite_system::_on_state_change(ecs::Entity& entity, const state::State_data& data){
+	void Sprite_system::_on_state_change(ecs::Entity& entity, state::State_data& data){
 		/*DEBUG("Entity "
 			  << entity.get<Sprite_comp>().get_or_throw()._animation->texture().aid().name()
 			  << " -> animation: " << static_cast<int>(data.s)
 			  << std::endl);*/
+		data.min_time(1_s);
 		entity.get<Sprite_comp>().get_or_throw().animation_type(renderer::Animation_type(static_cast<int>(data.s)));
 	}
 

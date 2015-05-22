@@ -40,6 +40,10 @@ namespace state {
 		float magnitude = 1.f;
 		Time left = Time(0);
 
+		void min_time(Time m)noexcept {
+			left = max(left, m);
+		}
+
 		auto operator!=(const State_data& rhs)const noexcept {
 			return s!=rhs.s || magnitude!=rhs.magnitude;
 		}
@@ -57,7 +61,7 @@ namespace state {
 			void state(Entity_state s, float magnitude = 1.f)noexcept;
 			auto state()const noexcept {return _state_last;}
 
-			auto update(Time dt)noexcept -> util::maybe<State_data>;
+			auto update(Time dt)noexcept -> util::maybe<State_data&>;
 
 		private:
 

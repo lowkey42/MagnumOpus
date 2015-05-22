@@ -61,7 +61,7 @@ namespace mo {
 
 
 
-	void Game_screen::_on_state_change(ecs::Entity& e, const sys::state::State_data& s) {
+	void Game_screen::_on_state_change(ecs::Entity& e, sys::state::State_data& s) {
 		if(&e==_state->main_player.get()) {
 			if(s.s==sys::state::Entity_state::died) {
 				INFO("The segfault bites. You die!");
