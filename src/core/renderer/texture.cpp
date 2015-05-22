@@ -54,12 +54,13 @@ namespace renderer {
 	Texture::Texture(int width, int height) : _width(width), _height(height) {
 		glGenTextures( 1, &_handle );
 		glBindTexture( GL_TEXTURE_2D, _handle );
+		glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
+
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
 
-		glTexImage2D(GL_TEXTURE_2D, 0,GL_RGBA8, _width, _height, 0, GL_RGBA, GL_UNSIGNED_BYTE, 0);
 	}
 
 	Texture::Texture(int width, int height, std::vector<uint8_t> rgbaData) : _width(width), _height(height) {
@@ -121,7 +122,7 @@ namespace renderer {
 		if(depth_buffer) {
 			glGenRenderbuffers(1, &_db_handle);
 			glBindRenderbuffer(GL_RENDERBUFFER, _db_handle);
-			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, width, height);
+			glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT16, width, height);
 			glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
 									  GL_RENDERBUFFER, _db_handle);
 		}

@@ -4,7 +4,11 @@
 #include <sstream>
 #include <cstdio>
 #include <GL/glew.h>
+#include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
+
 #include "../utils/log.hpp"
+#include "../asset/asset_manager.hpp"
 
 namespace {
 	void sdl_error_check() {
@@ -25,12 +29,65 @@ namespace {
 		WARN(std::string(message,length)<<" (source: "<<source<<", type: "<<type<<", id: "<<id<<", severity: "<<severity<<")");
 	}
 #endif
+
+
+	struct Graphics_cfg {
+		int width;
+		int height;
+		bool fullscreen;
+	};
+	sf2_structDef(Graphics_cfg,
+		sf2_member(width),
+		sf2_member(height),
+		sf2_member(fullscreen)
+	)
+
+#ifndef EMSCRIPTEN
+	constexpr auto default_cfg = Graphics_cfg{960,540,false};
+#else
+	constexpr auto default_cfg = Graphics_cfg{1024,512,false};
+#endif
+
+}
+
+namespace mo {
+namespace asset {
+	template<>
+	struct Loader<Graphics_cfg> {
+		using RT = std::shared_ptr<Graphics_cfg>;
+
+		static RT load(istream in) throw(Loading_failed) {
+			auto r = std::make_shared<Graphics_cfg>();
+
+			sf2::parseStream(in, *r);
+
+			return r;
+		}
+
+		static void store(ostream out, const Graphics_cfg& asset) throw(Loading_failed) {
+			sf2::writeStream(out,asset);
+		}
+	};
+}
 }
 
 namespace mo {
 namespace renderer {
-	Graphics_ctx::Graphics_ctx(const std::string& name, int width, int height, bool fullscreen)
-	 : _name(name), _win_width(width), _win_height(height), _window(nullptr, SDL_DestroyWindow) {
+
+	Graphics_ctx::Graphics_ctx(const std::string& name, asset::Asset_manager& assets)
+	 : _name(name), _window(nullptr, SDL_DestroyWindow) {
+
+		auto& cfg = asset::unpack(assets.load_maybe<Graphics_cfg>("cfg:graphics"_aid)).get_or_other(
+			default_cfg
+		);
+
+		_win_width = cfg.width;
+		_win_height = cfg.height;
+		bool fullscreen = cfg.fullscreen;
+
+		if(&cfg==&default_cfg) {
+			assets.save<Graphics_cfg>("cfg:graphics"_aid, cfg);
+		}
 
 #ifndef EMSCRIPTEN
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);

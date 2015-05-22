@@ -33,7 +33,7 @@ namespace level {
 		        .build();
 
 		// Load a predefined texture and bind it
-		_texture = engine.assets().load<Texture>("tex:tilemap_m"_aid);
+		_texture = engine.assets().load<Texture>("tex:tilemap"_aid);
 
 		_tex_width = _texture->width();
 		_tex_height = _texture->height();

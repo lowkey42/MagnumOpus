@@ -23,10 +23,14 @@
 #include <glm/vec3.hpp>
 
 namespace mo {
+	namespace asset{
+		class Asset_manager;
+	}
+
 namespace renderer {
 	class Graphics_ctx {
 		public:
-			Graphics_ctx(const std::string& name, int width, int height, bool fullscreen);
+			Graphics_ctx(const std::string& name, asset::Asset_manager& assets);
 			~Graphics_ctx();
 
 			void start_frame();

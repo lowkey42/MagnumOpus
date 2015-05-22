@@ -16,28 +16,38 @@ namespace asset {
 
 	template<typename T>
 	Ptr<T> Asset_manager::load(const AID& id) throw(Loading_failed) {
+		auto asset = load_maybe<T>(id);
+
+		if(asset.is_nothing())
+			throw Loading_failed("asset not found: "+id.str());
+
+		return asset.get_or_throw();
+	}
+
+	template<typename T>
+	auto Asset_manager::load_maybe(const AID& id) throw(Loading_failed) -> util::maybe<Ptr<T>> {
 		auto res = _assets.find(id);
 		if(res!=_assets.end())
-			return {*this, id, std::static_pointer_cast<const T>(res->second.data)};
+			return Ptr<T>{*this, id, std::static_pointer_cast<const T>(res->second.data)};
 
 		auto path = _locate(id);
 
 		if(!path)
-			throw Loading_failed("asset not found: "+id.str());
+			return util::nothing();
 
 		auto stream = _open(path.get_or_throw(), id);
 		if(!stream)
-			throw Loading_failed("asset not found: "+id.str());
+			return util::nothing();
 
 		auto asset = Loader<T>::load(std::move(stream.get_or_throw()));
 
 		_add_asset(id, path.get_or_throw(), &_asset_reloader_impl<T>, std::static_pointer_cast<void>(asset));
 
-		return {*this, id, asset};
+		return Ptr<T>{*this, id, asset};
 	}
 
 	template<typename T>
-	void Asset_manager::save(const AID& id, T& asset) throw(Loading_failed) {
+	void Asset_manager::save(const AID& id, const T& asset) throw(Loading_failed) {
 		Loader<T>::store(_create(id), asset);
 		_assets.erase(id);
 	}

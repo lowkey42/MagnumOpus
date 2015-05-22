@@ -116,7 +116,7 @@ namespace asset {
 			throw Loading_failed("Unsupported assetId for shader: "+in.aid().str());
 		}
 
-		static void store(istream out, renderer::Shader&) throw(Loading_failed) {
+		static void store(istream out, const renderer::Shader&) throw(Loading_failed) {
 			throw Loading_failed("Saving shaders is not supported!");
 		}
 	};

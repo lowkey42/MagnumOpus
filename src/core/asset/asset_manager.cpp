@@ -59,7 +59,7 @@ namespace {
 	}
 
 	bool exists(const std::string path) {
-		return PHYSFS_exists(path.c_str())!=0;
+		return PHYSFS_exists(path.c_str())!=0 && PHYSFS_isDirectory(path.c_str())==0;
 	}
 
 	void print_dir_recursiv(const std::string& dir, uint8_t depth) {
@@ -184,7 +184,7 @@ namespace asset {
 			if(exists(res->second))
 				return res->second;
 			else
-				WARN("Asset not found in configured place: "<<res->second);
+				INFO("Asset not found in configured place: "<<res->second);
 		}
 
 		if(exists(id.name()))
@@ -192,7 +192,13 @@ namespace asset {
 
 		auto baseDir = _base_dir(id.type());
 
-		return baseDir.is_some() ? util::just(append_file(baseDir.get_or_throw(), id.name())) : util::nothing();
+		if(baseDir.is_some()) {
+			auto path = append_file(baseDir.get_or_throw(), id.name());
+			if(exists(path))
+				return util::just(std::move(path));
+		}
+
+		return util::nothing();
 	}
 
 	ostream Asset_manager::_create(const AID& id) throw(Loading_failed) {
@@ -210,7 +216,7 @@ namespace asset {
 					id.name();
 		}
 
-		PHYSFS_mkdir(util::split_on_last(path, "/").first.c_str());
+		//PHYSFS_mkdir(util::split_on_last(path, "/").first.c_str());
 
 		return {id, *this, path};
 	}

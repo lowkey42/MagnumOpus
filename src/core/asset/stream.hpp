@@ -84,7 +84,7 @@ namespace asset {
 		static_assert(util::dependent_false<T>(), "Required AssetLoader specialization not provided.");
 
 		static auto load(istream in) throw(Loading_failed) -> std::shared_ptr<T>;
-		static void store(ostream out, T& asset) throw(Loading_failed);
+		static void store(ostream out, const T& asset) throw(Loading_failed);
 	};
 
 }

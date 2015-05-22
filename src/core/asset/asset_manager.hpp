@@ -77,10 +77,13 @@ namespace asset {
 			template<typename T>
 			auto load(const AID& id) throw(Loading_failed) -> Ptr<T>;
 
+			template<typename T>
+			auto load_maybe(const AID& id) throw(Loading_failed) -> util::maybe<Ptr<T>>;
+
 			auto list(Asset_type type) -> std::vector<AID>;
 
 			template<typename T>
-			void save(const AID& id, T& asset) throw(Loading_failed);
+			void save(const AID& id, const T& asset) throw(Loading_failed);
 
 			void reload();
 
@@ -110,6 +113,11 @@ namespace asset {
 
 			auto _create(const AID& id)throw(Loading_failed) -> ostream;
 	};
+
+	template<class T>
+	util::maybe<const T&> unpack(util::maybe<Ptr<T>> m) {
+		return m.process(util::maybe<const T&>{}, [](Ptr<T>& p){return util::maybe<const T&>{*p};});
+	}
 
 } /* namespace asset */
 }

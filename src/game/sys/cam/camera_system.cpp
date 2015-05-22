@@ -11,8 +11,8 @@ namespace cam {
 
 	using namespace unit_literals;
 
-	constexpr auto world_scale = 48.f; // pixel/meter
-	constexpr auto vscreen_height = 720;
+	constexpr auto world_scale = 16.f*3; // pixel/meter
+	constexpr auto vscreen_height = 512;
 
 	VScreen::VScreen(glm::vec2 size, float world_scale)
 		: camera(size, world_scale), vscreen(size.x, size.y, true) {

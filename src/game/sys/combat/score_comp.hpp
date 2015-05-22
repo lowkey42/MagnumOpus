@@ -40,7 +40,7 @@ namespace combat {
 			friend class Combat_system;
 
 			int _value;
-			bool _collectable;
+			bool _collectable = false;
 			bool _collected = false;
 	};
 

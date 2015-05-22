@@ -76,7 +76,7 @@ namespace asset {
 
 		static RT load(istream in) throw(Loading_failed);
 
-		static void store(ostream out, renderer::Animation& asset) throw(Loading_failed);
+		static void store(ostream out, const renderer::Animation& asset) throw(Loading_failed);
 	};
 }
 }
