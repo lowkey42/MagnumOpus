@@ -1,8 +1,12 @@
 {
 	"animations": {
-		"idle": {"row":0, "fps":8, "frames":4},
-		"moving": {"row":0, "fps":8, "frames":4},
-		"attack": {"row":0, "fps":8, "frames":4}
+		"idle": {"row":0, "fps":1, "frames":1},
+		"walking": {"row":0, "fps":8, "frames":4},
+		"attacking_melee": {"row":0, "fps":1, "frames":1},
+		"damaged": {"row":0, "fps":1, "frames":1},
+		"healed": {"row":0, "fps":1, "frames":1},
+		"died": {"row":0, "fps":1, "frames":1},
+		"resurrected": {"row":0, "fps":1, "frames":1}
 	},
 	
 	"texName": "tex:enemy_moving",

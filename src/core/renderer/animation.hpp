@@ -26,9 +26,20 @@ namespace mo {
 namespace renderer {
 
 	enum class Animation_type{
-		idle,
+		/*idle,
 		moving,
-		attack
+		attack*/
+		idle,
+		walking,
+		attacking_melee,
+		attacking_range,
+		interacting,
+		taking,
+		change_weapon,
+		damaged,
+		healed,
+		died,
+		resurrected
 	};
 }
 }

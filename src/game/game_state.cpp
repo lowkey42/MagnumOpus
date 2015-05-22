@@ -250,11 +250,6 @@ namespace mo {
 		else
 			p->emplace<sys::controller::Controllable_comp>(&controller);
 
-		// [Sebastian]: changing Animation type for player to another Animation
-		p->get<sys::sprite::Sprite_comp>().process([&](sys::sprite::Sprite_comp& sprite){
-			sprite.animation_type(renderer::Animation_type::moving);
-		});
-
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 			trans.position(pos);
 		});

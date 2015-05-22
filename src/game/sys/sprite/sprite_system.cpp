@@ -53,7 +53,11 @@ namespace sprite {
 	}
 
 	void Sprite_system::_on_state_change(ecs::Entity& entity, const state::State_data& data){
-
+		/*DEBUG("Entity "
+			  << entity.get<Sprite_comp>().get_or_throw()._animation->texture().aid().name()
+			  << " -> animation: " << static_cast<int>(data.s)
+			  << std::endl);*/
+		entity.get<Sprite_comp>().get_or_throw().animation_type(renderer::Animation_type(static_cast<int>(data.s)));
 	}
 
 
