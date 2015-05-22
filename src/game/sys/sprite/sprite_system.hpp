@@ -20,6 +20,7 @@
 #include <core/renderer/camera.hpp>
 
 #include "sprite_comp.hpp"
+#include "../state/state_system.hpp"
 
 namespace mo{
 namespace sys{
@@ -31,7 +32,7 @@ namespace sprite{
 
 			// Constructors
 			Sprite_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
-						  asset::Asset_manager& asset_manager) noexcept;
+						  asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept;
 
 			// Methods
 			void draw(const renderer::Camera& camera) noexcept;
@@ -39,10 +40,12 @@ namespace sprite{
 
 		private:
 
+			void _on_state_change(ecs::Entity& e, const state::State_data& data);
+
 			physics::Transform_system& _transform;
 			renderer::Sprite_batch _sprite_batch;
 			Sprite_comp::Pool& _sprites;
-
+			util::slot<ecs::Entity&, const state::State_data&> _state_change_slot;
 	};
 
 }

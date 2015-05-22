@@ -9,8 +9,14 @@ namespace sys {
 namespace sprite {
 
 	Sprite_system::Sprite_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
-								 asset::Asset_manager& asset_manager) noexcept :
-		_transform(ts), _sprite_batch(asset_manager), _sprites(entity_manager.list<Sprite_comp>()) {
+								 asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept
+		: _transform(ts),
+		  _sprite_batch(asset_manager),
+		  _sprites(entity_manager.list<Sprite_comp>()),
+		  _state_change_slot(&Sprite_system::_on_state_change, this)
+	{
+		_state_change_slot.connect(state_system.state_change_events);
+
 		entity_manager.register_component_type<Sprite_comp>();
 	}
 
@@ -44,6 +50,10 @@ namespace sprite {
 			);
 
 		}
+	}
+
+	void Sprite_system::_on_state_change(ecs::Entity& entity, const state::State_data& data){
+
 	}
 
 
