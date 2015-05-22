@@ -25,9 +25,6 @@ namespace renderer{
 	};
 
 	sf2_enumDef(Animation_type,
-		/*sf2_value(idle),
-		sf2_value(moving),
-		sf2_value(attack)*/
 		sf2_value(idle),
 		sf2_value(walking),
 		sf2_value(attacking_melee),
