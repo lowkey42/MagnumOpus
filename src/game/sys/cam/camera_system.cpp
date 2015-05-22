@@ -36,6 +36,8 @@ namespace cam {
 			if(target._rotation_zoom_time_left>0_s)
 				target._rotation_zoom_time_left-=dt;
 
+			Position target_offset{0_m, 0_m};
+
 			target.owner().get<physics::Transform_comp>().process([&](auto& transform) {
 				auto target_pos = transform.position();
 				auto target_rot = transform.rotation();
@@ -49,22 +51,15 @@ namespace cam {
 					moving = tpnt.x*tpnt.x + tpnt.y*tpnt.y >= 0.1f;
 				});
 
-				if(std::abs(target._last_rotation-target_rot)>10_deg || moving) {
-					target._rotation_zoom_time_left = target._rotation_zoom_time;
-					target._last_rotation=target_rot;
-				}
+				target._last_rotation = target._last_rotation*(1-dt.value()*4.f) + target_rot*dt.value()*4.f;
 
-/*
-				float p = target._rotation_zoom_time_left / target._rotation_zoom_time;
-
-				target_pos += rotate(Position{3_m*p, 0_m}, transform.rotation());
-				*/
+				target_offset += rotate(Position{3_m, 0_m}, target._last_rotation);
 
 				target.chase(target_pos, dt);
 			});
 
 			// TODO: add support for multiple cameras
-			_cameras.back().camera.position(remove_units(target.cam_position()));
+			_cameras.back().camera.position(remove_units(target.cam_position() + target_offset));
 			_cameras.back().targets.clear();
 			_cameras.back().targets.push_back(target.owner_ptr());
 		}
