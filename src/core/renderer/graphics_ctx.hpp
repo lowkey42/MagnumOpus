@@ -20,17 +20,24 @@
 #include <memory>
 #include <string>
 #include <SDL2/SDL.h>
+#include <glm/vec3.hpp>
 
 namespace mo {
+	namespace asset{
+		class Asset_manager;
+	}
+
 namespace renderer {
 	class Graphics_ctx {
 		public:
-			Graphics_ctx(const std::string& name, int width, int height, bool fullscreen);
+			Graphics_ctx(const std::string& name, asset::Asset_manager& assets);
 			~Graphics_ctx();
 
 			void start_frame();
 			void end_frame(float delta_time);
 			void set_clear_color(float r, float g, float b);
+
+			void reset_viewport()const noexcept;
 
 			auto win_width()const noexcept{return _win_width;}
 			auto win_height()const noexcept{return _win_height;}
@@ -41,6 +48,7 @@ namespace renderer {
 
 			std::unique_ptr<SDL_Window,void(*)(SDL_Window*)> _window;
 			SDL_GLContext _gl_ctx;
+			glm::vec3 _clear_color;
 
 			float _frame_start_time = 0;
 			float _delta_time_smoothed = 0;

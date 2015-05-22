@@ -186,7 +186,10 @@ namespace util {
 
 				return *_ref;
 			}
-			T& get_or_other(T& other)const noexcept {
+			T& get_or_other(std::remove_const_t<T>& other)const noexcept {
+				return is_some() ? *_ref : other;
+			}
+			const T& get_or_other(const T& other)const noexcept {
 				return is_some() ? *_ref : other;
 			}
 

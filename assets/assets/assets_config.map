@@ -1,2 +1,3 @@
 cfg:controlls = controlls-cfg.json
 cfg:dungeons = rooms/dungeons.json
+cfg:graphics = graphics-cfg.json

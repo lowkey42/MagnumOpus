@@ -36,8 +36,8 @@ namespace renderer {
 
 #define VERTEX_FACTORY(TYPE,NAME,COUNT) \
 	template<class Base> \
-	Vertex_layout::Element vertex(const std::string& name, TYPE Base::* value, bool normalized) { \
-		return Vertex_layout::Element{name, COUNT, Vertex_layout::Element_type::NAME, normalized, details::calcOffset(value)};\
+	Vertex_layout::Element vertex(const std::string& name, TYPE Base::* value, std::size_t buffer, uint8_t divisor, bool normalized) { \
+		return Vertex_layout::Element{name, COUNT, Vertex_layout::Element_type::NAME, normalized, details::calcOffset(value), buffer, divisor};\
 	}
 
 	VERTEX_FACTORY(int8_t,    byte_t,   1)
@@ -53,6 +53,17 @@ namespace renderer {
 	VERTEX_FACTORY(glm::vec4, float_t,  4)
 
 #undef VERTEX_FACTORY
+
+
+	template<class... B>
+	Object::Object(const Vertex_layout& layout, B&&... d)
+		: _mode(layout._mode), _data(), _vao_id(0) {
+		_data.reserve(sizeof...(d));
+		auto ignored = {(_data.emplace_back(std::forward<B>(d)), 0)...};
+		(void)ignored;
+
+		_init(layout);
+	}
 
 }
 }

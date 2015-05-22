@@ -114,7 +114,7 @@ namespace asset {
 			return std::make_shared<renderer::Font>(in.manager(), in);
 		}
 
-		static void store(ostream out, renderer::Texture& asset) throw(Loading_failed) {
+		static void store(ostream out, const renderer::Texture& asset) throw(Loading_failed) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

@@ -18,6 +18,8 @@
 #include <string>
 #include <vector>
 #include <stdexcept>
+#include <glm/vec3.hpp>
+
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
 
@@ -33,25 +35,59 @@ namespace renderer {
 			explicit Texture(const std::string& path) throw(Texture_loading_failed);
 			explicit Texture(std::vector<uint8_t> buffer) throw(Texture_loading_failed);
 			Texture(int width, int height, std::vector<uint8_t> rgba_data);
-			~Texture()noexcept;
+			virtual ~Texture()noexcept;
 
-			Texture& operator=(Texture&&);
+			Texture& operator=(Texture&&)noexcept;
+			Texture(Texture&& s)noexcept;
 
-			void bind()const; // TODO: allow mutliple textures
-			void unbind()const;
+			void bind(int index=0)const;
+			void unbind(int index=0)const;
 
 			auto width()const noexcept {return _width;}
 			auto height()const noexcept {return _height;}
 
 			Texture(const Texture&) = delete;
-			Texture(Texture&& s) = delete;
 			Texture& operator=(const Texture&) = delete;
 
-		private:
+		protected:
+			Texture(int width, int height);
+
 			unsigned int _handle;
 			int _width=1, _height=1;
 	};
 	using Texture_ptr = asset::Ptr<Texture>;
+
+
+	class Framebuffer : public Texture {
+		public:
+			Framebuffer(int width, int height, bool depth_buffer);
+			~Framebuffer()noexcept;
+
+			Framebuffer& operator=(Framebuffer&&)noexcept;
+			Framebuffer(Framebuffer&& s)noexcept;
+
+
+			void clear(glm::vec3 color=glm::vec3(0,0,0));
+			void bind_target();
+			void unbind_target();
+
+		private:
+			unsigned int _fb_handle;
+			unsigned int _db_handle;
+	};
+
+
+	inline auto bind_target(Framebuffer& fb) {
+		auto c = util::cleanup_later([&fb](){fb.unbind_target();});
+		fb.bind_target();
+		return c;
+	}
+	inline auto bind(const Texture& tex) {
+		auto c = util::cleanup_later([&tex](){tex.unbind();});
+		tex.bind();
+		return c;
+	}
+
 
 } /* namespace renderer */
 
@@ -64,7 +100,7 @@ namespace asset {
 			return std::make_shared<renderer::Texture>(in.bytes());
 		}
 
-		static void store(ostream out, renderer::Texture& asset) throw(Loading_failed) {
+		static void store(ostream out, const renderer::Texture& asset) throw(Loading_failed) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

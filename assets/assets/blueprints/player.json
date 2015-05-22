@@ -14,8 +14,8 @@
         "aid": "anim:soldier"
     },
     "Camera_target": {
-        "mass": 0.2,
-        "damping": 0.3,
+        "mass": 5.,
+        "damping": 0.2,
         "freq": 5.0,
         "lazyness":1
     },

@@ -42,16 +42,20 @@ namespace util {
 			~no_copy_move()noexcept = default;
 	};
 
+	template<class Func>
 	struct cleanup {
-		template<class Func>
 		cleanup(Func f)noexcept : active(true), f(f) {}
 		cleanup(const cleanup&)=delete;
 		cleanup(cleanup&& o)noexcept : active(o.active), f(o.f) {o.active=false;}
 		~cleanup()noexcept{f();}
 
 		bool active;
-		std::function<void()> f;
+		Func f;
 	};
+	template<class Func>
+	inline auto cleanup_later(Func f)noexcept {
+		return cleanup<Func>{f};
+	}
 
 	template<typename T>
 	constexpr bool dependent_false() {
@@ -102,6 +106,12 @@ namespace util {
 		private:
 			Iter b, e;
 	};
+	template<class T>
+	using vector_range = iter_range<typename std::vector<T>::iterator>;
+
+	template<class T>
+	using cvector_range = iter_range<typename std::vector<T>::const_iterator>;
+
 	template<class T>
 	class numeric_range {
 		struct iterator : std::iterator<std::random_access_iterator_tag, T, T> {

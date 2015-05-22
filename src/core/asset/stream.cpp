@@ -115,6 +115,8 @@ namespace asset {
 	}
 
 	stream::~stream()noexcept {
+		_fbuf.reset();
+
 		if(_file)
 			PHYSFS_close((PHYSFS_File*)_file);
 	}

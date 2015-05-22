@@ -19,6 +19,9 @@
 #include "../../../core/units.hpp"
 #include "../../../core/utils/template_utils.hpp"
 #include "../../../core/renderer/camera.hpp"
+#include <core/renderer/texture.hpp>
+#include <core/renderer/vertex_object.hpp>
+#include <core/renderer/graphics_ctx.hpp>
 
 #include "camera_target_comp.hpp"
 
@@ -28,13 +31,14 @@ namespace mo {
 namespace sys {
 namespace cam {
 
-	struct Camera_mapping {
+	struct VScreen {
 		renderer::Camera camera;
 		std::vector<ecs::Entity_ptr> targets;
 
-		Camera_mapping(const Engine &engine, float world_scale)
-		    : camera(engine, world_scale) {
-		}
+		renderer::Framebuffer vscreen;
+
+		VScreen(glm::vec2 size, float world_scale);
+		VScreen(VScreen&&) = default;
 	};
 
 	class Camera_system {
@@ -43,16 +47,35 @@ namespace cam {
 
 			void update(Time dt);
 
-			auto cameras()const noexcept {return util::range(_cameras);}
+			// Func = void(const Camera&, const std::vector<ecs::Entity_ptr>&)
+			template<typename Func>
+			void draw(Func f) {
+				for(auto& c : _cameras) {
+					auto vsb = renderer::bind_target(c.vscreen);
+					(void)vsb;
+					c.camera.bind_viewport();
+
+					c.vscreen.clear();
+
+					f(c.camera, c.targets);
+				}
+
+				_gctx.reset_viewport();
+			}
+
+			auto vscreens()const noexcept {return util::range(_cameras);}
 
 			auto main_camera()const noexcept -> const auto& {
-				return _cameras.front().camera;
+				return _main_camera;
 			}
 
 		private:
-			Game_engine& _engine;
+			renderer::Graphics_ctx& _gctx;
 			Camera_target_comp::Pool& _targets;
-			std::vector<Camera_mapping> _cameras;
+			const glm::vec2 _vscreen_size;
+
+			renderer::Camera _main_camera;
+			std::vector<VScreen> _cameras;
 	};
 
 }

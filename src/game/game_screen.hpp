@@ -18,6 +18,8 @@
 #include "game_engine.hpp"
 
 #include <core/ecs/serializer.hpp>
+#include <core/renderer/shader.hpp>
+#include <core/renderer/vertex_object.hpp>
 #include "sys/state/state_system.hpp"
 
 #include "../core/units.hpp"
@@ -62,6 +64,9 @@ namespace mo {
 			Game_ui _ui;
 
 			util::slot<ecs::Entity&, const sys::state::State_data&> _player_sc_slot;
+
+			renderer::Shader_program _post_effects;
+			renderer::Object _post_effect_obj;
 	};
 
 }

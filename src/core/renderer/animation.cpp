@@ -1,6 +1,7 @@
 #include "animation.hpp"
 
 #include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
 
 namespace mo{
 namespace renderer{
@@ -108,11 +109,7 @@ namespace asset {
 
 	std::shared_ptr<renderer::Animation> Loader<renderer::Animation>::load(istream in) throw(Loading_failed){
 		auto r = std::make_unique<renderer::Animation_data>();
-
-		std::string data = in.content();
-		sf2::io::StringCharSource source(data);
-
-		sf2::ParserDefChooser<renderer::Animation_data>::get().parse(source, *r.get());
+		sf2::parseStream(in, *r);
 
 		r->texture = in.manager().load<renderer::Texture>(r->texName);
 
@@ -122,10 +119,9 @@ namespace asset {
 		return anim;
 	}
 
-	void Loader<renderer::Animation>::store(ostream out, renderer::Animation& asset) throw(Loading_failed) {
+	void Loader<renderer::Animation>::store(ostream out, const renderer::Animation& asset) throw(Loading_failed) {
 		asset._data->texName = asset._data->texture.aid().name();
-		std::string data = sf2::writeString(asset);
-		out.write(data.c_str(), data.length());
+		sf2::writeStream(out, asset);
 	}
 }
 }
