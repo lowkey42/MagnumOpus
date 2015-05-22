@@ -67,7 +67,14 @@ namespace renderer{
 	Animation& Animation::operator=(Animation&& rhs) noexcept {
 		_data = std::move(rhs._data);
 		return *this;
-	 }
+	}
+
+	bool Animation::animation_exists(Animation_type type) const noexcept {
+		if(_data->animations.find(type) == _data->animations.end()){
+			return false;
+		}
+		return true;
+	}
 
 	int Animation::frame_width() const noexcept{
 		return _data->frame_width;
