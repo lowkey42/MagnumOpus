@@ -51,8 +51,8 @@ namespace cam {
 			template<typename Func>
 			void draw(Func f) {
 				for(auto& c : _cameras) {
-					auto vsb = renderer::bind_target(c.vscreen);
-					(void)vsb;
+					renderer::Framebuffer_binder vsb = c.vscreen;
+
 					c.camera.bind_viewport();
 
 					c.vscreen.clear();

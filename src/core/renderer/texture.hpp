@@ -76,17 +76,28 @@ namespace renderer {
 			unsigned int _db_handle;
 	};
 
+	struct Framebuffer_binder {
+		Framebuffer_binder(Framebuffer& fb) : fb(fb) {
+			fb.bind_target();
+		}
+		~Framebuffer_binder()noexcept {
+			fb.unbind_target();
+		}
 
-	inline auto bind_target(Framebuffer& fb) {
-		auto c = util::cleanup_later([&fb](){fb.unbind_target();});
-		fb.bind_target();
-		return c;
-	}
-	inline auto bind(const Texture& tex) {
-		auto c = util::cleanup_later([&tex](){tex.unbind();});
-		tex.bind();
-		return c;
-	}
+		Framebuffer& fb;
+	};
+
+	struct Texture_binder {
+		Texture_binder(const Framebuffer& tex, std::size_t idx=0) : tex(tex), idx(idx) {
+			tex.bind(idx);
+		}
+		~Texture_binder()noexcept {
+			tex.unbind(idx);
+		}
+
+		const Texture& tex;
+		std::size_t idx;
+	};
 
 
 } /* namespace renderer */
