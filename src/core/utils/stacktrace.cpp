@@ -278,8 +278,7 @@
 				CRASH_REPORT("\n"<<error);
 			}
 
-			void posix_signal_handler(int sig, siginfo_t *siginfo, void *context) {
-			  (void)context;
+			void posix_signal_handler(int sig, siginfo_t *siginfo, void *) {
 			  switch(sig) {
 				case SIGSEGV:
 				  printStackTrace("Caught SIGSEGV: Segmentation Fault");
