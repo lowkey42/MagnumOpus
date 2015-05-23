@@ -33,6 +33,14 @@ namespace sprite {
 		return renderer::Sprite_batch::Sprite{{}, 0, 0, _animation->uv(_currentFrame, _animType), &*_animation->texture()};
 	}
 
+	void Sprite_comp::animation_type(renderer::Animation_type type) noexcept {
+		if(animation()->animation_exists(type)){
+			_animType = type;
+		} else {
+			_animType = renderer::Animation_type::idle;
+		}
+	}
+
 }
 }
 }

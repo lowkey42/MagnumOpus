@@ -37,11 +37,12 @@ namespace sprite {
 			Component(owner), _currentFrame(0), _animation(animation), _animType(renderer::Animation_type::idle){}
 
 		auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
+		auto animation() const noexcept { return _animation; }
 		auto current_frame() const noexcept { return _currentFrame; }
 		auto animation_type() const noexcept { return _animType; }
 
 		void current_frame(float frame) noexcept { _currentFrame = frame; }
-		void animation_type(renderer::Animation_type type) noexcept { _animType = type; }
+		void animation_type(renderer::Animation_type type) noexcept;
 
 		struct Persisted_state;
 		friend struct Persisted_state;

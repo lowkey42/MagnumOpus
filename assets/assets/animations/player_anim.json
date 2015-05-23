@@ -1,8 +1,9 @@
 ﻿{
 	"animations": {
 		"idle": {"row":0, "fps":1, "frames":1},
-		"moving": {"row":0, "fps":8, "frames":8},
-		"attack": {"row":1, "fps":8, "frames":8}
+		"walking": {"row":0, "fps":8, "frames":8},
+		"attacking_melee": {"row":0, "fps":1, "frames":1},
+		"died": {"row":1, "fps":8, "frames":8}
 	},
 	
 	"texName": "tex:player",

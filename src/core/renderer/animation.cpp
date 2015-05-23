@@ -27,8 +27,16 @@ namespace renderer{
 
 	sf2_enumDef(Animation_type,
 		sf2_value(idle),
-		sf2_value(moving),
-		sf2_value(attack)
+		sf2_value(walking),
+		sf2_value(attacking_melee),
+		sf2_value(attacking_range),
+		sf2_value(interacting),
+		sf2_value(taking),
+		sf2_value(change_weapon),
+		sf2_value(damaged),
+		sf2_value(healed),
+		sf2_value(died),
+		sf2_value(resurrected)
 	)
 
 	sf2_structDef(Animation_frame_data,
@@ -57,7 +65,14 @@ namespace renderer{
 	Animation& Animation::operator=(Animation&& rhs) noexcept {
 		_data = std::move(rhs._data);
 		return *this;
-	 }
+	}
+
+	bool Animation::animation_exists(Animation_type type) const noexcept {
+		if(_data->animations.find(type) == _data->animations.end()){
+			return false;
+		}
+		return true;
+	}
 
 	int Animation::frame_width() const noexcept{
 		return _data->frame_width;

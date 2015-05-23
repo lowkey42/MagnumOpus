@@ -30,7 +30,7 @@ namespace state {
 
 			void update(Time dt);
 
-			util::signal_source<ecs::Entity&, const State_data&> state_change_events;
+			util::signal_source<ecs::Entity&, State_data&> state_change_events;
 
 		private:
 			State_comp::Pool& _states;

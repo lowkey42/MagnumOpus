@@ -1,8 +1,8 @@
 ﻿{
 	"animations": {
 		"idle": {"row":0, "fps":18, "frames":6},
-		"moving": {"row":1, "fps":9, "frames":9},
-		"attack": {"row":0, "fps":60, "frames":1}
+		"walking": {"row":0, "fps":18, "frames":6},
+		"died": {"row":1, "fps":18, "frames":9}
 	},
 	
 	"texName": "tex:fireball",

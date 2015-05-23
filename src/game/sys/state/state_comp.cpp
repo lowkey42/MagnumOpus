@@ -12,15 +12,15 @@ namespace state {
 			switch(state) {
 				case Entity_state::idle:			return  0_s;
 				case Entity_state::walking:			return  0.1_s;
-				case Entity_state::attacking_melee:	return  0.25_s;
-				case Entity_state::attacking_range:	return  0.25_s;
-				case Entity_state::interacting:		return  1_s;
-				case Entity_state::taking:			return  1.0_s;
-				case Entity_state::change_weapon:	return  0.1_s;
-				case Entity_state::damaged:			return  0.5_s;
-				case Entity_state::healed:			return  0.5_s;
-				case Entity_state::died:			return  1.0_s;
-				case Entity_state::resurrected:		return  1.0_s;
+				case Entity_state::attacking_melee:	return  0.1_s;
+				case Entity_state::attacking_range:	return  0.1_s;
+				case Entity_state::interacting:		return  0.1_s;
+				case Entity_state::taking:			return  0.5_s;
+				case Entity_state::change_weapon:	return  0.5_s;
+				case Entity_state::damaged:			return  0.1_s;
+				case Entity_state::healed:			return  0.1_s;
+				case Entity_state::died:			return  0.1_s;
+				case Entity_state::resurrected:		return  0.1_s;
 			}
 
 			INVARIANT(false, "Unexpected state "<<static_cast<int>(state));
@@ -52,8 +52,8 @@ namespace state {
 		state.left=required_time_for(s);
 	}
 
-	auto State_comp::update(Time dt)noexcept -> util::maybe<State_data> {
-		if(_state_background.left>0_s) {
+	auto State_comp::update(Time dt)noexcept -> util::maybe<State_data&> {
+		if(_state_background.left>0_s && _state_background.s!=Entity_state::idle) {
 			_state_background.left-=dt;
 
 			// time is up, lets idle
@@ -72,9 +72,8 @@ namespace state {
 		auto& cstate = _state_primary.left>0_s ? _state_primary : _state_background;
 
 		if(cstate!=_state_last) {
-			// TODO[foe]: call listener
 			_state_last = cstate;
-			return util::justCopy(cstate);
+			return util::justPtr(&cstate);
 		}
 
 		return util::nothing();

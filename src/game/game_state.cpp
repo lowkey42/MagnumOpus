@@ -39,11 +39,11 @@ namespace mo {
 	      transform(em, MaxEntitySize, level.width(), level.height(), level),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
-		  spritesys(em, transform, engine.assets()),
 		  controller(em, transform),
 		  ai(em, engine, transform, level),
 		  combat(em, transform, physics),
 		  state(em),
+		  spritesys(em, transform, engine.assets(), state),
 		  ray_renderer(engine.assets()) {
 
 		auto d = depth.get_or_other(profile.depth);
@@ -262,11 +262,6 @@ namespace mo {
 			        .get_or_throw().set(controller);
 		else
 			p->emplace<sys::controller::Controllable_comp>(&controller);
-
-		// [Sebastian]: changing Animation type for player to another Animation
-		p->get<sys::sprite::Sprite_comp>().process([&](sys::sprite::Sprite_comp& sprite){
-			sprite.animation_type(renderer::Animation_type::moving);
-		});
 
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 			trans.position(pos);
