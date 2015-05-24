@@ -26,9 +26,6 @@ namespace mo {
 namespace renderer {
 
 	enum class Animation_type{
-		/*idle,
-		moving,
-		attack*/
 		idle,
 		walking,
 		attacking_melee,
@@ -41,6 +38,7 @@ namespace renderer {
 		died,
 		resurrected
 	};
+
 }
 }
 

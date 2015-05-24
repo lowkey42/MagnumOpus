@@ -34,14 +34,16 @@ namespace sprite {
 
 		// TODO: nullptr check
 		Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
-			Component(owner), _currentFrame(0), _animation(animation), _animType(renderer::Animation_type::idle){}
+			Component(owner), _current_frame(0), _animation(animation), _anim_type(renderer::Animation_type::idle){}
 
 		auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
 		auto animation() const noexcept { return _animation; }
-		auto current_frame() const noexcept { return _currentFrame; }
-		auto animation_type() const noexcept { return _animType; }
+		auto current_frame() const noexcept { return _current_frame; }
+		auto animation_type() const noexcept { return _anim_type; }
+		auto repeat_animation() const noexcept { return _repeat_animation; }
+		auto repeat_animation(const bool r) noexcept { _repeat_animation = r; }
 
-		void current_frame(float frame) noexcept { _currentFrame = frame; }
+		void current_frame(float frame) noexcept { _current_frame = frame; }
 		void animation_type(renderer::Animation_type type) noexcept;
 
 		struct Persisted_state;
@@ -49,10 +51,12 @@ namespace sprite {
 
 	private:
 		friend class Sprite_system;
-		float _currentFrame;
+		float _current_frame;
+		// Maybe Declaration would fit better somewhere else
+		bool _repeat_animation;
 
 		asset::Ptr<renderer::Animation> _animation;
-		renderer::Animation_type _animType;
+		renderer::Animation_type _anim_type;
 
 	};
 
