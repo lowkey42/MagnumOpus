@@ -108,12 +108,6 @@ namespace renderer{
 		int fps = _data->animations.find(type)->second.fps;
 		float ret = cur_frame;
 
-		/*if(ret > max_frames){
-			ret = 0;
-			DEBUG("ERROR!");
-			DEBUG("next_frame: " << ret << " / max Frames: " << max_frames);
-		}*/
-
 		// checking if cur_frame + change is in max_frames bounding for cur Animation
 		// if not but repeat is set -> set Animation back to 0 else keep last frame
 
