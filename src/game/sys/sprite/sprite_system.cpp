@@ -47,7 +47,7 @@ namespace sprite {
 
 			sprite.current_frame(
 				sprite._animation->next_frame(
-					sprite.animation_type(), sprite.current_frame(), dt.value(), true
+					sprite.animation_type(), sprite.current_frame(), dt.value(), sprite._repeat_animation
 				)
 			);
 
@@ -56,6 +56,7 @@ namespace sprite {
 
 	void Sprite_system::_on_state_change(ecs::Entity& entity, state::State_data& data){
 
+		bool toRepeat = false;
 		renderer::Animation_type type;
 
 		/*DEBUG("Entity "
@@ -67,49 +68,63 @@ namespace sprite {
 		switch(data.s){
 			case state::Entity_state::idle:
 				type = renderer::Animation_type::idle;
+				toRepeat = true;
 				break;
 			case state::Entity_state::walking:
 				type = renderer::Animation_type::walking;
+				toRepeat = true;
 				break;
 			case state::Entity_state::attacking_melee:
 				type = renderer::Animation_type::attacking_melee;
+				toRepeat = true;
 				break;
 			case state::Entity_state::attacking_range:
 				type = renderer::Animation_type::attacking_range;
+				toRepeat = true;
 				break;
 			case state::Entity_state::change_weapon:
 				type = renderer::Animation_type::change_weapon;
+				toRepeat = false;
 				break;
 			case state::Entity_state::taking:
 				type = renderer::Animation_type::taking;
+				toRepeat = false;
 				break;
 			case state::Entity_state::interacting:
 				type = renderer::Animation_type::interacting;
+				toRepeat = false;
 				break;
 			case state::Entity_state::damaged:
 				type = renderer::Animation_type::damaged;
+				toRepeat = false;
 				break;
 			case state::Entity_state::healed:
 				type = renderer::Animation_type::healed;
+				toRepeat = false;
 				break;
 			case state::Entity_state::dead:
 				type = renderer::Animation_type::died;
+				toRepeat = false;
 				break;
 			case state::Entity_state::dying:
 				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
 				break;
 			case state::Entity_state::resurrected:
 				type = renderer::Animation_type::resurrected;
+				toRepeat = false;
 				break;
 			default:
 				type = renderer::Animation_type::idle;
+				toRepeat = false;
 				break;
 		}
 
 		// TODO: use me  data.min_time(1_s);
 
 		// applying new animation type
-		entity.get<Sprite_comp>().get_or_throw().animation_type(type);
+		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
+		sprite._repeat_animation = toRepeat;
+		sprite.animation_type(type);
 
 	}
 

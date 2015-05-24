@@ -105,17 +105,21 @@ namespace renderer{
 	}
 
 	float Animation::next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept{
-		int frames = _data->animations.find(type)->second.frames;
+		int max_frames = _data->animations.find(type)->second.frames;
 		int fps = _data->animations.find(type)->second.fps;
 		float ret = cur_frame;
+
 		// checking if cur_frame + change is in max_frames bounding for cur Animation
 		// if not but repeat is set -> set Animation back to 0 else keep last frame
-		if(cur_frame + fps * deltaTime < frames){
+
+		if(cur_frame + fps * deltaTime < max_frames){
 			ret = cur_frame + fps * deltaTime;
 		} else if(repeat){
 			ret = 0;
 		}
+
 		return ret;
+
 	}
 
 }

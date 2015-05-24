@@ -30,15 +30,24 @@ namespace sprite {
 	}
 
 	renderer::Sprite_batch::Sprite Sprite_comp::sprite() const noexcept{
-		return renderer::Sprite_batch::Sprite{{}, 0, 0, _animation->uv(_currentFrame, _animType), &*_animation->texture()};
+		return renderer::Sprite_batch::Sprite{{}, 0, 0, _animation->uv(_current_frame, _anim_type), &*_animation->texture()};
 	}
 
 	void Sprite_comp::animation_type(renderer::Animation_type type) noexcept {
+
+		renderer::Animation_type before = _anim_type;
+
 		if(animation()->animation_exists(type)){
-			_animType = type;
+			_anim_type = type;
 		} else {
-			_animType = renderer::Animation_type::idle;
+			_anim_type = renderer::Animation_type::idle;
 		}
+
+		// resetting currentFrame to 0 after animation has been changed to
+		// another one so if the old animation and had more frames than the
+		// new there will be no blank sprite till next reset in calculation
+		if(before != _anim_type)
+			_current_frame = 0;
 	}
 
 }
