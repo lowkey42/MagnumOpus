@@ -5,8 +5,8 @@
 		"attacking_melee": {"row":1, "fps":2, "frames":2},
 		"damaged": {"row":0, "fps":2, "frames":4},
 		"healed": {"row":0, "fps":2, "frames":4},
-		"died": {"row":0, "fps":2, "frames":4},
-		"resurrected": {"row":2, "fps":2, "frames":2}
+        "died": {"row":0, "fps":2, "frames":4},
+        "resurrected": {"row":2, "fps":2, "frames":2}
 	},
 	
 	"texName": "tex:zombie",

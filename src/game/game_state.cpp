@@ -39,10 +39,10 @@ namespace mo {
 	      transform(em, MaxEntitySize, level.width(), level.height(), level),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
+		  state(em),
 		  controller(em, transform),
 		  ai(em, engine, transform, level),
-		  combat(em, transform, physics),
-		  state(em),
+		  combat(em, transform, physics, state),
 		  spritesys(em, transform, engine.assets(), state),
 		  ray_renderer(engine.assets()) {
 

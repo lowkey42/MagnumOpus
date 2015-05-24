@@ -55,7 +55,7 @@ namespace util {
 				_usedElements=0;
 			}
 			void pop_back() {
-				std::memset(get(_usedElements-1), 0, BytesPerElement);
+				std::memset(get(_usedElements-1), 0xdead, BytesPerElement);
 				_usedElements--;
 			}
 			char* back() {
@@ -96,46 +96,26 @@ namespace util {
 			std::size_t _usedElements;
 	};
 
-	template<class POOL>
+	template<class Pool>
 	class pool_iterator {
 		public:
-			static constexpr auto BytesPerElement = POOL::BytesPerElement;
-			static constexpr auto LastOffset = (POOL::BytesPerElement-1)*POOL::ElementsPerChunk;
-			static constexpr auto ElementsPerChunk = POOL::ElementsPerChunk;
-
 			typedef std::bidirectional_iterator_tag  iterator_category;
 			typedef char*                            value_type;
 			typedef std::ptrdiff_t                   difference_type;
 			typedef std::vector<char*>::iterator     chunk_iterator;
 
+			pool_iterator(Pool& pool, std::size_t index) : _pool(pool), _index(index) {};
 
-			pool_iterator() : _left(0) {};
-			pool_iterator(POOL& pool, std::size_t index=0)
-			    : _chunk(pool._chunks.begin()+index/ElementsPerChunk),
-			      _offset((index % ElementsPerChunk) * BytesPerElement),
-			      _left(pool._usedElements-index) {};
-
-			value_type operator*() {return (*_chunk)+_offset;}
+			value_type operator*() {return _pool.get(_index);}
 
 			pool_iterator& operator++() {
-				_left--;
-				_offset+=BytesPerElement;
-				if(_offset>LastOffset) {
-					_offset=0;
-					_chunk++;
-				}
-
+				INVARIANT(_index<_pool.size(), "overflow in pool_iterator");
+				++_index;
 				return *this;
 			}
 			pool_iterator& operator--() {
-				_left++;
-				if(_offset<BytesPerElement) {
-					_offset=LastOffset;
-					_chunk++;
-
-				} else
-					_offset-=BytesPerElement;
-
+				INVARIANT(_index>0, "underflow in pool_iterator");
+				--_index;
 				return *this;
 			}
 
@@ -152,31 +132,30 @@ namespace util {
 			}
 
 			bool operator==(const pool_iterator& o) const {
-				return _left==o._left;
+				return _index==o._index;
 			}
 			bool operator!=(const pool_iterator& o) const {
-				return _left!=o._left;
+				return _index!=o._index;
 			}
 			bool operator<(const pool_iterator& o) const {
-				return _left>o._left;
+				return _index>o._index;
 			}
 
 		private:
-			chunk_iterator _chunk;
-			std::size_t _offset;
-			std::size_t _left;
+			Pool& _pool;
+			std::size_t _index;
 	};
 
 	template<std::size_t BytesPerElement, std::size_t ElementsPerChunk>
 	auto pool<BytesPerElement, ElementsPerChunk>::begin()noexcept
 			-> iterator {
-		return iterator(*this);
+		return iterator(*this, 0);
 	}
 
 	template<std::size_t BytesPerElement, std::size_t ElementsPerChunk>
 	auto pool<BytesPerElement, ElementsPerChunk>::end()noexcept
 			-> iterator {
-		return iterator(*this, _usedElements);
+		return iterator(*this, size());
 	}
 
 }

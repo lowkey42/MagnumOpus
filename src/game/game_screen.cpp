@@ -92,7 +92,7 @@ namespace mo {
 
 	void Game_screen::_on_state_change(ecs::Entity& e, sys::state::State_data& s) {
 		if(&e==_state->main_player.get()) {
-			if(s.s==sys::state::Entity_state::died) {
+			if(s.s==sys::state::Entity_state::dead) {
 				INFO("The segfault bites. You die!");
 				_state->delete_savegame();
 				_engine.enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));

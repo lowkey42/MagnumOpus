@@ -92,8 +92,11 @@ namespace sprite {
 			case state::Entity_state::healed:
 				type = renderer::Animation_type::healed;
 				break;
-			case state::Entity_state::died:
+			case state::Entity_state::dead:
 				type = renderer::Animation_type::died;
+				break;
+			case state::Entity_state::dying:
+				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
 				break;
 			case state::Entity_state::resurrected:
 				type = renderer::Animation_type::resurrected;

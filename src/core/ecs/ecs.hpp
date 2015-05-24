@@ -78,6 +78,9 @@ namespace ecs {
 			template<typename T>
 			void erase();
 
+			template<typename... T>
+			void erase_other();
+
 			template<typename T>
 			auto get_handle() -> util::lazy<util::maybe<T&>>;
 
@@ -116,6 +119,8 @@ namespace ecs {
 			auto serializer()noexcept -> Serializer& {return *_serializer;}
 
 		private:
+			friend class Entity;
+
 			std::vector<Entity_ptr> _entities;
 			std::vector<Entity_ptr> _delete_queue;
 			unsigned int _unoptimized_deletions;

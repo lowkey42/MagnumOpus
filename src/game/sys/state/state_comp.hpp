@@ -32,7 +32,8 @@ namespace state {
 		change_weapon,
 		damaged,
 		healed,
-		died,
+		dying,
+		dead,
 		resurrected
 	};
 	struct State_data {

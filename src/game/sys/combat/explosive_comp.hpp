@@ -40,6 +40,7 @@ namespace combat {
 			friend struct Persisted_state;
 		private:
 			friend class Combat_system;
+			friend class Reaper;
 
 			float _damage;
 			Distance _range;

@@ -48,7 +48,10 @@ namespace ecs {
 				Component_base& operator=(Component_base&& o)noexcept;
 
 				auto owner_ptr()const -> Entity_ptr;
-				auto owner()const noexcept -> Entity& {return *_owner;}
+				auto owner()const noexcept -> Entity& {
+					INVARIANT(_owner, "invalid component");
+					return *_owner;
+				}
 				bool valid()const noexcept {
 					return _owner!=nullptr;
 				}

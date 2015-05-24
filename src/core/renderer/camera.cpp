@@ -59,9 +59,10 @@ namespace renderer {
 		_dirty = true;
 	}
 	void Camera::recalc_vp()const noexcept {
+		auto z = _zoom*_world_scale;
 		auto scale = glm::scale(glm::mat4(1.0f),
-		                        glm::vec3(_zoom*_world_scale, _zoom*_world_scale, 1.f));
-		auto trans = glm::translate(glm::mat4(1.0f), glm::vec3(std::round(-_pos.x*_world_scale)/_world_scale, std::round(-_pos.y*_world_scale)/_world_scale, 0));
+								glm::vec3(z, z, 1.f));
+		auto trans = glm::translate(glm::mat4(1.0f), glm::vec3(std::round(-_pos.x*z)/z, std::round(-_pos.y*z)/z, 0));
 		_vp = _projection * scale * trans;
 		_dirty = false;
 	}

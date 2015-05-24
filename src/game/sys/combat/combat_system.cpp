@@ -4,10 +4,7 @@
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 
-#include <core/asset/asset_manager.hpp> // TODO[foe]: remove after sprite_comp integration
-#include "../controller/controllable_comp.hpp" // TODO[foe]: remove
 #include <core/asset/aid.hpp>
-#include "../sprite/sprite_comp.hpp"
 
 #include "friend_comp.hpp"
 #include "score_comp.hpp"
@@ -22,13 +19,15 @@ namespace combat {
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
 								 physics::Transform_system& ts,
-								 physics::Physics_system& physics_system)
+								 physics::Physics_system& physics_system,
+								 state::State_system& state_system)
 		: _em(entity_manager),
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
 		  _explosives(entity_manager.list<Explosive_comp>()),
 		  _ts(ts),
-		  _collision_slot(&Combat_system::_on_collision, this)
+		  _collision_slot(&Combat_system::_on_collision, this),
+		  _reaper(entity_manager, state_system)
 	{
 
 		_collision_slot.connect(physics_system.collisions);
@@ -72,31 +71,8 @@ namespace combat {
 
 			if(h._current_hp<=0) {
 				h.owner().get<State_comp>().process([](auto& s){
-					s.state(Entity_state::died);
+					s.state(Entity_state::dying);
 				});
-
-				h.owner().get<physics::Transform_comp>().process([&](const auto& transform){
-					h.owner().get<Score_comp>().process([&](auto& s){
-						s._collectable = true;
-						s._collected = true;
-						for(int i=0; i<s._value; ++i) {
-							auto coin = _em.emplace("blueprint:coin"_aid);
-							coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
-						}
-					});
-				});
-
-				auto explosive = h.owner().get<Explosive_comp>();
-				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage;});
-
-				if(!explode) {
-					_em.erase(h.owner_ptr());
-
-				} else {
-					explosive.process([&](auto& e){
-						this->_explode(e);
-					});
-				}
 			}
 		}
 	}
@@ -224,7 +200,7 @@ namespace combat {
 			m.a->owner().get<Score_comp>().process([&](auto& s){
 				if(s._collectable && !s._collected) {
 					m.b.comp->owner().get<Score_comp>().process([&](auto& os) {
-						if(!os._collectable) {
+						if(os._collector) {
 							os._value+=s._value;
 							s._collected = true;
 							_em.erase(s.owner_ptr());

@@ -5,8 +5,8 @@
 		"attacking_melee": {"row":1, "fps":4, "frames":2},
 		"damaged": {"row":0, "fps":1, "frames":1},
 		"healed": {"row":0, "fps":1, "frames":1},
-		"died": {"row":2, "fps":1, "frames":1},
-		"resurrected": {"row":0, "fps":1, "frames":1}		
+        "died": {"row":2, "fps":1, "frames":1},
+        "resurrected": {"row":0, "fps":1, "frames":1}
 	},
 	
 	"texName": "tex:crow",
