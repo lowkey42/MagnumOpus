@@ -64,6 +64,8 @@ namespace mo {
 			Game_ui _ui;
 
 			util::slot<ecs::Entity&, sys::state::State_data&> _player_sc_slot;
+			util::slot<sys::controller::Controller_added_event> _join_slot;
+			util::slot<sys::controller::Controller_removed_event> _unjoin_slot;
 
 			renderer::Shader_program _post_effects;
 			renderer::Object _post_effect_obj;

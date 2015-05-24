@@ -26,6 +26,8 @@ namespace mo {
 	    _state(std::make_unique<Game_state>(engine,profile,players,depth)),
 		_ui(engine),
 		_player_sc_slot(&Game_screen::_on_state_change, this),
+	    _join_slot(&Game_screen::_join, this),
+	    _unjoin_slot(&Game_screen::_unjoin, this),
 		_post_effect_obj(renderer::simple_vertex_layout,
 						 renderer::create_buffer(std::vector<renderer::Simple_vertex>{
 			{{0,0}, {0,1}},
@@ -38,6 +40,8 @@ namespace mo {
 		}))
 	{
 		_player_sc_slot.connect(_state->state.state_change_events);
+		_join_slot.connect(engine.controllers().join_events);
+		_unjoin_slot.connect(engine.controllers().unjoin_events);
 
 		_post_effects.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:simple"_aid))
 					 .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:simple"_aid))
@@ -102,6 +106,7 @@ namespace mo {
 
 	void Game_screen::_join(sys::controller::Controller_added_event e) {
 		// TODO
+		_state->add_player(e.controller, _state->main_player->get<sys::physics::Transform_comp>().get_or_throw().position());
 	}
 
 	void Game_screen::_unjoin(sys::controller::Controller_removed_event e) {
