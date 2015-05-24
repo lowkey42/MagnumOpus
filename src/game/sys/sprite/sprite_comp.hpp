@@ -53,7 +53,8 @@ namespace sprite {
 		friend class Sprite_system;
 		float _current_frame;
 		// Maybe Declaration would fit better somewhere else
-		bool _repeat_animation;
+		// Set to true --> Coins animation, it seems that there is no state change for coins
+		bool _repeat_animation = true;
 
 		asset::Ptr<renderer::Animation> _animation;
 		renderer::Animation_type _anim_type;
