@@ -53,15 +53,18 @@ namespace combat {
 			});
 
 			auto explosive = e.get<Explosive_comp>();
-			auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage;});
+			auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage && !e._exloded;});
 
 			if(!explode) {
-				// remove components:
-				e.erase_other<
-						Explosive_comp,
-						physics::Transform_comp,
-						sprite::Sprite_comp,
-						state::State_comp>();
+				if(e.get<State_comp>().get_or_throw().delete_dead())
+					_em.erase(e.shared_from_this());
+
+				else // remove components:
+					e.erase_other<
+							Explosive_comp,
+							physics::Transform_comp,
+							sprite::Sprite_comp,
+							state::State_comp>();
 
 			} else {
 				explosive.process([&](auto& e){

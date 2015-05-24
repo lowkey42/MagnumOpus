@@ -10,9 +10,13 @@
         "damage": 5,
         "range": 2,
         "delay":0,
-        "on_contact": true
+        "on_contact": true,
+        "blast_force": 100
     },
     "Friend",
+    "State": {
+        "delete_dead":true
+    },
     "Sprite": {
         "aid": "anim:fireball"
     }

@@ -51,6 +51,8 @@ namespace combat {
 			Time _delay_left = Time(0);
 			bool _exloded = false;
 
+			Force _blast_force = Force(0);
+
 			// TODO{foe]: add other effects
 	};
 

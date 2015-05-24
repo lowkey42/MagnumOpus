@@ -46,9 +46,9 @@ namespace combat {
 		private:
 			friend class Combat_system;
 
-			Weapon_type _type        = Weapon_type::melee;
-			asset::AID  _bullet_type = asset::AID{};
-			Speed       _bullet_vel  = Speed{0};
+			Weapon_type _type          = Weapon_type::melee;
+			asset::AID  _bullet_type   = asset::AID{};
+			Speed       _bullet_vel    = Speed{0};
 
 			Time        _cooldown      = Time(1);
 			Time        _cooldown_left = Time(0);
@@ -57,6 +57,11 @@ namespace combat {
 			float       _melee_damage  = 5;
 			Distance    _melee_range   = Distance{1};
 			Angle       _melee_angle   = Angle{3};
+
+			Time        _attack_delay      = Time(0);
+			Time        _attack_delay_left = Time(0);
+
+			Force       _recoil = Force(0);
 	};
 
 }

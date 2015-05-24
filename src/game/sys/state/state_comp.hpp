@@ -53,6 +53,8 @@ namespace state {
 	class State_comp : public ecs::Component<State_comp> {
 		public:
 			static constexpr const char* name() {return "State";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
 			State_comp(ecs::Entity& owner, Entity_state s = Entity_state::idle) noexcept
 				: Component(owner) {
@@ -64,8 +66,12 @@ namespace state {
 
 			auto update(Time dt)noexcept -> util::maybe<State_data&>;
 
-		private:
+			auto delete_dead()const noexcept {return _delete_dead;}
 
+			struct Persisted_state;
+			friend struct Persisted_state;
+		private:
+			bool _delete_dead = false;
 			State_data _state_primary;
 			State_data _state_last;
 			State_data _state_background;

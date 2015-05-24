@@ -1,11 +1,31 @@
 #include "state_comp.hpp"
 
+#include <core/ecs/serializer_impl.hpp>
 
 namespace mo {
 namespace sys {
 namespace state {
 
 	using namespace unit_literals;
+
+	struct State_comp::Persisted_state {
+		bool delete_dead;
+
+		Persisted_state(const State_comp& c)
+			: delete_dead(c._delete_dead) {}
+	};
+
+	sf2_structDef(State_comp::Persisted_state,
+		sf2_member(delete_dead)
+	)
+
+	void State_comp::load(ecs::Entity_state& state) {
+		auto s = state.read_to(Persisted_state{*this});
+		_delete_dead = s.delete_dead;
+	}
+	void State_comp::store(ecs::Entity_state& state) {
+		state.write_from(Persisted_state{*this});
+	}
 
 	namespace {
 		Time required_time_for(Entity_state state)noexcept {
