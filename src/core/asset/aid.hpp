@@ -74,7 +74,7 @@ namespace std {
 		size_t operator()(const mo::asset::AID& aid)const noexcept {
 			auto classPart = static_cast<uint8_t>(aid.type());
 			hash<string> hs;
-			return classPart + hs(aid.name())*71;
+			return classPart*size_t{71} + hs(aid.name());
 		}
 	};
 }

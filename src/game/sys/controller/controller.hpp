@@ -37,6 +37,7 @@ namespace controller {
 	};
 
 	struct Controller {
+		virtual ~Controller()noexcept = default;
 		virtual void operator()(Controllable_interface&) = 0;
 		virtual void feedback(float force) {}
 	};

@@ -41,7 +41,7 @@ namespace mo {
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  state(em),
 		  controller(em, transform),
-		  ai(em, engine, transform, level),
+		  ai(em, transform, level),
 		  combat(em, transform, physics, state),
 		  spritesys(em, transform, engine.assets(), state),
 		  ray_renderer(engine.assets()) {
