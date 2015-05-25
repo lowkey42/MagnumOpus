@@ -258,7 +258,7 @@ namespace controller {
 		std::vector<Pad_stick> aim_sticks;
 		std::vector<Pad_stick> move_sticks;
 		float stick_dead_zone;
-		int stick_max_value = 32767;
+		float stick_max_value = 32767;
 	};
 	using Mapping_ptr = std::shared_ptr<const Mapping>;
 
