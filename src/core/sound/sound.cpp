@@ -10,4 +10,16 @@ namespace sound {
 
 
 }
+
+namespace asset{
+
+	std::shared_ptr<sound::Sound> Loader<sound::Sound>::load(istream in) throw(Loading_failed){
+
+		auto s = std::make_shared<sound::Sound>();
+		// Right implementation here
+
+
+	}
+
+}
 }

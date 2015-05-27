@@ -31,7 +31,7 @@ namespace sound {
 		explicit Sound_loading_failed(const std::string& msg)noexcept : Loading_failed(msg){}
 	};
 
-	class Sound{
+	class Sound {
 
 		public:
 			explicit Sound(const std::string& path) throw(Sound_loading_failed);
@@ -47,9 +47,10 @@ namespace sound {
 			// Methods
 
 		protected:
-			Sound();
+			Mix_Chunk* _ptr;
+			std::string path;
 
-			Time length = Time(0);
+			Time _length = Time(0);
 			float _volume = 100.f;
 			float _modulation = 1.0f;
 			float _pitch = 1.0f;
@@ -64,14 +65,10 @@ namespace asset {
 	struct Loader<sound::Sound> {
 		using RT = std::shared_ptr<sound::Sound>;
 
-		static RT load(istream in) throw(Loading_failed){
-			return std::make_shared<sound::Sound>(in.bytes());
-		}
+		static RT load(istream in) throw(Loading_failed);
 
-		static void store(ostream out, const sound::Sound& asset) throw(Loading_failed) {
-			// TODO
-			FAIL("NOT IMPLEMENTED, YET!");
-		}
+		static void store(ostream out, const sound::Sound& asset) throw(Loading_failed);
+
 	};
 }
 }
