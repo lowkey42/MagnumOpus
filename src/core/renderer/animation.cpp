@@ -10,6 +10,7 @@ namespace renderer{
 		int row;
 		float fps;
 		int frames;
+		float modulation = 1.0f;
 	};
 
 	struct Animation_data{
@@ -42,7 +43,8 @@ namespace renderer{
 	sf2_structDef(Animation_frame_data,
 		sf2_member(row),
 		sf2_member(fps),
-		sf2_member(frames)
+		sf2_member(frames),
+		sf2_member(modulation)
 	)
 
 	sf2_structDef(Animation,
@@ -65,6 +67,10 @@ namespace renderer{
 	Animation& Animation::operator=(Animation&& rhs) noexcept {
 		_data = std::move(rhs._data);
 		return *this;
+	}
+
+	void Animation::modulation(Animation_type type, float mod) const noexcept {
+		_data->animations.find(type)->second.modulation = mod;
 	}
 
 	bool Animation::animation_exists(Animation_type type) const noexcept {
@@ -106,7 +112,7 @@ namespace renderer{
 
 	float Animation::next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept{
 		int max_frames = _data->animations.find(type)->second.frames;
-		int fps = _data->animations.find(type)->second.fps;
+		int fps = _data->animations.find(type)->second.fps * _data->animations.find(type)->second.modulation;
 		float ret = cur_frame;
 
 		// checking if cur_frame + change is in max_frames bounding for cur Animation

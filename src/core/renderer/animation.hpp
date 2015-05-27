@@ -68,6 +68,8 @@ namespace renderer {
 		std::unique_ptr<Animation_data> _data;
 
 		// Methods
+		void modulation(Animation_type type, float mod) const noexcept;
+
 		auto animation_exists(Animation_type type) const noexcept -> bool;
 		auto frame_width() const noexcept -> int;
 		auto frame_height() const noexcept -> int;

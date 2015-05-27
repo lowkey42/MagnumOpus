@@ -76,7 +76,7 @@ namespace sprite {
 				break;
 			case state::Entity_state::attacking_melee:
 				type = renderer::Animation_type::attacking_melee;
-				toRepeat = true;
+				toRepeat = false;
 				break;
 			case state::Entity_state::attacking_range:
 				type = renderer::Animation_type::attacking_range;
@@ -108,6 +108,7 @@ namespace sprite {
 				break;
 			case state::Entity_state::dying:
 				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
+				toRepeat = false;
 				break;
 			case state::Entity_state::resurrected:
 				type = renderer::Animation_type::resurrected;
@@ -125,6 +126,7 @@ namespace sprite {
 		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
 		sprite._repeat_animation = toRepeat;
 		sprite.animation_type(type);
+		sprite.animation()->modulation(type, 1/data.magnitude);
 
 	}
 
