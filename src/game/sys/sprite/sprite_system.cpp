@@ -59,11 +59,6 @@ namespace sprite {
 		bool toRepeat = false;
 		renderer::Animation_type type;
 
-		/*DEBUG("Entity "
-			  << entity.get<Sprite_comp>().get_or_throw()._animation->texture().aid().name()
-			  << " -> animation: " << static_cast<int>(data.s)
-			  << std::endl);*/
-
 		// Map Entity-State to Animation-Type
 		switch(data.s){
 			case state::Entity_state::idle:
@@ -126,7 +121,7 @@ namespace sprite {
 		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
 		sprite._repeat_animation = toRepeat;
 		sprite.animation_type(type);
-		sprite.animation()->modulation(type, 1/data.magnitude);
+		sprite.animation()->modulation(type, data.magnitude);
 
 	}
 

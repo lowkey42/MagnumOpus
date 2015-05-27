@@ -1,6 +1,9 @@
 
 #include "game_screen.hpp"
 
+#include <SDL2/SDL.h>
+#include <SDL2/SDL_mixer.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -53,6 +56,12 @@ namespace mo {
 	}
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
+
+		Mix_Music* music = NULL;
+		music = Mix_LoadMUS("vonstantineogg.ogg");
+		Mix_PlayMusic(music, -1);
+		Mix_VolumeMusic(50);
+
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
 			return main_camera.screen_to_world(p);

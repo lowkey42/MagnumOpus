@@ -1,5 +1,5 @@
 /**************************************************************************\
- *	sprite_system.hpp	-   Sprite Component Management System            *
+ *	sound_comp.hpp	- Component class for Sounds                          *
  *                                                ___                     *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,37 +15,29 @@
 
 #pragma once
 
-#include "../../sys/physics/transform_system.hpp"
-#include <core/renderer/sprite_batch.hpp>
-#include <core/renderer/camera.hpp>
+#include <core/ecs/ecs.hpp>
+#include <SDL.h>
 
-#include "sprite_comp.hpp"
-#include "../state/state_system.hpp"
+namespace mo {
+namespace sys {
+namespace sound {
 
-namespace mo{
-namespace sys{
-namespace sprite{
+	class Sound_comp : public ecs::Component<Sound_comp> {
 
-	class Sprite_system{
+	public:
 
-		public:
+		static constexpr const char* name() {return "Sprite";}
+		void load(ecs::Entity_state&)override;
+		void store(ecs::Entity_state&)override;
 
-			// Constructors
-			Sprite_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
-						  asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept;
+		Sound_comp(ecs::Entity& owner) : Component(owner){}
 
-			// Methods
-			void draw(const renderer::Camera& camera) noexcept;
-			void update(Time dt) noexcept;
+		struct Persisted_state;
+		friend struct Persisted_state;
 
-		private:
+	private:
+		friend class Sound_system;
 
-			void _on_state_change(ecs::Entity& e, state::State_data& data);
-
-			physics::Transform_system& _transform;
-			renderer::Sprite_batch _sprite_batch;
-			Sprite_comp::Pool& _sprites;
-			util::slot<ecs::Entity&, state::State_data&> _state_change_slot;
 	};
 
 }

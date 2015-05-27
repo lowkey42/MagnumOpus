@@ -46,10 +46,11 @@ else()
 	add_definitions(${OpenGL_DEFINITIONS})
 	find_package(SDL2 REQUIRED)
 	include_directories(${SDL2_INCLUDE_DIR})
+	find_package(SDL2_MIXER REQUIRED)
 	
 	
 	if(WIN32)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -limagehlp -lsdl2main -lglew32") # why???
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -limagehlp -lsdl2main -lsdl2_mixer -lglew32") # why???
 		add_definitions(-DWIN)
 
 	else()

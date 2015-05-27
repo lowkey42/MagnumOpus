@@ -42,10 +42,11 @@ else()
 	add_definitions(${OpenGL_DEFINITIONS})
 	find_package(SDL2 REQUIRED)
 	include_directories(${SDL2_INCLUDE_DIR})
+	find_package(SDL2_MIXER REQUIRED)
 	
 	
 	if(WIN32)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -lsdl2main -lglew32") # why???
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -lsdl2main -lsdl2_mixer -lglew32") # why???
 		set(WIN_LIBS "-limagehlp")
 		add_definitions(-DWIN)
 
@@ -65,5 +66,5 @@ file(GLOB_RECURSE CORE_SRCS
 
 ADD_LIBRARY(core STATIC ${CORE_SRCS} ecs/serializer_impl.hpp)
 SET_TARGET_PROPERTIES(core PROPERTIES OUTPUT_NAME "core")
-target_link_libraries(core ${WIN_LIBS} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ZLIB_LIBRARY} physfs-static soil)
+target_link_libraries(core ${WIN_LIBS} ${SDL2_LIBRARY} ${SDLMIXER_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ZLIB_LIBRARY} physfs-static soil)
 
