@@ -1,5 +1,5 @@
 /**************************************************************************\
- * stores the current health of an entity (+shield, ...)                  *
+ * Draws the per-player ingame ui                                         *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -16,42 +16,39 @@
 #pragma once
 
 #include <core/ecs/ecs.hpp>
-#include <core/units.hpp>
+#include <core/utils/events.hpp>
+
+#include <core/renderer/graphics_ctx.hpp>
+#include <core/renderer/shader.hpp>
+#include <core/renderer/text.hpp>
+#include <core/renderer/camera.hpp>
+
+#include "ui_comp.hpp"
 
 namespace mo {
 namespace sys {
-namespace combat {
+namespace ui {
 
-	class Health_comp : public ecs::Component<Health_comp> {
+	class Ui_system {
 		public:
-			static constexpr const char* name() {return "Health";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			Ui_system(Engine& e, ecs::Entity_manager& em);
 
-			Health_comp(ecs::Entity& owner) noexcept
-				: Component(owner) {}
+			void update(Time dt);
+			void draw();
 
-			void heal(float hp)noexcept {_heal+=hp;}
-			void damage(float hp)noexcept{_damage+=hp;}
-
-			auto hp()const noexcept {return _current_hp;}
-			auto max_hp()const noexcept {return _max_hp;}
-			auto hp_percent()const noexcept {return _current_hp/_max_hp;}
-
-			auto damaged()const noexcept {return _current_hp<_max_hp;}
-
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
-			friend class Combat_system;
+			Ui_comp::Pool& _ui_comps;
 
-			float _auto_heal_max=0;
-			float _auto_heal=0;
+			renderer::Camera _cam;
+			renderer::Shader_program _hud_shader;
+			renderer::Object _hud;
+			renderer::Texture_ptr _hud_bg_tex;
+			renderer::Texture_ptr _hud_fg_tex;
+			renderer::Texture_ptr _hud_health_tex;
 
-			float _max_hp = 0;
-			float _current_hp = 0;
-
-			float _damage=0, _heal=0;
+			renderer::Shader_program _score_shader;
+			renderer::Font_ptr    _score_font;
+			renderer::Text_dynamic _score_text;
 	};
 
 }

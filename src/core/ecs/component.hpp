@@ -38,7 +38,7 @@ namespace ecs {
 
 
 	namespace details {
-		constexpr Component_type max_comp_type = 16;
+		constexpr Component_type max_comp_type = 24;
 
 		class Component_base : public util::no_copy {
 			public:

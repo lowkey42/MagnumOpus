@@ -1,6 +1,5 @@
 tex: = textures/
 tex:test = textures/test.tga
-tex:x_font = textures/x.template_regular_48.tga
 tex:tilemap = textures/tilemap_base_modded.png
 tex:player = textures/player_tmp.png
 tex:enemy_moving = textures/scorpion_move.png
@@ -13,3 +12,10 @@ tex:crow = textures/crow.png
 tex:soldier = textures/soldier.png
 tex:fireball = textures/fireball.png
 tex:vomitball = textures/vomitball.png
+
+tex:x_font = textures/x.template_regular_48.tga
+tex:nixie_font = textures/nixie_font.png
+
+tex:ui_hud_bg = textures/ui_stats_bg.png
+tex:ui_hud_fg = textures/ui_stats_fg.png
+tex:ui_hud_health = textures/ui_stats_health.png

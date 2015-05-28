@@ -20,7 +20,6 @@
 #include "../core/units.hpp"
 #include "../core/ecs/ecs.hpp"
 #include "../core/ecs/serializer.hpp"
-#include <core/renderer/primitives.hpp>
 
 #include "level/level.hpp"
 #include "level/tilemap.hpp"
@@ -33,7 +32,7 @@
 #include "sys/ai/ai_system.hpp"
 #include "sys/combat/combat_system.hpp"
 #include "sys/state/state_system.hpp"
-
+#include "sys/ui/ui_system.hpp"
 
 namespace mo {
 	namespace renderer{ class Camera; }
@@ -62,11 +61,11 @@ namespace mo {
 		sys::ai::Ai_system ai;
 		sys::combat::Combat_system combat;
 		sys::sprite::Sprite_system spritesys;
+		sys::ui::Ui_system ui;
 
 		ecs::Entity_ptr main_player;
 		std::vector<ecs::Entity_ptr> sec_players;
 
-		renderer::Ray_renderer ray_renderer;
 
 		Game_state(Game_engine& engine,
 		           std::string profile,
@@ -75,6 +74,7 @@ namespace mo {
 
 		void update(Time dt);
 		auto draw() -> util::cvector_range<sys::cam::VScreen>;
+		void draw_ui();
 
 		auto add_player(sys::controller::Controller& controller, Position pos,
 		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;
