@@ -36,12 +36,6 @@ Sdl_wrapper::Sdl_wrapper() {
 	INVARIANT(SDL_Init(0)==0, "Could not initialize SDL: "<<get_sdl_error());
 
 	init_sub_system(SDL_INIT_AUDIO, "SDL_Audio");
-		// Initialize Audio with 44100 Hz, 2 Channels and 2048 Byte Buffer
-		if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) != 0){
-			WARN("OpenAudio couldnt be executed");
-			WARN(Mix_GetError());
-		}
-
 	init_sub_system(SDL_INIT_VIDEO, "SDL_Video");
 	init_sub_system(SDL_INIT_JOYSTICK, "SDL_Joystick");
 	init_sub_system(SDL_INIT_HAPTIC, "SDL_Haptic", false);
