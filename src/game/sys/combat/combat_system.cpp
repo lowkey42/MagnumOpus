@@ -26,6 +26,7 @@ namespace combat {
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
 		  _explosives(entity_manager.list<Explosive_comp>()),
+	      _lsights(entity_manager.list<Laser_sight_comp>()),
 		  _ts(ts),
 		  _collision_slot(&Combat_system::_on_collision, this),
 		  _reaper(entity_manager, state_system),
@@ -50,9 +51,8 @@ namespace combat {
 	void Combat_system::draw(const renderer::Camera& cam) {
 		_ray_renderer.set_vp(cam.vp());
 
-		for(auto& w : _weapons) {
-			if(w._draw_ray)
-				_draw_ray(w);
+		for(auto& l : _lsights) {
+			_draw_ray(l);
 		}
 	}
 
@@ -224,8 +224,8 @@ namespace combat {
 		});
 	}
 
-	void Combat_system::_draw_ray(Weapon_comp& w) {
-		w.owner().get<sys::physics::Transform_comp>().process(
+	void Combat_system::_draw_ray(Laser_sight_comp& l) {
+		l.owner().get<sys::physics::Transform_comp>().process(
 			[&](sys::physics::Transform_comp& t) {
 				Distance dist = 20_m;
 				util::maybe<ecs::Entity&> entity = util::nothing();
@@ -235,7 +235,7 @@ namespace combat {
 														 t.rotation(),
 														 20_m,
 														 [&](ecs::Entity& e){
-					return &w.owner()!=&e && e.get<sys::physics::Transform_comp>().get_or_throw().layer()>=0.5;
+					return &l.owner()!=&e && e.get<sys::physics::Transform_comp>().get_or_throw().layer()>=0.5;
 				});
 
 				auto p = remove_units(t.position());
@@ -244,7 +244,7 @@ namespace combat {
 					dist = std::max(dist,Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position()))));
 				});
 
-				_ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), 0.04);
+				_ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), l.color(), l.width());
 		});
 	}
 

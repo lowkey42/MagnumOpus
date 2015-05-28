@@ -50,7 +50,7 @@ namespace ui {
 	}
 
 	void Ui_system::update(Time dt) {
-		// TODO
+		// TODO: animations ?
 	}
 
 	void Ui_system::draw() {
@@ -62,6 +62,16 @@ namespace ui {
 
 		auto w = _hud_bg_tex->width();
 		auto h = _hud_bg_tex->height();
+
+		auto calc_offset = [&](int idx) {
+			switch(idx) {
+				case 0:   return glm::vec3(-screen_w/2+10, screen_h/2-h-10, 0);
+				case 1:   return glm::vec3(+screen_w/2-10, -screen_h/2+10, 0);
+				case 2:   return glm::vec3(-screen_w/2+10,   -screen_h/2+10, 0);
+				case 3:   return glm::vec3(+screen_w/2-10, +screen_h/2-h-10, 0);
+				default:  return glm::vec3(0,0,-1000); //< hide
+			}
+		};
 
 		_hud_bg_tex->bind(0);
 		_hud_fg_tex->bind(1);
@@ -76,8 +86,14 @@ namespace ui {
 		_hud_fg_tex->bind(1);
 		_hud_health_tex->bind(2);
 
+		int idx = 0;
 		for(auto& hud : _ui_comps) {
-			auto model = glm::scale(glm::translate(glm::mat4{}, glm::vec3(-screen_w/2+10, screen_h/2-h-10, 0)), glm::vec3(w,h,1));
+			auto offset = calc_offset(idx++);
+
+			auto model = glm::scale(glm::translate(glm::mat4{}, offset), glm::vec3(w,h,1));
+
+			if(offset.x>0)
+				model = glm::scale(model, glm::vec3(-1,1,1));
 
 			_hud_shader.set_uniform("mvp", _cam.vp()*model)
 			           .set_uniform("health",
@@ -101,15 +117,23 @@ namespace ui {
 		             .set_uniform("layer",   1.0f)
 		             .set_uniform("color",   glm::vec4(2,2,2,1));
 
+		idx = 0;
 		for(auto& hud : _ui_comps) {
+			auto offset = calc_offset(idx++);
+
 			hud.owner().get<sys::combat::Score_comp>().process([&](const auto& s){
 				std::stringstream str;
 				str<<std::setfill(' ')<<std::setw(4)<<s.value();
 
 				_score_text.set(str.str());
 
+				if(offset.x>0)
+					offset+=glm::vec3(-250-180, 64+27, 0);
+				else
+					offset+=glm::vec3(+250, 64+27, 0);
 
-				auto model = glm::translate(glm::mat4{}, glm::vec3(-screen_w/2+10  +250, screen_h/2-h-10 +64+27, 0));
+				auto model = glm::translate(glm::mat4{}, offset);
+
 				_score_shader.set_uniform("model",model);
 				_score_text.draw();
 			});
