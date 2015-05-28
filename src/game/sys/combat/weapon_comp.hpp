@@ -49,6 +49,7 @@ namespace combat {
 			Weapon_type _type          = Weapon_type::melee;
 			asset::AID  _bullet_type   = asset::AID{};
 			Speed       _bullet_vel    = Speed{0};
+			bool        _draw_ray      = false;
 
 			Time        _cooldown      = Time(1);
 			Time        _cooldown_left = Time(0);

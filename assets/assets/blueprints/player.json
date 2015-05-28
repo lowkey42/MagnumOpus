@@ -37,5 +37,6 @@
     "Score":{
         "collector": true
     },
-    "Collector"
+    "Collector",
+    "ui"
 }

@@ -12,3 +12,6 @@ frag_shader:sprite_batch = shader/sprite.frag
 
 vert_shader:ray = shader/ray.vert
 frag_shader:ray = shader/ray.frag
+
+vert_shader:hud = shader/hud.vert
+frag_shader:hud = shader/hud.frag
