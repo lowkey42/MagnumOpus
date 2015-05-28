@@ -28,6 +28,25 @@ namespace combat {
 		melee
 	};
 
+	class Laser_sight_comp : public ecs::Component<Laser_sight_comp> {
+		public:
+			static constexpr const char* name() {return "Laser_sight";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
+
+			Laser_sight_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
+
+			auto color()const noexcept {return _color;}
+			auto width()const noexcept {return _width;}
+
+			struct Persisted_state;
+			friend struct Persisted_state;
+		private:
+			glm::vec4 _color {1,0,0,0.2};
+			float _width = 0.04;
+	};
+
 	class Weapon_comp : public ecs::Component<Weapon_comp> {
 		public:
 			static constexpr const char* name() {return "Weapon";}
@@ -49,7 +68,6 @@ namespace combat {
 			Weapon_type _type          = Weapon_type::melee;
 			asset::AID  _bullet_type   = asset::AID{};
 			Speed       _bullet_vel    = Speed{0};
-			bool        _draw_ray      = false;
 
 			Time        _cooldown      = Time(1);
 			Time        _cooldown_left = Time(0);

@@ -53,7 +53,7 @@ namespace combat {
 			void _explode_explosives(Time dt);
 			void _deal_damage(ecs::Entity& target, int group, float damage);
 			void _explode(Explosive_comp& e);
-			void _draw_ray(Weapon_comp& w);
+			void _draw_ray(Laser_sight_comp& l);
 
 			void _on_collision(physics::Manifold& m);
 
@@ -61,6 +61,7 @@ namespace combat {
 			Weapon_comp::Pool& _weapons;
 			Health_comp::Pool& _healths;
 			Explosive_comp::Pool& _explosives;
+			Laser_sight_comp::Pool& _lsights;
 			physics::Transform_system& _ts;
 			util::slot<physics::Manifold&> _collision_slot;
 			Reaper _reaper;
