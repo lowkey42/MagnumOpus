@@ -91,17 +91,25 @@ namespace util {
 	inline std::pair<std::string, std::string> split(const std::string& line, const std::string& delim) {
 		auto delIter = line.find(delim);
 
-		return std::make_pair(
-					trim_copy(line.substr(0, delIter)),
-					trim_copy(line.substr(delIter+1)));
+		if(delIter!=std::string::npos)
+			return std::make_pair(
+						trim_copy(line.substr(0, delIter)),
+						trim_copy(line.substr(delIter+1)));
+
+		else
+			return std::make_pair(trim_copy(line), trim_copy(""));
 	}
 
 	inline std::pair<std::string, std::string> split_on_last(const std::string& line, const std::string& delim) {
 		auto delIter = line.find_last_of(delim);
 
-		return std::make_pair(
-					trim_copy(line.substr(0, delIter)),
-					trim_copy(line.substr(delIter+1)));
+		if(delIter!=std::string::npos)
+			return std::make_pair(
+						trim_copy(line.substr(0, delIter)),
+						trim_copy(line.substr(delIter+1)));
+
+		else
+			return std::make_pair(trim_copy(line), trim_copy(""));
 	}
 
 	inline void to_lower_inplace(std::string& str) {

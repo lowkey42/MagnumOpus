@@ -15,9 +15,9 @@ namespace ai {
 
 	using namespace unit_literals;
 
-	Ai_system::Ai_system(ecs::Entity_manager& entity_manager, Game_engine& engine,
+	Ai_system::Ai_system(ecs::Entity_manager& entity_manager,
 	                     physics::Transform_system& transform_system, level::Level& level)
-	    : _engine(engine), _simples(entity_manager.list<Simple_ai_comp>()),
+	    : _simples(entity_manager.list<Simple_ai_comp>()),
 	      _transform_system(transform_system), _level(level) {
 
 		entity_manager.register_component_type<Simple_ai_comp>();
@@ -25,7 +25,6 @@ namespace ai {
 	}
 
 	void Ai_system::update(Time dt) {
-		_engine.assets();
 		for(auto& e : _simples) {
 			e.owner().get<physics::Transform_comp>().process([&](auto& trans){
 				ecs::Entity* target_entity = nullptr;

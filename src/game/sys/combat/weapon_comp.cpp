@@ -8,6 +8,37 @@ namespace combat {
 
 	using namespace unit_literals;
 
+
+	struct Laser_sight_comp::Persisted_state {
+		uint8_t r,g,b, occlusion;
+		float width;
+
+		Persisted_state(const Laser_sight_comp& o)
+		    : r(o._color.r*255), g(o._color.g*255),
+		      b(o._color.b*255), occlusion(o._color.a*255),
+		      width(o._width){
+		}
+	};
+	sf2_structDef(Laser_sight_comp::Persisted_state,
+		sf2_member(r),
+		sf2_member(g),
+		sf2_member(b),
+		sf2_member(occlusion),
+		sf2_member(width)
+	)
+
+	void Laser_sight_comp::load(ecs::Entity_state& state) {
+		auto s = state.read_to(Persisted_state{*this});
+
+		_color = {s.r/255.f, s.g/255.f, s.b/255.f, s.occlusion/255.f};
+		_width = s.width;
+	}
+	void Laser_sight_comp::store(ecs::Entity_state& state) {
+		state.write_from(Persisted_state{*this});
+	}
+
+
+
 	struct Weapon_comp::Persisted_state {
 		Weapon_type type;
 		std::string bullet_type;

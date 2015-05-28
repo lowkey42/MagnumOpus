@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Ingame-UI renderer                                                     *
+ * marks entities with ingame ui                                          *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,28 +15,28 @@
 
 #pragma once
 
-#include <memory>
+#include <core/ecs/ecs.hpp>
+#include <core/units.hpp>
 
 namespace mo {
-	class Game_engine;
-	namespace renderer {
-		class Camera;
-	}
-	namespace ecs {
-		class Entity;
-	}
+namespace sys {
+namespace ui {
 
-	class Game_ui {
+	class Ui_comp : public ecs::Component<Ui_comp> {
 		public:
-			Game_ui(Game_engine& engine);
-			~Game_ui()noexcept;
+			static constexpr const char* name() {return "ui";}
+			//void load(ecs::Entity_state&)override;
+			//void store(ecs::Entity_state&)override;
 
-			void pre_draw();
-			void draw(const renderer::Camera& cam, ecs::Entity& entity, int offset=1);
+			Ui_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {
+			}
 
+			// struct Persisted_state;
+			// friend struct Persisted_state;
 		private:
-			struct PImpl;
-			std::unique_ptr<PImpl> _impl;
 	};
 
+}
+}
 }

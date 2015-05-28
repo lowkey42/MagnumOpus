@@ -39,14 +39,15 @@ namespace renderer {
 		_prog.bind().set_uniform("vp", vp);
 	}
 
-	void Ray_renderer::draw(glm::vec3 p, Angle a, float length, float width) {
+	void Ray_renderer::draw(glm::vec3 p, Angle a, float length, glm::vec4 color, float width) {
 		auto scale = glm::scale(glm::translate(glm::mat4(), glm::vec3(0,-width/2.f,0)),
 								glm::vec3(length, width, 1));
 		auto rot = glm::rotate(a.value(), glm::vec3(0,0,1));
 		auto trans = glm::translate(glm::mat4(), p);
 
 		_prog.bind()
-				.set_uniform("model", trans*rot*scale);
+				.set_uniform("model", trans*rot*scale)
+		        .set_uniform("color", color);
 		_obj.draw();
 	}
 

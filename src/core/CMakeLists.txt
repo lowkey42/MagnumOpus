@@ -15,14 +15,19 @@ if(EMSCRIPTEN)
 	set(SDL2_LIBRARY "")
 	
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
-
 	if(NOT CMAKE_BUILD_TYPE)
 		set(CMAKE_BUILD_TYPE "Debug")
 	endif()
-	if(CMAKE_BUILD_TYPE MATCHES DEBUG)
-		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=integer -fsanitize=undefined")
+
+	option(SAN "Build with sanitizers" OFF)
+
+	if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
+		MESSAGE("Debug build")
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND SAN)
+			MESSAGE("Building with sanitizers")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=integer ")
 
 		elseif(WIN32)
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
@@ -30,7 +35,11 @@ else()
 		endif()
 
 	else()
-		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -gline-tables-only")
+		else()
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -g")
+		endif()
 	endif()
 
 	add_definitions(-DSTACKTRACE)

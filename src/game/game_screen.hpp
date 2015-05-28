@@ -24,8 +24,6 @@
 
 #include "../core/units.hpp"
 
-#include "game_ui.hpp"
-
 namespace mo {
 	namespace renderer{ class Camera; }
 
@@ -61,7 +59,6 @@ namespace mo {
 			Game_engine& _engine;
 
 			std::unique_ptr<Game_state> _state;
-			Game_ui _ui;
 
 			util::slot<ecs::Entity&, sys::state::State_data&> _player_sc_slot;
 			util::slot<sys::controller::Controller_added_event> _join_slot;

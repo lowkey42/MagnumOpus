@@ -20,6 +20,7 @@
 #include <algorithm>
 #include <cassert>
 #include <iostream>
+#include "log.hpp"
 
 namespace mo {
 namespace util {
@@ -142,8 +143,8 @@ namespace util {
 		path path(targetField.path_length-1ul);
 
 		const node* f = &targetField;
-		for(auto i=path.size()-1; f->prev_index>=0; i--, f=&_closed_list[f->prev_index] ) {
-			assert(i>=0);
+		for(int32_t i=path.size()-1; f->prev_index>=0; i--, f=&_closed_list[f->prev_index] ) {
+			INVARIANT(i>=0, "underflow");
 
 			path[i] = f->pos;
 		}
