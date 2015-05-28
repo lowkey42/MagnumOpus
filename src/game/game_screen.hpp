@@ -24,8 +24,6 @@
 
 #include "../core/units.hpp"
 
-#include "game_ui.hpp"
-
 namespace mo {
 	namespace renderer{ class Camera; }
 
