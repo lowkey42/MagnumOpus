@@ -45,5 +45,12 @@
         "collector": true
     },
     "Collector",
-    "ui"
+    "ui",
+    "Explosive": {
+        "damage": 10,
+        "range": 4,
+        "delay":0.3,
+        "on_damage": true,
+        "blast_force": 100
+    }
 }
