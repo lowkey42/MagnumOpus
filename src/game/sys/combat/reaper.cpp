@@ -44,7 +44,7 @@ namespace combat {
 				e.get<Score_comp>().process([&](auto& s){
 					s._collectable = true;
 					s._collected = true;
-					for(int i=0; i<s._value; ++i) {
+					for(int i=0; i<std::min(s._value, 100); ++i) {
 						auto coin = _em.emplace("blueprint:coin"_aid);
 						coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
 						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *20_N);
@@ -52,26 +52,15 @@ namespace combat {
 				});
 			});
 
-			auto explosive = e.get<Explosive_comp>();
-			auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage && !e._exloded;});
+			if(e.get<State_comp>().get_or_throw().delete_dead())
+				_em.erase(e.shared_from_this());
 
-			if(!explode) {
-				if(e.get<State_comp>().get_or_throw().delete_dead())
-					_em.erase(e.shared_from_this());
-
-				else // remove components:
-					e.erase_other<
-							Explosive_comp,
-							physics::Transform_comp,
-							sprite::Sprite_comp,
-							state::State_comp>();
-
-			} else {
-				explosive.process([&](auto& e){
-					if(e._delay_left<=0_s)
-						e._delay_left = max(e._delay, 1_ms);
-				});
-			}
+			else // remove components:
+				e.erase_other<
+						Explosive_comp,
+						physics::Transform_comp,
+						sprite::Sprite_comp,
+						state::State_comp>();
 		}
 	}
 

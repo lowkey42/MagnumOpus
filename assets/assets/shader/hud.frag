@@ -15,8 +15,16 @@ void main() {
 
 	vec4 c = bg;
 	
-	if(hb.a>0 && hb.a>=(1-health))
-		c = vec4(hb.rgb/(hb.a*1.1), 1);
+	if(hb.a>0 && hb.a>=(1-health)) {
+		vec3 corrHb =hb.rgb/(hb.a*1.1);
+
+		float r = 1-health;
+		r*=r*1.5;
+		corrHb += vec3(r, -r, 0);
+
+		c = vec4(corrHb, 1);
+
+	}
 
 	c = vec4(c.rgb*(1-fg.a) + fg.rgb*fg.a, c.a+fg.a);
 
