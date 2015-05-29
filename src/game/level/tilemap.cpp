@@ -37,6 +37,11 @@ namespace level {
 
 		_tex_width = _texture->width();
 		_tex_height = _texture->height();
+
+		// TODO: [Sebastian]
+		// Accessing camera.world_scale() and appending it to _tile_tex_heigth & _tile_tex_width
+		// for further use in calculations
+
 		_tpl = _tex_width / _tile_tex_width;
 
 		_xTexTile = _tile_tex_width / static_cast<double>(_tex_width);
