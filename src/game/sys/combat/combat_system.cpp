@@ -80,9 +80,20 @@ namespace combat {
 			h._heal = 0;
 
 			if(h._current_hp<=0) {
-				h.owner().get<State_comp>().process([](auto& s){
-					s.state(Entity_state::dying);
-				});
+				auto explosive = h.owner().get<Explosive_comp>();
+				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage && !e._exloded;});
+
+				if(explode) {
+					explosive.process([&](auto& e){
+						if(e._delay_left<=0_s)
+							e._delay_left = max(e._delay, 1_ms);
+					});
+
+				} else {
+					h.owner().get<State_comp>().process([](auto& s){
+						s.state(Entity_state::dying);
+					});
+				}
 			}
 		}
 	}
@@ -205,8 +216,7 @@ namespace combat {
 			}
 		});
 
-		//_em.erase(e.owner_ptr());
-		e.owner().get<State_comp>().process([](auto& s){
+		e.owner().get<State_comp>().process([](auto& s) {
 			s.state(Entity_state::dying);
 		});
 	}

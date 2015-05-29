@@ -42,8 +42,15 @@
         "width": 0.06
     },
     "Score":{
-        "collector": true
+        "collector": true, "value": 1000
     },
     "Collector",
-    "ui"
+    "ui",
+    "Explosive": {
+        "damage": 10,
+        "range": 4,
+        "delay":0.3,
+        "on_damage": true,
+        "blast_force": 100
+    }
 }
