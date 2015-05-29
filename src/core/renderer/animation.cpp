@@ -80,6 +80,15 @@ namespace renderer{
 		return true;
 	}
 
+	Time Animation::remaining_time(const Animation_type type, const float cur_frame) const noexcept {
+
+		Animation_frame_data d = _data->animations.find(type)->second;
+		// calculating remaining time in seconds for current animation
+		float r_time = (d.frames - cur_frame) / (d.modulation * d.fps);
+
+		return (unit_literals::second * r_time);
+	}
+
 	int Animation::frame_width() const noexcept{
 		return _data->frame_width;
 	}
@@ -93,11 +102,12 @@ namespace renderer{
 	}
 
 	// Converting float frame to int frame --> 0.9 = 0 or 1.3 = 1
-	glm::vec4 Animation::uv(int frame, Animation_type type) const noexcept{
+	glm::vec4 Animation::uv(const int frame, const Animation_type type) const noexcept{
 
 		// Calculating corresponding uv-coords
 		// uv-coords -> 1: x = xStart from left | 2: y = yStart from down | 3: z = xEnd from left | 4: w = yEnd from down
 
+		// TODO: [foe] check const violation in
 		_data->currentAnim = type;
 		int row = _data->animations.find(type) -> second.row;
 
@@ -110,7 +120,7 @@ namespace renderer{
 		return uv;
 	}
 
-	float Animation::next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept{
+	float Animation::next_frame(const Animation_type type, const float cur_frame, const float deltaTime, const bool repeat) const noexcept{
 		int max_frames = _data->animations.find(type)->second.frames;
 		int fps = _data->animations.find(type)->second.fps * _data->animations.find(type)->second.modulation;
 		float ret = cur_frame;

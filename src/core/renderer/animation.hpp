@@ -20,6 +20,8 @@
 #include "../renderer/texture.hpp"
 #include "../../core/asset/asset_manager.hpp"
 
+#include "../units.hpp"
+
 #include <glm/glm.hpp>
 
 namespace mo {
@@ -70,12 +72,13 @@ namespace renderer {
 		// Methods
 		void modulation(Animation_type type, float mod) const noexcept;
 
-		auto animation_exists(Animation_type type) const noexcept -> bool;
+		auto animation_exists(const Animation_type type) const noexcept -> bool;
+		auto remaining_time(const Animation_type type, const float cur_frame) const noexcept -> Time;
 		auto frame_width() const noexcept -> int;
 		auto frame_height() const noexcept -> int;
 		auto texture() const noexcept -> Texture_ptr;
-		auto uv(int frame, Animation_type type = Animation_type::idle) const noexcept -> glm::vec4;
-		auto next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept -> float ;
+		auto uv(const int frame, const Animation_type type = Animation_type::idle) const noexcept -> glm::vec4;
+		auto next_frame(const Animation_type type, const float cur_frame, const float deltaTime, const bool repeat) const noexcept -> float ;
 
 	};
 

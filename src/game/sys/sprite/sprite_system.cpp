@@ -121,8 +121,12 @@ namespace sprite {
 		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
 		sprite._repeat_animation = toRepeat;
 		sprite.animation_type(type);
+
+		// applying magnitude
 		sprite.animation()->modulation(type, data.magnitude);
 
+		// calculating remaining time for current animation and inform state_comp about it
+		data.min_time(sprite.animation()->remaining_time(sprite.animation_type(), sprite.current_frame()));
 	}
 
 }
