@@ -42,7 +42,7 @@
         "width": 0.06
     },
     "Score":{
-        "collector": true, "value": 1000
+        "collector": true
     },
     "Collector",
     "ui",
