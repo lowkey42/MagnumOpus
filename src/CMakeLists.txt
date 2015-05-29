@@ -55,6 +55,7 @@ else()
 	add_definitions(${OpenGL_DEFINITIONS})
 	find_package(SDL2 REQUIRED)
 	include_directories(${SDL2_INCLUDE_DIR})
+	find_package(SDL2_MIXER REQUIRED)
 	
 	
 	if(WIN32)
