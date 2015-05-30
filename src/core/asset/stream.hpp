@@ -64,6 +64,8 @@ namespace asset {
 			istream(AID aid, Asset_manager& manager, const std::string& path);
 			istream(istream&&);
 
+			istream& operator=(istream&&) = default;
+
 			auto lines() -> std::vector<std::string>;
 			auto content() -> std::string;
 			auto bytes() -> std::vector<uint8_t>;
@@ -72,6 +74,8 @@ namespace asset {
 		public:
 			ostream(AID aid, Asset_manager& manager, const std::string& path);
 			ostream(ostream&&);
+
+			ostream& operator=(ostream&&) = default;
 	};
 
 	/**

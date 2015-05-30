@@ -70,6 +70,9 @@ namespace mo {
 		_engine.sound_ctx().play(mainMusic, Time(0));
 		_engine.sound_ctx().play(mySound, Angle(0), Distance(0), 0);
 
+		mainMusic.reset();
+		mySound.reset();
+
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
 			return main_camera.screen_to_world(p);
@@ -79,6 +82,7 @@ namespace mo {
 		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
 			return p;
 		});
+
 	}
 
 	void Game_screen::_update(float delta_time) {

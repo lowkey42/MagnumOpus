@@ -13,15 +13,5 @@ namespace sound {
 
 	}
 
-	Sound& Sound::operator=(Sound&& s) noexcept {
-		if(_handle != nullptr)
-			Mix_FreeChunk(_handle.get());
-
-		_handle.reset(s._handle.release());
-		s._handle.~unique_ptr();
-
-		return *this;
-	}
-
 } /* namespace sound */
 }
