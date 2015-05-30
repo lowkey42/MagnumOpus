@@ -4,6 +4,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
+#include <core/sound/sound.hpp>
+#include <core/sound/music.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -20,6 +23,9 @@
 namespace mo {
 	using namespace util;
 	using namespace unit_literals;
+
+	sound::Sound_ptr mySound;
+	sound::Music_ptr myMusic;
 
 	Game_screen::Game_screen(Game_engine& engine,
 	                         std::string profile,
@@ -41,6 +47,9 @@ namespace mo {
 			{{0,1}, {0,0}}
 		}))
 	{
+
+
+
 		_player_sc_slot.connect(_state->state.state_change_events);
 		_join_slot.connect(engine.controllers().join_events);
 		_unjoin_slot.connect(engine.controllers().unjoin_events);
@@ -55,6 +64,16 @@ namespace mo {
 	}
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
+
+		if(Mix_OpenAudio(44100, MIX_DEFAULT_FORMAT, 2, 2048) == 0){
+			DEBUG("SDL MIXER AUDIO OPENED SUCCESFULLY!");
+			mySound = _engine.assets().load<sound::Sound>("sound:test"_aid);
+			myMusic = _engine.assets().load<sound::Music>("music:test"_aid);
+			mySound->getSound()->volume = 50;
+			Mix_PlayChannel(-1, mySound->getSound(), 0);
+			Mix_VolumeMusic(40);
+			//Mix_PlayMusic(myMusic->getMusic(), 0);
+		}
 
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){

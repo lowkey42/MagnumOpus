@@ -75,5 +75,5 @@ file(GLOB_RECURSE CORE_SRCS
 
 ADD_LIBRARY(core STATIC ${CORE_SRCS} ecs/serializer_impl.hpp)
 SET_TARGET_PROPERTIES(core PROPERTIES OUTPUT_NAME "core")
-target_link_libraries(core ${WIN_LIBS} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ZLIB_LIBRARY} physfs-static soil)
+target_link_libraries(core ${WIN_LIBS} ${SDL2_LIBRARY} ${SDLMIXER_LIBRARY} ${OPENGL_LIBRARIES} ${GLEW_LIBRARIES} ${ZLIB_LIBRARY} physfs-static soil)
 

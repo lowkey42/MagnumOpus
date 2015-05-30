@@ -1,2 +1,2 @@
 sound: = sounds/
-sound:test = sounds/test.mp3
+sound:test = sounds/test.ogg
