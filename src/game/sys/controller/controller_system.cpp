@@ -158,12 +158,18 @@ namespace controller {
 		}
 		void Controllable_interface_impl::move(glm::vec2 direction) {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
+				auto len = glm::length(direction);
+				if(len>0) {
+					direction/=len;
+					len = 1;
+				}
+
 				comp.accelerate_active(direction);
 
 				if(_state.s!=Entity_state::attacking_melee && _state.s!=Entity_state::attacking_range)
 					this->look_in_dir(direction);
 
-				this->set_state(Entity_state::walking, glm::length(direction));
+				this->set_state(Entity_state::walking, len);
 			});
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {

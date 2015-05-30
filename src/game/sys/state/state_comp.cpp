@@ -95,6 +95,8 @@ namespace state {
 	}
 
 	void State_comp::state(Entity_state s, float magnitude)noexcept {
+		INVARIANT(magnitude>=0 && magnitude<=1, "magnitude is out of range: "+util::to_string(magnitude));
+
 		auto& cstate = _state_primary.left>0_s ? _state_primary : _state_background;
 		if(priority(cstate.s)>priority(s))
 			return;
