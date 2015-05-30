@@ -33,12 +33,10 @@ namespace sound {
 
 	class Music {
 		public:
-			Music() = delete;
-			//explicit Sound(const std::string& path) throw(Sound_loading_failed);
-			explicit Music(std::vector<uint8_t> buffer) throw(Music_loading_failed);
+			explicit Music(asset::istream stream) throw(Music_loading_failed);
 			virtual ~Music()noexcept = default;
 
-			Music& operator=(Music&&) noexcept;
+			Music& operator=(Music&&) noexcept = default;
 
 			Music(const Music&) = delete;
 			Music& operator=(const Music&) = delete;
@@ -47,7 +45,7 @@ namespace sound {
 
 		protected:
 			std::unique_ptr<Mix_Music,void(*)(Mix_Music*)> _handle;
-			std::vector<uint8_t> _buffer;
+			std::unique_ptr<asset::istream> _stream;
 
 	};
 	using Music_ptr = asset::Ptr<Music>;
@@ -61,7 +59,7 @@ namespace asset {
 		using RT = std::shared_ptr<sound::Music>;
 
 		static RT load(istream in) throw(Loading_failed){
-			return std::make_unique<sound::Music>(in.bytes());
+			return std::make_unique<sound::Music>(std::move(in));
 		}
 
 		static void store(ostream out, const sound::Music& asset) throw(Loading_failed) {

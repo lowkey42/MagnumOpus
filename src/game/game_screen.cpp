@@ -72,7 +72,7 @@ namespace mo {
 			mySound->getSound()->volume = 50;
 			Mix_PlayChannel(-1, mySound->getSound(), 0);
 			Mix_VolumeMusic(40);
-			Mix_PlayMusic(myMusic->getMusic(), 0);
+			Mix_PlayMusic(myMusic->getMusic(), -1);
 		}
 
 		auto& main_camera = _state->camera.main_camera();
@@ -84,6 +84,8 @@ namespace mo {
 		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
 			return p;
 		});
+		myMusic.reset();
+		mySound.reset();
 	}
 
 	void Game_screen::_update(float delta_time) {

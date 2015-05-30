@@ -38,7 +38,7 @@ namespace sound {
 			explicit Sound(std::vector<uint8_t> buffer) throw(Sound_loading_failed);
 			virtual ~Sound()noexcept = default;
 
-			Sound& operator=(Sound&&) noexcept;
+			Sound& operator=(Sound&&) noexcept = default;
 
 			Sound(const Sound&) = delete;
 			Sound& operator=(const Sound&) = delete;

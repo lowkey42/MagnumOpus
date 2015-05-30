@@ -60,6 +60,8 @@ namespace asset {
 			void load();
 			void unload();
 
+			void reset(){_ptr.reset();}
+
 		private:
 			Asset_manager* _mgr;
 			std::shared_ptr<const R> _ptr;
