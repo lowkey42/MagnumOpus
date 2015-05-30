@@ -8,6 +8,8 @@
 #include "sound/sound_ctx.hpp"
 #include "asset/asset_manager.hpp"
 
+#include "sound/sound.hpp"
+
 #include <stdexcept>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
@@ -52,8 +54,10 @@ Engine::Engine(const std::string& title, Configuration cfg)
     _configuration(std::make_unique<Configuration>(std::move(cfg))),
     _sdl(),
 	_graphics_ctx(std::make_unique<renderer::Graphics_ctx>(title, *_asset_manager)),
+	_sound_ctx(std::make_unique<sound::Sound_ctx>("SoundContext", *_asset_manager)),
 	_input_manager(std::make_unique<Input_manager>()), _current_time(SDL_GetTicks() / 1000.0f) {
 }
+
 Engine::~Engine() noexcept = default;
 
 auto Engine::enter_screen(std::unique_ptr<Screen> screen) -> Screen& {

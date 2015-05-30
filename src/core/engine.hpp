@@ -87,6 +87,8 @@ namespace mo {
 			auto& cfg()const noexcept {return *_configuration;}
 			auto& graphics_ctx()noexcept {return *_graphics_ctx;}
 			auto& graphics_ctx()const noexcept {return *_graphics_ctx;}
+			auto& sound_ctx() const noexcept {return *_sound_ctx;}
+			auto& sound_ctx() noexcept {return *_sound_ctx;}
 			auto& assets()noexcept {return *_asset_manager;}
 			auto& assets()const noexcept {return *_asset_manager;}
 			auto& input()noexcept {return *_input_manager;}
@@ -101,6 +103,7 @@ namespace mo {
 			std::unique_ptr<Configuration> _configuration;
 			Sdl_wrapper _sdl;
 			std::unique_ptr<renderer::Graphics_ctx> _graphics_ctx;
+			std::unique_ptr<sound::Sound_ctx> _sound_ctx;
 			std::unique_ptr<Input_manager> _input_manager;
 			std::vector<std::shared_ptr<Screen>> _screen_stack;
 

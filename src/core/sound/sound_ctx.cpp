@@ -20,9 +20,9 @@ namespace {
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Sounds_cfg{44100, 32, 4096};
+	constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096};
 #else
-	constexpr auto default_cfg = Sounds_cfg{44100, 128, 2048};
+	constexpr auto default_cfg = Sounds_cfg{44100, 2, 2048};
 #endif
 
 }
@@ -55,13 +55,39 @@ namespace asset {
 				 default_cfg
 			);
 
-			Mix_OpenAudio(cfg.frequence, MIX_DEFAULT_FORMAT, cfg.max_channels, cfg.buffer_size);
+			DEBUG("frequence: " << cfg.frequence << " | channels: " << cfg.max_channels << " | buffer: " << cfg.buffer_size);
+
+			if(Mix_OpenAudio(cfg.frequence, MIX_DEFAULT_FORMAT, cfg.max_channels, cfg.buffer_size) == 0) {
+				DEBUG("Sound_ctx succesfully initialized!");
+			} else {
+				FAIL("Initializing Sound incomplete: " << Mix_GetError());
+			}
 
 			if(&cfg==&default_cfg) {
 				assets.save<Sounds_cfg>("cfg:sounds"_aid, cfg);
 			}
-
 		}
+
+
+		void Sound_ctx::play(std::shared_ptr<const sound::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
+			Mix_PlayChannel(-1, s->getSound(), 0);
+		}
+
+
+		void Sound_ctx::play(std::shared_ptr<const sound::Music> m, Time fade_time) const noexcept {
+			Mix_PlayMusic(m->getMusic(), -1);
+		}
+
+
+		void Sound_ctx::sound_volume(std::shared_ptr<const sound::Sound> sound, int v) const noexcept {
+			Mix_VolumeChunk(sound->getSound(), v);
+		}
+
+
+		void Sound_ctx::music_volume(int v) const noexcept {
+			Mix_VolumeMusic(v);
+		}
+
 
 	}
 }

@@ -36,8 +36,10 @@ namespace sound{
 		Sound_ctx(const std::string& name, asset::Asset_manager& assets);
 		~Sound_ctx() = default;
 
-		void play(std::shared_ptr<const sound::Sound>, Time fade_time) const noexcept;
-		void play(std::shared_ptr<const sound::Music>, Angle angle, Distance dist, int loop) const noexcept;
+		void play(std::shared_ptr<const sound::Music> music, Time fade_time) const noexcept;
+		void play(std::shared_ptr<const sound::Sound> sound, Angle angle, Distance dist, int loop) const noexcept;
+		void sound_volume(std::shared_ptr<const sound::Sound> sound, int volume) const noexcept;
+		void music_volume(int volume) const noexcept;
 		void stop(Channel_id) const noexcept;
 		void pauseAll() const noexcept;
 		void resumeAll() const noexcept;
