@@ -35,8 +35,8 @@ namespace {
 		int width;
 		int height;
 		bool fullscreen;
-	};
-	sf2_structDef(Graphics_cfg,
+		};
+		sf2_structDef(Graphics_cfg,
 		sf2_member(width),
 		sf2_member(height),
 		sf2_member(fullscreen)

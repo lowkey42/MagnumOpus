@@ -72,7 +72,7 @@ namespace mo {
 			mySound->getSound()->volume = 50;
 			Mix_PlayChannel(-1, mySound->getSound(), 0);
 			Mix_VolumeMusic(40);
-			//Mix_PlayMusic(myMusic->getMusic(), 0);
+			Mix_PlayMusic(myMusic->getMusic(), 0);
 		}
 
 		auto& main_camera = _state->camera.main_camera();

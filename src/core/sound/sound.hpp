@@ -43,10 +43,10 @@ namespace sound {
 			Sound(const Sound&) = delete;
 			Sound& operator=(const Sound&) = delete;
 
-			Mix_Chunk* getSound() const noexcept { return _data.get(); }
+			Mix_Chunk* getSound() const noexcept { return _handle.get(); }
 
 		protected:
-			std::unique_ptr<Mix_Chunk,void(*)(Mix_Chunk*)> _data;
+			std::unique_ptr<Mix_Chunk,void(*)(Mix_Chunk*)> _handle;
 
 	};
 	using Sound_ptr = asset::Ptr<Sound>;

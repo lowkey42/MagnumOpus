@@ -43,10 +43,11 @@ namespace sound {
 			Music(const Music&) = delete;
 			Music& operator=(const Music&) = delete;
 
-			Mix_Music* getMusic() const noexcept { return _data.get(); }
+			Mix_Music* getMusic() const noexcept { return _handle.get(); }
 
 		protected:
-			std::unique_ptr<Mix_Music,void(*)(Mix_Music*)> _data;
+			std::unique_ptr<Mix_Music,void(*)(Mix_Music*)> _handle;
+			std::vector<uint8_t> _buffer;
 
 	};
 	using Music_ptr = asset::Ptr<Music>;

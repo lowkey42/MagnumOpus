@@ -22,6 +22,7 @@
 namespace mo {
 	namespace asset {class Asset_manager;}
 	namespace renderer {class Graphics_ctx;}
+	namespace sound {class Sound_ctx;}
 	class Configuration;
 	class Input_manager;
 
