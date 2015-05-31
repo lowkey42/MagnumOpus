@@ -159,10 +159,11 @@ namespace controller {
 		void Controllable_interface_impl::move(glm::vec2 direction) {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
 				auto len = glm::length(direction);
-				if(len>0) {
+				if(len>1) {
 					direction/=len;
 					len = 1;
-				}
+				}else if(len<0.00001)
+					return;
 
 				comp.accelerate_active(direction);
 
