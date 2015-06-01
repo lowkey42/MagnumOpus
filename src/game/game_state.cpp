@@ -99,7 +99,9 @@ namespace mo {
 				util::lerp<Speed_per_time>(5_m/second_2, 0_m/second_2),
 				util::cerp<Angle_acceleration>({0_deg/second_2}, 1_deg/second_2),
 				util::lerp<glm::vec4>({1,0,0,0.6}, {0,1,0,0.1}, {0.2,0,0,0.1}),
-				util::lerp<Position>({5_cm, 5_cm}, {50_cm, 50_cm}, {0_cm, 0_cm})
+				util::lerp<Position>({5_cm, 5_cm}, {50_cm, 50_cm}, {0_cm, 0_cm}),
+				util::scerp<int8_t>(1),
+				engine.assets().load<renderer::Texture>("tex:ball"_aid)
 		);
 
 		// TODO[foe]: save profile
@@ -239,13 +241,7 @@ namespace mo {
 			combat.draw(cam);
 			spritesys.draw(cam);
 
-
-			auto cam_area  = cam.area();
-			particle_renderer.draw(
-			            dt,
-			            {cam_area.x, cam_area.y},
-			            {cam_area.z, cam_area.w}
-			);
+			particle_renderer.draw(dt, cam);
 		});
 
 		return camera.vscreens();

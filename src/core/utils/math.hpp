@@ -55,6 +55,8 @@ namespace util {
 
 		auto operator()(float t, int32_t seed=0)const noexcept -> T;
 
+		auto max()const noexcept -> T;
+
 		T                  initial_value;
 		T                  final_value;
 		Interpolation_type type;
@@ -76,6 +78,12 @@ namespace util {
 	 */
 	template<typename T>
 	auto cerp(std::vector<T> values, T max_deviation = T(0)) -> Interpolation<T>;
+
+	/**
+	 * single constant 'interpolation'
+	 */
+	template<typename T>
+	auto scerp(T value, T max_deviation = T(0)) -> Interpolation<T>;
 
 }
 }

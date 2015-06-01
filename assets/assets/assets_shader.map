@@ -15,3 +15,6 @@ frag_shader:ray = shader/ray.frag
 
 vert_shader:hud = shader/hud.vert
 frag_shader:hud = shader/hud.frag
+
+vert_shader:particles = shader/particles.vert
+frag_shader:particles = shader/particles.frag

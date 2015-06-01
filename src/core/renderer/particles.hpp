@@ -23,6 +23,8 @@
 
 #include "shader.hpp"
 #include "vertex_object.hpp"
+#include "texture.hpp"
+#include "camera.hpp"
 
 namespace mo {
 namespace renderer {
@@ -32,6 +34,7 @@ namespace renderer {
 		glm::vec4 color;
 		glm::vec2 size;
 		float     rotation;
+		float     frame;
 
 		glm::vec2 velocity;
 		float     angular_velocity;
@@ -39,7 +42,7 @@ namespace renderer {
 		float     max_age;
 
 		Particle(glm::vec2 pos, glm::vec4 color, glm::vec2 size, float rotation,
-				 glm::vec2 vel, float rot_vel, float ttl);
+				 glm::vec2 vel, float rot_vel, float frame, float ttl);
 	};
 
 	struct Environment_callback {
@@ -62,11 +65,13 @@ namespace renderer {
 			                util::Xerp<Speed_per_time> acceleration,
 			                util::Xerp<Angle_acceleration> angular_acceleration,
 			                util::Xerp<glm::vec4> color,
-			                util::Xerp<Position> size);
+			                util::Xerp<Position> size,
+			                util::Xerp<int8_t> frame,
+			                Texture_ptr texture);
 
 			void update(bool active, Time dt, Environment_callback& env);
 
-			void draw();
+			void draw(Shader_program& prog);
 
 			bool visible(glm::vec2 top_left, glm::vec2 bottom_right)const noexcept;
 
@@ -81,6 +86,7 @@ namespace renderer {
 			Time      _min_ttl;
 			Time      _max_ttl;
 
+			util::Xerp<int8_t>             _frame;
 			util::Xerp<Angle>              _direction;
 			util::Xerp<Speed_per_time>     _acceleration;
 			util::Xerp<Angle_acceleration> _angular_acceleration;
@@ -90,6 +96,7 @@ namespace renderer {
 			glm::vec2             _top_left;
 			glm::vec2             _bottom_right;
 			std::vector<Particle> _particles;
+			Texture_ptr           _texture;
 			Object                _obj;
 	};
 	using Particle_emiter_ptr = std::shared_ptr<Particle_emiter>;
@@ -99,10 +106,19 @@ namespace renderer {
 		public:
 			Particle_renderer(asset::Asset_manager& assets, std::unique_ptr<Environment_callback> env=std::unique_ptr<Environment_callback>());
 
-			template<typename... Args>
-			Particle_emiter_ptr create_emiter(Args&&... args);
+			Particle_emiter_ptr create_emiter(Position center, Distance radius,
+			                                  bool physical, bool aligned,
+							                  float spawn_rate, std::size_t max_particles,
+							                  Time min_ttl, Time max_ttl,
+							                  util::Xerp<Angle> direction,
+							                  util::Xerp<Speed_per_time> acceleration,
+							                  util::Xerp<Angle_acceleration> angular_acceleration,
+							                  util::Xerp<glm::vec4> color,
+							                  util::Xerp<Position> size,
+							                  util::Xerp<int8_t> frame,
+							                  Texture_ptr texture);
 
-			void draw(Time dt, glm::vec2 top_left, glm::vec2 bottom_right);
+			void draw(Time dt, const Camera& cam);
 
 		private:
 			std::unique_ptr<Environment_callback> _env;
@@ -111,10 +127,19 @@ namespace renderer {
 			std::vector<Particle_emiter_ptr> _emiter;
 	};
 
-	template<typename... Args>
-	Particle_emiter_ptr Particle_renderer::create_emiter(Args&&... args) {
-		auto pe = std::make_shared<Particle_emiter>(std::forward<Args>(args)...);
-		_emiter.push_back(pe);
+	inline Particle_emiter_ptr Particle_renderer::create_emiter(Position center, Distance radius,
+	                                                     bool physical, bool aligned,
+										                 float spawn_rate, std::size_t max_particles,
+										                 Time min_ttl, Time max_ttl,
+										                 util::Xerp<Angle> direction,
+										                 util::Xerp<Speed_per_time> acceleration,
+										                 util::Xerp<Angle_acceleration> angular_acceleration,
+										                 util::Xerp<glm::vec4> color,
+										                 util::Xerp<Position> size,
+										                 util::Xerp<int8_t> frame,
+										                 Texture_ptr texture) {
+		auto pe = std::make_shared<Particle_emiter>(center, radius, physical, aligned, spawn_rate, max_particles, min_ttl, max_ttl, direction, acceleration, angular_acceleration, color, size, frame, texture);
+		_emiter.emplace_back(pe);
 
 		return pe;
 	}

@@ -43,13 +43,31 @@ namespace util {
 	}
 
 	template<typename T>
+	auto Interpolation<T>::max()const noexcept -> T {
+		using std::max;
+		return max(initial_value, final_value) + max_deviation;
+	}
+
+	template<typename T>
 	auto lerp(T begin, T end, T max_deviation) -> Interpolation<T> {
 		return {begin ,end, Interpolation_type::linear, max_deviation, {}};
 	}
 
 	template<typename T>
 	auto cerp(std::vector<T> values, T max_deviation) -> Interpolation<T> {
-		return {T{0} ,T{0}, Interpolation_type::linear, max_deviation, std::move(values)};
+		using std::max;
+
+		T max_v{0};
+		for(const auto& v : values)
+			max_v = max(max_v, v);
+
+		return {T{0} ,T{max_v}, Interpolation_type::linear, max_deviation, std::move(values)};
 	}
+
+	template<typename T>
+	auto scerp(T value, T max_deviation) -> Interpolation<T> {
+		return {value ,value, Interpolation_type::linear, max_deviation, {}};
+	}
+
 }
 }
