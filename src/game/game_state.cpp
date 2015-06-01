@@ -31,6 +31,8 @@ namespace mo {
 		}
 	};
 
+	renderer::Particle_emiter_ptr my_p;
+
 	Game_state::Game_state(Game_engine& engine,
 	                       std::string profile_name,
 				           std::vector<ecs::ETO> players,
@@ -84,6 +86,21 @@ namespace mo {
 			add_player(engine.controllers().main_controller(),
 			           start_position);
 		}
+
+		my_p = particle_renderer.create_emiter(
+				start_position,
+				0.5_m,
+				true,
+				false,
+				20,
+				500,
+				0.5_s, 2_s,
+				util::cerp<Angle>({0_deg}, 180_deg),
+				util::lerp<Speed_per_time>(5_m/second_2, 0_m/second_2),
+				util::cerp<Angle_acceleration>({0_deg/second_2}, 1_deg/second_2),
+				util::lerp<glm::vec4>({1,0,0,0.6}, {0,1,0,0.1}, {0.2,0,0,0.1}),
+				util::lerp<Position>({5_cm, 5_cm}, {50_cm, 50_cm}, {0_cm, 0_cm})
+		);
 
 		// TODO[foe]: save profile
 		im_a_savegame = profile;

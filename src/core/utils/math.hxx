@@ -49,7 +49,7 @@ namespace util {
 
 	template<typename T>
 	auto cerp(std::vector<T> values, T max_deviation) -> Interpolation<T> {
-		return {0 ,0, Interpolation_type::linear, max_deviation, values};
+		return {T{0} ,T{0}, Interpolation_type::linear, max_deviation, std::move(values)};
 	}
 }
 }

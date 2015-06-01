@@ -52,9 +52,8 @@ namespace renderer {
 		public:
 			void update_center(Position center);
 
-		protected:
-			friend class Particle_renderer;
 
+		// private API
 			Particle_emiter(Position center, Distance radius,
 			                bool physical, bool aligned,
 			                float spawn_rate, std::size_t max_particles,
@@ -114,7 +113,7 @@ namespace renderer {
 
 	template<typename... Args>
 	Particle_emiter_ptr Particle_renderer::create_emiter(Args&&... args) {
-		auto pe = std::make_shared<Particle_emiter>(std::forward<Args...>(args...));
+		auto pe = std::make_shared<Particle_emiter>(std::forward<Args>(args)...);
 		_emiter.push_back(pe);
 
 		return pe;

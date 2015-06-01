@@ -86,7 +86,7 @@ namespace renderer {
 		            std::remove_if(_emiter.begin(),
 		                           _emiter.end(),
 		                           [](auto& pe){return pe.use_count()<=1;}),
-		            _emiter.begin());
+		            _emiter.end());
 	}
 
 }
