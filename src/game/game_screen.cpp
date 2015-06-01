@@ -69,7 +69,7 @@ namespace mo {
 	class Camera {};
 
 	void Game_screen::_draw(float time) {
-		auto vscreens = _state->draw();
+		auto vscreens = _state->draw(Time(time));
 
 		_ui.pre_draw();
 		for(auto& screen : vscreens) {

@@ -3,6 +3,7 @@
 #include "game_engine.hpp"
 #include "game_screen.hpp"
 
+#include <core/renderer/particles.hpp>
 
 #include <core/renderer/texture.hpp>
 #include <core/asset/aid.hpp>
@@ -24,6 +25,12 @@ namespace mo {
 
 	static Profile_data im_a_savegame{"default", 42,0,0};
 
+	struct My_environment_callback : renderer::Environment_callback {
+		void handle(Position& p, Velocity& vel)const noexcept override {
+			// TODO
+		}
+	};
+
 	Game_state::Game_state(Game_engine& engine,
 	                       std::string profile_name,
 				           std::vector<ecs::ETO> players,
@@ -44,7 +51,8 @@ namespace mo {
 		  ai(em, engine, transform, level),
 		  combat(em, transform, physics),
 		  state(em),
-		  ray_renderer(engine.assets()) {
+		  ray_renderer(engine.assets()),
+		  particle_renderer(engine.assets(), std::make_unique<My_environment_callback>()) {
 
 		auto d = depth.get_or_other(profile.depth);
 
@@ -235,7 +243,7 @@ namespace mo {
 		}
 	}
 
-	auto Game_state::draw() -> util::cvector_range<sys::cam::VScreen> {
+	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {
 		camera.draw(
 			[&](const renderer::Camera& cam,
 				const std::vector<ecs::Entity_ptr>& targets) {
@@ -246,6 +254,14 @@ namespace mo {
 			render_rays(targets, ray_renderer, transform);
 
 			spritesys.draw(cam);
+
+
+			auto cam_area  = cam.area();
+			particle_renderer.draw(
+			            dt,
+			            {cam_area.x, cam_area.y},
+			            {cam_area.z, cam_area.w}
+			);
 		});
 
 		return camera.vscreens();

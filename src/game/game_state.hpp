@@ -34,6 +34,7 @@
 #include "sys/combat/combat_system.hpp"
 #include "sys/state/state_system.hpp"
 
+#include <core/renderer/particles.hpp>
 
 namespace mo {
 	namespace renderer{ class Camera; }
@@ -67,6 +68,7 @@ namespace mo {
 		std::vector<ecs::Entity_ptr> sec_players;
 
 		renderer::Ray_renderer ray_renderer;
+		renderer::Particle_renderer particle_renderer;
 
 		Game_state(Game_engine& engine,
 		           std::string profile,
@@ -74,7 +76,7 @@ namespace mo {
 		           util::maybe<int> depth);
 
 		void update(Time dt);
-		auto draw() -> util::cvector_range<sys::cam::VScreen>;
+		auto draw(Time dt) -> util::cvector_range<sys::cam::VScreen>;
 
 		auto add_player(sys::controller::Controller& controller, Position pos,
 		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;

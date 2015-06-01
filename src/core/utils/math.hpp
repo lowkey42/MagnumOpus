@@ -16,6 +16,9 @@
 #pragma once
 
 #include <tuple>
+#include <memory>
+#include <vector>
+
 #include "../units.hpp"
 
 namespace mo {
@@ -39,5 +42,43 @@ namespace util {
 		return std::make_tuple(new_pos, new_vel);
 	}
 
+
+	enum class Interpolation_type {
+		linear,
+		constant
+	};
+
+	template<typename T>
+	struct Interpolation {
+		Interpolation(T begin, T end, Interpolation_type type,
+					  T max_deviation, std::vector<T> cpoints)noexcept;
+
+		auto operator()(float t, int32_t seed=0)const noexcept -> T;
+
+		T                  initial_value;
+		T                  final_value;
+		Interpolation_type type;
+		T                  max_deviation;
+		std::vector<T>     cpoints;
+	};
+
+	template<typename T>
+	using Xerp = Interpolation<T>;
+
+	/**
+	 * linear interpolation
+	 */
+	template<typename T>
+	auto lerp(T begin, T end, T max_deviation = T(0)) -> Interpolation<T>;
+
+	/**
+	 * constant 'interpolation'
+	 */
+	template<typename T>
+	auto cerp(std::vector<T> values, T max_deviation = T(0)) -> Interpolation<T>;
+
 }
 }
+
+#define UTIL_MATH_INCLUDED
+#include "math.hxx"
