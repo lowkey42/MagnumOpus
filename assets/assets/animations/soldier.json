@@ -1,8 +1,16 @@
 {
 	"animations": {
-		"idle": {"row":1, "fps":6, "frames":8}
-		"moving": {"row":1, "fps":6, "frames":8}
-		"attack": {"row":0, "fps":60, "frames":1}
+		"idle": {"row":1, "fps":1, "frames":1},
+		"walking": {"row":1, "fps":6, "frames":8},
+		"attacking_melee": {"row":1, "fps":1, "frames":1},
+		"attacking_range": {"row":1, "fps":1, "frames":1},
+		"interacting": {"row":1, "fps":1, "frames":1},
+		"taking": {"row":1, "fps":1, "frames":1},
+		"change_weapon": {"row":1, "fps":1, "frames":1},
+		"damaged": {"row":1, "fps":1, "frames":1},
+		"healed": {"row":1, "fps":1, "frames":1},
+        "died": {"row":2, "fps":1, "frames":1},
+		"resurrected": {"row":1, "fps":1, "frames":1}
 	},
 	
 	"texName": "tex:soldier",

@@ -7,10 +7,6 @@ project(MagnumOpus)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
 
-if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -ftrapv -fslp-vectorize-aggressive -ffast-math")
-endif()
-
 include_directories(${ROOT_DIR}/src)
 
 
@@ -23,7 +19,23 @@ if(EMSCRIPTEN)
 	set(SDL2_LIBRARY "")
 	
 else()
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -O1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
+
+	if(NOT CMAKE_BUILD_TYPE)
+		set(CMAKE_BUILD_TYPE "Debug")
+	endif()
+	if(CMAKE_BUILD_TYPE MATCHES DEBUG)
+		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fsanitize=address -fsanitize=integer -fsanitize=undefined")
+
+		elseif(WIN32)
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O1")
+
+		endif()
+
+	else()
+		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
+	endif()
 	
 	add_definitions(-DSTACKTRACE)
 	find_package(GLEW REQUIRED)

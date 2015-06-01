@@ -4,10 +4,7 @@
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 
-#include <core/asset/asset_manager.hpp> // TODO[foe]: remove after sprite_comp integration
-#include "../controller/controllable_comp.hpp" // TODO[foe]: remove
 #include <core/asset/aid.hpp>
-#include "../sprite/sprite_comp.hpp"
 
 #include "friend_comp.hpp"
 #include "score_comp.hpp"
@@ -22,13 +19,15 @@ namespace combat {
 
 	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
 								 physics::Transform_system& ts,
-								 physics::Physics_system& physics_system)
+								 physics::Physics_system& physics_system,
+								 state::State_system& state_system)
 		: _em(entity_manager),
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
 		  _explosives(entity_manager.list<Explosive_comp>()),
 		  _ts(ts),
-		  _collision_slot(&Combat_system::_on_collision, this)
+		  _collision_slot(&Combat_system::_on_collision, this),
+		  _reaper(entity_manager, state_system)
 	{
 
 		_collision_slot.connect(physics_system.collisions);
@@ -72,46 +71,14 @@ namespace combat {
 
 			if(h._current_hp<=0) {
 				h.owner().get<State_comp>().process([](auto& s){
-					s.state(Entity_state::died);
+					s.state(Entity_state::dying);
 				});
-
-				h.owner().get<physics::Transform_comp>().process([&](const auto& transform){
-					h.owner().get<Score_comp>().process([&](auto& s){
-						s._collectable = true;
-						s._collected = true;
-						for(int i=0; i<s._value; ++i) {
-							auto coin = _em.emplace("blueprint:coin"_aid);
-							coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
-						}
-					});
-				});
-
-				auto explosive = h.owner().get<Explosive_comp>();
-				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage;});
-
-				if(!explode) {
-					_em.erase(h.owner_ptr());
-
-				} else {
-					explosive.process([&](auto& e){
-						this->_explode(e);
-					});
-				}
 			}
 		}
 	}
 
 	void Combat_system::_shoot_something(Time dt) {
 		for(auto& w : _weapons) {
-			if(w._attack) {
-				w.owner().get<State_comp>().process([&w](auto& s){
-					if(w.weapon_type()==combat::Weapon_type::melee)
-						s.state(Entity_state::attacking_melee);
-					else
-						s.state(Entity_state::attacking_range);
-				});
-			}
-
 			if(w._cooldown_left>0_s) {
 				w._cooldown_left = w._cooldown_left-dt;
 				if(w._cooldown_left<0_s)
@@ -121,7 +88,33 @@ namespace combat {
 				continue;
 			}
 
+			bool attack_now = false;
+
 			if(w._attack) {
+				w.owner().get<State_comp>().process([&w](auto& s){
+					if(w.weapon_type()==combat::Weapon_type::melee)
+						s.state(Entity_state::attacking_melee);
+					else
+						s.state(Entity_state::attacking_range);
+				});
+
+				if(w._attack_delay==0_s)
+					attack_now = true;
+				else if(w._attack_delay_left<=0_s)
+					w._attack_delay_left = w._attack_delay;
+
+				w._attack = false;
+			}
+
+			if(w._attack_delay_left>0_s) {
+				w._attack_delay_left -= dt;
+				if(w._attack_delay_left<=0_s) {
+					w._attack_delay_left = 0_s;
+					attack_now = true;
+				}
+			}
+
+			if(attack_now) {
 				auto& transform = w.owner().get<physics::Transform_comp>().get_or_throw();
 				auto position = transform.position();
 				auto rotation = transform.rotation();
@@ -144,7 +137,7 @@ namespace combat {
 
 					case Weapon_type::range:
 						if(w._bullet_type) {
-							physics.impulse(rotate(glm::vec2(-1,0), rotation) * 50_N); // TODO[foe]: 50N should be a parameter
+							physics.impulse(rotate(glm::vec2(-1,0), rotation) * w._recoil);
 							auto bullet = _em.emplace(w._bullet_type);
 							bullet->get<Friend_comp>().process([&](auto& f) {
 								f.group(group);
@@ -164,7 +157,6 @@ namespace combat {
 				}
 
 				w._cooldown_left = w._cooldown;
-				w._attack = false;
 			}
 		}
 	}
@@ -198,12 +190,15 @@ namespace combat {
 				t.get<physics::Physics_comp>().process([&](auto& p){
 					auto dir = remove_units(t.get<physics::Transform_comp>().get_or_throw().position()-position);
 					glm::normalize(dir);
-					p.impulse(dir * 100_N); // TODO[foe]: should be a parameter
+					p.impulse(dir * e._blast_force);
 				});
 			}
 		});
 
-		_em.erase(e.owner_ptr());
+		//_em.erase(e.owner_ptr());
+		e.owner().get<State_comp>().process([](auto& s){
+			s.state(Entity_state::dying);
+		});
 	}
 
 	void Combat_system::_deal_damage(ecs::Entity& target, int group, float damage) {
@@ -224,7 +219,7 @@ namespace combat {
 			m.a->owner().get<Score_comp>().process([&](auto& s){
 				if(s._collectable && !s._collected) {
 					m.b.comp->owner().get<Score_comp>().process([&](auto& os) {
-						if(!os._collectable) {
+						if(os._collector) {
 							os._value+=s._value;
 							s._collected = true;
 							_em.erase(s.owner_ptr());

@@ -88,6 +88,21 @@ namespace ecs {
 		if(has<T>())
 			_manager.list<T>().free(*this);
 	}
+	template<typename... T>
+	void Entity::erase_other() {
+		bool erase_c[details::max_comp_type];
+
+		for(Component_type c=0; c<details::max_comp_type; ++c)
+			erase_c[c] = true;
+
+		for(auto c : {T::type()...})
+			erase_c[c] = false;
+
+		for(Component_type c=0; c<details::max_comp_type; ++c) {
+			if(erase_c[c] && _components[c])
+				_manager._pools[c]->free(*this);
+		}
+	}
 
 	template<typename T>
 	auto Entity::get_handle() -> util::lazy<util::maybe<T&>> {

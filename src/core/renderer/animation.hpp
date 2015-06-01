@@ -27,9 +27,18 @@ namespace renderer {
 
 	enum class Animation_type{
 		idle,
-		moving,
-		attack
+		walking,
+		attacking_melee,
+		attacking_range,
+		interacting,
+		taking,
+		change_weapon,
+		damaged,
+		healed,
+		died,
+		resurrected
 	};
+
 }
 }
 
@@ -59,6 +68,7 @@ namespace renderer {
 		std::unique_ptr<Animation_data> _data;
 
 		// Methods
+		auto animation_exists(Animation_type type) const noexcept -> bool;
 		auto frame_width() const noexcept -> int;
 		auto frame_height() const noexcept -> int;
 		auto texture() const noexcept -> Texture_ptr;

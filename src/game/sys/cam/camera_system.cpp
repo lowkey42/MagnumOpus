@@ -27,7 +27,7 @@ namespace cam {
 		entity_manager.register_component_type<Camera_target_comp>();
 
 		_cameras.emplace_back(_vscreen_size, world_scale);
-		_cameras.back().camera.zoom(1.f);
+		_cameras.back().camera.zoom(0.75f);
 	}
 
 	void Camera_system::update(Time dt) {

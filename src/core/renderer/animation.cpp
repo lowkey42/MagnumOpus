@@ -27,8 +27,16 @@ namespace renderer{
 
 	sf2_enumDef(Animation_type,
 		sf2_value(idle),
-		sf2_value(moving),
-		sf2_value(attack)
+		sf2_value(walking),
+		sf2_value(attacking_melee),
+		sf2_value(attacking_range),
+		sf2_value(interacting),
+		sf2_value(taking),
+		sf2_value(change_weapon),
+		sf2_value(damaged),
+		sf2_value(healed),
+		sf2_value(died),
+		sf2_value(resurrected)
 	)
 
 	sf2_structDef(Animation_frame_data,
@@ -57,7 +65,14 @@ namespace renderer{
 	Animation& Animation::operator=(Animation&& rhs) noexcept {
 		_data = std::move(rhs._data);
 		return *this;
-	 }
+	}
+
+	bool Animation::animation_exists(Animation_type type) const noexcept {
+		if(_data->animations.find(type) == _data->animations.end()){
+			return false;
+		}
+		return true;
+	}
 
 	int Animation::frame_width() const noexcept{
 		return _data->frame_width;
@@ -90,17 +105,21 @@ namespace renderer{
 	}
 
 	float Animation::next_frame(Animation_type type, float cur_frame, float deltaTime, bool repeat) const noexcept{
-		int frames = _data->animations.find(type)->second.frames;
+		int max_frames = _data->animations.find(type)->second.frames;
 		int fps = _data->animations.find(type)->second.fps;
 		float ret = cur_frame;
+
 		// checking if cur_frame + change is in max_frames bounding for cur Animation
 		// if not but repeat is set -> set Animation back to 0 else keep last frame
-		if(cur_frame + fps * deltaTime < frames){
+
+		if(cur_frame + fps * deltaTime < max_frames){
 			ret = cur_frame + fps * deltaTime;
 		} else if(repeat){
 			ret = 0;
 		}
+
 		return ret;
+
 	}
 
 }

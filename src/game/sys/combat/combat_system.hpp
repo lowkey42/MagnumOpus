@@ -21,6 +21,9 @@
 #include "../physics/transform_system.hpp"
 #include "../physics/physics_system.hpp"
 
+#include "../state/state_comp.hpp"
+#include "reaper.hpp"
+
 #include "weapon_comp.hpp"
 #include "health_comp.hpp"
 #include "explosive_comp.hpp"
@@ -35,7 +38,8 @@ namespace combat {
 		public:
 			Combat_system(ecs::Entity_manager& entity_manager,
 						  physics::Transform_system& transform_system,
-						  physics::Physics_system& physics_system);
+						  physics::Physics_system& physics_system,
+						  state::State_system& state_system);
 
 			void update(Time dt);
 
@@ -54,6 +58,7 @@ namespace combat {
 			Explosive_comp::Pool& _explosives;
 			physics::Transform_system& _ts;
 			util::slot<physics::Manifold&> _collision_slot;
+			Reaper _reaper;
 	};
 
 }

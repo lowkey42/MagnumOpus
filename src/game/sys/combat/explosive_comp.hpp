@@ -40,6 +40,7 @@ namespace combat {
 			friend struct Persisted_state;
 		private:
 			friend class Combat_system;
+			friend class Reaper;
 
 			float _damage;
 			Distance _range;
@@ -49,6 +50,8 @@ namespace combat {
 
 			Time _delay_left = Time(0);
 			bool _exloded = false;
+
+			Force _blast_force = Force(0);
 
 			// TODO{foe]: add other effects
 	};

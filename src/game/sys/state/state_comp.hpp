@@ -32,13 +32,18 @@ namespace state {
 		change_weapon,
 		damaged,
 		healed,
-		died,
+		dying,
+		dead,
 		resurrected
 	};
 	struct State_data {
 		Entity_state s = Entity_state::idle;
 		float magnitude = 1.f;
 		Time left = Time(0);
+
+		void min_time(Time m)noexcept {
+			left = max(left, m);
+		}
 
 		auto operator!=(const State_data& rhs)const noexcept {
 			return s!=rhs.s || magnitude!=rhs.magnitude;
@@ -48,6 +53,8 @@ namespace state {
 	class State_comp : public ecs::Component<State_comp> {
 		public:
 			static constexpr const char* name() {return "State";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
 			State_comp(ecs::Entity& owner, Entity_state s = Entity_state::idle) noexcept
 				: Component(owner) {
@@ -57,10 +64,14 @@ namespace state {
 			void state(Entity_state s, float magnitude = 1.f)noexcept;
 			auto state()const noexcept {return _state_last;}
 
-			auto update(Time dt)noexcept -> util::maybe<State_data>;
+			auto update(Time dt)noexcept -> util::maybe<State_data&>;
 
+			auto delete_dead()const noexcept {return _delete_dead;}
+
+			struct Persisted_state;
+			friend struct Persisted_state;
 		private:
-
+			bool _delete_dead = false;
 			State_data _state_primary;
 			State_data _state_last;
 			State_data _state_background;

@@ -1,6 +1,13 @@
 {
 	"animations": {
-		"idle": {"row":0, "fps":60, "frames":1}
+		"idle": {"row":0, "fps":1, "frames":1},
+		"walking": {"row":0, "fps":3, "frames":4},
+		"attacking_melee": {"row":0, "fps":1, "frames":1},
+        "attacking_range": {"row":1, "fps":4, "frames":2},
+		"damaged": {"row":0, "fps":1, "frames":1},
+		"healed": {"row":0, "fps":1, "frames":1},
+		"died": {"row":3, "fps":1, "frames":1},
+		"resurrected": {"row":2, "fps":2, "frames":2}
 	},
 	
 	"texName": "tex:vomit_zombie",

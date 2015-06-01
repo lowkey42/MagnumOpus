@@ -58,11 +58,11 @@ namespace mo {
 		sys::physics::Transform_system transform;
 		sys::cam::Camera_system camera;
 		sys::physics::Physics_system physics;
-		sys::sprite::Sprite_system spritesys;
+		sys::state::State_system state;
 		sys::controller::Controller_system controller;
 		sys::ai::Ai_system ai;
 		sys::combat::Combat_system combat;
-		sys::state::State_system state;
+		sys::sprite::Sprite_system spritesys;
 
 		ecs::Entity_ptr main_player;
 		std::vector<ecs::Entity_ptr> sec_players;
