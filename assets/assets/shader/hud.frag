@@ -15,20 +15,20 @@ void main() {
 
 	vec4 c = bg;
 	
-	if(hb.a>0 && hb.a>=(1-health)) {
+	if(hb.a>0.0 && hb.a>=(1.0-health)) {
 		vec3 corrHb =hb.rgb/(hb.a*1.1);
 
-		float r = 1-health;
+		float r = 1.0-health;
 		r*=r*1.5;
-		corrHb += vec3(r, -r, 0);
+		corrHb += vec3(r, -r, 0.0);
 
-		c = vec4(corrHb, 1);
+		c = vec4(corrHb, 1.0);
 
 	}
 
-	c = vec4(c.rgb*(1-fg.a) + fg.rgb*fg.a, c.a+fg.a);
+	c = vec4(c.rgb*(1.0-fg.a) + fg.rgb*fg.a, c.a+fg.a);
 
-	if(c.a>0) {
+	if(c.a>0.0) {
 		gl_FragColor = c;
 	}else
 		discard;
