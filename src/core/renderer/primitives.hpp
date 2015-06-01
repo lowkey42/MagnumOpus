@@ -38,7 +38,7 @@ namespace renderer {
 
 			void set_vp(const glm::mat4& vp);
 
-			void draw(glm::vec3 p, Angle a, float length, float width=1);
+			void draw(glm::vec3 p, Angle a, float length, glm::vec4 color, float width=1);
 
 		private:
 			Shader_program _prog;

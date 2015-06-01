@@ -48,10 +48,10 @@ namespace mo {
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  state(em),
 		  controller(em, transform),
-		  ai(em, engine, transform, level),
-		  combat(em, transform, physics, state),
+		  ai(em, transform, level),
+		  combat(engine.assets(), em, transform, physics, state),
 		  spritesys(em, transform, engine.assets(), state),
-		  ray_renderer(engine.assets()),
+		  ui(engine, em),
 	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>()) {
 
 		auto d = depth.get_or_other(profile.depth);
@@ -182,6 +182,7 @@ namespace mo {
 		camera.update(dt);
 		spritesys.update(dt);
 		state.update(dt);
+		ui.update(dt);
 
 		// TODO: update sprites and tilemap
 
@@ -212,47 +213,13 @@ namespace mo {
 		});
 	}
 
-	namespace {
-		void render_rays(const std::vector<ecs::Entity_ptr>& targets,
-						renderer::Ray_renderer& ray_renderer,
-						sys::physics::Transform_system& transform) {
-
-			for(auto& p : targets) {
-				p->get<sys::physics::Transform_comp>().process(
-					[&](sys::physics::Transform_comp& t) {
-						Distance dist = 20_m;
-						util::maybe<ecs::Entity&> entity = util::nothing();
-
-						std::tie(entity, dist) =
-								transform.raycast_nearest_entity(t.position(),
-																 t.rotation(),
-																 20_m,
-																 [&](ecs::Entity& e){
-							return p.get()!=&e && e.get<sys::physics::Transform_comp>().get_or_throw().layer()>=0.5;
-						});
-
-						auto p = remove_units(t.position());
-
-						entity.process([&](ecs::Entity& e){
-							dist = std::max(dist,Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position()))));
-						});
-
-						ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), 0.04);
-				});
-			}
-		}
-	}
-
 	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {
 		camera.draw(
 			[&](const renderer::Camera& cam,
-				const std::vector<ecs::Entity_ptr>& targets) {
+				const std::vector<ecs::Entity_ptr>&) {
 
 			tilemap.draw(cam);
-
-			ray_renderer.set_vp(cam.vp());
-			render_rays(targets, ray_renderer, transform);
-
+			combat.draw(cam);
 			spritesys.draw(cam);
 
 
@@ -265,6 +232,9 @@ namespace mo {
 		});
 
 		return camera.vscreens();
+	}
+	void Game_state::draw_ui() {
+		ui.draw();
 	}
 
 	auto Game_state::add_player(sys::controller::Controller& controller,

@@ -243,12 +243,15 @@ namespace physics {
 
 					if(dir_diff<=a/2.f) {
 						auto distance = glm::sqrt(distance_2);
-						auto step = diff / distance;
-						auto mp = pos;
-						for(float d=0; d<=distance; d++) {
-							mp+=step;
-							if(this->_world.solid(mp.x.value()+0.5f, mp.y.value()+0.5f))
-								return;
+
+						if(distance>0) {
+							auto step = diff / distance;
+							auto mp = pos;
+							for(float d=0; d<=distance; d++) {
+								mp+=step;
+								if(this->_world.solid(mp.x.value()+0.5f, mp.y.value()+0.5f))
+									return;
+							}
 						}
 
 						func(e);

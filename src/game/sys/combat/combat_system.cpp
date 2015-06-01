@@ -17,7 +17,8 @@ namespace combat {
 	using namespace state;
 	using namespace unit_literals;
 
-	Combat_system::Combat_system(ecs::Entity_manager& entity_manager,
+	Combat_system::Combat_system(asset::Asset_manager& assets,
+	                             ecs::Entity_manager& entity_manager,
 								 physics::Transform_system& ts,
 								 physics::Physics_system& physics_system,
 								 state::State_system& state_system)
@@ -25,9 +26,11 @@ namespace combat {
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
 		  _explosives(entity_manager.list<Explosive_comp>()),
+	      _lsights(entity_manager.list<Laser_sight_comp>()),
 		  _ts(ts),
 		  _collision_slot(&Combat_system::_on_collision, this),
-		  _reaper(entity_manager, state_system)
+		  _reaper(entity_manager, state_system),
+	      _ray_renderer(assets)
 	{
 
 		_collision_slot.connect(physics_system.collisions);
@@ -44,6 +47,13 @@ namespace combat {
 		_shoot_something(dt);
 		_explode_explosives(dt);
 		_health_care(dt);
+	}
+	void Combat_system::draw(const renderer::Camera& cam) {
+		_ray_renderer.set_vp(cam.vp());
+
+		for(auto& l : _lsights) {
+			_draw_ray(l);
+		}
 	}
 
 	void Combat_system::_health_care(Time dt) {
@@ -70,9 +80,20 @@ namespace combat {
 			h._heal = 0;
 
 			if(h._current_hp<=0) {
-				h.owner().get<State_comp>().process([](auto& s){
-					s.state(Entity_state::dying);
-				});
+				auto explosive = h.owner().get<Explosive_comp>();
+				auto explode = explosive.process(false, [](const auto& e){return e._activate_on_damage && !e._exloded;});
+
+				if(explode) {
+					explosive.process([&](auto& e){
+						if(e._delay_left<=0_s)
+							e._delay_left = max(e._delay, 1_ms);
+					});
+
+				} else {
+					h.owner().get<State_comp>().process([](auto& s){
+						s.state(Entity_state::dying);
+					});
+				}
 			}
 		}
 	}
@@ -195,8 +216,7 @@ namespace combat {
 			}
 		});
 
-		//_em.erase(e.owner_ptr());
-		e.owner().get<State_comp>().process([](auto& s){
+		e.owner().get<State_comp>().process([](auto& s) {
 			s.state(Entity_state::dying);
 		});
 	}
@@ -211,6 +231,30 @@ namespace combat {
 			}
 
 			h.damage(damage);
+		});
+	}
+
+	void Combat_system::_draw_ray(Laser_sight_comp& l) {
+		l.owner().get<sys::physics::Transform_comp>().process(
+			[&](sys::physics::Transform_comp& t) {
+				Distance dist = 20_m;
+				util::maybe<ecs::Entity&> entity = util::nothing();
+
+				std::tie(entity, dist) =
+						_ts.raycast_nearest_entity(t.position(),
+														 t.rotation(),
+														 20_m,
+														 [&](ecs::Entity& e){
+					return &l.owner()!=&e && e.get<sys::physics::Transform_comp>().get_or_throw().layer()>=0.5;
+				});
+
+				auto p = remove_units(t.position());
+
+				entity.process([&](ecs::Entity& e){
+					dist = std::max(dist,Distance(glm::length(p - remove_units(e.get<sys::physics::Transform_comp>().get_or_throw().position()))));
+				});
+
+				_ray_renderer.draw(glm::vec3(p.x,p.y,0.49), t.rotation(), dist.value(), l.color(), l.width());
 		});
 	}
 

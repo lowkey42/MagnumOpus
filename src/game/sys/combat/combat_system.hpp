@@ -17,6 +17,8 @@
 
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
+#include <core/renderer/primitives.hpp>
+#include <core/renderer/camera.hpp>
 
 #include "../physics/transform_system.hpp"
 #include "../physics/physics_system.hpp"
@@ -36,12 +38,14 @@ namespace combat {
 
 	class Combat_system {
 		public:
-			Combat_system(ecs::Entity_manager& entity_manager,
+			Combat_system(asset::Asset_manager& assets,
+			              ecs::Entity_manager& entity_manager,
 						  physics::Transform_system& transform_system,
 						  physics::Physics_system& physics_system,
 						  state::State_system& state_system);
 
 			void update(Time dt);
+			void draw(const renderer::Camera& cam);
 
 		private:
 			void _health_care(Time dt);
@@ -49,6 +53,7 @@ namespace combat {
 			void _explode_explosives(Time dt);
 			void _deal_damage(ecs::Entity& target, int group, float damage);
 			void _explode(Explosive_comp& e);
+			void _draw_ray(Laser_sight_comp& l);
 
 			void _on_collision(physics::Manifold& m);
 
@@ -56,9 +61,11 @@ namespace combat {
 			Weapon_comp::Pool& _weapons;
 			Health_comp::Pool& _healths;
 			Explosive_comp::Pool& _explosives;
+			Laser_sight_comp::Pool& _lsights;
 			physics::Transform_system& _ts;
 			util::slot<physics::Manifold&> _collision_slot;
 			Reaper _reaper;
+			renderer::Ray_renderer _ray_renderer;
 	};
 
 }

@@ -176,33 +176,37 @@ namespace controller {
 	}
 
 
-	namespace {
-		float filter_axis_input(int v, float max, float d) {
-			return glm::abs(v)<max*d ? 0 : v/max;
-		}
-	}
-
 	void Gamepad_controller::on_frame() {
 		Input_controller_base::on_frame();
 
-		auto axis = [&](auto a) {
-			return filter_axis_input(SDL_GameControllerGetAxis(_controller, a), _mapping->stick_max_value, _mapping->stick_dead_zone);
+		auto stick = [&](auto s) {
+			glm::vec2 v {
+				SDL_GameControllerGetAxis(_controller, to_sdl_axis_x(s)) / _mapping->stick_max_value,
+				SDL_GameControllerGetAxis(_controller, to_sdl_axis_y(s)) / _mapping->stick_max_value,
+			};
+
+			auto dz = _mapping->stick_dead_zone;
+			auto length = glm::length(v);
+
+			if(length<dz)
+				return glm::vec2{0,0};
+
+			return v/length * ((length-dz)/(1-dz));
 		};
+
 		auto trigger = [&](auto t) {
 			return glm::abs(SDL_GameControllerGetAxis(_controller,t))>_mapping->stick_max_value*_mapping->stick_dead_zone;
 		};
 
 
 		_move.x=_move.y=0;
-		for(auto stick : _mapping->move_sticks) {
-			_move.x+=axis(to_sdl_axis_x(stick));
-			_move.y+=axis(to_sdl_axis_y(stick));
+		for(auto s : _mapping->move_sticks) {
+			_move+=stick(s);
 		}
 
 		_look.x=_look.y=0;
-		for(auto stick : _mapping->aim_sticks) {
-			_look.x+=axis(to_sdl_axis_x(stick));
-			_look.y+=axis(to_sdl_axis_y(stick));
+		for(auto s : _mapping->aim_sticks) {
+			_look+=stick(s);
 		}
 
 

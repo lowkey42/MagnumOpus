@@ -36,6 +36,7 @@ namespace combat {
 
 			auto hp()const noexcept {return _current_hp;}
 			auto max_hp()const noexcept {return _max_hp;}
+			auto hp_percent()const noexcept {return _current_hp/_max_hp;}
 
 			auto damaged()const noexcept {return _current_hp<_max_hp;}
 
