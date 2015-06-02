@@ -30,25 +30,26 @@ namespace mo {
 namespace renderer {
 
 	struct Particle {
+		uint16_t  seed;
+
 		glm::vec2 position;
 		glm::vec4 color;
 		glm::vec2 size;
 		float     rotation;
 		float     frame;
 
-		glm::vec2 velocity;
+		float     velocity;
 		float     angular_velocity;
 		float     time_to_live;
 		float     max_age;
 
-		Particle(glm::vec2 pos, glm::vec4 color, glm::vec2 size, float rotation,
-				 glm::vec2 vel, float rot_vel, float frame, float ttl);
+		Particle(glm::vec2 pos, float rot, float ttl, uint16_t seed);
 	};
 
 	struct Environment_callback {
 		virtual ~Environment_callback()noexcept{}
 
-		virtual void handle(Position& p, Velocity& vel)const noexcept=0;
+		virtual bool handle(glm::vec2 p, float& vel, float& dir)noexcept=0;
 	};
 
 	class Particle_emiter {
@@ -58,7 +59,7 @@ namespace renderer {
 
 		// private API
 			Particle_emiter(Position center, Distance radius,
-			                bool physical, bool aligned,
+			                bool physical,
 			                float spawn_rate, std::size_t max_particles,
 			                Time min_ttl, Time max_ttl,
 			                util::Xerp<Angle> direction,
@@ -78,13 +79,18 @@ namespace renderer {
 			bool empty()const noexcept;
 
 		private:
-			Position  _center;
-			Distance  _radius;
-			float     _spawn_rate;
-			bool      _physical;
-			bool      _aligned;
-			Time      _min_ttl;
-			Time      _max_ttl;
+			void spawn_new(Time dt);
+			auto simulate(Time dt, Environment_callback& env) -> std::vector<Particle>::iterator;
+			auto simulate_one(float dt, Environment_callback& env, Particle& p) -> bool;
+			void update_bounds(const Particle& p);
+
+			Position    _center;
+			Distance    _radius;
+			float       _spawn_rate;
+			bool        _physical;
+			Time        _min_ttl;
+			Time        _max_ttl;
+			std::size_t _max_particles;
 
 			util::Xerp<int8_t>             _frame;
 			util::Xerp<Angle>              _direction;
@@ -98,6 +104,8 @@ namespace renderer {
 			std::vector<Particle> _particles;
 			Texture_ptr           _texture;
 			Object                _obj;
+
+			Time _dt_acc {0};
 	};
 	using Particle_emiter_ptr = std::shared_ptr<Particle_emiter>;
 
@@ -107,7 +115,7 @@ namespace renderer {
 			Particle_renderer(asset::Asset_manager& assets, std::unique_ptr<Environment_callback> env=std::unique_ptr<Environment_callback>());
 
 			Particle_emiter_ptr create_emiter(Position center, Distance radius,
-			                                  bool physical, bool aligned,
+			                                  bool physical,
 							                  float spawn_rate, std::size_t max_particles,
 							                  Time min_ttl, Time max_ttl,
 							                  util::Xerp<Angle> direction,
@@ -128,7 +136,7 @@ namespace renderer {
 	};
 
 	inline Particle_emiter_ptr Particle_renderer::create_emiter(Position center, Distance radius,
-	                                                     bool physical, bool aligned,
+	                                                     bool physical,
 										                 float spawn_rate, std::size_t max_particles,
 										                 Time min_ttl, Time max_ttl,
 										                 util::Xerp<Angle> direction,
@@ -138,7 +146,7 @@ namespace renderer {
 										                 util::Xerp<Position> size,
 										                 util::Xerp<int8_t> frame,
 										                 Texture_ptr texture) {
-		auto pe = std::make_shared<Particle_emiter>(center, radius, physical, aligned, spawn_rate, max_particles, min_ttl, max_ttl, direction, acceleration, angular_acceleration, color, size, frame, texture);
+		auto pe = std::make_shared<Particle_emiter>(center, radius, physical, spawn_rate, max_particles, min_ttl, max_ttl, direction, acceleration, angular_acceleration, color, size, frame, texture);
 		_emiter.emplace_back(pe);
 
 		return pe;

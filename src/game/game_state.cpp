@@ -26,8 +26,18 @@ namespace mo {
 	static Profile_data im_a_savegame{"default", 42,0,0};
 
 	struct My_environment_callback : renderer::Environment_callback {
-		void handle(Position& p, Velocity& vel)const noexcept override {
-			// TODO
+		My_environment_callback(const level::Level& level)
+		    : level(level) {}
+
+		const level::Level& level;
+
+		bool handle(glm::vec2 p, float& vel, float& dir)noexcept override {
+			if(!level.solid(p.x+0.5, p.y+0.5))
+				return false;
+
+			// TODO: write better collision code
+			dir=dir - (180_deg).value();
+			return false;
 		}
 	};
 
@@ -54,7 +64,7 @@ namespace mo {
 		  combat(engine.assets(), em, transform, physics, state),
 		  spritesys(em, transform, engine.assets(), state),
 		  ui(engine, em),
-	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>()) {
+	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>(level)) {
 
 		auto d = depth.get_or_other(profile.depth);
 
@@ -89,18 +99,18 @@ namespace mo {
 
 		my_p = particle_renderer.create_emiter(
 				start_position,
-				0.5_m,
+				0.25_m,
 				true,
-				false,
-				20,
-				500,
-				0.5_s, 2_s,
+				400,
+				4000,
+				1.0_s, 5_s,
 				util::cerp<Angle>({0_deg}, 180_deg),
-				util::lerp<Speed_per_time>(5_m/second_2, 0_m/second_2),
-				util::cerp<Angle_acceleration>({0_deg/second_2}, 1_deg/second_2),
-				util::lerp<glm::vec4>({1,0,0,0.6}, {0,1,0,0.1}, {0.2,0,0,0.1}),
-				util::lerp<Position>({5_cm, 5_cm}, {50_cm, 50_cm}, {0_cm, 0_cm}),
-				util::scerp<int8_t>(1),
+				util::lerp<Speed_per_time>(2_m/second_2, 0_m/second_2),
+				//util::cerp<Angle_acceleration>({180_deg/second_2}, 1_deg/second_2),
+				util::lerp<Angle_acceleration>(22_deg/second_2, 0_deg/second_2),
+				util::lerp<glm::vec4>({1,0,0,0}, {.1,.1,.1,0.8}, {0,0,0,0.1}),
+				util::lerp<Position>({5_cm, 5_cm}, {100_cm, 100_cm}, {5_cm, 5_cm}),
+				util::scerp<int8_t>(0),
 				engine.assets().load<renderer::Texture>("tex:ball"_aid)
 		);
 

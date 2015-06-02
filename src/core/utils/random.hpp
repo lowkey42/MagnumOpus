@@ -16,6 +16,7 @@
 #pragma once
 
 #include <random>
+#include <ctime>
 
 namespace mo {
 namespace util {
@@ -66,8 +67,8 @@ namespace util {
 	using random_generator = std::mt19937_64;
 
 	inline auto create_random_generator() -> random_generator {
-		static std::random_device rd;
-		return random_generator{rd()};
+		//static std::random_device rd;
+		return random_generator(std::time(0));
 	}
 
 	template<class T, class Generator>

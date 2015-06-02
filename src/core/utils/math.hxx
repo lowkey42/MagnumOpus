@@ -9,8 +9,8 @@ namespace util {
 	namespace {
 		constexpr int32_t small_magic_prime = 337;
 		constexpr int32_t magic_prime = 1'299'827;
-		constexpr auto max_seed = 512;
-		constexpr auto max_seed_real = 512.f;
+		constexpr auto max_seed = 1024;
+		constexpr auto max_seed_real = 1024.f;
 	}
 
 	template<typename T>
@@ -22,22 +22,18 @@ namespace util {
 
 	template<typename T>
 	auto Interpolation<T>::operator()(float t, int32_t seed)const noexcept -> T {
-		int32_t base = seed;
-		T val;
+		int32_t base = (seed*small_magic_prime) % max_seed;
+		T val = (base/max_seed_real) * max_deviation*2.f - max_deviation;
+
 		switch(type) {
 			case Interpolation_type::linear:
-				val = (1-t)*initial_value + t*final_value;
-				base=base + t*small_magic_prime;
+				val += (1-t)*initial_value + t*final_value;
 				break;
 
 			case Interpolation_type::constant:
-				val = cpoints.at((seed+magic_prime) % cpoints.size());
+				val += cpoints.at((seed+magic_prime) % cpoints.size());
 				break;
 		}
-
-		base = (base*small_magic_prime) % max_seed;
-
-		val += (base/max_seed_real) * max_deviation*2 - max_deviation;
 
 		return val;
 	}
