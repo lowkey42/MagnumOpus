@@ -31,12 +31,38 @@ namespace mo {
 
 		const level::Level& level;
 
-		bool handle(glm::vec2 p, float& vel, float& dir)noexcept override {
-			if(!level.solid(p.x+0.5, p.y+0.5))
+		bool handle(glm::vec2 p, float& v, float& dir)noexcept override {
+			int x = static_cast<int>(p.x+0.5);
+			int y = static_cast<int>(p.y+0.5);
+
+			if(!level.solid(x, y))
 				return false;
 
-			// TODO: write better collision code
-			dir=dir - (180_deg).value();
+			auto rel = glm::vec2{x-p.x, y-p.y};
+			auto arel = glm::abs(rel);
+
+			if((arel.x<0.01 && arel.y<0.01))
+				return true;
+
+			auto dv = glm::vec2{glm::cos(dir), glm::sin(dir)};
+
+			if(glm::abs(arel.x-arel.y) < 0.01) {
+				dv.x=-dv.x;
+				dv.y=-dv.y;
+
+			} else if(arel.x > arel.y) {
+				dv.x=-dv.x;
+			} else {
+				dv.y=-dv.y;
+			}
+
+			auto np = p+ dv*v * (1/30.f);
+			if(level.solid(np.x+0.5f, y+0.5f))
+				return true;
+
+			dir = glm::atan(dv.y, dv.x);
+			v*=0.9f;
+
 			return false;
 		}
 	};
@@ -99,17 +125,17 @@ namespace mo {
 
 		my_p = particle_renderer.create_emiter(
 				start_position,
-				0.25_m,
+				0_deg,
+				0.1_m,
 				true,
 				400,
-				4000,
-				1.0_s, 5_s,
-				util::cerp<Angle>({0_deg}, 180_deg),
-				util::lerp<Speed_per_time>(2_m/second_2, 0_m/second_2),
-				//util::cerp<Angle_acceleration>({180_deg/second_2}, 1_deg/second_2),
-				util::lerp<Angle_acceleration>(22_deg/second_2, 0_deg/second_2),
+				2000,
+				1_s, 3_s,
+				util::cerp<Angle>({0_deg}, 5_deg),
+				util::lerp<Speed_per_time>(4_m/second_2, 0_m/second_2),
+				util::lerp<Angle_acceleration>(0_deg/second_2, 1_deg/second_2),
 				util::lerp<glm::vec4>({1,0,0,0}, {.1,.1,.1,0.8}, {0,0,0,0.1}),
-				util::lerp<Position>({5_cm, 5_cm}, {100_cm, 100_cm}, {5_cm, 5_cm}),
+				util::lerp<Position>({10_cm, 10_cm}, {80_cm, 80_cm}, {5_cm, 5_cm}),
 				util::scerp<int8_t>(0),
 				engine.assets().load<renderer::Texture>("tex:ball"_aid)
 		);
@@ -217,6 +243,8 @@ namespace mo {
 
 		main_player->get<sys::physics::Transform_comp>().process(
 			[&](auto& transform){
+				my_p->update_center(transform.position(), transform.rotation());
+
 				auto x = static_cast<int>(transform.position().x.value()+0.5f);
 				auto y = static_cast<int>(transform.position().y.value()+0.5f);
 

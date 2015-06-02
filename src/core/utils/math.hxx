@@ -57,7 +57,7 @@ namespace util {
 		for(const auto& v : values)
 			max_v = max(max_v, v);
 
-		return {T{0} ,T{max_v}, Interpolation_type::linear, max_deviation, std::move(values)};
+		return {T{0} ,T{max_v}, Interpolation_type::constant, max_deviation, std::move(values)};
 	}
 
 	template<typename T>

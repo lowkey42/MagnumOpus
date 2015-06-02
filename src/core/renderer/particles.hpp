@@ -54,11 +54,11 @@ namespace renderer {
 
 	class Particle_emiter {
 		public:
-			void update_center(Position center);
+			void update_center(Position center, Angle orientation);
 
 
 		// private API
-			Particle_emiter(Position center, Distance radius,
+			Particle_emiter(Position center, Angle orientation, Distance radius,
 			                bool physical,
 			                float spawn_rate, std::size_t max_particles,
 			                Time min_ttl, Time max_ttl,
@@ -85,6 +85,7 @@ namespace renderer {
 			void update_bounds(const Particle& p);
 
 			Position    _center;
+			Angle       _orientation;
 			Distance    _radius;
 			float       _spawn_rate;
 			bool        _physical;
@@ -114,7 +115,7 @@ namespace renderer {
 		public:
 			Particle_renderer(asset::Asset_manager& assets, std::unique_ptr<Environment_callback> env=std::unique_ptr<Environment_callback>());
 
-			Particle_emiter_ptr create_emiter(Position center, Distance radius,
+			Particle_emiter_ptr create_emiter(Position center, Angle orientation, Distance radius,
 			                                  bool physical,
 							                  float spawn_rate, std::size_t max_particles,
 							                  Time min_ttl, Time max_ttl,
@@ -135,7 +136,8 @@ namespace renderer {
 			std::vector<Particle_emiter_ptr> _emiter;
 	};
 
-	inline Particle_emiter_ptr Particle_renderer::create_emiter(Position center, Distance radius,
+	inline Particle_emiter_ptr Particle_renderer::create_emiter(Position center, Angle orientation,
+	                                                            Distance radius,
 	                                                     bool physical,
 										                 float spawn_rate, std::size_t max_particles,
 										                 Time min_ttl, Time max_ttl,
@@ -146,7 +148,7 @@ namespace renderer {
 										                 util::Xerp<Position> size,
 										                 util::Xerp<int8_t> frame,
 										                 Texture_ptr texture) {
-		auto pe = std::make_shared<Particle_emiter>(center, radius, physical, spawn_rate, max_particles, min_ttl, max_ttl, direction, acceleration, angular_acceleration, color, size, frame, texture);
+		auto pe = std::make_shared<Particle_emiter>(center, orientation, radius, physical, spawn_rate, max_particles, min_ttl, max_ttl, direction, acceleration, angular_acceleration, color, size, frame, texture);
 		_emiter.emplace_back(pe);
 
 		return pe;

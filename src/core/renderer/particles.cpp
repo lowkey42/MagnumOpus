@@ -68,7 +68,7 @@ namespace renderer {
 	}
 
 	Particle_emiter::Particle_emiter(
-	        Position center, Distance radius,
+	        Position center, Angle orientation, Distance radius,
 	        bool physical,
 	        float spawn_rate, std::size_t max_particles,
 	        Time min_ttl, Time max_ttl,
@@ -79,7 +79,7 @@ namespace renderer {
 	        util::Xerp<Position> size,
 	        util::Xerp<int8_t> frame,
 	        Texture_ptr texture)
-	    : _center(center), _radius(radius), _spawn_rate(spawn_rate),
+	    : _center(center), _orientation(orientation), _radius(radius), _spawn_rate(spawn_rate),
 	      _physical(physical),
 	      _min_ttl(min_ttl), _max_ttl(max_ttl), _max_particles(max_particles),
 	      _frame(frame), _direction(direction),
@@ -91,8 +91,9 @@ namespace renderer {
 		_bottom_right = _top_left = remove_units(_center);
 	}
 
-	void Particle_emiter::update_center(Position center) {
+	void Particle_emiter::update_center(Position center, Angle orientation) {
 		_center = center;
+		_orientation = orientation;
 	}
 
 	void Particle_emiter::update(bool active, Time dt, Environment_callback& env) {
@@ -117,7 +118,7 @@ namespace renderer {
 
 			_particles.emplace_back(
 				remove_units(_center)+rand_point(_radius.value()),
-				_direction(0, seed).value(),
+				_direction(0, seed).value() + _orientation,
 				random_int(rng, _min_ttl, _max_ttl).value(), seed);
 		}
 	}
@@ -152,15 +153,15 @@ namespace renderer {
 		p.velocity         += (_acceleration(t, p.seed)*dt).value();
 		p.angular_velocity += (_angular_acceleration(t, p.seed)*dt).value();
 
+		p.rotation += p.angular_velocity*dt;
+
 		if(_physical) {
 			if(env.handle(p.position, p.velocity, p.rotation))
 				return false;
 		}
 
-		p.rotation += p.angular_velocity*dt;
-
 		auto r = p.velocity * dt;
-		p.position += glm::vec2{r*glm::cos(p.rotation), r*glm::sin(p.rotation)};
+		p.position += r*glm::vec2{glm::cos(p.rotation), glm::sin(p.rotation)};
 
 		update_bounds(p);
 
@@ -223,7 +224,7 @@ namespace renderer {
 		_prog.bind()
 		     .set_uniform("vp", cam.vp())
 		     .set_uniform("texture", 0)
-		     .set_uniform("layer", 0.8f);
+		     .set_uniform("layer", 0.9f);
 
 		for(auto& pe : _emiter) {
 			if(pe->visible(top_left, bottom_right)) {
