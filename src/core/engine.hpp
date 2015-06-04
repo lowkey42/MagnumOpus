@@ -22,7 +22,7 @@
 namespace mo {
 	namespace asset {class Asset_manager;}
 	namespace renderer {class Graphics_ctx;}
-	namespace sound {class Sound_ctx;}
+	namespace audio {class Sound_ctx;}
 	class Configuration;
 	class Input_manager;
 
@@ -103,7 +103,7 @@ namespace mo {
 			std::unique_ptr<Configuration> _configuration;
 			Sdl_wrapper _sdl;
 			std::unique_ptr<renderer::Graphics_ctx> _graphics_ctx;
-			std::unique_ptr<sound::Sound_ctx> _sound_ctx;
+			std::unique_ptr<audio::Sound_ctx> _sound_ctx;
 			std::unique_ptr<Input_manager> _input_manager;
 			std::vector<std::shared_ptr<Screen>> _screen_stack;
 

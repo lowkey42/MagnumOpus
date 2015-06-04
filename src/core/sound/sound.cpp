@@ -1,7 +1,7 @@
 #include "sound.hpp"
 
 namespace mo {
-namespace sound {
+namespace audio {
 
 	Sound::Sound(std::vector<uint8_t> buffer) throw(Sound_loading_failed) : _handle(nullptr, Mix_FreeChunk){
 

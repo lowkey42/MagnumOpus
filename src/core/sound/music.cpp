@@ -1,7 +1,7 @@
 #include "music.hpp"
 
 namespace mo {
-namespace sound {
+namespace audio {
 
 	namespace {
 
@@ -52,7 +52,7 @@ namespace sound {
 		rwops->close = istream_close;
 		rwops->hidden.unknown.data1 = _stream.get();
 
-		_handle.reset(Mix_LoadMUS_RW(rwops));
+		_handle.reset(Mix_LoadMUS_RW(rwops, 1));
 		if(_handle.get() == NULL){
 			DEBUG("Mix_LoadMUS_RW returned NULL -> " << _handle.get() << "  Problem: " << Mix_GetError());
 		}

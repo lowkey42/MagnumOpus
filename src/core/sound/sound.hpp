@@ -19,13 +19,13 @@
 #include <vector>
 #include <stdexcept>
 
-#include "SDL/SDL_mixer.h"
+#include "SDL2/SDL_mixer.h"
 
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
 
 namespace mo {
-namespace sound {
+namespace audio {
 
 	struct Sound_loading_failed : public asset::Loading_failed {
 		explicit Sound_loading_failed(const std::string& msg)noexcept : Loading_failed(msg){}
@@ -56,14 +56,14 @@ namespace sound {
 
 namespace asset {
 	template<>
-	struct Loader<sound::Sound> {
-		using RT = std::shared_ptr<sound::Sound>;
+	struct Loader<audio::Sound> {
+		using RT = std::shared_ptr<audio::Sound>;
 
 		static RT load(istream in) throw(Loading_failed){
-			return std::make_unique<sound::Sound>(in.bytes());
+			return std::make_unique<audio::Sound>(in.bytes());
 		}
 
-		static void store(ostream out, const sound::Sound& asset) throw(Loading_failed) {
+		static void store(ostream out, const audio::Sound& asset) throw(Loading_failed) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

@@ -48,7 +48,7 @@ namespace asset {
 	};
 }
 
-	namespace sound {
+	namespace audio {
 
 		Sound_ctx::Sound_ctx(const std::string& name, asset::Asset_manager& assets){
 			auto& cfg = asset::unpack(assets.load_maybe<Sounds_cfg>("cfg:sounds"_aid)).get_or_other(
@@ -69,17 +69,17 @@ namespace asset {
 		}
 
 
-		void Sound_ctx::play(std::shared_ptr<const sound::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
+		void Sound_ctx::play(std::shared_ptr<const audio::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
 			Mix_PlayChannel(-1, s->getSound(), 0);
 		}
 
 
-		void Sound_ctx::play(std::shared_ptr<const sound::Music> m, Time fade_time) const noexcept {
+		void Sound_ctx::play(std::shared_ptr<const audio::Music> m, Time fade_time) const noexcept {
 			Mix_PlayMusic(m->getMusic(), -1);
 		}
 
 
-		void Sound_ctx::sound_volume(std::shared_ptr<const sound::Sound> sound, int v) const noexcept {
+		void Sound_ctx::sound_volume(std::shared_ptr<const audio::Sound> sound, int v) const noexcept {
 			Mix_VolumeChunk(sound->getSound(), v);
 		}
 

@@ -63,11 +63,11 @@ namespace mo {
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
 
-		sound::Sound_ptr mySound = _engine.assets().load<sound::Sound>("sound:test"_aid);
-		//sound::Music_ptr mainMusic = _engine.assets().load<sound::Music>("music:test"_aid);
+		audio::Sound_ptr mySound = _engine.assets().load<audio::Sound>("sound:test"_aid);
+		audio::Music_ptr mainMusic = _engine.assets().load<audio::Music>("music:test"_aid);
 
 		_engine.sound_ctx().music_volume(50);
-		//_engine.sound_ctx().play(mainMusic, Time(0));
+		_engine.sound_ctx().play(mainMusic, Time(0));
 		_engine.sound_ctx().play(mySound, Angle(0), Distance(0), 0);
 
 		//mainMusic.reset();
