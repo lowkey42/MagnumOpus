@@ -19,7 +19,7 @@
 #include <vector>
 #include <stdexcept>
 
-#include "SDL2/SDL_mixer.h"
+#include "SDL/SDL_mixer.h"
 
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"

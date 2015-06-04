@@ -1,0 +1,7 @@
+{
+
+	"frequence": 44100,
+	"max_channels": 2,
+	"buffer_size": 2048
+
+}

@@ -52,7 +52,7 @@ namespace sound {
 		rwops->close = istream_close;
 		rwops->hidden.unknown.data1 = _stream.get();
 
-		_handle.reset(Mix_LoadMUS_RW(rwops, 1));
+		_handle.reset(Mix_LoadMUS_RW(rwops));
 		if(_handle.get() == NULL){
 			DEBUG("Mix_LoadMUS_RW returned NULL -> " << _handle.get() << "  Problem: " << Mix_GetError());
 		}
