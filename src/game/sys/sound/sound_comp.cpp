@@ -7,35 +7,37 @@
 #include <sf2/sf2.hpp>
 #include <sf2/FileParser.hpp>
 
+#include "../../../core/ecs/serializer_impl.hpp"
+
 #include <string>
 
 namespace mo {
 namespace sys {
 namespace sound {
 
-	struct Sounds_entry{
-		std::string sound_name = "";
+	struct Sound_entry{
+		std::string sound_name;
 		audio::Sound_ptr ptr;
 	};
 
 	struct Sounds_map{
-		std::unordered_map<sys::state::Entity_state, Sounds_entry> sounds;
+		std::unordered_map<sys::state::Entity_state, Sound_entry> sounds;
 	};
 
-	struct Sound_comp_data{
-		Sound_comp_data(std::unique_ptr<Sounds_map> data){
-			_data = std::move(data);
-		}
+	Sound_comp_data::Sound_comp_data(std::unique_ptr<Sounds_map> data){
+		_data = std::move(data);
+	}
 
-		~Sound_comp_data() = default;
+	Sound_comp_data::~Sound_comp_data() = default;
 
-		Sound_comp_data& operator=(Sound_comp_data&& rhs) noexcept {
-			_data = std::move(rhs._data);
-			return *this;
-		}
+	Sound_comp_data& Sound_comp_data::operator=(Sound_comp_data&& rhs) noexcept {
+		_data = std::move(rhs._data);
+		return *this;
+	}
 
-		std::unique_ptr<Sounds_map> _data;
-	};
+}
+
+namespace state {
 
 	sf2_enumDef(sys::state::Entity_state,
 		sf2_value(idle),
@@ -51,7 +53,11 @@ namespace sound {
 		sf2_value(resurrected)
 	)
 
-	sf2_structDef(Sounds_entry,
+}
+
+namespace sound {
+
+	sf2_structDef(Sound_entry,
 		sf2_member(sound_name)
 	)
 
@@ -83,22 +89,35 @@ namespace sound {
 		state.write_from(Persisted_state{*this});
 	}
 
+	Mix_Chunk* Sound_comp::getSound(int pos) const noexcept {
+		return _sc_data->_data->sounds.find(sys::state::Entity_state(pos))->second.ptr->getSound();
+	}
+
 }
 }
 
 namespace asset {
-	template<>
-	struct Loader<sys::sound::Sound_comp_data> {
-		using RT = std::shared_ptr<sys::sound::Sound_comp_data>;
-
-		static RT load(istream in) throw(Loading_failed);
-
-		static void store(ostream out, const sys::sound::Sound_comp_data& asset) throw(Loading_failed);
-	};
 
 	std::shared_ptr<sys::sound::Sound_comp_data> Loader<sys::sound::Sound_comp_data>::load(istream in) throw(Loading_failed){
 		auto r = std::make_unique<sys::sound::Sounds_map>();
 		sf2::parseStream(in, *r);
+
+
+		using estate = sys::state::Entity_state;
+		int end = static_cast<int>(estate::resurrected);
+		for(int i = 0; i < end; i++){
+			auto cur_iter = r->sounds.find(estate(i));
+			if(cur_iter != r->sounds.end()){
+				DEBUG("Sound at estate pos " << i << ": " << cur_iter->second.sound_name);
+				cur_iter->second.ptr = in.manager().load<audio::Sound>(cur_iter->second.sound_name);
+			}
+		}
+
+		//std::string sname = r->sounds.find(sys::state::Entity_state::idle)->second.sound_name;
+		//r->sounds.find(sys::state::Entity_state::idle)->second.ptr = in.manager().load<audio::Sound>(sname);
+		//DEBUG("Attached Sound = " << r->sounds.find(sys::state::Entity_state::idle)->second.ptr.aid().name());
+
+		Mix_PlayChannel(-1, r->sounds.find(sys::state::Entity_state::dead)->second.ptr->getSound(), 0);
 
 		// Generating new Animation-Shared-Ptr and set _data-ptr to what r pointed to
 		auto sc_data = std::make_shared<sys::sound::Sound_comp_data>(std::move(r));

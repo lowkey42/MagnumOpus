@@ -17,6 +17,7 @@
 
 #include "sys/physics/transform_comp.hpp"
 #include "sys/sprite/sprite_comp.hpp"
+#include "sys/sound/sound_comp.hpp"
 
 #include "game_state.hpp"
 
@@ -26,14 +27,14 @@ namespace mo {
 	using namespace unit_literals;
 
 	Game_screen::Game_screen(Game_engine& engine,
-	                         std::string profile,
-	                         std::vector<ecs::ETO> players,
-	                         util::maybe<int> depth) :
+							 std::string profile,
+							 std::vector<ecs::ETO> players,
+							 util::maybe<int> depth) :
 		Screen(engine), _engine(engine),
-	    _state(std::make_unique<Game_state>(engine,profile,players,depth)),
+		_state(std::make_unique<Game_state>(engine,profile,players,depth)),
 		_player_sc_slot(&Game_screen::_on_state_change, this),
-	    _join_slot(&Game_screen::_join, this),
-	    _unjoin_slot(&Game_screen::_unjoin, this),
+		_join_slot(&Game_screen::_join, this),
+		_unjoin_slot(&Game_screen::_unjoin, this),
 		_post_effect_obj(renderer::simple_vertex_layout,
 						 renderer::create_buffer(std::vector<renderer::Simple_vertex>{
 			{{0,0}, {0,1}},
@@ -68,7 +69,7 @@ namespace mo {
 
 		_engine.sound_ctx().music_volume(50);
 		_engine.sound_ctx().play(mainMusic, Time(0));
-		_engine.sound_ctx().play(mySound, Angle(0), Distance(0), 0);
+		//_engine.sound_ctx().play(mySound, Angle(0), Distance(0), 0);
 
 		//mainMusic.reset();
 		mySound.reset();
@@ -77,6 +78,15 @@ namespace mo {
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
 			return main_camera.screen_to_world(p);
 		});
+
+		ecs::Entity_ptr player = _state->main_player;
+		auto snd_data = _engine.assets().load<sys::sound::Sound_comp_data>("sound_data:soldier"_aid);
+		player->emplace<sys::sound::Sound_comp>(snd_data);
+		player->get<sys::sound::Sound_comp>().process([&](sys::sound::Sound_comp& snd) {
+			Mix_PlayChannel(-1, snd.getSound(0), -1);
+		});
+		DEBUG("Player has transform? -> " << player->has<sys::physics::Transform_comp>());
+
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {
 		_engine.controllers().screen_to_world_coords([](glm::vec2 p){

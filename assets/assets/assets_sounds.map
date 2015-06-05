@@ -1,2 +1,7 @@
 sound: = sounds/
 sound:test = sounds/test.ogg
+sound:footstep = sounds/footstep.ogg
+
+sound_data: = sounds/data
+sound_data:player = sounds/data/player_snd.json
+sound_data:soldier = sounds/data/soldier_snd.json

@@ -18,23 +18,41 @@
 #include <core/ecs/ecs.hpp>
 #include <core/asset/asset_manager.hpp>
 
+#include <SDL2/SDL_mixer.h>
+
 namespace mo {
 namespace sys {
 namespace sound {
 
-	struct Sound_comp_data;
+	struct Sound_entry;
+
+	struct Sounds_map;
+
+	struct Sound_comp_data {
+
+		Sound_comp_data(std::unique_ptr<Sounds_map> data);
+		~Sound_comp_data();
+
+		Sound_comp_data& operator=(Sound_comp_data&& rhs) noexcept;
+
+		// Attributes
+		std::unique_ptr<Sounds_map> _data;
+
+	};
 
 	class Sound_comp : public ecs::Component<Sound_comp> {
 
 	public:
 
-		static constexpr const char* name() {return "Sprite";}
+		static constexpr const char* name() {return "Sound";}
 		void load(ecs::Entity_state&)override;
 		void store(ecs::Entity_state&)override;
 
 		// TODO: nullptr check
 		Sound_comp(ecs::Entity& owner, asset::Ptr<Sound_comp_data> sc_data = asset::Ptr<Sound_comp_data>()) :
 			Component(owner), _sc_data(sc_data){}
+
+		Mix_Chunk* getSound(int pos) const noexcept;
 
 		struct Persisted_state;
 		friend struct Persisted_state;
@@ -43,9 +61,22 @@ namespace sound {
 		friend class Sound_system;
 
 		asset::Ptr<Sound_comp_data> _sc_data;
+		std::vector<int> _loaded_sounds;
 
 	};
 
 }
+}
+
+namespace asset {
+	template<>
+	struct Loader<sys::sound::Sound_comp_data> {
+		using RT = std::shared_ptr<sys::sound::Sound_comp_data>;
+
+		static RT load(istream in) throw(Loading_failed);
+
+		static void store(ostream out, const sys::sound::Sound_comp_data& asset) throw(Loading_failed);
+	};
+
 }
 }
