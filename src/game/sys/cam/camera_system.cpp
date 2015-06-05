@@ -13,6 +13,8 @@ namespace cam {
 
 	constexpr auto world_scale = 16.f*3; // pixel/meter
 	constexpr auto vscreen_height = 512;
+	constexpr auto min_zoom = 0.5f;
+	constexpr auto max_zoom = 0.75f;
 
 	VScreen::VScreen(glm::vec2 size, float world_scale)
 		: camera(size, world_scale), vscreen(size.x, size.y, true) {
@@ -27,10 +29,15 @@ namespace cam {
 		entity_manager.register_component_type<Camera_target_comp>();
 
 		_cameras.emplace_back(_vscreen_size, world_scale);
-		_cameras.back().camera.zoom(0.75f);
+		_cameras.back().camera.zoom(max_zoom);
 	}
 
 	void Camera_system::update(Time dt) {
+		glm::vec2 pos_acc, pos_min{99999.f, 99999.f}, pos_max;
+		float pos_count=0;
+
+		_cameras.back().targets.clear();
+
 		for(auto& target : _targets) {
 
 			if(target._rotation_zoom_time_left>0_s)
@@ -58,10 +65,25 @@ namespace cam {
 				target.chase(target_pos, dt);
 			});
 
-			// TODO: add support for multiple cameras
-			_cameras.back().camera.position(remove_units(target.cam_position() + target_offset));
-			_cameras.back().targets.clear();
 			_cameras.back().targets.push_back(target.owner_ptr());
+			auto p = remove_units(target.cam_position() + target_offset);
+			pos_acc+=p;
+			pos_count++;
+
+			if(pos_min.x>p.x) pos_min.x = p.x;
+			if(pos_min.y>p.y) pos_min.y = p.y;
+			if(pos_max.x<p.x) pos_max.x = p.x;
+			if(pos_max.y<p.y) pos_max.y = p.y;
+		}
+
+		if(pos_count>0) {
+			auto& cam = _cameras.back().camera;
+			auto cam_pos = pos_acc / pos_count;
+			cam.position(cam_pos*0.25f + cam.position()*0.75f);
+			float max_dist = glm::length(pos_max-pos_min) + 1;
+
+			auto new_zoom = glm::clamp((vscreen_height/world_scale)/max_dist, min_zoom, max_zoom);
+			cam.zoom(cam.zoom()*0.8f + new_zoom*0.2f);
 		}
 
 		_main_camera.position(_cameras.front().camera.position());
