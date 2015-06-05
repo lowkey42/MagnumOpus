@@ -79,11 +79,14 @@ namespace mo {
 			return main_camera.screen_to_world(p);
 		});
 
+
+		// TODO [Sebastian]: remove after finishing Sound finalization
 		ecs::Entity_ptr player = _state->main_player;
 		auto snd_data = _engine.assets().load<sys::sound::Sound_comp_data>("sound_data:soldier"_aid);
 		player->emplace<sys::sound::Sound_comp>(snd_data);
 		player->get<sys::sound::Sound_comp>().process([&](sys::sound::Sound_comp& snd) {
-			Mix_PlayChannel(-1, snd.getSound(6), -1);
+			Mix_PlayChannel(1, snd.get_sound(0), -1);
+			Mix_SetPosition(1, 270, 100);
 		});
 
 	}

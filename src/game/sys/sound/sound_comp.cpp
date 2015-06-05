@@ -92,7 +92,7 @@ namespace sound {
 		state.write_from(Persisted_state{*this});
 	}
 
-	Mix_Chunk* Sound_comp::getSound(int pos) const noexcept {
+	Mix_Chunk* Sound_comp::get_sound(int pos) const noexcept {
 		if(!_sc_data->_loaded_sounds.at(pos)){
 			ERROR("Tried to access a Sound position that is not initialized -> try to load idle sound!");
 			if(!_sc_data->_loaded_sounds.at(0)){
@@ -117,7 +117,7 @@ namespace asset {
 		std::vector<audio::Sound_ptr> ptrs;
 		using estate = sys::state::Entity_state;
 		int end = static_cast<int>(estate::resurrected);
-		for(int i = 0; i < end; i++){
+		for(int i = 0; i <= end; i++){
 			auto cur_iter = r->sounds.find(estate(i));
 			ptrs.push_back(audio::Sound_ptr());
 			if(cur_iter != r->sounds.end()){

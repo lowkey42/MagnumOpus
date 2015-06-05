@@ -55,7 +55,7 @@ namespace sound {
 		Sound_comp(ecs::Entity& owner, asset::Ptr<Sound_comp_data> sc_data = asset::Ptr<Sound_comp_data>()) :
 			Component(owner), _sc_data(sc_data){}
 
-		Mix_Chunk* getSound(int pos) const noexcept;
+		Mix_Chunk* get_sound(int pos) const noexcept;
 
 		struct Persisted_state;
 		friend struct Persisted_state;
