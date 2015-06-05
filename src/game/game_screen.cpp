@@ -83,9 +83,8 @@ namespace mo {
 		auto snd_data = _engine.assets().load<sys::sound::Sound_comp_data>("sound_data:soldier"_aid);
 		player->emplace<sys::sound::Sound_comp>(snd_data);
 		player->get<sys::sound::Sound_comp>().process([&](sys::sound::Sound_comp& snd) {
-			Mix_PlayChannel(-1, snd.getSound(0), -1);
+			Mix_PlayChannel(-1, snd.getSound(6), -1);
 		});
-		DEBUG("Player has transform? -> " << player->has<sys::physics::Transform_comp>());
 
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {

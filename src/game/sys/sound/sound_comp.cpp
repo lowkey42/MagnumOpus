@@ -24,14 +24,17 @@ namespace sound {
 		std::unordered_map<sys::state::Entity_state, Sound_entry> sounds;
 	};
 
-	Sound_comp_data::Sound_comp_data(std::unique_ptr<Sounds_map> data){
+	Sound_comp_data::Sound_comp_data(std::unique_ptr<Sounds_map> data, std::vector<audio::Sound_ptr> ptrs){
 		_data = std::move(data);
+		_loaded_sounds = std::move(ptrs);
+
 	}
 
 	Sound_comp_data::~Sound_comp_data() = default;
 
 	Sound_comp_data& Sound_comp_data::operator=(Sound_comp_data&& rhs) noexcept {
 		_data = std::move(rhs._data);
+		_loaded_sounds = std::move(rhs._loaded_sounds);
 		return *this;
 	}
 
@@ -90,7 +93,16 @@ namespace sound {
 	}
 
 	Mix_Chunk* Sound_comp::getSound(int pos) const noexcept {
-		return _sc_data->_data->sounds.find(sys::state::Entity_state(pos))->second.ptr->getSound();
+		if(!_sc_data->_loaded_sounds.at(pos)){
+			ERROR("Tried to access a Sound position that is not initialized -> try to load idle sound!");
+			if(!_sc_data->_loaded_sounds.at(0)){
+				CRASH_REPORT("No standard Sound at pos0 (idle)!");
+			}
+			INFO("Found standard sound for idle -> loading");
+			return _sc_data->_loaded_sounds.at(0)->getSound();
+		}
+		DEBUG("LOADED SOUND FROM VECTOR AT POS " << pos);
+		return _sc_data->_loaded_sounds.at(pos)->getSound();
 	}
 
 }
@@ -102,25 +114,21 @@ namespace asset {
 		auto r = std::make_unique<sys::sound::Sounds_map>();
 		sf2::parseStream(in, *r);
 
-
+		std::vector<audio::Sound_ptr> ptrs;
 		using estate = sys::state::Entity_state;
 		int end = static_cast<int>(estate::resurrected);
 		for(int i = 0; i < end; i++){
 			auto cur_iter = r->sounds.find(estate(i));
+			ptrs.push_back(audio::Sound_ptr());
 			if(cur_iter != r->sounds.end()){
 				DEBUG("Sound at estate pos " << i << ": " << cur_iter->second.sound_name);
 				cur_iter->second.ptr = in.manager().load<audio::Sound>(cur_iter->second.sound_name);
+				ptrs.at(i) = cur_iter->second.ptr;
 			}
 		}
 
-		//std::string sname = r->sounds.find(sys::state::Entity_state::idle)->second.sound_name;
-		//r->sounds.find(sys::state::Entity_state::idle)->second.ptr = in.manager().load<audio::Sound>(sname);
-		//DEBUG("Attached Sound = " << r->sounds.find(sys::state::Entity_state::idle)->second.ptr.aid().name());
-
-		Mix_PlayChannel(-1, r->sounds.find(sys::state::Entity_state::dead)->second.ptr->getSound(), 0);
-
-		// Generating new Animation-Shared-Ptr and set _data-ptr to what r pointed to
-		auto sc_data = std::make_shared<sys::sound::Sound_comp_data>(std::move(r));
+		// Generating new Sound-Shared-Ptr and set _sc_data-ptr to what r pointed to
+		auto sc_data = std::make_shared<sys::sound::Sound_comp_data>(std::move(r), std::move(ptrs));
 
 		return sc_data;
 	}

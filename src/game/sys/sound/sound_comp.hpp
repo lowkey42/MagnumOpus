@@ -18,6 +18,8 @@
 #include <core/ecs/ecs.hpp>
 #include <core/asset/asset_manager.hpp>
 
+#include <core/sound/sound.hpp>
+
 #include <SDL2/SDL_mixer.h>
 
 namespace mo {
@@ -30,13 +32,14 @@ namespace sound {
 
 	struct Sound_comp_data {
 
-		Sound_comp_data(std::unique_ptr<Sounds_map> data);
+		Sound_comp_data(std::unique_ptr<Sounds_map> data, std::vector<audio::Sound_ptr>);
 		~Sound_comp_data();
 
 		Sound_comp_data& operator=(Sound_comp_data&& rhs) noexcept;
 
 		// Attributes
 		std::unique_ptr<Sounds_map> _data;
+		std::vector<audio::Sound_ptr> _loaded_sounds;
 
 	};
 
@@ -61,7 +64,6 @@ namespace sound {
 		friend class Sound_system;
 
 		asset::Ptr<Sound_comp_data> _sc_data;
-		std::vector<int> _loaded_sounds;
 
 	};
 
