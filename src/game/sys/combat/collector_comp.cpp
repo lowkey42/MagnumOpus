@@ -12,37 +12,36 @@ namespace combat {
 	using namespace unit_literals;
 
 	struct Collector_comp::Persisted_state {
-		int group;
+		float force;
+		float near, far;
+		float near_angle, far_angle;
 
 		Persisted_state(const Collector_comp& c)
-				: group(c._group) {}
+		    : force(c._force.value()),
+		      near(c._near.value()),
+		      far(c._far.value()),
+		      near_angle(c._near_angle / 1_deg),
+		      far_angle(c._far_angle / 1_deg) {}
 	};
 
 	sf2_structDef(Collector_comp::Persisted_state,
-		sf2_member(group)
+		sf2_member(force),
+		sf2_member(near),
+		sf2_member(far),
+		sf2_member(near_angle),
+		sf2_member(far_angle)
 	)
 
 	void Collector_comp::load(ecs::Entity_state& state) {
 		auto s = state.read_to(Persisted_state{*this});
-		_group = s.group;
+		_force      = s.force * 1_N;
+		_near       = s.near * 1_m;
+		_far        = s.far * 1_m;
+		_near_angle = s.near_angle * 1_deg;
+		_far_angle  = s.far_angle * 1_deg;
 	}
 	void Collector_comp::store(ecs::Entity_state& state) {
 		state.write_from(Persisted_state{*this});
-	}
-
-	void Collector_comp::take(physics::Transform_system& ts) {
-		owner().get<physics::Transform_comp>().process([&](auto& t){
-
-			ts.foreach_in_range(t.position(), t.rotation(), 0.5_m, 10_m, 60_deg, 90_deg,
-			                    [&](ecs::Entity& e){
-				util::process(e.get<physics::Transform_comp>(),
-				              e.get<physics::Physics_comp>())
-				>> [&](auto& tt, auto& tp){
-					tp.apply_force(500_N * remove_units(t.position()-tt.position()) );
-				};
-			});
-
-		});
 	}
 
 }

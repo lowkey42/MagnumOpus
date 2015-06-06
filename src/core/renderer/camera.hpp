@@ -48,6 +48,8 @@ namespace renderer {
 
 			void bind_viewport()const noexcept;
 
+			auto area()const noexcept -> glm::vec4;
+
 		private:
 			void recalc_vp()const noexcept;
 

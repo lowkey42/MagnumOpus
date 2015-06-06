@@ -1,5 +1,4 @@
 tex: = textures/
-tex:test = textures/test.tga
 tex:tilemap = textures/tilemap_base_modded.png
 tex:player = textures/player_tmp.png
 tex:enemy_moving = textures/scorpion_move.png

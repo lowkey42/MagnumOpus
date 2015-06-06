@@ -20,6 +20,7 @@
 #include "../core/units.hpp"
 #include "../core/ecs/ecs.hpp"
 #include "../core/ecs/serializer.hpp"
+#include <core/renderer/particles.hpp>
 
 #include "level/level.hpp"
 #include "level/tilemap.hpp"
@@ -54,6 +55,9 @@ namespace mo {
 		level::Tilemap tilemap;
 
 		sys::physics::Transform_system transform;
+
+		renderer::Particle_renderer particle_renderer;
+
 		sys::cam::Camera_system camera;
 		sys::physics::Physics_system physics;
 		sys::state::State_system state;
@@ -73,7 +77,7 @@ namespace mo {
 		           util::maybe<int> depth);
 
 		void update(Time dt);
-		auto draw() -> util::cvector_range<sys::cam::VScreen>;
+		auto draw(Time dt) -> util::cvector_range<sys::cam::VScreen>;
 		void draw_ui();
 
 		auto add_player(sys::controller::Controller& controller, Position pos,

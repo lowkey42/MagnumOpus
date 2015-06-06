@@ -72,7 +72,7 @@ namespace mo {
 	class Camera {};
 
 	void Game_screen::_draw(float time) {
-		auto vscreens = _state->draw();
+		auto vscreens = _state->draw(Time(time));
 
 		for(auto& screen : vscreens) {
 			glm::mat4 vp = glm::ortho(0.f,1.f,1.f,0.f,-1.f,1.f);

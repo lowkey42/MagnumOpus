@@ -25,6 +25,7 @@
 
 #include "../state/state_comp.hpp"
 #include "reaper.hpp"
+#include "collectable_subsystem.hpp"
 
 #include "weapon_comp.hpp"
 #include "health_comp.hpp"
@@ -32,6 +33,7 @@
 
 namespace mo {
 	namespace asset {class Asset_manager;}
+	namespace renderer {class Particle_renderer;}
 
 namespace sys {
 namespace combat {
@@ -42,7 +44,8 @@ namespace combat {
 			              ecs::Entity_manager& entity_manager,
 						  physics::Transform_system& transform_system,
 						  physics::Physics_system& physics_system,
-						  state::State_system& state_system);
+						  state::State_system& state_system,
+			              renderer::Particle_renderer& particles);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& cam);
@@ -65,6 +68,7 @@ namespace combat {
 			physics::Transform_system& _ts;
 			util::slot<physics::Manifold&> _collision_slot;
 			Reaper _reaper;
+			Collectable_subsystem _collectables;
 			renderer::Ray_renderer _ray_renderer;
 	};
 
