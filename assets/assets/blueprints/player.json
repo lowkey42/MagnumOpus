@@ -44,7 +44,13 @@
     "Score":{
         "collector": true
     },
-    "Collector",
+    "Collector":{
+        "force": 500,
+        "near": 0.5,
+        "far": 10,
+        "near_angle": 180,
+        "far_angle": 60
+    },
     "ui",
     "Explosive": {
         "damage": 10,

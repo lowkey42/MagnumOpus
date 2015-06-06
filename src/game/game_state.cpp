@@ -31,43 +31,10 @@ namespace mo {
 
 		const level::Level& level;
 
-		bool handle(glm::vec2 p, float& v, float& dir)noexcept override {
-			int x = static_cast<int>(p.x+0.5);
-			int y = static_cast<int>(p.y+0.5);
-
-			if(!level.solid(x, y))
-				return false;
-
-			auto rel = glm::vec2{x-p.x, y-p.y};
-			auto arel = glm::abs(rel);
-
-			if((arel.x<0.01 && arel.y<0.01))
-				return true;
-
-			auto dv = glm::vec2{glm::cos(dir), glm::sin(dir)};
-
-			if(glm::abs(arel.x-arel.y) < 0.01) {
-				dv.x=-dv.x;
-				dv.y=-dv.y;
-
-			} else if(arel.x > arel.y) {
-				dv.x=-dv.x;
-			} else {
-				dv.y=-dv.y;
-			}
-
-			auto np = p+ dv*v * (1/30.f);
-			if(level.solid(np.x+0.5f, y+0.5f))
-				return true;
-
-			dir = glm::atan(dv.y, dv.x);
-			v*=0.9f;
-
-			return false;
+		bool check_collision(int x, int y)noexcept override {
+			return level.solid(x, y);
 		}
 	};
-
-	renderer::Particle_emiter_ptr my_p;
 
 	Game_state::Game_state(Game_engine& engine,
 	                       std::string profile_name,
@@ -82,15 +49,15 @@ namespace mo {
 	      em(engine.assets()),
 	      tilemap(engine, level),
 	      transform(em, MaxEntitySize, level.width(), level.height(), level),
+	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>(level)),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  state(em),
-		  controller(em, transform),
+		  controller(em),
 		  ai(em, transform, level),
-		  combat(engine.assets(), em, transform, physics, state),
+		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
 		  spritesys(em, transform, engine.assets(), state),
-		  ui(engine, em),
-	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>(level)) {
+		  ui(engine, em) {
 
 		auto d = depth.get_or_other(profile.depth);
 
@@ -122,23 +89,6 @@ namespace mo {
 			add_player(engine.controllers().main_controller(),
 			           start_position);
 		}
-
-		my_p = particle_renderer.create_emiter(
-				start_position,
-				0_deg,
-				0.1_m,
-				true,
-				400,
-				2000,
-				1_s, 3_s,
-				util::cerp<Angle>({0_deg}, 5_deg),
-				util::lerp<Speed_per_time>(4_m/second_2, 0_m/second_2),
-				util::lerp<Angle_acceleration>(0_deg/second_2, 1_deg/second_2),
-				util::lerp<glm::vec4>({1,0,0,0}, {.1,.1,.1,0.8}, {0,0,0,0.1}),
-				util::lerp<Position>({10_cm, 10_cm}, {80_cm, 80_cm}, {5_cm, 5_cm}),
-				util::scerp<int8_t>(0),
-				engine.assets().load<renderer::Texture>("tex:ball"_aid)
-		);
 
 		// TODO[foe]: save profile
 		im_a_savegame = profile;
@@ -243,8 +193,6 @@ namespace mo {
 
 		main_player->get<sys::physics::Transform_comp>().process(
 			[&](auto& transform){
-				my_p->update_center(transform.position(), transform.rotation());
-
 				auto x = static_cast<int>(transform.position().x.value()+0.5f);
 				auto y = static_cast<int>(transform.position().y.value()+0.5f);
 

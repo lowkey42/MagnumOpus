@@ -14,9 +14,8 @@ namespace controller {
 	using namespace state;
 	using namespace unit_literals;
 
-	Controller_system::Controller_system(ecs::Entity_manager& entity_manager,
-	                                     physics::Transform_system& ts)
-	  : _controllables(entity_manager.list<Controllable_comp>()), _ts(ts) {
+	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
+	  : _controllables(entity_manager.list<Controllable_comp>()) {
 
 		entity_manager.register_component_type<Controllable_comp>();
 	}
@@ -24,14 +23,12 @@ namespace controller {
 	namespace {
 
 		struct Controllable_interface_impl : public Controllable_interface {
-			Controllable_interface_impl(Time dt, ecs::Entity& entity,
-			                            physics::Transform_system& ts)
+			Controllable_interface_impl(Time dt, ecs::Entity& entity)
 				: _dt(dt), _entity(entity),
 				  _state(entity.get<State_comp>().process(State_data{},
 														   [](auto& s){return s.state();})),
 				  _target_rotation(entity.get<Transform_comp>().process(0_deg,
-																	[](auto& p){return p.rotation();})),
-				  _ts(ts){}
+																	[](auto& p){return p.rotation();})) {}
 
 			~Controllable_interface_impl()noexcept;
 
@@ -55,12 +52,11 @@ namespace controller {
 				ecs::Entity& _entity;
 				const State_data _state;
 				Angle _target_rotation;
-				physics::Transform_system& _ts;
 		};
 	}
 	void Controller_system::update(Time dt) {
 		for(auto& controllable : _controllables) {
-			Controllable_interface_impl c(dt, controllable.owner(), _ts);
+			Controllable_interface_impl c(dt, controllable.owner());
 
 			if(controllable._controller)
 				(*controllable._controller)(c);
@@ -196,7 +192,7 @@ namespace controller {
 			// TODO: InventoryComponent.take(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
 
 			_entity.get<combat::Collector_comp>().process([&](auto& c){
-				c.take(this->_ts);
+				c.take();
 			});
 
 			set_state(Entity_state::taking);

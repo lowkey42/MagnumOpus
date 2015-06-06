@@ -72,13 +72,12 @@ namespace controller {
 
 	class Controller_system {
 		public:
-			Controller_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts);
+			Controller_system(ecs::Entity_manager& entity_manager);
 
 			void update(Time dt);
 
 		private:
 			Controllable_comp::Pool& _controllables;
-			physics::Transform_system& _ts;
 		};
 
 }

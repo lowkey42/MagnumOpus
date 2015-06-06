@@ -39,6 +39,13 @@ namespace util {
 	}
 
 	template<typename T>
+	auto Interpolation<T>::avg(int32_t seed)const noexcept -> T {
+		auto& self = *this;
+
+		return (self(0,seed) + self(1,seed)) / 2.f;
+	}
+
+	template<typename T>
 	auto Interpolation<T>::max()const noexcept -> T {
 		using std::max;
 		return max(initial_value, final_value) + max_deviation;

@@ -34,14 +34,14 @@ namespace renderer {
 		};
 
 		std::vector<Base_vertex> particle_vertices {
-			{{-.5,-.5}, {0,0}},
-			{{ .5,-.5}, {1,0}},
-			{{-.5, .5}, {0,1}},
-			{{ .5, .5}, {1,1}}
+			{{-.5,-.5}, {0,1}},
+			{{ .5,-.5}, {1,1}},
+			{{-.5, .5}, {0,0}},
+			{{ .5, .5}, {1,0}}
 		};
 
 		struct Default_env_callback : Environment_callback {
-			bool handle(glm::vec2, float&, float&)noexcept {
+			bool check_collision(int, int)noexcept {
 				return false;
 			}
 		};
@@ -62,27 +62,29 @@ namespace renderer {
 	}
 
 	Particle::Particle(glm::vec2 pos, float rot, float ttl, uint16_t seed)
-	    : seed(seed), position(pos), color{0}, size{0}, rotation{rot}, frame{0},
+	    : seed(seed), position(pos), color{0}, size{0}, orientation{rot}, frame{0},
 	      velocity{0}, angular_velocity{0}, time_to_live(ttl), max_age(ttl)
 	{
 	}
 
 	Particle_emiter::Particle_emiter(
 	        Position center, Angle orientation, Distance radius,
-	        bool physical,
+	        Collision_handler collision_handler,
 	        float spawn_rate, std::size_t max_particles,
 	        Time min_ttl, Time max_ttl,
 	        util::Xerp<Angle> direction,
+	        util::Xerp<Angle> rotation_offset,
 	        util::Xerp<Speed_per_time> acceleration,
 	        util::Xerp<Angle_acceleration> angular_acceleration,
 	        util::Xerp<glm::vec4> color,
 	        util::Xerp<Position> size,
 	        util::Xerp<int8_t> frame,
-	        Texture_ptr texture)
+	        Texture_ptr texture,
+	        bool reverse)
 	    : _center(center), _orientation(orientation), _radius(radius), _spawn_rate(spawn_rate),
-	      _physical(physical),
-	      _min_ttl(min_ttl), _max_ttl(max_ttl), _max_particles(max_particles),
-	      _frame(frame), _direction(direction),
+	      _collision_handler(collision_handler),
+	      _min_ttl(min_ttl), _max_ttl(max_ttl), _max_particles(max_particles), _reverse(reverse),
+	      _frame(frame), _direction(direction), _rotation_offset(rotation_offset),
 	      _acceleration(acceleration), _angular_acceleration(angular_acceleration),
 	      _color(color), _size(size), _texture(texture),
 	      _obj(particle_vertex_layout, create_buffer(particle_vertices),
@@ -97,15 +99,15 @@ namespace renderer {
 	}
 
 	void Particle_emiter::update(bool active, Time dt, Environment_callback& env) {
-		if(active) {
-			spawn_new(dt);
+		if(active && _activated) {
+			spawn_new(dt, env);
 		}
 
 		auto di = simulate(dt, env);
 
 		_particles.erase(di, _particles.end());
 	}
-	void Particle_emiter::spawn_new(Time dt) {
+	void Particle_emiter::spawn_new(Time dt, Environment_callback& env) {
 		_dt_acc+=dt;
 
 		auto to_spawn = static_cast<std::size_t>(std::round(_spawn_rate * _dt_acc.value()));
@@ -116,10 +118,39 @@ namespace renderer {
 		for(std::size_t i=0; i<to_spawn; ++i) {
 			auto seed = next_pseed();
 
+			auto start = remove_units(_center)+rand_point(_radius.value());
+			auto dir = _direction(0, seed).value() + _orientation.value();
+			auto ttl = random_int(rng, _min_ttl, _max_ttl).value();
+
+			if(_reverse) {
+				auto dest = start+rotate(glm::vec2{1,0}, Angle(dir)) * ttl * _acceleration.avg(seed).value() * ttl;
+
+				if(_collision_handler!=Collision_handler::none) {
+					auto max_distance = glm::length(dest-start);
+					auto step = (dest-start) / max_distance / 2.f;
+					auto p=dest + step;
+					auto dist=0.5f;
+					auto collided = false;
+					for(; dist<=max_distance; dist+=0.5, p+=step) {
+						auto x = static_cast<int32_t>(p.x+0.5f);
+						auto y = static_cast<int32_t>(p.y+0.5f);
+						if(env.check_collision(x,y)) {
+							collided = true;
+							break;
+						}
+					}
+					if(collided)
+						continue;
+				}
+
+				start = dest;
+				dir -= (180.0_deg).value();
+			}
+
 			_particles.emplace_back(
-				remove_units(_center)+rand_point(_radius.value()),
-				_direction(0, seed).value() + _orientation,
-				random_int(rng, _min_ttl, _max_ttl).value(), seed);
+				start,
+				dir,
+				ttl, seed);
 		}
 	}
 	auto Particle_emiter::simulate(Time dt,
@@ -144,7 +175,8 @@ namespace renderer {
 		return last+1;
 	}
 	auto Particle_emiter::simulate_one(float dt, Environment_callback& env, Particle& p) -> bool {
-		auto t = (p.max_age-p.time_to_live) / p.max_age;
+		auto t = !_reverse ? (p.max_age-p.time_to_live) / p.max_age
+		                   : 1- (p.max_age-p.time_to_live) / p.max_age;
 
 		p.color    = _color(t, p.seed);
 		p.size     = remove_units(_size(t, p.seed));
@@ -153,15 +185,56 @@ namespace renderer {
 		p.velocity         += (_acceleration(t, p.seed)*dt).value();
 		p.angular_velocity += (_angular_acceleration(t, p.seed)*dt).value();
 
-		p.rotation += p.angular_velocity*dt;
+		p.orientation += p.angular_velocity*dt;
+		p.rotation = p.orientation + _rotation_offset(t, p.seed).value() - 90_deg;
 
-		if(_physical) {
-			if(env.handle(p.position, p.velocity, p.rotation))
-				return false;
+		if(_collision_handler!=Collision_handler::none) {
+			int x = static_cast<int>(p.position.x+0.5);
+			int y = static_cast<int>(p.position.y+0.5);
+
+			if(env.check_collision(x,y)) {
+				if(_collision_handler==Collision_handler::kill)
+					return false;
+
+
+				auto rel = glm::vec2{x-p.position.x, y-p.position.y};
+				auto arel = glm::abs(rel);
+
+				if((arel.x<0.01 && arel.y<0.01))
+					return false;
+
+				auto dv = glm::vec2{glm::cos(p.orientation), glm::sin(p.orientation)};
+
+				if(glm::abs(arel.x-arel.y) < 0.01) {
+					dv.x=-dv.x;
+					dv.y=-dv.y;
+
+				} else if(arel.x > arel.y) {
+					dv.x=-dv.x;
+				} else {
+					dv.y=-dv.y;
+				}
+
+				auto np = p.position+ dv*p.velocity * (1/30.f);
+				if(env.check_collision(np.x+0.5f, y+0.5f))
+					return false;
+
+				p.orientation = glm::atan(dv.y, dv.x);
+
+				switch(_collision_handler) {
+					case Collision_handler::stop:
+						p.velocity*=0.2f;
+
+					case Collision_handler::bounce:
+					default:
+						p.velocity*=0.9f;
+						break;
+				}
+			}
 		}
 
 		auto r = p.velocity * dt;
-		p.position += r*glm::vec2{glm::cos(p.rotation), glm::sin(p.rotation)};
+		p.position += r*glm::vec2{glm::cos(p.orientation), glm::sin(p.orientation)};
 
 		update_bounds(p);
 
@@ -238,7 +311,7 @@ namespace renderer {
 		_emiter.erase(
 		            std::remove_if(_emiter.begin(),
 		                           _emiter.end(),
-		                           [](auto& pe){return pe.use_count()<=1;}),
+		                           [](auto& pe){return pe.use_count()<=1 && pe->empty();}),
 		            _emiter.end());
 	}
 

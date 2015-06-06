@@ -56,6 +56,7 @@ namespace util {
 		auto operator()(float t, int32_t seed=0)const noexcept -> T;
 
 		auto max()const noexcept -> T;
+		auto avg(int32_t seed=0)const noexcept -> T;
 
 		T                  initial_value;
 		T                  final_value;

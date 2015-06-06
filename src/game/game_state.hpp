@@ -55,6 +55,9 @@ namespace mo {
 		level::Tilemap tilemap;
 
 		sys::physics::Transform_system transform;
+
+		renderer::Particle_renderer particle_renderer;
+
 		sys::cam::Camera_system camera;
 		sys::physics::Physics_system physics;
 		sys::state::State_system state;
@@ -66,8 +69,6 @@ namespace mo {
 
 		ecs::Entity_ptr main_player;
 		std::vector<ecs::Entity_ptr> sec_players;
-
-		renderer::Particle_renderer particle_renderer;
 
 
 		Game_state(Game_engine& engine,
