@@ -70,7 +70,7 @@ namespace asset {
 
 
 		void Sound_ctx::play(std::shared_ptr<const audio::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
-			Mix_PlayChannel(-1, s->getSound(), 0);
+			Mix_PlayChannel(-1, s->getSound(), loop);
 		}
 
 

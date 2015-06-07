@@ -39,6 +39,7 @@ namespace sound {
 
 		// Attributes
 		std::unique_ptr<Sounds_map> _data;
+		// TODO [Sebastian]: Absprache mit Flo -> Umwandlung in einen std::vector<std::shared_ptr<const audio::Sound>> ?
 		std::vector<audio::Sound_ptr> _loaded_sounds;
 
 	};
@@ -55,7 +56,7 @@ namespace sound {
 		Sound_comp(ecs::Entity& owner, asset::Ptr<Sound_comp_data> sc_data = asset::Ptr<Sound_comp_data>()) :
 			Component(owner), _sc_data(sc_data){}
 
-		Mix_Chunk* get_sound(int pos) const noexcept;
+		std::shared_ptr<const audio::Sound> get_sound(int pos) const noexcept;
 
 		struct Persisted_state;
 		friend struct Persisted_state;

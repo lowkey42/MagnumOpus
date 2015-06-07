@@ -92,17 +92,23 @@ namespace sound {
 		state.write_from(Persisted_state{*this});
 	}
 
-	Mix_Chunk* Sound_comp::get_sound(int pos) const noexcept {
+	std::shared_ptr<const audio::Sound> Sound_comp::get_sound(int pos) const noexcept {
+		std::shared_ptr<const audio::Sound> ret;
+		audio::Sound_ptr ptr;
 		if(!_sc_data->_loaded_sounds.at(pos)){
 			ERROR("Tried to access a Sound position that is not initialized -> try to load idle sound!");
 			if(!_sc_data->_loaded_sounds.at(0)){
-				CRASH_REPORT("No standard Sound at pos0 (idle)!");
+				FAIL("No standard Sound at pos0 (idle)!");
 			}
 			INFO("Found standard sound for idle -> loading");
-			return _sc_data->_loaded_sounds.at(0)->getSound();
+			ptr = _sc_data->_loaded_sounds.at(0);
+			//return _sc_data->_loaded_sounds.at(0)->getSound();
 		}
 		DEBUG("LOADED SOUND FROM VECTOR AT POS " << pos);
-		return _sc_data->_loaded_sounds.at(pos)->getSound();
+		ptr = _sc_data->_loaded_sounds.at(pos);
+		ret = std::shared_ptr<const audio::Sound> (ptr);
+		//return _sc_data->_loaded_sounds.at(pos)->getSound();
+		return ret;
 	}
 
 }
