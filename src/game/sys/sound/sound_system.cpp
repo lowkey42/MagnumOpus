@@ -49,6 +49,32 @@ namespace sound {
 
 
 	void Sound_system::_on_state_change(ecs::Entity& entity, state::State_data& data){
+
+		if(entity.has<Sound_comp>()){
+		Sound_comp& snd = entity.get<sys::sound::Sound_comp>().get_or_throw();
+
+		int state = static_cast<int>(data.s);
+		int loop = 0;
+
+		switch(data.s){
+
+			case(sys::state::Entity_state::idle):
+				loop = -1;
+				break;
+
+			case(sys::state::Entity_state::walking):
+				loop = -1;
+				break;
+
+			default:
+				break;
+
+		}
+
+		snd._assigned_channel = _sound_ctx.play(snd.get_sound(state), Angle(0), Distance(0), loop);
+
+		}
+
 		// DEBUG("Executed Sound_system::_on_state_change");
 		// TODO
 	}
