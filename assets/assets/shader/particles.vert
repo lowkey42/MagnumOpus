@@ -26,6 +26,6 @@ void main() {
 
     gl_Position = vp * vec4(epos.x, epos.y, layer, 1.0);
 
-	tex_coords = vec2(uv.x*((frame+1)/frames), uv.y);
+	tex_coords = vec2(uv.x*((frame+1.0)/frames), uv.y);
 	fcolor = color;
 }
