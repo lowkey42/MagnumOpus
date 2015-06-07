@@ -4,9 +4,9 @@
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_mixer.h>
 
-#include <core/sound/sound.hpp>
-#include <core/sound/music.hpp>
-#include <core/sound/sound_ctx.hpp>
+#include <core/audio/sound.hpp>
+#include <core/audio/music.hpp>
+#include <core/audio/sound_ctx.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>

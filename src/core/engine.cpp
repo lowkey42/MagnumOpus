@@ -5,10 +5,10 @@
 #include "configuration.hpp"
 #include "input_manager.hpp"
 #include "renderer/graphics_ctx.hpp"
-#include "sound/sound_ctx.hpp"
+#include "audio/sound_ctx.hpp"
 #include "asset/asset_manager.hpp"
 
-#include "sound/sound.hpp"
+#include "audio/sound.hpp"
 
 #include <stdexcept>
 #include <SDL2/SDL.h>

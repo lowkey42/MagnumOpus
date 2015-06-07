@@ -1,7 +1,7 @@
 #include "sound_comp.hpp"
 
 #include <unordered_map>
-#include <core/sound/sound.hpp>
+#include <core/audio/sound.hpp>
 #include <game/sys/state/state_comp.hpp>
 
 #include <sf2/sf2.hpp>

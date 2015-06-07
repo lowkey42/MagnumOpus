@@ -1,0 +1,7 @@
+{
+	"sounds": {	
+		"walking": {"sound_name": "sound:footstep"},
+		"idle": {"sound_name": "sound:footstep"},
+		"healed": {"sound_name": "sound:footstep"}
+	}
+}

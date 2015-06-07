@@ -18,7 +18,7 @@
 #include <core/ecs/ecs.hpp>
 #include <core/asset/asset_manager.hpp>
 
-#include <core/sound/sound.hpp>
+#include <core/audio/sound.hpp>
 
 #include <SDL2/SDL_mixer.h>
 
