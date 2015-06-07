@@ -85,7 +85,7 @@ namespace mo {
 		auto snd_data = _engine.assets().load<sys::sound::Sound_comp_data>("sound_data:soldier"_aid);
 		player->emplace<sys::sound::Sound_comp>(snd_data);
 		player->get<sys::sound::Sound_comp>().process([&](sys::sound::Sound_comp& snd) {
-			_engine.sound_ctx().play(snd.get_sound(0), Angle(0), Distance(0), -1);
+			_engine.sound_ctx().play(snd.get_sound(static_cast<int>(sys::state::Entity_state::walking)), Angle(0), Distance(0), -1);
 		});
 
 	}
@@ -114,7 +114,7 @@ namespace mo {
 					.set_uniform("layer",   1.0f)
 					.set_uniform("texture", 0)
 					.set_uniform("model", glm::mat4())
-					.set_uniform("color",   glm::vec4(1,1,1,1));
+					.set_uniform("color", glm::vec4(1,1,1,1));
 			screen.vscreen.bind();
 			_post_effect_obj.draw();
 		}

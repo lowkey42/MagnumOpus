@@ -94,7 +94,7 @@ namespace sound {
 
 	std::shared_ptr<const audio::Sound> Sound_comp::get_sound(int pos) const noexcept {
 		std::shared_ptr<const audio::Sound> ret;
-		audio::Sound_ptr ptr;
+		audio::Sound_ptr ptr = _sc_data->_loaded_sounds.at(pos);
 		if(!_sc_data->_loaded_sounds.at(pos)){
 			ERROR("Tried to access a Sound position that is not initialized -> try to load idle sound!");
 			if(!_sc_data->_loaded_sounds.at(0)){
@@ -105,9 +105,7 @@ namespace sound {
 			//return _sc_data->_loaded_sounds.at(0)->getSound();
 		}
 		DEBUG("LOADED SOUND FROM VECTOR AT POS " << pos);
-		ptr = _sc_data->_loaded_sounds.at(pos);
 		ret = std::shared_ptr<const audio::Sound> (ptr);
-		//return _sc_data->_loaded_sounds.at(pos)->getSound();
 		return ret;
 	}
 
@@ -122,10 +120,15 @@ namespace asset {
 
 		std::vector<audio::Sound_ptr> ptrs;
 		using estate = sys::state::Entity_state;
+
+		// TODO [Sebastian]: automatic calculation of enum-class ending
 		int end = static_cast<int>(estate::resurrected);
+
+		// fill array corresponding to Entity-State-Entries with empty Sound_ptrs
 		for(int i = 0; i <= end; i++){
 			auto cur_iter = r->sounds.find(estate(i));
 			ptrs.push_back(audio::Sound_ptr());
+			// if entry for entity_state(i) is given in config-file -> map it into the corresponding array position
 			if(cur_iter != r->sounds.end()){
 				DEBUG("Sound at estate pos " << i << ": " << cur_iter->second.sound_name);
 				cur_iter->second.ptr = in.manager().load<audio::Sound>(cur_iter->second.sound_name);
