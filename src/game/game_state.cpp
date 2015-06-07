@@ -3,6 +3,7 @@
 #include "game_engine.hpp"
 #include "game_screen.hpp"
 
+#include <core/renderer/particles.hpp>
 
 #include <core/renderer/texture.hpp>
 #include <core/asset/aid.hpp>
@@ -24,6 +25,17 @@ namespace mo {
 
 	static Profile_data im_a_savegame{"default", 42,0,0};
 
+	struct My_environment_callback : renderer::Environment_callback {
+		My_environment_callback(const level::Level& level)
+		    : level(level) {}
+
+		const level::Level& level;
+
+		bool check_collision(int x, int y)noexcept override {
+			return level.solid(x, y);
+		}
+	};
+
 	Game_state::Game_state(Game_engine& engine,
 	                       std::string profile_name,
 				           std::vector<ecs::ETO> players,
@@ -37,15 +49,16 @@ namespace mo {
 	      em(engine.assets()),
 	      tilemap(engine, level),
 	      transform(em, MaxEntitySize, level.width(), level.height(), level),
+	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>(level)),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  state(em),
-		  controller(em, transform),
+		  controller(em),
 		  ai(em, transform, level),
-		  combat(engine.assets(), em, transform, physics, state),
+		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
 		  spritesys(em, transform, engine.assets(), state),
 		  soundsys(em, transform, engine.sound_ctx(), engine.assets(), state),
-	      ui(engine, em) {
+		  ui(engine, em) {
 
 		auto d = depth.get_or_other(profile.depth);
 
@@ -207,7 +220,7 @@ namespace mo {
 		});
 	}
 
-	auto Game_state::draw() -> util::cvector_range<sys::cam::VScreen> {
+	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {
 		camera.draw(
 			[&](const renderer::Camera& cam,
 				const std::vector<ecs::Entity_ptr>&) {
@@ -216,6 +229,7 @@ namespace mo {
 			combat.draw(cam);
 			spritesys.draw(cam);
 			soundsys.play_sounds(cam);
+			particle_renderer.draw(dt, cam);
 		});
 
 		return camera.vscreens();

@@ -142,6 +142,10 @@ namespace mo {
 	struct Angle_per_time : Value_type<Angle_per_time> {
 		constexpr explicit Angle_per_time(float radians) : Value_type(radians){}
 	};
+	using Angle_velocity = Angle_per_time;
+	struct Angle_acceleration : Value_type<Angle_acceleration> {
+		constexpr explicit Angle_acceleration(float radians) : Value_type(radians){}
+	};
 
 	// directed units
 	using Position = glm::detail::tvec2<Distance, glm::highp>;
@@ -174,8 +178,13 @@ namespace mo {
 	constexpr Speed_per_time operator/(Distance s, Time_squared t) noexcept { return Speed_per_time(s.value()/t.value()); }
 	constexpr Speed operator*(Speed_per_time a, Time t) noexcept { return Speed(a.value()*t.value()); }
 
-	constexpr Angle operator*(Angle_per_time at, Time t) noexcept { return Angle(at.value()*t.value()); }
-	constexpr Angle_per_time operator/(Angle a, Time t) noexcept { return Angle_per_time(a.value()/t.value()); }
+	constexpr Angle operator*(Angle_velocity at, Time t) noexcept { return Angle(at.value()*t.value()); }
+	constexpr Angle_velocity operator/(Angle a, Time t) noexcept { return Angle_velocity(a.value()/t.value()); }
+
+	constexpr Angle_acceleration operator/(Angle_velocity a, Time t) noexcept { return Angle_acceleration(a.value()/t.value()); }
+	constexpr Angle_acceleration operator/(Angle a, Time_squared t) noexcept { return Angle_acceleration(a.value()/t.value()); }
+	constexpr Angle_velocity operator*(Angle_acceleration at, Time t) noexcept { return Angle_velocity(at.value()*t.value()); }
+	constexpr Angle operator*(Angle_acceleration at, Time_squared t) noexcept { return Angle(at.value()*t.value()); }
 
 
 	inline Velocity operator*(Acceleration a, Time t) noexcept { return Velocity(a.x*t, a.y*t); }

@@ -98,7 +98,8 @@ namespace state {
 		INVARIANT(magnitude>=0 && magnitude<=1, "magnitude is out of range: "+util::to_string(magnitude));
 
 		auto& cstate = _state_primary.left>0_s ? _state_primary : _state_background;
-		if(priority(cstate.s)>priority(s))
+
+		if(priority(cstate.s)>priority(s) && cstate.left>0_s)
 			return;
 
 		auto& state = is_background(s) ? _state_background : _state_primary;

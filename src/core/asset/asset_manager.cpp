@@ -61,21 +61,27 @@ namespace {
 	bool exists(const std::string path) {
 		return PHYSFS_exists(path.c_str())!=0 && PHYSFS_isDirectory(path.c_str())==0;
 	}
+	bool exists_dir(const std::string path) {
+		return PHYSFS_exists(path.c_str())!=0 && PHYSFS_isDirectory(path.c_str())!=0;
+	}
 
-	void print_dir_recursiv(const std::string& dir, uint8_t depth) {
+	template<typename Stream>
+	void print_dir_recursiv(const std::string& dir, uint8_t depth, Stream& stream) {
 		std::string p;
 		for(uint8_t i=0; i<depth; i++)
 			p+="  ";
 
-		std::cerr<<p<<dir<<std::endl;
+		stream<<p<<dir<<"\n";
 		depth++;
 		for(auto&& f : list_files(dir, "", "")) {
 			if(depth>=5)
-				std::cerr<<p<<"  "<<f<<std::endl;
+				stream<<p<<"  "<<f<<"\n";
 			else
-				print_dir_recursiv(f, depth);
+				print_dir_recursiv(f, depth, stream);
 		}
 	}
+
+	constexpr auto default_source = {std::make_tuple("assets", false), std::make_tuple("assets.zip", true)};
 }
 
 namespace mo {
@@ -110,20 +116,46 @@ namespace asset {
 		if(!PHYSFS_setWriteDir(write_dir.c_str()))
 			FAIL("Unable to set write-dir to \""<<write_dir<<"\": "<< PHYSFS_getLastError());
 
+
+		auto add_source = [](const char* path){
+			if(!PHYSFS_addToSearchPath(path, 1))
+				WARN("Error adding custom archive \""<<path<<"\": "<<PHYSFS_getLastError());
+		};
+
 		auto archive_file = _open("archives.lst");
 		if(!archive_file) {
-			std::cerr<<"WARN: No archives.lst found."<<std::endl;
-			print_dir_recursiv("/", 0);
-		}
+			bool lost = true;
+			for(auto& s : default_source) {
+				const char* path;
+				bool file;
 
-		// load other archives
-		archive_file.process([](istream& in) {
-			for(auto&& l : in.lines()) {
-				if(!PHYSFS_addToSearchPath(l.c_str(), 1))
-					WARN("Error adding custom archive \""<<l
-							 <<"\": "<<PHYSFS_getLastError());
+				std::tie(path, file) = s;
+
+				if(file ? exists(path) : exists_dir(path)) {
+					add_source(path);
+					lost = false;
+				}
 			}
-		});
+
+			if(lost) {
+				auto& log = ::mo::util::fail (__func__, __FILE__, __LINE__);
+				log<<"No archives.lst found. printing search-path...\n";
+				print_dir_recursiv("/", 0, log);
+
+				log<<std::endl; // crash with error
+
+			} else {
+				INFO("No archives.lst found. Using defaults.");
+			}
+
+		} else {
+			// load other archives
+			archive_file.process([&](istream& in) {
+				for(auto&& l : in.lines()) {
+					add_source(l.c_str());
+				}
+			});
+		}
 
 		for(auto&& df : list_files("", "assets", ".map"))
 			_open(df).process([this](istream& in) {

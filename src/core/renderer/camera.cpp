@@ -89,5 +89,13 @@ namespace renderer {
 	void Camera::bind_viewport()const noexcept {
 		glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
 	}
+
+	auto Camera::area()const noexcept -> glm::vec4 {
+		auto start = screen_to_world(viewport().xy()) + glm::vec2(0.5f, 0.5f);
+		auto end   = screen_to_world(viewport().xy() +
+									 viewport().zw()) + glm::vec2(1.5f, 1.5f);
+
+		return {start.x, start.y, end.x, end.y};
+	}
 }
 }

@@ -50,9 +50,9 @@ namespace level {
 
 
 	void Tilemap::draw(const Camera& cam){
-		auto cam_start = cam.screen_to_world(cam.viewport().xy()) + glm::vec2(0.5f, 0.5f);
-		auto cam_end   = cam.screen_to_world(cam.viewport().xy() +
-											 cam.viewport().zw()) + glm::vec2(1.5f, 1.5f);
+		auto cam_area  = cam.area();
+		auto cam_start = glm::vec2{cam_area.x, cam_area.y};
+		auto cam_end   = glm::vec2{cam_area.z, cam_area.w};
 
 		auto cam_range = glm::abs(cam_end-cam_start);
 		_vertices.clear();

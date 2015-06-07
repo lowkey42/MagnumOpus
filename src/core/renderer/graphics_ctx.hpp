@@ -60,6 +60,10 @@ namespace renderer {
 		Disable_depthtest();
 		~Disable_depthtest();
 	};
+	struct Disable_depthwrite {
+		Disable_depthwrite();
+		~Disable_depthwrite();
+	};
 }
 }
 
