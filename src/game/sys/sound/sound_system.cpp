@@ -32,7 +32,7 @@ namespace sound {
 			process(entity.get<sys::physics::Transform_comp>(),
 					entity.get<sys::sound::Sound_comp>())
 			>> [&](const sys::physics::Transform_comp& trans, const sys::sound::Sound_comp& snd) {
-				DEBUG("Got something with trans & snd with Channel_id: " << snd.Channel_id());
+				DEBUG("Got something with trans & snd -> with Channel_id: " << snd.Channel_id());
 			};
 		});
 

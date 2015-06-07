@@ -15,6 +15,9 @@
     "Sprite": {
         "aid": "anim:crow"
     },
+	"Sound": {
+		"aid": "sound_data:soldier"
+	},
     "Simple_ai":{
         "attack_distance": 1,
         "near":5,

@@ -64,28 +64,16 @@ namespace mo {
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
 
-		audio::Sound_ptr mySound = _engine.assets().load<audio::Sound>("sound:test"_aid);
 		audio::Music_ptr mainMusic = _engine.assets().load<audio::Music>("music:test"_aid);
 
 		_engine.sound_ctx().music_volume(50);
 		_engine.sound_ctx().play(mainMusic, Time(0));
-		//_engine.sound_ctx().play(mySound, Angle(0), Distance(0), 0);
 
-		//mainMusic.reset();
-		mySound.reset();
+		mainMusic.reset();
 
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
 			return main_camera.screen_to_world(p);
-		});
-
-
-		// TODO [Sebastian]: remove after finishing Sound finalization
-		ecs::Entity_ptr player = _state->main_player;
-		auto snd_data = _engine.assets().load<sys::sound::Sound_comp_data>("sound_data:soldier"_aid);
-		player->emplace<sys::sound::Sound_comp>(snd_data);
-		player->get<sys::sound::Sound_comp>().process([&](sys::sound::Sound_comp& snd) {
-			DEBUG("Playing on channel: " << _engine.sound_ctx().play(snd.get_sound(static_cast<int>(sys::state::Entity_state::walking)), Angle(0), Distance(0), -1));
 		});
 
 	}
