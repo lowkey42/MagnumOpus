@@ -85,7 +85,7 @@ namespace mo {
 		auto snd_data = _engine.assets().load<sys::sound::Sound_comp_data>("sound_data:soldier"_aid);
 		player->emplace<sys::sound::Sound_comp>(snd_data);
 		player->get<sys::sound::Sound_comp>().process([&](sys::sound::Sound_comp& snd) {
-			_engine.sound_ctx().play(snd.get_sound(static_cast<int>(sys::state::Entity_state::walking)), Angle(0), Distance(0), -1);
+			DEBUG("Playing on channel: " << _engine.sound_ctx().play(snd.get_sound(static_cast<int>(sys::state::Entity_state::walking)), Angle(0), Distance(0), -1));
 		});
 
 	}

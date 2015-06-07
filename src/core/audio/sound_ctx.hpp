@@ -37,7 +37,7 @@ namespace audio{
 		~Sound_ctx() = default;
 
 		void play(std::shared_ptr<const audio::Music> music, Time fade_time) const noexcept;
-		void play(std::shared_ptr<const audio::Sound> sound, Angle angle, Distance dist, int loop) const noexcept;
+		Channel_id play(std::shared_ptr<const audio::Sound> sound, Angle angle, Distance dist, int loop) const noexcept;
 		void sound_volume(std::shared_ptr<const audio::Sound> sound, int volume) const noexcept;
 		void music_volume(int volume) const noexcept;
 		void stop(Channel_id) const noexcept;

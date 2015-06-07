@@ -44,6 +44,7 @@ namespace mo {
 		  ai(em, transform, level),
 		  combat(engine.assets(), em, transform, physics, state),
 		  spritesys(em, transform, engine.assets(), state),
+		  soundsys(em, transform, engine.sound_ctx(), engine.assets(), state),
 	      ui(engine, em) {
 
 		auto d = depth.get_or_other(profile.depth);
@@ -173,6 +174,7 @@ namespace mo {
 		combat.update(dt);
 		camera.update(dt);
 		spritesys.update(dt);
+		soundsys.update(dt);
 		state.update(dt);
 		ui.update(dt);
 
@@ -213,6 +215,7 @@ namespace mo {
 			tilemap.draw(cam);
 			combat.draw(cam);
 			spritesys.draw(cam);
+			soundsys.play_sounds(cam);
 		});
 
 		return camera.vscreens();

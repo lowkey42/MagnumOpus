@@ -115,8 +115,6 @@ namespace sprite {
 				break;
 		}
 
-		// TODO: use me  data.min_time(1_s);
-
 		// applying new animation type
 		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
 		sprite._repeat_animation = toRepeat;

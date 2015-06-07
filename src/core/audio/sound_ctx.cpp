@@ -69,8 +69,10 @@ namespace asset {
 		}
 
 
-		void Sound_ctx::play(std::shared_ptr<const audio::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
-			Mix_PlayChannel(-1, s->getSound(), loop);
+		Channel_id Sound_ctx::play(std::shared_ptr<const audio::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
+			Channel_id curID =  Mix_PlayChannel(-1, s->getSound(), loop);
+			Mix_SetPosition(curID, angle.value(), dist.value());
+			return curID;
 		}
 
 

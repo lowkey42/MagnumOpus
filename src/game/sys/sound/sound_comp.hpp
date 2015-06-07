@@ -68,7 +68,7 @@ namespace sound {
 	private:
 		friend class Sound_system;
 
-		audio::Channel_id _assigned_channel;
+		audio::Channel_id _assigned_channel = 0;
 		asset::Ptr<Sound_comp_data> _sc_data;
 
 	};
