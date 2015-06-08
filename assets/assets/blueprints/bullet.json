@@ -21,6 +21,6 @@
         "aid": "anim:fireball"
     },
 	"Sound": {
-		"aid": "sound_data:soldier"
+		"aid": "sound_data:firebolt"
 	}
 }

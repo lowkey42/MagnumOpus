@@ -40,14 +40,16 @@ namespace audio{
 		Channel_id play(std::shared_ptr<const audio::Sound> sound, Angle angle, Distance dist, int loop) noexcept;
 		void sound_volume(std::shared_ptr<const audio::Sound> sound, int volume) const noexcept;
 		void music_volume(int volume) const noexcept;
+		bool sound_playing(Channel_id id) const noexcept { return Mix_Playing(id); }
+		void update_position(Channel_id id, Angle angle, Distance dist) const noexcept;
 		void stop(Channel_id) const noexcept;
 		void pauseAll() const noexcept;
 		void resumeAll() const noexcept;
-		Channel_id set_position(Channel_id, Angle angle, Distance dist) const noexcept;
 
 	private:
 		short _sound_volume;
 		short _music_volume;
+		unsigned int const _max_channels;
 
 		unsigned int _curMixPos = 0;
 

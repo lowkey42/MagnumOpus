@@ -52,6 +52,7 @@ namespace state {
 		sf2_value(change_weapon),
 		sf2_value(damaged),
 		sf2_value(healed),
+		sf2_value(dying),
 		sf2_value(dead),
 		sf2_value(resurrected)
 	)
@@ -96,7 +97,7 @@ namespace sound {
 		std::shared_ptr<const audio::Sound> ret;
 		audio::Sound_ptr ptr = _sc_data->_loaded_sounds.at(pos);
 		if(!_sc_data->_loaded_sounds.at(pos)){
-			ERROR("Tried to access a Sound position that is not initialized -> try to load idle sound!");
+			ERROR("Tried to access a Sound position that is not initialized (" << pos << ") -> try to load idle sound!");
 			if(!_sc_data->_loaded_sounds.at(0)){
 				FAIL("No standard Sound at pos0 (idle)!");
 			}

@@ -9,20 +9,22 @@ namespace {
 
 	struct Sounds_cfg {
 		int frequence;
+		int mono_stereo;
 		int max_channels;
 		int buffer_size;
 	};
 
 	sf2_structDef(Sounds_cfg,
 		sf2_member(frequence),
+		sf2_member(mono_stereo),
 		sf2_member(max_channels),
 		sf2_member(buffer_size)
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096};
+	constexpr auto default_cfg = Sounds_cfg{44100, 2, 1024, 4096};
 #else
-	constexpr auto default_cfg = Sounds_cfg{44100, 2, 2048};
+	constexpr auto default_cfg = Sounds_cfg{44100, 2, 256, 2048};
 #endif
 
 }
@@ -50,20 +52,25 @@ namespace asset {
 
 	namespace audio {
 
-		Sound_ctx::Sound_ctx(const std::string& name, asset::Asset_manager& assets){
+		Sound_ctx::Sound_ctx(const std::string& name, asset::Asset_manager& assets)
+			: _max_channels(asset::unpack(assets.load_maybe<Sounds_cfg>("cfg:sounds"_aid)).get_or_other(default_cfg).max_channels) {
 			auto& cfg = asset::unpack(assets.load_maybe<Sounds_cfg>("cfg:sounds"_aid)).get_or_other(
 				 default_cfg
 			);
 
-			DEBUG("frequence: " << cfg.frequence << " | channels: " << cfg.max_channels << " | buffer: " << cfg.buffer_size);
+			// Checking if frequence is faulty -> setting to 44100MHz
+			int verified_frequence = (cfg.frequence % 22050 == 0) ? cfg.frequence : 44100;
+			DEBUG("frequence: " << verified_frequence << " | " << ((cfg.mono_stereo == 1) ? "Mono" : "Stereo")
+								<< " | max_channels: " << cfg.max_channels << " | buffer: " << cfg.buffer_size);
 
-			if(Mix_OpenAudio(cfg.frequence, MIX_DEFAULT_FORMAT, cfg.max_channels, cfg.buffer_size) == 0) {
+			// Open SDL Audio Mixer
+			if(Mix_OpenAudio(verified_frequence, MIX_DEFAULT_FORMAT, cfg.mono_stereo, cfg.buffer_size) == 0) {
 				DEBUG("Sound_ctx succesfully initialized!");
 			} else {
 				FAIL("Initializing Sound incomplete: " << Mix_GetError());
 			}
 
-			Mix_AllocateChannels(128);
+			Mix_AllocateChannels(cfg.max_channels);
 
 			if(&cfg==&default_cfg) {
 				assets.save<Sounds_cfg>("cfg:sounds"_aid, cfg);
@@ -76,8 +83,8 @@ namespace asset {
 			Mix_SetPosition(curID, angle.value(), dist.value());
 			_curMixPos++;
 
-			// Assuming that there is no need of 30000 sounds at once
-			if(_curMixPos > 128){
+			// Assuming that there is no need of 1024 sounds at once
+			if(_curMixPos > _max_channels){
 				_curMixPos = curID = 0;
 			}
 
@@ -97,6 +104,16 @@ namespace asset {
 
 		void Sound_ctx::music_volume(int v) const noexcept {
 			Mix_VolumeMusic(v);
+		}
+
+
+		void Sound_ctx::stop(Channel_id id) const noexcept {
+			Mix_HaltChannel(id);
+		}
+
+
+		void Sound_ctx::update_position(Channel_id id, Angle angle, Distance dist) const noexcept {
+			Mix_SetPosition(id, angle.value(), dist.value());
 		}
 
 

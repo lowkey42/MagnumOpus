@@ -1,7 +1,6 @@
 {
-
 	"frequence": 44100,
-	"max_channels": 2,
+	"mono_stereo": 2,
+	"max_channels": 256,
 	"buffer_size": 2048
-
 }
