@@ -63,15 +63,24 @@ namespace asset {
 				FAIL("Initializing Sound incomplete: " << Mix_GetError());
 			}
 
+			Mix_AllocateChannels(128);
+
 			if(&cfg==&default_cfg) {
 				assets.save<Sounds_cfg>("cfg:sounds"_aid, cfg);
 			}
 		}
 
 
-		Channel_id Sound_ctx::play(std::shared_ptr<const audio::Sound> s, Angle angle, Distance dist, int loop) const noexcept {
-			Channel_id curID =  Mix_PlayChannel(-1, s->getSound(), loop);
+		Channel_id Sound_ctx::play(std::shared_ptr<const audio::Sound> s, Angle angle, Distance dist, int loop) noexcept {
+			Channel_id curID = Mix_PlayChannel(_curMixPos, s->getSound(), loop);
 			Mix_SetPosition(curID, angle.value(), dist.value());
+			_curMixPos++;
+
+			// Assuming that there is no need of 30000 sounds at once
+			if(_curMixPos > 128){
+				_curMixPos = curID = 0;
+			}
+
 			return curID;
 		}
 

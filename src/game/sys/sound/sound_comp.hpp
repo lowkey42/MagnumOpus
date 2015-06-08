@@ -58,9 +58,9 @@ namespace sound {
 			Component(owner), _sc_data(sc_data){}
 
 		std::shared_ptr<const audio::Sound> get_sound(int pos) const noexcept;
-		audio::Channel_id Channel_id() const noexcept { return _assigned_channel; }
+		audio::Channel_id channel_id() const noexcept { return _assigned_channel; }
 
-		void Channel_id(audio::Channel_id id) noexcept { _assigned_channel = id; }
+		void channel_id(audio::Channel_id id) noexcept { _assigned_channel = id; }
 
 		struct Persisted_state;
 		friend struct Persisted_state;
@@ -68,6 +68,7 @@ namespace sound {
 	private:
 		friend class Sound_system;
 
+		int _state = 0, _loop = 0;
 		audio::Channel_id _assigned_channel = 0;
 		asset::Ptr<Sound_comp_data> _sc_data;
 

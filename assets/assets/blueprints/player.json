@@ -13,9 +13,6 @@
     "Sprite": {
         "aid": "anim:soldier"
     },
-	"Sound": {
-		"aid": "sound_data:soldier"
-	},
     "Camera_target": {
         "mass": 5.,
         "damping": 0.2,
