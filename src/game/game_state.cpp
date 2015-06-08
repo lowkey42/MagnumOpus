@@ -109,6 +109,12 @@ namespace mo {
 					case level::Tile_type::floor_tile:
 						log_out<<".";
 						break;
+					case level::Tile_type::stairs_down:
+						log_out<<"<";
+						break;
+					case level::Tile_type::stairs_up:
+						log_out<<">";
+						break;
 					case level::Tile_type::door_closed_ns:
 					case level::Tile_type::door_closed_we:
 						log_out<<"+";

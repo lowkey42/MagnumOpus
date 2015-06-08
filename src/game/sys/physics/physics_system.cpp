@@ -1,3 +1,5 @@
+#define GLM_SWIZZLE
+
 #include "physics_system.hpp"
 
 #include<glm/gtc/constants.hpp>
@@ -140,11 +142,13 @@ namespace physics {
 		for(auto x : util::range(min_world_x, max_world_x)) {
 			for(auto y : util::range(min_world_y, max_world_y)) {
 				if(_world.solid(x,y)) {
+					auto tile_dim = _world.get(x,y).dimensions();
+
 					auto n = Position(x,y) - pos;
 
 					auto closest = n;
 
-					closest = glm::clamp(remove_units(closest), {tile_min, tile_min}, {tile_max, tile_max}) * 1_m;
+					closest = glm::clamp(remove_units(closest), tile_dim.xy(), tile_dim.zw()) * 1_m;
 					bool inside = false;
 
 					// Circle is inside the AABB, so we need to clamp the circle's center

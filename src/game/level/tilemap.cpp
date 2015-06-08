@@ -65,7 +65,7 @@ namespace level {
 			int tile_y = std::floor(tile_type / _tpl) + 1;
 
 			float layer = 0;
-			if(tile_type == 0 || (tile_type >= 4 && tile_type <= 6))
+			if(tile.solid())
 				layer = 0.99;
 
 			// First triangle of the rectangle
