@@ -88,6 +88,9 @@ namespace state {
 				case Entity_state::dying:
 					return Entity_state::dead;
 
+				case Entity_state::dead:
+					return Entity_state::dead;
+
 				default:
 					return Entity_state::idle;
 			}
