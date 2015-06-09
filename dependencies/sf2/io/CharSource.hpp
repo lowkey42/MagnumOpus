@@ -139,7 +139,7 @@ namespace sf2 {
 
 					return *this;
 				}
-				template<typename T>
+			/*	template<typename T>
 				CharSink& operator<<(const T& obj ) {
 					std::stringstream ss;
 					ss<<obj;
@@ -147,7 +147,7 @@ namespace sf2 {
 					(*this)<<ss.str().c_str();
 
 					return *this;
-				}
+				}*/
 		};
 		class StrCharSink : public CharSink {
 			public:

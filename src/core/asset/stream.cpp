@@ -67,14 +67,18 @@ namespace asset {
 			if (pptr() == pbase() && c == traits_type::eof()) {
 				return 0; // no-op
 			}
-			if (PHYSFS_write(file, pbase(), pptr() - pbase(), 1) < 1) {
+
+			auto res = PHYSFS_write(file, pbase(), pptr() - pbase(), 1);
+			if (res<1) {
 				return traits_type::eof();
 			}
 			if (c != traits_type::eof()) {
-				if (PHYSFS_write(file, &c, 1, 1) < 1) {
+				res = PHYSFS_write(file, &c, 1, 1);
+				if (res < 1) {
 					return traits_type::eof();
 				}
 			}
+			setp(buffer, static_cast<size_t>(res)==bufferSize ? buffer+bufferSize : buffer+res);
 
 			return 0;
 		}
@@ -120,6 +124,13 @@ namespace asset {
 		if(_file)
 			PHYSFS_close((PHYSFS_File*)_file);
 	}
+	stream& stream::operator=(stream&& rhs)noexcept {
+		INVARIANT(&_manager==&rhs._manager, "cross-manager move");
+		_file = std::move(rhs._file);
+		_aid = std::move(rhs._aid);
+		_fbuf = std::move(rhs._fbuf);
+		return *this;
+	}
 
 	bool stream::eof()const noexcept {
 		return PHYSFS_eof((PHYSFS_File*)_file);
@@ -133,6 +144,11 @@ namespace asset {
 	}
 	istream::istream(istream&& o)
 	  : stream(std::move(o)), std::istream(_fbuf.get()) {
+	}
+	auto istream::operator=(istream&& s) -> istream& {
+		stream::operator=(std::move(s));
+		init(_fbuf.get());
+		return *this;
 	}
 
 	std::vector<std::string> istream::lines() {
@@ -166,6 +182,11 @@ namespace asset {
 	}
 	ostream::ostream(ostream&& o)
 	  : stream(std::move(o)), std::ostream(_fbuf.get()) {
+	}
+	auto ostream::operator=(ostream&& s) -> ostream& {
+		stream::operator=(std::move(s));
+		init(_fbuf.get());
+		return *this;
 	}
 
 }

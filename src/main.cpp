@@ -67,8 +67,7 @@ void init(int argc, char** argv, char** env) {
 	INFO("Nothing to see here!");
 	try {
 		util::init_stacktrace(argv[0]);
-		engine.reset(new mo::Game_engine("MagnumOpus", Configuration(argc, argv, env)));
-		engine->enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
+		engine.reset(new mo::Game_engine("MagnumOpus", argc, argv, env));
 
 	} catch (const util::Error& ex) {
 		CRASH_REPORT("Exception in init: "<<ex.what());

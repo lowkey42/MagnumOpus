@@ -18,17 +18,8 @@ namespace mo {
 	using namespace util;
 	using namespace unit_literals;
 
-	Game_screen::Game_screen(Game_engine& engine,
-	                         std::string profile,
-	                         std::vector<ecs::ETO> players,
-	                         util::maybe<int> depth) :
-		Screen(engine), _engine(engine),
-	    _state(std::make_unique<Game_state>(engine,profile,players,depth)),
-		_player_sc_slot(&Game_screen::_on_state_change, this),
-	    _join_slot(&Game_screen::_join, this),
-	    _unjoin_slot(&Game_screen::_unjoin, this),
-		_post_effect_obj(renderer::simple_vertex_layout,
-						 renderer::create_buffer(std::vector<renderer::Simple_vertex>{
+	namespace {
+		std::vector<renderer::Simple_vertex> posteffect_buffer {
 			{{0,0}, {0,1}},
 			{{0,1}, {0,0}},
 			{{1,0}, {1,1}},
@@ -36,7 +27,20 @@ namespace mo {
 			{{1,1}, {1,0}},
 			{{1,0}, {1,1}},
 			{{0,1}, {0,0}}
-		}))
+		};
+	}
+
+	Game_screen::Game_screen(Game_engine& engine,
+	                         std::string profile,
+	                         std::vector<ecs::ETO> players,
+	                         util::maybe<int> depth) :
+		Screen(engine), _engine(engine),
+	    _state(Game_state::create(engine,profile,players,depth)),
+		_player_sc_slot(&Game_screen::_on_state_change, this),
+	    _join_slot(&Game_screen::_join, this),
+	    _unjoin_slot(&Game_screen::_unjoin, this),
+		_post_effect_obj(renderer::simple_vertex_layout,
+						 renderer::create_buffer(posteffect_buffer))
 	{
 		_player_sc_slot.connect(_state->state.state_change_events);
 		_join_slot.connect(engine.controllers().join_events);
@@ -49,6 +53,28 @@ namespace mo {
 	}
 
 	Game_screen::~Game_screen()noexcept {
+	}
+
+	Game_screen::Game_screen(Game_engine& engine, const Saveable_state& save_file) :
+	    Screen(engine), _engine(engine),
+	    _state(Game_state::create_from_save(engine, save_file)),
+		_player_sc_slot(&Game_screen::_on_state_change, this),
+	    _join_slot(&Game_screen::_join, this),
+	    _unjoin_slot(&Game_screen::_unjoin, this),
+		_post_effect_obj(renderer::simple_vertex_layout,
+						 renderer::create_buffer(posteffect_buffer))
+	{
+		_player_sc_slot.connect(_state->state.state_change_events);
+		_join_slot.connect(engine.controllers().join_events);
+		_unjoin_slot.connect(engine.controllers().unjoin_events);
+
+		_post_effects.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:simple"_aid))
+					 .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:simple"_aid))
+					 .bind_all_attribute_locations(renderer::simple_vertex_layout)
+					 .build();
+	}
+	auto Game_screen::save() -> Saveable_state {
+		return _state->save();
 	}
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {

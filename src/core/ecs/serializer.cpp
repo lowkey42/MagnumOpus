@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <vector>
 #include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
 #include <iostream>
 
 
@@ -124,7 +125,7 @@ namespace ecs {
 					if(first) first=false;
 					else sink(',');
 
-					sink<<compInfo.name;
+					sink<<compInfo.name.c_str();
 
 					Entity_state state {assets, sink};
 					compPtr->store(state);
@@ -253,30 +254,29 @@ namespace ecs {
 		}
 	}
 
-	std::string Serializer::write() {
+	void Serializer::write(std::ostream& stream) {
 		const auto compTypes = _entities.list_comp_infos();
 
-		io::StrCharSink sink;
+		io::StreamCharSink sink{stream};
 
 		sink('[');
 
 		bool first=true;
 		for(auto& e : _entities.list_entities()) {
 			if(first) first=false;
-			else sink(',');
+			else      sink(',');
 
 			storeEntity(compTypes, sink, *e, _assets);
 		}
 
 		sink(']');
-
-		return sink.extractString();
+		stream.flush();
 	}
 
-	void Serializer::read(const std::string& content) {
+	void Serializer::read(std::istream& stream) {
 		_entities.clear();
 
-		StringCharSource cs(content);
+		io::StreamCharSource cs(stream);
 
 		char c=cs();
 

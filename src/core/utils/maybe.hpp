@@ -50,9 +50,9 @@ namespace util {
 				_valid = o._valid;
 				if(o._valid) {
 					if(_valid)
-						_data = o._data;
+						_data = std::move(o._data);
 					else
-						_data.T(_data);
+						new(&_data) T(std::move(o._data));
 				}
 
 				o._valid = false;
@@ -194,7 +194,7 @@ namespace util {
 			}
 
 			template<typename Func>
-			void process(Func f) {
+			void process(Func f)const {
 				if(is_some())
 					f(get_or_throw());
 			}

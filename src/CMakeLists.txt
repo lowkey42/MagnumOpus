@@ -26,7 +26,7 @@ else()
 	option(SAN "Build with sanitizers" OFF)
 
 	if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-		MESSAGE("Debug build")
+		MESSAGE("Debug build; Compiler=${CMAKE_CXX_COMPILER_ID}")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND SAN)
