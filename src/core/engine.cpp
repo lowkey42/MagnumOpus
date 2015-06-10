@@ -76,8 +76,12 @@ struct Engine::Reload_handler {
 		auto largs = args;
 		largs.push_back((char*) addition_arg.c_str());
 		largs.push_back(nullptr);
-		auto r = execve(self_exec_path.c_str(), largs.data(), envs.data());
-		ERROR("exec returned with "<<r<<"; error: "<<strerror(errno));
+
+		int r=0;
+		do {
+			r = execve(self_exec_path.c_str(), largs.data(), envs.data());
+			//ERROR("exec returned with "<<r<<"; error: "<<strerror(errno));
+		} while(r!=0);
 #endif
 	}
 

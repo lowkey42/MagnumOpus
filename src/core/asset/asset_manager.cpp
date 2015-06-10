@@ -170,6 +170,7 @@ namespace asset {
 	}
 
 	Asset_manager::~Asset_manager() {
+		_assets.clear();
 		PHYSFS_deinit();
 	}
 

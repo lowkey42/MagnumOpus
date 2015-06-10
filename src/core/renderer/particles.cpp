@@ -128,7 +128,7 @@ namespace renderer {
 				if(_collision_handler!=Collision_handler::none) {
 					auto max_distance = glm::length(dest-start);
 					auto step = (dest-start) / max_distance / 2.f;
-					auto p=dest;
+					auto p=start;
 					auto dist=0.f;
 					auto collided = false;
 					for(; dist<=max_distance; dist+=0.5, p+=step) {
