@@ -2,6 +2,6 @@
 	"sounds": {	
 		"idle": {"sound_name": "sound:empty"},
 		"walking": {"sound_name": "sound:empty"},
-		"dying": {"sound_name": "sound:firebolt"}
+		"dying": {"sound_name": "sound:empty"}
 	}
 }
