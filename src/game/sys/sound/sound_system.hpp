@@ -16,12 +16,10 @@
 #pragma once
 
 #include "../../sys/physics/transform_system.hpp"
-#include <core/audio/sound.hpp>
-#include <core/audio/sound_ctx.hpp>
+#include <core/audio/audio_ctx.hpp>
 #include <core/renderer/camera.hpp>
 
 #include "sound_comp.hpp"
-#include "../state/state_system.hpp"
 
 namespace mo{
 namespace sys{
@@ -31,24 +29,18 @@ namespace sound{
 
 		public:
 
-		// Constructors
-		Sound_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
-					 audio::Sound_ctx& snd_ctx, asset::Asset_manager& asset_manager,
-					 state::State_system& state_system) noexcept;
+			// Constructors
+			Sound_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
+						 audio::Audio_ctx& audio_ctx) noexcept;
 
-		// Methods
-		void play_sounds(const renderer::Camera& camera) noexcept;
-		void update(Time dt) noexcept;
+			// Methods
+			void play_sounds(const renderer::Camera& camera) noexcept;
 
 
 		private:
-
-			void _on_state_change(ecs::Entity& e, state::State_data& data);
-
 			physics::Transform_system& _transform;
-			audio::Sound_ctx& _sound_ctx;
+			audio::Audio_ctx& _audio_ctx;
 			sound::Sound_comp::Pool& _sounds;
-			util::slot<ecs::Entity&, state::State_data&> _state_change_slot;
 
 	};
 

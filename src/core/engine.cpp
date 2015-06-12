@@ -5,7 +5,7 @@
 #include "configuration.hpp"
 #include "input_manager.hpp"
 #include "renderer/graphics_ctx.hpp"
-#include "audio/sound_ctx.hpp"
+#include "audio/audio_ctx.hpp"
 #include "asset/asset_manager.hpp"
 
 #include "audio/sound.hpp"
@@ -54,7 +54,7 @@ Engine::Engine(const std::string& title, Configuration cfg)
     _configuration(std::make_unique<Configuration>(std::move(cfg))),
     _sdl(),
 	_graphics_ctx(std::make_unique<renderer::Graphics_ctx>(title, *_asset_manager)),
-	_sound_ctx(std::make_unique<audio::Sound_ctx>("SoundContext", *_asset_manager)),
+	_audio_ctx(std::make_unique<audio::Audio_ctx>(*_asset_manager)),
 	_input_manager(std::make_unique<Input_manager>()), _current_time(SDL_GetTicks() / 1000.0f) {
 }
 
@@ -101,6 +101,7 @@ void Engine::on_frame() {
 
 	_graphics_ctx->start_frame();
 
+	_audio_ctx->flip();
 	_input_manager->update(delta_time);
 
 	_poll_events();

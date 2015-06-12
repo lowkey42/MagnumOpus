@@ -6,7 +6,7 @@
 
 #include <core/audio/sound.hpp>
 #include <core/audio/music.hpp>
-#include <core/audio/sound_ctx.hpp>
+#include <core/audio/audio_ctx.hpp>
 
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
@@ -66,10 +66,7 @@ namespace mo {
 
 		audio::Music_ptr mainMusic = _engine.assets().load<audio::Music>("music:test"_aid);
 
-		_engine.sound_ctx().music_volume(50);
-		_engine.sound_ctx().play(mainMusic, Time(0));
-
-		mainMusic.reset();
+		_engine.audio_ctx().play_music(mainMusic);
 
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){

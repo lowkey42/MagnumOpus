@@ -57,7 +57,7 @@ namespace mo {
 		  ai(em, transform, level),
 		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
 		  spritesys(em, transform, engine.assets(), state),
-		  soundsys(em, transform, engine.sound_ctx(), engine.assets(), state),
+		  soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 
 		auto d = depth.get_or_other(profile.depth);
@@ -187,7 +187,6 @@ namespace mo {
 		combat.update(dt);
 		camera.update(dt);
 		spritesys.update(dt);
-		soundsys.update(dt);
 		state.update(dt);
 		ui.update(dt);
 
