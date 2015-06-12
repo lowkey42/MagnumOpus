@@ -18,8 +18,8 @@ namespace mo {
 				int frequence;
 				int channels;
 				int buffer_size;
-				float music_volume = 0.5;
-				float sound_volume = 1;
+				float music_volume;
+				float sound_volume;
 			};
 
 			sf2_structDef(Sounds_cfg,
@@ -31,9 +31,9 @@ namespace mo {
 			)
 
 #ifndef EMSCRIPTEN
-			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.5, 1};
+			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.5f, 1.0f};
 #else
-			constexpr auto default_cfg = Sounds_cfg{44100, 2, 2048, 0.5, 1};
+			constexpr auto default_cfg = Sounds_cfg{44100, 2, 2048, 0.5f, 1.0f};
 #endif
 
 			constexpr auto create_mask(int i) -> uint16_t {
@@ -82,7 +82,7 @@ namespace mo {
 		using namespace unit_literals;
 
 		Audio_ctx::Audio_ctx(asset::Asset_manager& assets)
-		    : _channels{}, _channels_last{}, _channel_versions{}, _channel_sounds{}
+			: _channels{nullptr}, _channels_last{nullptr}, _channel_versions{0}, _channel_sounds{0}
 		{
 			_channels.fill(false);
 			_channels_last.fill(false);
