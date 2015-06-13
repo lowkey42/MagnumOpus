@@ -82,7 +82,7 @@ namespace mo {
 		using namespace unit_literals;
 
 		Audio_ctx::Audio_ctx(asset::Asset_manager& assets)
-			: _channels{nullptr}, _channels_last{nullptr}, _channel_versions{0}, _channel_sounds{0}
+			: _channels{false}, _channels_last{false}, _channel_versions{0}, _channel_sounds{nullptr}
 		{
 			_channels.fill(false);
 			_channels_last.fill(false);
