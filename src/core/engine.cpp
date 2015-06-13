@@ -11,8 +11,6 @@
 #include "audio/sound.hpp"
 
 #include <stdexcept>
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
 
 
 namespace mo {
@@ -58,7 +56,10 @@ Engine::Engine(const std::string& title, Configuration cfg)
 	_input_manager(std::make_unique<Input_manager>()), _current_time(SDL_GetTicks() / 1000.0f) {
 }
 
-Engine::~Engine() noexcept = default;
+Engine::~Engine() noexcept {
+	_screen_stack.clear();
+	assets().shrink_to_fit();
+}
 
 auto Engine::enter_screen(std::unique_ptr<Screen> screen) -> Screen& {
 	if(!_screen_stack.empty())
@@ -96,7 +97,7 @@ void Engine::leave_screen(uint8_t depth) {
 void Engine::on_frame() {
 	_last_time = _current_time;
 	_current_time = SDL_GetTicks() / 1000.0f;
-	const float delta_time = _current_time - _last_time;
+	const float delta_time = std::min(_current_time - _last_time, 1.f);
 
 
 	_graphics_ctx->start_frame();

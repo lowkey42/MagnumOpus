@@ -19,10 +19,10 @@
 #include <vector>
 #include <stdexcept>
 
-#include "SDL2/SDL_mixer.h"
-
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
+
+typedef struct _Mix_Music Mix_Music;
 
 namespace mo {
 namespace audio {
@@ -41,7 +41,9 @@ namespace audio {
 			Music(const Music&) = delete;
 			Music& operator=(const Music&) = delete;
 
-			Mix_Music* getMusic() const noexcept { return _handle.get(); }
+			auto getMusic() const noexcept { return _handle.get(); }
+
+			bool valid()const noexcept {return _handle.get();}
 
 		protected:
 			std::unique_ptr<Mix_Music,void(*)(Mix_Music*)> _handle;

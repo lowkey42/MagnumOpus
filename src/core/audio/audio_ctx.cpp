@@ -7,7 +7,11 @@
 #include <sf2/sf2.hpp>
 #include <sf2/FileParser.hpp>
 
-#include <SDL2/SDL_mixer.h>
+#ifndef EMSCRIPTEN
+#	include <SDL2/SDL_mixer.h>
+#else
+#	include <SDL/SDL_mixer.h>
+#endif
 
 
 namespace mo {
@@ -33,7 +37,7 @@ namespace mo {
 #ifndef EMSCRIPTEN
 			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.5f, 1.0f};
 #else
-			constexpr auto default_cfg = Sounds_cfg{44100, 2, 2048, 0.5f, 1.0f};
+			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.5f, 1.0f};
 #endif
 
 			constexpr auto create_mask(int i) -> uint16_t {
@@ -81,9 +85,7 @@ namespace mo {
 
 		using namespace unit_literals;
 
-		Audio_ctx::Audio_ctx(asset::Asset_manager& assets)
-			: _channels{false}, _channels_last{false}, _channel_versions{0}, _channel_sounds{nullptr}
-		{
+		Audio_ctx::Audio_ctx(asset::Asset_manager& assets) {
 			_channels.fill(false);
 			_channels_last.fill(false);
 			_channel_versions.fill(0);
@@ -106,6 +108,11 @@ namespace mo {
 			DEBUG("frequence: " << verified_frequence << " | " << ((cfg.channels == 1) ? "Mono" : "Stereo")
 								<< " | buffer: " << cfg.buffer_size);
 
+			int mix_flags = MIX_INIT_OGG;
+			if((Mix_Init(mix_flags)&mix_flags) != mix_flags) {
+				FAIL("Initializing Mixer failed: " << Mix_GetError());
+			}
+
 			// Open SDL Audio Mixer
 			if(Mix_OpenAudio(verified_frequence, MIX_DEFAULT_FORMAT, cfg.channels, cfg.buffer_size) == 0) {
 				DEBUG("Sound_ctx succesfully initialized!");
@@ -122,6 +129,7 @@ namespace mo {
 
 		Audio_ctx::~Audio_ctx() {
 			Mix_CloseAudio();
+			Mix_Quit();
 		}
 
 		void Audio_ctx::flip() {
@@ -146,15 +154,29 @@ namespace mo {
 			}
 
 			_playing_music = music;
-			Mix_FadeInMusic(music->getMusic(), -1, fade_time/1_ms);
+
+			if(!music || !music->valid())
+				return;
+
+#ifndef EMSCRIPTEN
+			Mix_FadeInMusic(music->getMusic(), -1, static_cast<int>(fade_time/1_ms));
+#else
+			Mix_PlayMusic(music->getMusic(), -1);
+#endif
 		}
 
 		auto Audio_ctx::play_static(const audio::Sound& sound) -> Channel_id {
+			if(!sound.valid())
+				return -1;
+
 			auto c = Mix_PlayChannel(-1, sound.getSound(), 0);
 			return build_channel_id(c, 0);
 		}
-		auto Audio_ctx::play_dynamic(const audio::Sound& sound, Angle angle, Distance dist,
+		auto Audio_ctx::play_dynamic(const audio::Sound& sound, Angle angle, float dist_percentage,
 		                             bool loop, Channel_id id) -> Channel_id {
+			if(!sound.valid())
+				return -1;
+
 			int16_t c;
 			uint8_t v;
 
@@ -171,11 +193,11 @@ namespace mo {
 				else if(&sound == _channel_sounds[c]) {
 					if(Mix_Paused(c)) {
 						Mix_Resume(c);
-						update(id, angle, dist);
+						update(id, angle, dist_percentage);
 						return id;
 
 					} else if(Mix_Playing(c)) {
-						update(id, angle, dist);
+						update(id, angle, dist_percentage);
 						return id;
 					}
 				}
@@ -197,24 +219,40 @@ namespace mo {
 
 			_channel_sounds[c] = &sound;
 			Mix_PlayChannel(c, sound.getSound(), loop ? -1 : 0);
-			update(id, angle, dist);
+			update(id, angle, dist_percentage);
 			return id;
 		}
 
-		void Audio_ctx::update(Channel_id id, Angle angle, Distance dist) {
+		void Audio_ctx::update(Channel_id id, Angle angle, float dist_percentage) {
+			if(id<0) return;
+
 			auto c = extract_channel(id);
 			auto v = extract_version(id);
 			if(c<_dynamic_channels && _channel_versions[c]==v) {
-				Mix_SetPosition(id, angle.value(), dist.value());
+#ifndef EMSCRIPTEN
+				auto a = angle.in_degrees()-90;
+				if(a<0)
+					a+=360;
+
+				Mix_SetPosition(id, a, dist_percentage);
+#else
+				Mix_Volume(id, dist_percentage * 255 * _sound_volume);
+#endif
 				_channels[c] = true;
 			}
 		}
 
 		void Audio_ctx::stop(Channel_id id) {
+			if(id<0) return;
+
 			auto c = extract_channel(id);
 			auto v = extract_version(id);
-			if(c>=_dynamic_channels || _channel_versions[c]==v)
-				Mix_HaltChannel(c);
+			if(c>=_dynamic_channels || _channel_versions[c]==v) {
+				Mix_FadeOutChannel(c, 100);
+				_free_channels.push_back(c);
+				_channels[c]=_channels_last[c] = false;
+				_channel_sounds[c] = nullptr;
+			}
 		}
 
 		void Audio_ctx::pause_sounds() {

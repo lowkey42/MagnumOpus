@@ -21,8 +21,6 @@
 #include <core/audio/sound.hpp>
 #include <core/audio/audio_ctx.hpp>
 
-#include <SDL2/SDL_mixer.h>
-
 namespace mo {
 namespace sys {
 namespace sound {

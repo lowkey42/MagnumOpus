@@ -1,9 +1,6 @@
 
 #include "game_screen.hpp"
 
-#include <SDL2/SDL.h>
-#include <SDL2/SDL_mixer.h>
-
 #include <core/audio/sound.hpp>
 #include <core/audio/music.hpp>
 #include <core/audio/audio_ctx.hpp>
@@ -78,7 +75,7 @@ namespace mo {
 		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
 			return p;
 		});
-
+		_engine.audio_ctx().stop_music();
 	}
 
 	void Game_screen::_update(float delta_time) {

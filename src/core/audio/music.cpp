@@ -1,10 +1,16 @@
 #include "music.hpp"
 
+#ifndef EMSCRIPTEN
+#	include <SDL2/SDL_mixer.h>
+#else
+#	include <SDL/SDL_mixer.h>
+#endif
+
 namespace mo {
 namespace audio {
 
+#ifndef EMSCRIPTEN
 	namespace {
-
 		int64_t istream_seek( struct SDL_RWops *context, int64_t offset, int whence) {
 			std::istream* stream = (std::istream*) context->hidden.unknown.data1;
 
@@ -37,12 +43,15 @@ namespace audio {
 			}
 			return 0;
 		}
-
 	}
+#endif
 
 	Music::Music(asset::istream stream) throw(Music_loading_failed) :
 	    _handle(nullptr, Mix_FreeMusic), _stream(std::make_unique<asset::istream>(std::move(stream))){
 
+		auto id = _stream->aid();
+
+#ifndef EMSCRIPTEN
 		SDL_RWops *rwops = SDL_AllocRW();
 		INVARIANT(rwops, "SDL_AllocRW failed");
 
@@ -53,8 +62,19 @@ namespace audio {
 		rwops->hidden.unknown.data1 = _stream.get();
 
 		_handle.reset(Mix_LoadMUS_RW(rwops, 1));
-		if(_handle.get() == NULL){
-			DEBUG("Mix_LoadMUS_RW returned NULL -> " << _handle.get() << "  Problem: " << Mix_GetError());
+
+#else
+		auto location = _stream->physical_location();
+		_stream.reset();
+
+		if(location.is_nothing())
+			return;
+
+		_handle.reset(Mix_LoadMUS(location.get_or_throw().c_str()));
+#endif
+
+		if(!_handle){
+			WARN("Mix_LoadMUS_RW ("<<id.str()<<") failed: " << Mix_GetError());
 		}
 
 	}

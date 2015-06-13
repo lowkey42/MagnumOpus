@@ -43,9 +43,10 @@ namespace audio{
 
 			void play_music  (std::shared_ptr<const audio::Music> music, Time fade_time = Time{0});
 			auto play_static (const audio::Sound& sound) -> Channel_id;
-			auto play_dynamic(const audio::Sound& sound, Angle angle, Distance dist, bool loop, Channel_id=-1) -> Channel_id;
+			auto play_dynamic(const audio::Sound& sound, Angle angle, float dist_percentage,
+			                  bool loop, Channel_id=-1) -> Channel_id;
 
-			void update    (Channel_id id, Angle angle, Distance dist);
+			void update    (Channel_id id, Angle angle, float dist_percentage);
 			void stop      (Channel_id);
 			void stop_music(Time fade_time=Time{0}) {play_music({}, fade_time);}
 

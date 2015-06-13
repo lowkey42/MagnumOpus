@@ -1,3 +1,5 @@
+#define GLM_SWIZZLE
+
 #include "sound_system.hpp"
 
 #include "../state/state_comp.hpp"
@@ -27,10 +29,12 @@ namespace sound {
 	}
 
 	void Sound_system::play_sounds(const renderer::Camera& camera) noexcept {
-		glm::vec2 upper_left = camera.screen_to_world({camera.viewport().x, camera.viewport().y});
-		glm::vec2 lower_right = camera.screen_to_world({camera.viewport().z, camera.viewport().w});
+		auto cam_area     = camera.area();
+		auto top_left     = cam_area.xy();
+		auto bottom_right = cam_area.zw();
+		auto max_dist     = glm::length(bottom_right-top_left) / 2.f;
 
-		_transform.foreach_in_rect(upper_left, lower_right, [&](ecs::Entity& entity) {
+		_transform.foreach_in_rect(top_left, bottom_right, [&](ecs::Entity& entity) {
 			process(entity.get<sys::physics::Transform_comp>(),
 			        entity.get<sys::sound::Sound_comp>(),
 			        entity.get<sys::state::State_comp>())
@@ -43,19 +47,10 @@ namespace sound {
 					sc._channel = -1;
 
 				} else {
-					// Moving cam to origin -> move entity the same dist in x and y and calculate angle between axis and entity-pos
-					glm::mat4 translation = glm::translate(glm::mat4(), glm::vec3(-camera.position().x, -camera.position().y, 0.f));
-					glm::vec4 camPos = translation * glm::vec4(camera.position(), 0.0f, 1.0f);
-					glm::vec4 entityRelToCam = translation * glm::vec4(trans.position().x.value(), trans.position().y.value(), 0.f, 1.0f);
+					auto p_entity = camera.world_to_screen(remove_units(trans.position()));
+					auto dist = glm::length(p_entity) / max_dist;
 
-					// Calculate distance (r) and angle(alpha)
-					Distance dist = Distance(glm::distance(camPos, entityRelToCam) * 16.f);
-					float degree = (glm::atan(entityRelToCam.y, entityRelToCam.x) * 180.f / glm::pi<float>()) + 90.f;
-					if(degree < 0)
-						degree = 360 - std::abs(degree); // FIXME[seb]: 360?!
-					Angle ang = Angle(degree);
-
-					sc._channel = _audio_ctx.play_dynamic(*sound, ang, dist, false, sc._channel);
+					sc._channel = _audio_ctx.play_dynamic(*sound, trans.rotation(), dist, false, sc._channel);
 				}
 			};
 		});

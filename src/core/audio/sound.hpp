@@ -19,10 +19,10 @@
 #include <vector>
 #include <stdexcept>
 
-#include "SDL2/SDL_mixer.h"
-
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
+
+typedef struct Mix_Chunk Mix_Chunk;
 
 namespace mo {
 namespace audio {
@@ -34,8 +34,7 @@ namespace audio {
 	class Sound {
 		public:
 			Sound() = delete;
-			//explicit Sound(const std::string& path) throw(Sound_loading_failed);
-			explicit Sound(std::vector<uint8_t> buffer) throw(Sound_loading_failed);
+			explicit Sound(asset::istream stream) throw(Sound_loading_failed);
 			virtual ~Sound()noexcept = default;
 
 			Sound& operator=(Sound&&) noexcept = default;
@@ -43,7 +42,9 @@ namespace audio {
 			Sound(const Sound&) = delete;
 			Sound& operator=(const Sound&) = delete;
 
-			Mix_Chunk* getSound() const noexcept { return _handle.get(); }
+			auto getSound() const noexcept { return _handle.get(); }
+
+			bool valid()const noexcept {return _handle.get();}
 
 		protected:
 			std::unique_ptr<Mix_Chunk,void(*)(Mix_Chunk*)> _handle;
@@ -60,7 +61,7 @@ namespace asset {
 		using RT = std::shared_ptr<audio::Sound>;
 
 		static RT load(istream in) throw(Loading_failed){
-			return std::make_unique<audio::Sound>(in.bytes());
+			return std::make_unique<audio::Sound>(std::move(in));
 		}
 
 		static void store(ostream out, const audio::Sound& asset) throw(Loading_failed) {
