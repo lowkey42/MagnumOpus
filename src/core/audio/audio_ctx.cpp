@@ -230,13 +230,15 @@ namespace mo {
 			auto v = extract_version(id);
 			if(c<_dynamic_channels && _channel_versions[c]==v) {
 #ifndef EMSCRIPTEN
-				auto a = angle.in_degrees()-90;
-				if(a<0)
-					a+=360;
+				auto a = angle.in_degrees();
 
-				Mix_SetPosition(id, a, dist_percentage);
+				auto dist = dist_percentage *255;
+
+				if(!Mix_SetPosition(c, a, dist)) {
+					DEBUG("Mix_SetPosition failed");
+				}
 #else
-				Mix_Volume(id, dist_percentage * 255 * _sound_volume);
+				Mix_Volume(c, std::max(1-dist_percentage, 0.f) * 255 * _sound_volume);
 #endif
 				_channels[c] = true;
 			}

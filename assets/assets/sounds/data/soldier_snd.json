@@ -3,7 +3,7 @@
 		"idle": {"sound_name": "sound:empty"},
 		"walking": {"sound_name": "sound:footstep"},
 		"attacking_melee": {"sound_name": "sound:empty"},
-		"attacking_range": {"sound_name": "sound:firebolt"},
+		"attacking_range": {"sound_name": "sound:empty"},
 		"interacting": {"sound_name": "sound:empty"},
 		"change_weapon": {"sound_name": "sound:empty"},
 		"taking": {"sound_name": "sound:empty"},
