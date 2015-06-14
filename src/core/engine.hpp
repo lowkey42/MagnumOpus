@@ -22,6 +22,7 @@
 namespace mo {
 	namespace asset {class Asset_manager;}
 	namespace renderer {class Graphics_ctx;}
+	namespace audio {class Audio_ctx;}
 	class Configuration;
 	class Input_manager;
 
@@ -86,6 +87,8 @@ namespace mo {
 
 			auto& graphics_ctx()noexcept {return *_graphics_ctx;}
 			auto& graphics_ctx()const noexcept {return *_graphics_ctx;}
+			auto& audio_ctx() const noexcept {return *_audio_ctx;}
+			auto& audio_ctx() noexcept {return *_audio_ctx;}
 			auto& assets()noexcept {return *_asset_manager;}
 			auto& assets()const noexcept {return *_asset_manager;}
 			auto& input()noexcept {return *_input_manager;}
@@ -100,6 +103,7 @@ namespace mo {
 			std::unique_ptr<asset::Asset_manager> _asset_manager;
 			Sdl_wrapper _sdl;
 			std::unique_ptr<renderer::Graphics_ctx> _graphics_ctx;
+			std::unique_ptr<audio::Audio_ctx> _audio_ctx;
 			std::unique_ptr<Input_manager> _input_manager;
 			std::vector<std::shared_ptr<Screen>> _screen_stack;
 

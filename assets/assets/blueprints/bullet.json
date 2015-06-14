@@ -19,5 +19,8 @@
     },
     "Sprite": {
         "aid": "anim:fireball"
-    }
+    },
+	"Sound": {
+		"aid": "sound_data:firebolt"
+	}
 }

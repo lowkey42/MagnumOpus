@@ -229,6 +229,8 @@ namespace asset {
 			auto path = append_file(baseDir.get_or_throw(), id.name());
 			if(exists(path))
 				return util::just(std::move(path));
+			else
+				DEBUG("asset "<<id.str()<<" not found in "<<path);
 		}
 
 		return util::nothing();
@@ -257,6 +259,21 @@ namespace asset {
 		return {id, *this, path};
 	}
 
+	auto Asset_manager::physical_location(const AID& id)const noexcept -> util::maybe<std::string>{
+		using RT = util::maybe<std::string>;
+		using namespace std::literals;
+		auto location = _locate(id);
+
+		return location.process<RT>(util::nothing(), [&](auto& f) -> RT{
+			auto dir = PHYSFS_getRealDir(f.c_str());
+			if(!dir)
+				return util::nothing();
+
+			auto file = dir+"/"s+f;
+			return exists(file) ? util::just(std::move(file)) : util::nothing();
+		});
+	}
+
 	void Asset_manager::reload() {
 		for(auto& a : _assets) {
 			auto location = _locate(a.first);
@@ -278,7 +295,7 @@ namespace asset {
 	}
 
 	void Asset_manager::shrink_to_fit()noexcept {
-		util::erase_if(_assets, [](const auto& v){return v.second.data.use_count()==1;});
+		util::erase_if(_assets, [](const auto& v){return v.second.data.use_count()<=1;});
 	}
 
 } /* namespace asset */

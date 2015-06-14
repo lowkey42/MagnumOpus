@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 #include "../utils/template_utils.hpp"
-
 #include "../utils/stacktrace.hpp"
+#include "../utils/maybe.hpp"
 
 #include "aid.hpp"
 
@@ -50,6 +50,10 @@ namespace asset {
 
 			auto aid()const noexcept {return _aid;}
 			auto& manager()noexcept {return _manager;}
+
+			auto physical_location()const noexcept -> util::maybe<std::string>;
+
+			void close();
 
 		protected:
 			File_handle* _file;

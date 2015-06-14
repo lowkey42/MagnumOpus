@@ -59,11 +59,6 @@ namespace sprite {
 		bool toRepeat = false;
 		renderer::Animation_type type;
 
-		/*DEBUG("Entity "
-			  << entity.get<Sprite_comp>().get_or_throw()._animation->texture().aid().name()
-			  << " -> animation: " << static_cast<int>(data.s)
-			  << std::endl);*/
-
 		// Map Entity-State to Animation-Type
 		switch(data.s){
 			case state::Entity_state::idle:
@@ -76,7 +71,7 @@ namespace sprite {
 				break;
 			case state::Entity_state::attacking_melee:
 				type = renderer::Animation_type::attacking_melee;
-				toRepeat = true;
+				toRepeat = false;
 				break;
 			case state::Entity_state::attacking_range:
 				type = renderer::Animation_type::attacking_range;
@@ -108,6 +103,7 @@ namespace sprite {
 				break;
 			case state::Entity_state::dying:
 				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
+				toRepeat = false;
 				break;
 			case state::Entity_state::resurrected:
 				type = renderer::Animation_type::resurrected;
@@ -119,13 +115,16 @@ namespace sprite {
 				break;
 		}
 
-		// TODO: use me  data.min_time(1_s);
-
 		// applying new animation type
 		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
 		sprite._repeat_animation = toRepeat;
 		sprite.animation_type(type);
 
+		// applying magnitude
+		sprite.animation()->modulation(type, data.magnitude);
+
+		// calculating remaining time for current animation and inform state_comp about it
+		data.min_time(sprite.animation()->remaining_time(sprite.animation_type(), sprite.current_frame()));
 	}
 
 }

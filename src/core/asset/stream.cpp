@@ -1,5 +1,7 @@
 #include "stream.hpp"
 
+#include "asset_manager.hpp"
+
 #include <physfs/physfs.h>
 #include <streambuf>
 #include <cstring>
@@ -124,12 +126,24 @@ namespace asset {
 		if(_file)
 			PHYSFS_close((PHYSFS_File*)_file);
 	}
+
 	stream& stream::operator=(stream&& rhs)noexcept {
 		INVARIANT(&_manager==&rhs._manager, "cross-manager move");
 		_file = std::move(rhs._file);
 		_aid = std::move(rhs._aid);
 		_fbuf = std::move(rhs._fbuf);
 		return *this;
+	}
+
+	void stream::close() {
+		_fbuf.reset();
+
+		if(_file)
+			PHYSFS_close((PHYSFS_File*)_file);
+	}
+
+	auto stream::physical_location()const noexcept -> util::maybe<std::string> {
+		return _manager.physical_location(_aid);
 	}
 
 	bool stream::eof()const noexcept {

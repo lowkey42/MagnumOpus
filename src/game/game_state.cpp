@@ -57,7 +57,6 @@ namespace mo {
 
 		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth.get_or_other(profile.depth)));
 
-
 		auto d = depth.get_or_other(profile.depth);
 
 		auto room_m = state->level.find_room(d<profile.depth ? level::Room_type::end :
@@ -211,6 +210,7 @@ namespace mo {
 		  ai(em, transform, level),
 		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
 		  spritesys(em, transform, engine.assets(), state),
+	      soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
 	}
@@ -289,7 +289,7 @@ namespace mo {
 			tilemap.draw(cam);
 			combat.draw(cam);
 			spritesys.draw(cam);
-
+			soundsys.play_sounds(cam);
 			particle_renderer.draw(dt, cam);
 		});
 

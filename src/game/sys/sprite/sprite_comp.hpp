@@ -1,6 +1,6 @@
 /**************************************************************************\
- *												                          *
- *                                               ___                      *
+ *	sprite_comp.hpp	- Component class for Sprites                         *
+ *                                                ___                     *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
  *  / /\/\ \ (_| | (_| | | | | |_| | | | | | | / \_//| |_) | |_| \__ \    *
@@ -43,7 +43,7 @@ namespace sprite {
 		auto repeat_animation() const noexcept { return _repeat_animation; }
 		auto repeat_animation(const bool r) noexcept { _repeat_animation = r; }
 
-		void current_frame(float frame) noexcept { _current_frame = frame; }
+		void current_frame(const float frame) noexcept { _current_frame = frame; }
 		void animation_type(renderer::Animation_type type) noexcept;
 
 		struct Persisted_state;

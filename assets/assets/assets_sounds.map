@@ -1,0 +1,12 @@
+sound: = sounds/
+sound:empty = sounds/empty.ogg
+sound:footstep = sounds/footstep.ogg
+sound:firebolt = sounds/firebolt.ogg
+sound:scream = sounds/male_scream.ogg
+sound:zattack = sounds/zombie_attack.ogg
+sound:player_dying = sounds/male_death.ogg
+
+sound_data: = sounds/data
+sound_data:soldier = sounds/data/soldier_snd.json
+sound_data:firebolt = sounds/data/firebolt_snd.json
+sound_data:zombie = sounds/data/zombie_snd.json

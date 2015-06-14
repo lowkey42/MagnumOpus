@@ -1,6 +1,10 @@
 
 #include "game_screen.hpp"
 
+#include <core/audio/sound.hpp>
+#include <core/audio/music.hpp>
+#include <core/audio/audio_ctx.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
@@ -10,6 +14,7 @@
 
 #include "sys/physics/transform_comp.hpp"
 #include "sys/sprite/sprite_comp.hpp"
+#include "sys/sound/sound_comp.hpp"
 
 #include "game_state.hpp"
 
@@ -31,17 +36,20 @@ namespace mo {
 	}
 
 	Game_screen::Game_screen(Game_engine& engine,
-	                         std::string profile,
-	                         std::vector<ecs::ETO> players,
-	                         util::maybe<int> depth) :
+							 std::string profile,
+							 std::vector<ecs::ETO> players,
+							 util::maybe<int> depth) :
 		Screen(engine), _engine(engine),
 	    _state(Game_state::create(engine,profile,players,depth)),
 		_player_sc_slot(&Game_screen::_on_state_change, this),
-	    _join_slot(&Game_screen::_join, this),
-	    _unjoin_slot(&Game_screen::_unjoin, this),
+		_join_slot(&Game_screen::_join, this),
+		_unjoin_slot(&Game_screen::_unjoin, this),
 		_post_effect_obj(renderer::simple_vertex_layout,
 						 renderer::create_buffer(posteffect_buffer))
 	{
+
+
+
 		_player_sc_slot.connect(_state->state.state_change_events);
 		_join_slot.connect(engine.controllers().join_events);
 		_unjoin_slot.connect(engine.controllers().unjoin_events);
@@ -78,15 +86,22 @@ namespace mo {
 	}
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
+
+		audio::Music_ptr mainMusic = _engine.assets().load<audio::Music>("music:test"_aid);
+
+		_engine.audio_ctx().play_music(mainMusic);
+
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
 			return main_camera.screen_to_world(p);
 		});
+
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {
 		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
 			return p;
 		});
+		_engine.audio_ctx().stop_music();
 	}
 
 	void Game_screen::_update(float delta_time) {
@@ -107,7 +122,7 @@ namespace mo {
 					.set_uniform("layer",   1.0f)
 					.set_uniform("texture", 0)
 					.set_uniform("model", glm::mat4())
-					.set_uniform("color",   glm::vec4(1,1,1,1));
+					.set_uniform("color", glm::vec4(1,1,1,1));
 			screen.vscreen.bind();
 			_post_effect_obj.draw();
 		}

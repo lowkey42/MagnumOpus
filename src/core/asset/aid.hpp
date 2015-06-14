@@ -27,6 +27,7 @@ namespace asset {
 		vert_shader,
 		frag_shader,
 		sound,
+		sound_data,
 		music,
 		cfg,
 		blueprint,
