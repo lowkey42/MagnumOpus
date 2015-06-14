@@ -1,5 +1,7 @@
 #include "stream.hpp"
 
+#include "asset_manager.hpp"
+
 #include <physfs/physfs.h>
 #include <streambuf>
 #include <cstring>
@@ -119,6 +121,16 @@ namespace asset {
 
 		if(_file)
 			PHYSFS_close((PHYSFS_File*)_file);
+	}
+	void stream::close() {
+		_fbuf.reset();
+
+		if(_file)
+			PHYSFS_close((PHYSFS_File*)_file);
+	}
+
+	auto stream::physical_location()const noexcept -> util::maybe<std::string> {
+		return _manager.physical_location(_aid);
 	}
 
 	bool stream::eof()const noexcept {

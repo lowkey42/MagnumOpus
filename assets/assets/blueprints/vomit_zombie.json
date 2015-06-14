@@ -12,7 +12,7 @@
 	},
     "Sprite": {
         "aid": "anim:vomit_zombie"
-    },
+    },		
     "Simple_ai":{
         "attack_distance": 10,
         "near":4,

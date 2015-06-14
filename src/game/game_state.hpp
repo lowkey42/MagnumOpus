@@ -28,6 +28,7 @@
 #include "sys/physics/transform_system.hpp"
 #include "sys/physics/physics_system.hpp"
 #include "sys/sprite/sprite_system.hpp"
+#include "sys/sound/sound_system.hpp"
 #include "sys/controller/controller_system.hpp"
 #include "sys/cam/camera_system.hpp"
 #include "sys/ai/ai_system.hpp"
@@ -65,6 +66,7 @@ namespace mo {
 		sys::ai::Ai_system ai;
 		sys::combat::Combat_system combat;
 		sys::sprite::Sprite_system spritesys;
+		sys::sound::Sound_system soundsys;
 		sys::ui::Ui_system ui;
 
 		ecs::Entity_ptr main_player;

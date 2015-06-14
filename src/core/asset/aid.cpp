@@ -21,6 +21,7 @@ namespace asset {
 		else if("vert_shader"==r.first)  _type=Asset_type::vert_shader;
 		else if("frag_shader"==r.first)  _type=Asset_type::frag_shader;
 		else if("sound"==r.first)        _type=Asset_type::sound;
+		else if("sound_data"==r.first)   _type=Asset_type::sound_data;
 		else if("music"==r.first)        _type=Asset_type::music;
 		else if("cfg"==r.first)          _type=Asset_type::cfg;
 		else if("blueprint"==r.first)    _type=Asset_type::blueprint;

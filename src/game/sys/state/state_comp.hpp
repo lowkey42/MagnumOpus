@@ -36,6 +36,22 @@ namespace state {
 		dead,
 		resurrected
 	};
+	}
+}
+}
+
+namespace std {
+	template <> struct hash<mo::sys::state::Entity_state> {
+		size_t operator()(mo::sys::state::Entity_state ac)const noexcept {
+			return static_cast<size_t>(ac);
+		}
+	};
+}
+
+namespace mo {
+namespace sys {
+namespace state {
+
 	struct State_data {
 		Entity_state s = Entity_state::idle;
 		float magnitude = 1.f;

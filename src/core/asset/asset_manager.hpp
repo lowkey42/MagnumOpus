@@ -60,6 +60,8 @@ namespace asset {
 			void load();
 			void unload();
 
+			void reset(){_ptr.reset();}
+
 		private:
 			Asset_manager* _mgr;
 			std::shared_ptr<const R> _ptr;
@@ -84,6 +86,8 @@ namespace asset {
 
 			template<typename T>
 			void save(const AID& id, const T& asset) throw(Loading_failed);
+
+			auto physical_location(const AID& id)const noexcept -> util::maybe<std::string>;
 
 			void reload();
 
