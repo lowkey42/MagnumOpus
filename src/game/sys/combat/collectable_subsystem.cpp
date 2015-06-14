@@ -45,7 +45,7 @@ namespace combat {
 								util::scerp<Angle>(0_deg, 0_deg),
 								util::lerp<Speed_per_time>(30_m/second_2, 10_m/second_2),
 								util::lerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
-								util::lerp<glm::vec4>({0.25,0.25,0.25,0}, {0,0,0,0}, {0,0,0,0}),
+								util::lerp<glm::vec4>({0.4,0.4,0.4,0}, {0,0,0,0}, {0,0,0,0}),
 								util::lerp<Position>({50_cm, 50_cm}, {5_cm, 5_cm}, {2_cm, 2_cm}),
 								util::lerp<int8_t>(0, 0),
 								_assets.load<renderer::Texture>("tex:particle_line.png"_aid),

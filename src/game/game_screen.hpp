@@ -28,14 +28,18 @@ namespace mo {
 	namespace renderer{ class Camera; }
 
 	struct Game_state;
+	struct Saveable_state;
 
 	class Game_screen : public Screen {
 		public:
-			Game_screen(Game_engine& engine, std::string profile="default",
-			            std::vector<ecs::ETO> players=
-			                 std::vector<ecs::ETO>(),
+			Game_screen(Game_engine& engine, std::string profile,
+			            std::vector<ecs::ETO> players,
 			            util::maybe<int> depth=util::nothing());
+
+			Game_screen(Game_engine& engine, const Saveable_state& state);
 			~Game_screen()noexcept;
+
+			auto save() -> Saveable_state;
 
 		protected:
 			void _update(float delta_time)override;

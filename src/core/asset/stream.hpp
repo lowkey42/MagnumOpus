@@ -43,7 +43,7 @@ namespace asset {
 			~stream()noexcept;
 
 			stream& operator=(const stream&) = delete;
-			stream& operator=(stream&&) = default;
+			stream& operator=(stream&&)noexcept;
 
 			auto eof()const noexcept -> bool;
 			auto length()const noexcept -> size_t;
@@ -68,7 +68,7 @@ namespace asset {
 			istream(AID aid, Asset_manager& manager, const std::string& path);
 			istream(istream&&);
 
-			istream& operator=(istream&&) = default;
+			auto operator=(istream&&) -> istream&;
 
 			auto lines() -> std::vector<std::string>;
 			auto content() -> std::string;
@@ -79,7 +79,7 @@ namespace asset {
 			ostream(AID aid, Asset_manager& manager, const std::string& path);
 			ostream(ostream&&);
 
-			ostream& operator=(ostream&&) = default;
+			auto operator=(ostream&&) -> ostream&;
 	};
 
 	/**
