@@ -18,6 +18,7 @@
 #include <vector>
 #include <iostream>
 #include <glm/vec2.hpp>
+#include <glm/vec4.hpp>
 
 #include "elements.hpp"
 #include "../../core/asset/asset_manager.hpp"
@@ -53,8 +54,9 @@ namespace level {
 		Tile_type type;
 		Elements elements;
 
-		bool solid()const;
-		float friction()const;
+		auto solid()const -> bool;
+		auto dimensions()const -> glm::vec4;
+		auto friction()const -> float;
 		void toggle();
 	};
 

@@ -10,13 +10,11 @@ namespace level {
 
 	using namespace mo::util;
 
-	bool Tile::solid()const {
+	auto Tile::solid()const -> bool {
 		switch(type) {
 			case Tile_type::floor_tile:
 			case Tile_type::floor_stone:
 			case Tile_type::floor_dirt:
-			case Tile_type::stairs_up:
-			case Tile_type::stairs_down:
 			case Tile_type::door_open_ns:
 			case Tile_type::door_open_we:
 				return false;
@@ -25,6 +23,10 @@ namespace level {
 			case Tile_type::wall_tile:
 			case Tile_type::wall_stone:
 			case Tile_type::wall_dirt:
+				return true;
+
+			case Tile_type::stairs_up:
+			case Tile_type::stairs_down:
 			case Tile_type::door_closed_ns:
 			case Tile_type::door_closed_we:
 				return true;
@@ -32,6 +34,24 @@ namespace level {
 			default:
 				return true;
 		}
+	}
+	auto Tile::dimensions()const -> glm::vec4 {
+		switch(type) {
+
+			case Tile_type::stairs_up:
+				return {.2f,-.5f, .5f,.5f};
+			case Tile_type::stairs_down:
+				return {-.5f,-.5f, -.2f,.5f};
+
+			case Tile_type::door_closed_ns:
+				// TODO
+			case Tile_type::door_closed_we:
+				// TODO
+
+			default:
+				return {-.5f,-.5f, .5f,.5f};
+		}
+
 	}
 	float Tile::friction()const {
 		return 1.0f;
