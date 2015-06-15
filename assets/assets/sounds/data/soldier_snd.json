@@ -11,6 +11,6 @@
 		"damaged": {"sound_name": "sound:scream"},
 		"dying": {"sound_name": "sound:player_dying"},
 		"dead": {"sound_name": "sound:empty"},
-		"ressurected": {"sound_name": "sound:empty"}
+		"resurrected": {"sound_name": "sound:empty"}
 	}
 }
