@@ -22,6 +22,7 @@
 #include <core/renderer/shader.hpp>
 #include <core/renderer/text.hpp>
 #include <core/renderer/camera.hpp>
+#include <core/renderer/primitives.hpp>
 
 #include "ui_comp.hpp"
 
@@ -41,6 +42,7 @@ namespace ui {
 
 			renderer::Camera _cam;
 			renderer::Shader_program _hud_shader;
+			renderer::Shader_program _health_shader;
 			renderer::Object _hud;
 			renderer::Texture_ptr _hud_bg_tex;
 			renderer::Texture_ptr _hud_fg_tex;
@@ -49,6 +51,9 @@ namespace ui {
 			renderer::Shader_program _score_shader;
 			renderer::Font_ptr    _score_font;
 			renderer::Text_dynamic _score_text;
+
+			renderer::Bubble_renderer _bubble_renderer;
+			asset::Asset_manager& _assets;
 	};
 
 }

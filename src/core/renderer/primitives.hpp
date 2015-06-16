@@ -24,6 +24,8 @@
 namespace mo {
 namespace renderer {
 
+	class Texture;
+
 	struct Simple_vertex {
 		glm::vec2 xy;
 		glm::vec2 uv;
@@ -39,6 +41,19 @@ namespace renderer {
 			void set_vp(const glm::mat4& vp);
 
 			void draw(glm::vec3 p, Angle a, float length, glm::vec4 color, float width=1);
+
+		private:
+			Shader_program _prog;
+			Object _obj;
+	};
+
+	class Bubble_renderer {
+		public:
+			Bubble_renderer(asset::Asset_manager& assets, float radius);
+
+			void set_vp(const glm::mat4& vp);
+
+			void draw(glm::vec2 center, float fill_level, const Texture& texture);
 
 		private:
 			Shader_program _prog;

@@ -13,8 +13,14 @@ frag_shader:sprite_batch = shader/sprite.frag
 vert_shader:ray = shader/ray.vert
 frag_shader:ray = shader/ray.frag
 
+vert_shader:bubble = shader/bubble.vert
+frag_shader:bubble = shader/bubble.frag
+
 vert_shader:hud = shader/hud.vert
 frag_shader:hud = shader/hud.frag
+
+vert_shader:hud_health = shader/hud_health.vert
+frag_shader:hud_health = shader/hud_health.frag
 
 vert_shader:particles = shader/particles.vert
 frag_shader:particles = shader/particles.frag

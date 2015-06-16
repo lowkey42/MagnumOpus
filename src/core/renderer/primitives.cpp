@@ -1,5 +1,6 @@
 #include "primitives.hpp"
 
+#include "texture.hpp"
 
 namespace mo {
 namespace renderer {
@@ -48,6 +49,61 @@ namespace renderer {
 		_prog.bind()
 				.set_uniform("model", trans*rot*scale)
 		        .set_uniform("color", color);
+		_obj.draw();
+	}
+
+
+	namespace {
+		auto create_bubble_mesh(float radius) -> std::vector<Simple_vertex> {
+			using glm::vec2;
+
+			constexpr auto steps = 12;
+
+			std::vector<Simple_vertex> m;
+			m.reserve(steps+1);
+
+			m.emplace_back(vec2{0,0},vec2{.5f,.5f});
+
+			for(auto phi=0.f; phi<=1; phi+=1.f/steps) {
+				auto x = std::cos(phi * 2*PI);
+				auto y = std::sin(phi * 2*PI);
+				m.emplace_back(vec2{x,y} * radius, (vec2{x,y}+1.f)/2.f);
+			}
+
+			for(auto& v : m)
+				DEBUG("V: "<<v.xy.x<<","<<v.xy.y);
+
+			return m;
+		}
+
+		Vertex_layout bubble_vertex_layout {
+			Vertex_layout::Mode::triangle_fan,
+			vertex("position", &Simple_vertex::xy),
+			vertex("uv", &Simple_vertex::uv)
+		};
+	}
+
+	Bubble_renderer::Bubble_renderer(asset::Asset_manager& assets, float radius)
+	    : _obj(bubble_vertex_layout, create_buffer(create_bubble_mesh(radius)))
+	{
+		_prog.attach_shader(assets.load<Shader>("frag_shader:bubble"_aid))
+			 .attach_shader(assets.load<Shader>("vert_shader:bubble"_aid))
+			 .bind_all_attribute_locations(bubble_vertex_layout)
+			 .build();
+	}
+
+	void Bubble_renderer::set_vp(const glm::mat4& vp) {
+		_prog.bind().set_uniform("vp", vp);
+	}
+
+	void Bubble_renderer::draw(glm::vec2 center, float fill_level, const Texture& texture) {
+		auto trans = glm::translate(glm::mat4(), {center.x, center.y, 0});
+
+		texture.bind();
+		_prog.bind()
+				.set_uniform("model", trans)
+		        .set_uniform("fill_level", fill_level)
+		        .set_uniform("texture", 0);
 		_obj.draw();
 	}
 

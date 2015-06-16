@@ -1,3 +1,5 @@
+#define GLM_SWIZZLE
+
 #include "ui_system.hpp"
 
 #include <core/renderer/primitives.hpp>
@@ -34,7 +36,9 @@ namespace ui {
 	      _hud_fg_tex(e.assets().load<Texture>("tex:ui_hud_fg"_aid)),
 	      _hud_health_tex(e.assets().load<Texture>("tex:ui_hud_health"_aid)),
 	      _score_font(e.assets().load<Font>("font:nixie"_aid)),
-	      _score_text(_score_font){
+	      _score_text(_score_font),
+	      _bubble_renderer(e.assets(), 58/2.f),
+	      _assets(e.assets()) {
 
 		_score_shader.attach_shader(e.assets().load<renderer::Shader>("vert_shader:simple"_aid))
 		             .attach_shader(e.assets().load<renderer::Shader>("frag_shader:simple"_aid))
@@ -46,6 +50,11 @@ namespace ui {
 	               .bind_all_attribute_locations(simple_vertex_layout)
 	               .build();
 
+		_health_shader.attach_shader(e.assets().load<Shader>("vert_shader:hud_health"_aid))
+		              .attach_shader(e.assets().load<Shader>("frag_shader:hud_health"_aid))
+                      .bind_all_attribute_locations(simple_vertex_layout)
+                      .build();
+
 		_cam.zoom(0.5f);
 	}
 
@@ -53,7 +62,7 @@ namespace ui {
 		// TODO: animations ?
 	}
 
-	void Ui_system::draw() {
+	void Ui_system::draw() { // TODO: refactor
 		renderer::Disable_depthtest ddt{};
 		(void)ddt;
 
@@ -73,20 +82,48 @@ namespace ui {
 			}
 		};
 
+		// draw bg
 		_hud_bg_tex->bind(0);
-		_hud_fg_tex->bind(1);
-		_hud_health_tex->bind(2);
-
-		_hud_shader.bind()
-				   .set_uniform("bg_tex", 0)
-				   .set_uniform("fg_tex", 1)
-				   .set_uniform("health_tex", 2);
-
-		_hud_bg_tex->bind(0);
-		_hud_fg_tex->bind(1);
-		_hud_health_tex->bind(2);
-
+		_hud_shader.bind().set_uniform("tex", 0);
 		int idx = 0;
+		for(auto& hud : _ui_comps) {
+			(void)hud;
+			auto offset = calc_offset(idx++);
+
+			auto model = glm::scale(glm::translate(glm::mat4{}, offset), glm::vec3(w,h,1));
+
+			if(offset.x>0)
+				model = glm::scale(model, glm::vec3(-1,1,1));
+
+			_hud_shader.set_uniform("mvp", _cam.vp()*model);
+
+			_hud.draw();
+		}
+
+		// draw elements
+		auto element_offsets = {
+		    glm::vec2{128.f, 5.f+58/2.f},
+		    glm::vec2{222.f, 130},
+		    glm::vec2{128.f, 222},
+		    glm::vec2{32.f, 130}
+		};
+		_bubble_renderer.set_vp(_cam.vp());
+		idx = 0;
+		for(auto& hud : _ui_comps) {
+			(void)hud;
+			auto offset = calc_offset(idx++);
+
+			// TODO[foe]: draw element indicators
+			for(auto& o : element_offsets)
+				_bubble_renderer.draw(offset.xy()+o, 0.5f,
+									  *_assets.load<renderer::Texture>("tex:bubble_test.tga"_aid));
+
+		}
+
+		// draw health
+		_health_shader.bind().set_uniform("tex", 0);
+		_hud_health_tex->bind();
+		idx = 0;
 		for(auto& hud : _ui_comps) {
 			auto offset = calc_offset(idx++);
 
@@ -95,21 +132,34 @@ namespace ui {
 			if(offset.x>0)
 				model = glm::scale(model, glm::vec3(-1,1,1));
 
-			_hud_shader.set_uniform("mvp", _cam.vp()*model)
-			           .set_uniform("health",
-			                        hud.owner().get<combat::Health_comp>().process(1.f,
+			_health_shader.set_uniform("mvp", _cam.vp()*model)
+			              .set_uniform("health",
+			                           hud.owner().get<combat::Health_comp>().process(1.f,
 			                                                                       [](auto& h){return h.hp_percent();}));
 
 			_hud.draw();
-
-			// TODO[foe]: draw element indicators
 		}
 
-		_hud_bg_tex->unbind(0);
-		_hud_fg_tex->unbind(1);
-		_hud_health_tex->unbind(2);
+		// draw fg
+		_hud_fg_tex->bind(0);
+		_hud_shader.bind().set_uniform("tex", 0);
+		idx = 0;
+		for(auto& hud : _ui_comps) {
+			(void)hud;
+			auto offset = calc_offset(idx++);
+
+			auto model = glm::scale(glm::translate(glm::mat4{}, offset), glm::vec3(w,h,1));
+
+			if(offset.x>0)
+				model = glm::scale(model, glm::vec3(-1,1,1));
+
+			_hud_shader.set_uniform("mvp", _cam.vp()*model);
+
+			_hud.draw();
+		}
 
 
+		// draw score
 		_score_font->bind();
 		_score_shader.bind()
 		             .set_uniform("VP", _cam.vp())
