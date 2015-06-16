@@ -1,0 +1,7 @@
+{
+	"frequence": 44100,
+	"channels": 2,
+	"buffer_size": 2048,
+	"music_volume": 1,
+	"sound_volume": 1
+}
