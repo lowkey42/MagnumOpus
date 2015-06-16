@@ -102,7 +102,7 @@ struct Engine::Reload_handler {
 		struct stat st;
 
 		if(!stat(self_exec_path.c_str(), &st)) {
-			return st.st_mtim.tv_sec;
+			return st.st_mtime;
 		}
 		return 0;
 #else
