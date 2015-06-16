@@ -59,6 +59,7 @@ namespace ui {
 	}
 
 	void Ui_system::update(Time dt) {
+		_time_acc+=dt;
 		// TODO: animations ?
 	}
 
@@ -113,10 +114,13 @@ namespace ui {
 			(void)hud;
 			auto offset = calc_offset(idx++);
 
+			float fill=0;
 			// TODO[foe]: draw element indicators
-			for(auto& o : element_offsets)
-				_bubble_renderer.draw(offset.xy()+o, 0.5f,
+			for(auto& o : element_offsets) {
+				_bubble_renderer.draw(offset.xy()+o, fill, _time_acc.value(),
 									  *_assets.load<renderer::Texture>("tex:bubble_test.tga"_aid));
+				fill+=1.f / 3;
+			}
 
 		}
 

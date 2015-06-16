@@ -67,7 +67,7 @@ namespace renderer {
 			for(auto phi=0.f; phi<=1; phi+=1.f/steps) {
 				auto x = std::cos(phi * 2*PI);
 				auto y = std::sin(phi * 2*PI);
-				m.emplace_back(vec2{x,y} * radius, (vec2{x,y}+1.f)/2.f);
+				m.emplace_back(vec2{x,y} * radius, (vec2{x,-y}+1.f)/2.f);
 			}
 
 			for(auto& v : m)
@@ -96,13 +96,14 @@ namespace renderer {
 		_prog.bind().set_uniform("vp", vp);
 	}
 
-	void Bubble_renderer::draw(glm::vec2 center, float fill_level, const Texture& texture) {
+	void Bubble_renderer::draw(glm::vec2 center, float fill_level, float time, const Texture& texture) {
 		auto trans = glm::translate(glm::mat4(), {center.x, center.y, 0});
 
 		texture.bind();
 		_prog.bind()
 				.set_uniform("model", trans)
-		        .set_uniform("fill_level", fill_level)
+		        .set_uniform("fill_level", glm::clamp(fill_level, 0.f, 1.f))
+		        .set_uniform("time", time)
 		        .set_uniform("texture", 0);
 		_obj.draw();
 	}

@@ -54,6 +54,8 @@ namespace ui {
 
 			renderer::Bubble_renderer _bubble_renderer;
 			asset::Asset_manager& _assets;
+
+			Time _time_acc = Time{0};
 	};
 
 }

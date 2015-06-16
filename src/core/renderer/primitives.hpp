@@ -53,7 +53,7 @@ namespace renderer {
 
 			void set_vp(const glm::mat4& vp);
 
-			void draw(glm::vec2 center, float fill_level, const Texture& texture);
+			void draw(glm::vec2 center, float fill_level, float time, const Texture& texture);
 
 		private:
 			Shader_program _prog;
