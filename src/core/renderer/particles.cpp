@@ -119,7 +119,7 @@ namespace renderer {
 			auto seed = next_pseed();
 
 			auto start = remove_units(_center)+rand_point(_radius.value());
-			auto dir = _direction(0, seed).value() + _orientation.value();
+			auto dir = normalize(_direction(0, seed) + _orientation).value();
 			auto ttl = random_int(rng, _min_ttl, _max_ttl).value();
 
 			if(_reverse) {
@@ -128,8 +128,8 @@ namespace renderer {
 				if(_collision_handler!=Collision_handler::none) {
 					auto max_distance = glm::length(dest-start);
 					auto step = (dest-start) / max_distance / 2.f;
-					auto p=dest + step;
-					auto dist=0.5f;
+					auto p=start;
+					auto dist=0.f;
 					auto collided = false;
 					for(; dist<=max_distance; dist+=0.5, p+=step) {
 						auto x = static_cast<int32_t>(p.x+0.5f);
@@ -185,7 +185,7 @@ namespace renderer {
 		p.velocity         += (_acceleration(t, p.seed)*dt).value();
 		p.angular_velocity += (_angular_acceleration(t, p.seed)*dt).value();
 
-		p.orientation += p.angular_velocity*dt;
+		p.orientation = normalize(Angle(p.orientation+ p.angular_velocity*dt)).value();
 		p.rotation = p.orientation + _rotation_offset(t, p.seed).value() - 90_deg;
 
 		if(_collision_handler!=Collision_handler::none) {

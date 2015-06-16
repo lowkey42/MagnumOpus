@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Reads & writes entites to disc                                         *
+ * marks a "player"                                                       *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,41 +15,25 @@
 
 #pragma once
 
-#include <string>
-#include <unordered_map>
-
-#include "ecs.hpp"
+#include <core/ecs/ecs.hpp>
+#include <core/units.hpp>
 
 namespace mo {
-	namespace asset {
-		class AID;
-		class Asset_manager;
-	}
 
-	namespace ecs {
+	class Player_tag_comp : public ecs::Component<Player_tag_comp> {
+		public:
+			static constexpr const char* name() {return "Player_tag";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-		// entity transfer object
-		using ETO = std::string;
+			Player_tag_comp(ecs::Entity& owner, uint8_t id=0): Component(owner), _id(id) {}
 
-		class Serializer {
-			public:
-				Serializer(Entity_manager& entityMgr, asset::Asset_manager& assetMgr);
+			auto id()const noexcept{return _id;}
 
-				auto apply(const asset::AID& blueprint, Entity_ptr target)const -> Entity_ptr;
-				void detach(Entity_ptr target)const;
+			struct Persisted_state;
+			friend struct Persisted_state;
+		private:
+			uint8_t _id;
+	};
 
-				void write(std::ostream&);
-				void read(std::istream&);
-
-				void on_reload();
-
-				auto export_entity(Entity& e)const -> ETO;
-				auto import_entity(const ETO& eto) -> Entity_ptr;
-
-			private:
-				Entity_manager& _entities;
-				asset::Asset_manager& _assets;
-		};
-
-	}
 }

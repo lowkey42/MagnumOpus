@@ -63,7 +63,7 @@ namespace mo {
 	class Engine {
 		friend class Screen;
 		public:
-			Engine(const std::string& title, Configuration cfg);
+			Engine(const std::string& title, int argc, char** argv, char** env);
 			~Engine() noexcept;
 
 			bool running() const noexcept {
@@ -81,10 +81,10 @@ namespace mo {
 
 			auto enter_screen(std::unique_ptr<Screen> screen) -> Screen&;
 			void leave_screen(uint8_t depth=1);
+			auto current_screen() -> Screen&;
 
 			void on_frame();
 
-			auto& cfg()const noexcept {return *_configuration;}
 			auto& graphics_ctx()noexcept {return *_graphics_ctx;}
 			auto& graphics_ctx()const noexcept {return *_graphics_ctx;}
 			auto& audio_ctx() const noexcept {return *_audio_ctx;}
@@ -96,11 +96,11 @@ namespace mo {
 
 		protected:
 			virtual void _on_frame(float dt) {};
+			virtual auto _on_reload() -> std::tuple<bool, std::string> {return std::make_tuple(false, "");};
 
 		protected:
 			bool _quit = false;
 			std::unique_ptr<asset::Asset_manager> _asset_manager;
-			std::unique_ptr<Configuration> _configuration;
 			Sdl_wrapper _sdl;
 			std::unique_ptr<renderer::Graphics_ctx> _graphics_ctx;
 			std::unique_ptr<audio::Audio_ctx> _audio_ctx;
@@ -111,6 +111,9 @@ namespace mo {
 			float _last_time = 0;
 
 			void _poll_events();
+
+			struct Reload_handler;
+			std::unique_ptr<Reload_handler> _rh;
 	};
 
 } /* namespace core */

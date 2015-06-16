@@ -24,12 +24,8 @@ namespace mo {
 
 	class Game_engine : public Engine {
 		public:
-			Game_engine(const std::string& title, Configuration cfg)
-				: Engine(title, std::move(cfg)),
-				  _controllers(assets(), input()),
-				  _on_quit_slot(&Game_engine::_on_quit, this) {
-				_on_quit_slot.connect(_controllers.quit_events);
-			}
+			Game_engine(const std::string& title, int argc, char** argv, char** env,
+			            bool start_game=true);
 			~Game_engine() {
 				_screen_stack.clear();
 			}
@@ -56,6 +52,7 @@ namespace mo {
 			void _on_quit(sys::controller::Quit_event) {
 				leave_screen();
 			}
+			auto _on_reload() -> std::tuple<bool, std::string> override;
 
 		private:
 			sys::controller::Controller_manager _controllers;

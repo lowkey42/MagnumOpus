@@ -12,6 +12,14 @@
 
 #include <stdexcept>
 
+#if !defined(WIN32) && !defined(EMSCRIPTE)
+	#define AUTO_RELOAD_SUPPORTED
+
+	#include <unistd.h>
+	#include <sys/types.h>
+	#include <sys/stat.h>
+	#include <errno.h>
+#endif
 
 namespace mo {
 	namespace {
@@ -47,13 +55,69 @@ Sdl_wrapper::~Sdl_wrapper() {
 	SDL_Quit();
 }
 
-Engine::Engine(const std::string& title, Configuration cfg)
-  : _asset_manager(std::make_unique<asset::Asset_manager>(cfg.get("exe").get_or_throw(), title)),
-    _configuration(std::make_unique<Configuration>(std::move(cfg))),
+struct Engine::Reload_handler {
+	std::vector<char*> args;
+	std::vector<char*> envs;
+	std::string self_exec_path;
+	int64_t last_mod;
+
+	Reload_handler(int argc, char** argv, char** env)
+	    : args(argc), self_exec_path(argv[0]), last_mod(get_mod_time()) {
+		int i=0;
+		for(auto& a : args)
+			a = argv[i++];
+
+		for(;*env!=0; env++)
+			envs.push_back(*env);
+
+		envs.push_back(nullptr);
+	}
+
+	void reload(const std::string& addition_arg) {
+#ifdef AUTO_RELOAD_SUPPORTED
+		auto largs = args;
+		largs.push_back((char*) addition_arg.c_str());
+		largs.push_back(nullptr);
+
+		int r=0;
+		do {
+			r = execve(self_exec_path.c_str(), largs.data(), envs.data());
+			//ERROR("exec returned with "<<r<<"; error: "<<strerror(errno));
+		} while(r!=0);
+#endif
+	}
+
+	bool reload_required() {
+		auto nmod = get_mod_time();
+		if(nmod>last_mod) {
+			last_mod = nmod;
+			return true;
+		}
+
+		return false;
+	}
+
+	auto get_mod_time() -> int64_t {
+#ifdef AUTO_RELOAD_SUPPORTED
+		struct stat st;
+
+		if(!stat(self_exec_path.c_str(), &st)) {
+			return st.st_mtim.tv_sec;
+		}
+		return 0;
+#else
+		return 0;
+#endif
+	}
+};
+
+Engine::Engine(const std::string& title, int argc, char** argv, char** env)
+  : _asset_manager(std::make_unique<asset::Asset_manager>(argv[0], title)),
     _sdl(),
 	_graphics_ctx(std::make_unique<renderer::Graphics_ctx>(title, *_asset_manager)),
 	_audio_ctx(std::make_unique<audio::Audio_ctx>(*_asset_manager)),
-	_input_manager(std::make_unique<Input_manager>()), _current_time(SDL_GetTicks() / 1000.0f) {
+	_input_manager(std::make_unique<Input_manager>()), _current_time(SDL_GetTicks() / 1000.0f),
+	_rh(std::make_unique<Reload_handler>(argc,argv,env)) {
 }
 
 Engine::~Engine() noexcept {
@@ -93,8 +157,20 @@ void Engine::leave_screen(uint8_t depth) {
 		_screen_stack.back()->_on_enter(util::justPtr(last.get()));
 	}
 }
+auto Engine::current_screen() -> Screen& {
+	return *_screen_stack.back();
+}
 
 void Engine::on_frame() {
+	if(_rh->reload_required()) {
+		bool reload;
+		std::string additional_args;
+		std::tie(reload, additional_args) = _on_reload();
+		if(reload) {
+			_rh->reload(additional_args);
+		}
+	}
+
 	_last_time = _current_time;
 	_current_time = SDL_GetTicks() / 1000.0f;
 	const float delta_time = std::min(_current_time - _last_time, 1.f);

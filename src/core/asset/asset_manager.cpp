@@ -253,6 +253,9 @@ namespace asset {
 
 		//PHYSFS_mkdir(util::split_on_last(path, "/").first.c_str());
 
+		if(exists(path))
+			PHYSFS_delete(path.c_str());
+
 		return {id, *this, path};
 	}
 
