@@ -121,7 +121,15 @@ Engine::Engine(const std::string& title, int argc, char** argv, char** env)
 }
 
 Engine::~Engine() noexcept {
+	// unwind screen-stack
+	for(auto& s : _screen_stack)
+		s->_on_leave(util::nothing());
+
 	_screen_stack.clear();
+
+	_audio_ctx->stop_music();
+	_audio_ctx->pause_sounds();
+
 	assets().shrink_to_fit();
 }
 

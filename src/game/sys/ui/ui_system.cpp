@@ -116,10 +116,13 @@ namespace ui {
 
 			float fill=0;
 			// TODO[foe]: draw element indicators
+			int element_num = 0;
 			for(auto& o : element_offsets) {
-				_bubble_renderer.draw(offset.xy()+o, fill, _time_acc.value(),
+				float activity = 1;
+				_bubble_renderer.draw(offset.xy()+o, fill, activity, _time_acc.value() + element_num/2.f,
 									  *_assets.load<renderer::Texture>("tex:bubble_test.tga"_aid));
 				fill+=1.f / 3;
+				element_num++;
 			}
 
 		}

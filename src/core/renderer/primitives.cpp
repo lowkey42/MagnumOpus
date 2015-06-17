@@ -96,7 +96,7 @@ namespace renderer {
 		_prog.bind().set_uniform("vp", vp);
 	}
 
-	void Bubble_renderer::draw(glm::vec2 center, float fill_level, float time, const Texture& texture) {
+	void Bubble_renderer::draw(glm::vec2 center, float fill_level, float activity, float time, const Texture& texture) {
 		auto trans = glm::translate(glm::mat4(), {center.x, center.y, 0});
 
 		texture.bind();
@@ -104,6 +104,7 @@ namespace renderer {
 				.set_uniform("model", trans)
 		        .set_uniform("fill_level", glm::clamp(fill_level, 0.f, 1.f))
 		        .set_uniform("time", time)
+		        .set_uniform("activity", glm::clamp(activity, 0.f, 1.f))
 		        .set_uniform("texture", 0);
 		_obj.draw();
 	}
