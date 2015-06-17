@@ -4,8 +4,8 @@
 
 #include <core/renderer/primitives.hpp>
 
-#include "../combat/health_comp.hpp"
-#include "../combat/score_comp.hpp"
+#include "../combat/comp/health_comp.hpp"
+#include "../combat/comp/score_comp.hpp"
 
 #include <sstream>
 #include <iomanip>

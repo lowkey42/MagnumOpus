@@ -2,8 +2,8 @@
 
 #include <core/asset/asset_manager.hpp>
 
-#include "score_comp.hpp"
-#include "collector_comp.hpp"
+#include "comp/score_comp.hpp"
+#include "comp/collector_comp.hpp"
 
 #include <core/renderer/particles.hpp>
 

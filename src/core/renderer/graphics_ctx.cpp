@@ -174,6 +174,10 @@ namespace renderer {
 			SDL_SetWindowTitle(_window.get(), osstr.str().c_str());
 		}
 		SDL_GL_SwapWindow(_window.get());
+
+		// unbind texture
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	void Graphics_ctx::set_clear_color(float r, float g, float b) {
 		_clear_color = glm::vec3(r,g,b);

@@ -24,12 +24,12 @@
 #include "../physics/physics_system.hpp"
 
 #include "../state/state_comp.hpp"
-#include "reaper.hpp"
+#include "reaper_subsystem.hpp"
 #include "collectable_subsystem.hpp"
 
-#include "weapon_comp.hpp"
-#include "health_comp.hpp"
-#include "explosive_comp.hpp"
+#include "comp/weapon_comp.hpp"
+#include "comp/health_comp.hpp"
+#include "comp/explosive_comp.hpp"
 
 namespace mo {
 	namespace asset {class Asset_manager;}
@@ -67,7 +67,7 @@ namespace combat {
 			Laser_sight_comp::Pool& _lsights;
 			physics::Transform_system& _ts;
 			util::slot<physics::Manifold&> _collision_slot;
-			Reaper _reaper;
+			Reaper_subsystem _reaper;
 			Collectable_subsystem _collectables;
 			renderer::Ray_renderer _ray_renderer;
 	};

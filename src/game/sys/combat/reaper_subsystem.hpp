@@ -21,10 +21,10 @@ namespace mo {
 namespace sys {
 namespace combat {
 
-	class Reaper {
+	class Reaper_subsystem {
 		public:
-			Reaper(ecs::Entity_manager& entity_manager,
-				   state::State_system& state_system);
+			Reaper_subsystem(ecs::Entity_manager& entity_manager,
+			                 state::State_system& state_system);
 
 		private:
 			void _reap(ecs::Entity&, sys::state::State_data&);
