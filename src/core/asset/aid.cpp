@@ -39,6 +39,7 @@ namespace asset {
 			case Asset_type::vert_shader: class_name="vert_shader"; break;
 			case Asset_type::frag_shader: class_name="frag_shader"; break;
 			case Asset_type::sound:       class_name="sound";       break;
+			case Asset_type::sound_data:  class_name="sound_data";  break;
 			case Asset_type::music:       class_name="music";       break;
 			case Asset_type::cfg:         class_name="cfg";         break;
 			case Asset_type::blueprint:   class_name="blueprint";   break;

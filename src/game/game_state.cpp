@@ -311,13 +311,24 @@ namespace mo {
 			trans.position(pos);
 		});
 
-		if(!main_player) {
-			main_player = p;
-			p->emplace<Player_tag_comp>(0);
+		if(!p->has<Player_tag_comp>()) {
+			if(!main_player) {
+				main_player = p;
+				p->emplace<Player_tag_comp>(0);
+
+			} else {
+				sec_players.emplace_back(p);
+				p->emplace<Player_tag_comp>(sec_players.size());
+			}
 
 		} else {
-			sec_players.emplace_back(p);
-			p->emplace<Player_tag_comp>(sec_players.size());
+			auto& pt = p->get<Player_tag_comp>().get_or_throw();
+			if(pt.id()==0)
+				main_player = p;
+
+			else {
+				sec_players.emplace_back(p);
+			}
 		}
 
 		return p;
