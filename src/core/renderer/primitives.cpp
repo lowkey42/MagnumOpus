@@ -14,14 +14,16 @@ namespace renderer {
 	namespace {
 		struct Ray_vertex {
 			glm::vec2 pos;
+			float radius_pos;
 		};
 
 		auto ray_layout = renderer::Vertex_layout{
 			renderer::Vertex_layout::Mode::triangle_strip,
-			renderer::vertex("position", &Ray_vertex::pos)
+			renderer::vertex("position", &Ray_vertex::pos),
+			renderer::vertex("radius_pos", &Ray_vertex::radius_pos)
 		};
 		auto ray_mesh = std::vector<Ray_vertex>{
-			{{0,0}}, {{1,0}}, {{0,1}}, {{1,1}}
+			{{0,0},-1}, {{1,0},-1}, {{0,1},1}, {{1,1},1}
 		};
 	}
 

@@ -68,9 +68,7 @@ namespace level {
 			// if x > maximum tile per line --> do a wrap to the next line (y)
 			int tile_y = std::floor(tile_type / tpl) + 1;
 
-			float layer = 0;
-			if(tile.solid())
-				layer = 0.99;
+			float layer = tile.height();
 
 			// First triangle of the rectangle
 			_vertices.push_back({{ x - 0.5f, y - 0.5f }, {tile_x*(xTexTile), 1.0-(tile_y*yTexTile)}, layer});

@@ -138,14 +138,14 @@ namespace physics {
 		using namespace util;
 		using namespace glm;
 
-		auto step = rotate(Position{0.5_m, 0_m}, dir);
+		auto step = rotate(Position{0.1_m, 0_m}, dir);
 
 		auto p=start;
 		auto dist=0_m;
-		for(; dist<=max_distance; dist+=0.5_m, p+=step) {
+		for(; dist<=max_distance; dist+=0.1_m, p+=step) {
 			auto x = static_cast<int32_t>(p.x.value()+0.5f);
 			auto y = static_cast<int32_t>(p.y.value()+0.5f);
-			if(_world.solid(x, y)) {
+			if(_world.solid_real(p.x.value(), p.y.value())) {
 				on_wall(x,y,dist.value());
 				break;
 			}
