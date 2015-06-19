@@ -2,8 +2,8 @@
 
 #include <core/ecs/serializer_impl.hpp>
 
-#include "../physics/physics_comp.hpp"
-#include "../physics/transform_system.hpp"
+#include "../../physics/physics_comp.hpp"
+#include "../../physics/transform_system.hpp"
 
 namespace mo {
 namespace sys {

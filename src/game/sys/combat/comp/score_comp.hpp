@@ -38,7 +38,7 @@ namespace combat {
 			friend struct Persisted_state;
 		private:
 			friend class Collectable_subsystem;
-			friend class Reaper;
+			friend class Reaper_subsystem;
 
 			int _value;
 			bool _collector=false;

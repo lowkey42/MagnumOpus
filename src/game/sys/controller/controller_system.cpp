@@ -3,9 +3,9 @@
 
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
-#include "../combat/weapon_comp.hpp"
+#include "../combat/comp/weapon_comp.hpp"
 #include "../state/state_comp.hpp"
-#include "../combat/collector_comp.hpp"
+#include "../combat/comp/collector_comp.hpp"
 
 namespace mo {
 namespace sys {

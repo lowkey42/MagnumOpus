@@ -1,4 +1,4 @@
-#include "reaper.hpp"
+#include "reaper_subsystem.hpp"
 
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
@@ -8,8 +8,8 @@
 #include "../state/state_comp.hpp"
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
-#include "score_comp.hpp"
-#include "explosive_comp.hpp"
+#include "comp/score_comp.hpp"
+#include "comp/explosive_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -27,14 +27,14 @@ namespace combat {
 		}
 	}
 
-	Reaper::Reaper(ecs::Entity_manager& entity_manager,
+	Reaper_subsystem::Reaper_subsystem(ecs::Entity_manager& entity_manager,
 				   state::State_system& state_system)
-		: _em(entity_manager), _reap_slot(&Reaper::_reap, this) {
+		: _em(entity_manager), _reap_slot(&Reaper_subsystem::_reap, this) {
 
 		_reap_slot.connect(state_system.state_change_events);
 	}
 
-	void Reaper::_reap(ecs::Entity& e, sys::state::State_data& s) {
+	void Reaper_subsystem::_reap(ecs::Entity& e, sys::state::State_data& s) {
 		if(s.s==Entity_state::dying) {
 			// he's dead jim
 

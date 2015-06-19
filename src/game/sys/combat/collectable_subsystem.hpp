@@ -21,7 +21,7 @@
 #include "../physics/transform_system.hpp"
 #include "../physics/physics_system.hpp"
 
-#include "collector_comp.hpp"
+#include "comp/collector_comp.hpp"
 
 namespace mo {
 	namespace asset {class Asset_manager;}

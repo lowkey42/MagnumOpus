@@ -70,6 +70,7 @@ namespace cam {
 			}
 
 		private:
+			bool _uninitialized = true;
 			renderer::Graphics_ctx& _gctx;
 			Camera_target_comp::Pool& _targets;
 			const glm::vec2 _vscreen_size;
