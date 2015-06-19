@@ -9,7 +9,6 @@
 #include <core/asset/aid.hpp>
 
 #include "sys/physics/transform_comp.hpp"
-#include "sys/sprite/sprite_comp.hpp"
 
 #include "level/level_generator.hpp"
 
@@ -209,7 +208,7 @@ namespace mo {
 		  controller(em),
 		  ai(em, transform, level),
 		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
-		  spritesys(em, transform, engine.assets(), state),
+		  graphics(em, transform, engine.assets(), state),
 	      soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
@@ -248,11 +247,9 @@ namespace mo {
 		physics.update(dt);
 		combat.update(dt);
 		camera.update(dt);
-		spritesys.update(dt);
+		graphics.update(dt);
 		state.update(dt);
 		ui.update(dt);
-
-		// TODO: update sprites and tilemap
 
 		main_player->get<sys::physics::Transform_comp>().process(
 			[&](auto& transform){
@@ -288,7 +285,7 @@ namespace mo {
 
 			tilemap.draw(cam);
 			combat.draw(cam);
-			spritesys.draw(cam);
+			graphics.draw(cam);
 			soundsys.play_sounds(cam);
 			particle_renderer.draw(dt, cam);
 		});

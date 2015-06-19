@@ -7,14 +7,15 @@
 
 namespace mo {
 namespace sys {
-namespace sprite {
+namespace graphic {
 
 	struct Sprite_comp::Persisted_state {
 		std::string aid;
-		Persisted_state(const Sprite_comp& c) :
-			aid(c._animation.aid().str()){}
 
-    };
+		Persisted_state(const Sprite_comp& c)
+		    : aid(c._animation.aid().str()){}
+
+	};
 
 	sf2_structDef(Sprite_comp::Persisted_state,
 		sf2_member(aid)
@@ -43,9 +44,6 @@ namespace sprite {
 			_anim_type = renderer::Animation_type::idle;
 		}
 
-		// resetting currentFrame to 0 after animation has been changed to
-		// another one so if the old animation and had more frames than the
-		// new there will be no blank sprite till next reset in calculation
 		if(before != _anim_type)
 			_current_frame = 0;
 	}

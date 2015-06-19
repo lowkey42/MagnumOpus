@@ -1,5 +1,5 @@
 /**************************************************************************\
- *	sprite_system.hpp	-   Sprite Component Management System            *
+ *	Sprite Component Management System                                    *
  *                                                ___                     *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -20,26 +20,22 @@
 #include <core/renderer/camera.hpp>
 
 #include "sprite_comp.hpp"
+#include "particle_emiter_comp.hpp"
 #include "../state/state_system.hpp"
 
 namespace mo{
 namespace sys{
-namespace sprite{
+namespace graphic{
 
-	class Sprite_system{
-
+	class Graphic_system {
 		public:
-
-			// Constructors
-			Sprite_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
+			Graphic_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
 						  asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept;
 
-			// Methods
 			void draw(const renderer::Camera& camera) noexcept;
 			void update(Time dt) noexcept;
 
 		private:
-
 			void _on_state_change(ecs::Entity& e, state::State_data& data);
 
 			physics::Transform_system& _transform;

@@ -22,7 +22,7 @@
 
 namespace mo {
 namespace sys {
-namespace sprite {
+namespace graphic {
 
 	class Sprite_comp : public ecs::Component<Sprite_comp> {
 
@@ -32,9 +32,8 @@ namespace sprite {
 		void load(ecs::Entity_state&)override;
 		void store(ecs::Entity_state&)override;
 
-		// TODO: nullptr check
 		Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
-			Component(owner), _current_frame(0), _animation(animation), _anim_type(renderer::Animation_type::idle){}
+			Component(owner), _animation(animation) {}
 
 		auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
 		auto animation() const noexcept { return _animation; }
@@ -50,14 +49,13 @@ namespace sprite {
 		friend struct Persisted_state;
 
 	private:
-		friend class Sprite_system;
-		float _current_frame;
-		// Maybe Declaration would fit better somewhere else
-		// Set to true --> Coins animation, it seems that there is no state change for coins
+		friend class Graphic_system;
+
+		float _current_frame = 0;
 		bool _repeat_animation = true;
 
 		asset::Ptr<renderer::Animation> _animation;
-		renderer::Animation_type _anim_type;
+		renderer::Animation_type _anim_type = renderer::Animation_type::idle;
 
 	};
 

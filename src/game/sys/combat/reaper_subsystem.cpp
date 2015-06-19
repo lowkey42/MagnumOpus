@@ -3,9 +3,10 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 #include <core/utils/random.hpp>
+#include <core/asset/aid.hpp>
 
-#include "../sprite/sprite_comp.hpp"
 #include "../state/state_comp.hpp"
+#include "../graphic/sprite_comp.hpp"
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 #include "comp/score_comp.hpp"
@@ -59,7 +60,7 @@ namespace combat {
 				e.erase_other<
 						Explosive_comp,
 						physics::Transform_comp,
-						sprite::Sprite_comp,
+						graphic::Sprite_comp,
 						state::State_comp>();
 		}
 	}

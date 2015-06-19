@@ -13,7 +13,7 @@
 #include <core/asset/aid.hpp>
 
 #include "sys/physics/transform_comp.hpp"
-#include "sys/sprite/sprite_comp.hpp"
+#include "sys/graphic/sprite_comp.hpp"
 #include "sys/sound/sound_comp.hpp"
 
 #include "game_state.hpp"
