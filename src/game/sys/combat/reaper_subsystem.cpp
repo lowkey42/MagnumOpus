@@ -11,6 +11,8 @@
 #include "../physics/physics_comp.hpp"
 #include "comp/score_comp.hpp"
 #include "comp/explosive_comp.hpp"
+#include "comp/health_comp.hpp"
+#include "comp/weapon_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -18,7 +20,6 @@ namespace combat {
 
 	using namespace state;
 	using namespace unit_literals;
-	using namespace state;
 
 	namespace {
 		auto rng = util::create_random_generator();
@@ -37,14 +38,17 @@ namespace combat {
 
 	void Reaper_subsystem::_reap(ecs::Entity& e, sys::state::State_data& s) {
 		if(s.s==Entity_state::dying) {
-			// he's dead jim
+			e.erase<physics::Physics_comp>();
+			e.erase<Health_comp>();
+			e.erase<Weapon_comp>();
+		}
+
+		if(s.s==Entity_state::dead) { // he's dead jim
 
 			e.get<physics::Transform_comp>().process([&](auto& transform){
 				transform.layer(0.1f);
 
-				e.get<Score_comp>().process([&](auto& s){
-					s._collectable = true;
-					s._collected = true;
+				e.get<Score_comp>().process([&](Score_comp& s){
 					for(int i=0; i<std::min(s._value, 100); ++i) {
 						auto coin = _em.emplace("blueprint:coin"_aid);
 						coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());

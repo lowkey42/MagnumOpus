@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Stores coins                                                           *
+ * FRIENDSHIP IS MAGIC! and protects against friendly fire                *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -19,30 +19,35 @@
 #include <core/units.hpp>
 
 namespace mo {
-namespace sys {
-namespace combat {
+namespace renderer {class Particle_emiter;}
 
-	class Score_comp : public ecs::Component<Score_comp> {
+namespace sys {
+namespace physics{class Transform_system;}
+
+namespace item {
+
+	class Collector_comp : public ecs::Component<Collector_comp> {
 		public:
-			static constexpr const char* name() {return "Score";}
+			static constexpr const char* name() {return "Collector";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Score_comp(ecs::Entity& owner, int value=0) noexcept
-				: Component(owner), _value(value) {}
+			Collector_comp(ecs::Entity& owner) noexcept : Component(owner) {}
 
-			void value(int value)noexcept {_value=value;}
-			auto value()const noexcept {return _value;}
-
-			void add(int mod)noexcept {_value+=mod;}
+			void take()noexcept {_active=true;}
 
 			struct Persisted_state;
 			friend struct Persisted_state;
+			friend class Item_system;
 		private:
-			friend class Collectable_subsystem;
-			friend class Reaper_subsystem;
+			Force    _force{500};
+			Distance _near{0.5};
+			Distance _far{10};
+			Angle    _near_angle{PI};
+			Angle    _far_angle{PI};
 
-			int _value;
+			bool _active=false;
+			std::shared_ptr<renderer::Particle_emiter> _particles;
 	};
 
 }

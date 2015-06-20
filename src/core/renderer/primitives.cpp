@@ -72,9 +72,6 @@ namespace renderer {
 				m.emplace_back(vec2{x,y} * radius, (vec2{x,-y}+1.f)/2.f);
 			}
 
-			for(auto& v : m)
-				DEBUG("V: "<<v.xy.x<<","<<v.xy.y);
-
 			return m;
 		}
 

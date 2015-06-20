@@ -1,0 +1,17 @@
+{
+    "Transform":{"layer":0.2},
+	"Physics":{
+        "radius": 0.2,
+        "mass": 0.25,
+        "restitution": 0.01,
+		"friction": 0.00001,
+        "solid":true
+    },
+    "Item": {
+        "target": "element",
+        "element": "gas",
+        "mod": 1,
+        "joinable": true
+    },
+    "Particle_emiter":{"type":"element_gas"}
+}

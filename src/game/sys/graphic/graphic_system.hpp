@@ -29,8 +29,11 @@ namespace graphic{
 
 	class Graphic_system {
 		public:
-			Graphic_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
-						  asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept;
+			Graphic_system(ecs::Entity_manager& entity_manager,
+			               physics::Transform_system& ts,
+			               asset::Asset_manager& asset_manager,
+			               renderer::Particle_renderer& particle_renderer,
+			               state::State_system& state_system) noexcept;
 
 			void draw(const renderer::Camera& camera) noexcept;
 			void update(Time dt) noexcept;
@@ -38,9 +41,13 @@ namespace graphic{
 		private:
 			void _on_state_change(ecs::Entity& e, state::State_data& data);
 
+			asset::Asset_manager& _assets;
+			renderer::Particle_renderer& _particle_renderer;
+
 			physics::Transform_system& _transform;
 			renderer::Sprite_batch _sprite_batch;
 			Sprite_comp::Pool& _sprites;
+			Particle_emiter_comp::Pool& _particles;
 			util::slot<ecs::Entity&, state::State_data&> _state_change_slot;
 	};
 

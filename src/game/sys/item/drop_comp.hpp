@@ -1,5 +1,5 @@
 /**************************************************************************\
- * manages collection of collactable                                      *
+ * Makrs entities that drop items on death                                *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -18,36 +18,26 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
-#include "../physics/transform_system.hpp"
-#include "../physics/physics_system.hpp"
-
-#include "comp/collector_comp.hpp"
-
 namespace mo {
-	namespace asset {class Asset_manager;}
-	namespace renderer {class Particle_renderer;}
-
 namespace sys {
-namespace combat {
+namespace item {
 
-	class Collectable_subsystem {
+	class Drop_comp : public ecs::Component<Drop_comp> {
 		public:
-			Collectable_subsystem(asset::Asset_manager& assets,
-			                      ecs::Entity_manager& entity_manager,
-			                      physics::Transform_system& transform,
-			                      renderer::Particle_renderer& particles);
+			static constexpr const char* name() {return "Drop";}
+			//void load(ecs::Entity_state&)override;
+			//void store(ecs::Entity_state&)override;
 
-			void update(Time dt);
-			void _on_collision(physics::Manifold& m);
+			Drop_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
 
+			struct Persisted_state;
+			friend struct Persisted_state;
+			friend class Item_system;
 		private:
-			asset::Asset_manager& _assets;
-			ecs::Entity_manager& _em;
-			physics::Transform_system& _ts;
-			renderer::Particle_renderer& _particles;
-			Collector_comp::Pool& _collectors;
 
 	};
+
 }
 }
 }

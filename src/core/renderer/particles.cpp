@@ -95,7 +95,7 @@ namespace renderer {
 
 	void Particle_emiter::update_center(Position center, Angle orientation) {
 		_center = center;
-		_orientation = orientation;
+		_orientation = normalize(orientation);
 	}
 
 	void Particle_emiter::update(bool active, Time dt, Environment_callback& env) {
@@ -265,12 +265,8 @@ namespace renderer {
 		_obj.draw();
 	}
 	bool Particle_emiter::visible(glm::vec2 top_left, glm::vec2 bottom_right)const noexcept {
-		return !(
-		            top_left.x     > _bottom_right.x ||
-		            bottom_right.x < _top_left.x ||
-		            top_left.y     > _bottom_right.y ||
-		            bottom_right.y < _top_left.y
-		        );
+		return _bottom_right.x >= top_left.x && _top_left.x <=bottom_right.x &&
+		       _bottom_right.y >= top_left.y && _top_left.y <=bottom_right.y;
 	}
 	bool Particle_emiter::empty()const noexcept {
 		return _particles.empty();
@@ -291,8 +287,8 @@ namespace renderer {
 		Disable_depthwrite ddw{};
 
 		auto cam_area  = cam.area();
-		glm::vec2 top_left    {cam_area.x, cam_area.y};
-		glm::vec2 bottom_right{cam_area.z, cam_area.w};
+		glm::vec2 top_left    {cam_area.x-1, cam_area.y-1};
+		glm::vec2 bottom_right{cam_area.z+1, cam_area.w+1};
 
 		_prog.bind()
 		     .set_uniform("vp", cam.vp())

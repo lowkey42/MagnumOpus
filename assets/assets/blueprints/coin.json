@@ -7,9 +7,9 @@
 		"friction": 0.0001,
         "solid":false
     },
-    "Score": {
-        "value": 1,
-        "collectable": true
+    "Item": {
+        "target": "score",
+        "mod": 5
     },
     "Sprite": {
         "aid": "anim:coin"

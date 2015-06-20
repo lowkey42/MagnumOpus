@@ -64,6 +64,24 @@ namespace renderer {
 		public:
 			void update_center(Position center, Angle orientation);
 
+			void radius(Distance r)noexcept {_radius=r;}
+			auto radius()const noexcept {return _radius;}
+
+			void spawn(float rate, std::size_t max)noexcept {
+				_spawn_rate=rate;
+				_max_particles=max;
+			}
+			void ttl(Time min, Time max)noexcept {
+				_min_ttl = min;
+				_max_ttl = max;
+			}
+			void acceleration(util::Xerp<Speed_per_time> acceleration,
+			                  util::Xerp<Angle_acceleration> angular_acceleration)noexcept {
+				_acceleration = acceleration;
+				_angular_acceleration = angular_acceleration;
+			}
+
+
 			void active(bool a)noexcept {_activated=a;}
 			bool active()const noexcept {return _activated;}
 

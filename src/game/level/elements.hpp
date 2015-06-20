@@ -28,12 +28,11 @@ namespace level {
 		frost,
 		water,
 		stone,
-		explosive,
-		lightning,
-		rubber,
+		gas,
+		lightning
 		// add more?
 	};
-	constexpr auto element_count = static_cast<std::size_t>(Element::rubber) + 1;
+	constexpr auto element_count = static_cast<std::size_t>(Element::lightning) + 1;
 	constexpr uint16_t mask(Element e) {
 		return e!=Element::neutral ? 1<<(static_cast<uint16_t>(e)-1) : 0;
 	}
@@ -92,3 +91,20 @@ namespace level {
 
 }
 }
+
+#ifdef MO_BUILD_SERIALIZER
+#include <sf2/sf2.hpp>
+
+namespace mo {
+namespace level {
+	sf2_enumDef(Element,
+		sf2_value(fire),
+		sf2_value(frost),
+		sf2_value(water),
+		sf2_value(stone),
+		sf2_value(gas),
+		sf2_value(lightning)
+	)
+}
+}
+#endif

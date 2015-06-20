@@ -8,7 +8,6 @@
 
 #include "comp/friend_comp.hpp"
 #include "comp/score_comp.hpp"
-#include "comp/collector_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -21,8 +20,7 @@ namespace combat {
 	                             ecs::Entity_manager& entity_manager,
 								 physics::Transform_system& ts,
 								 physics::Physics_system& physics_system,
-								 state::State_system& state_system,
-	                             renderer::Particle_renderer& particles)
+								 state::State_system& state_system)
 		: _em(entity_manager),
 		  _weapons(entity_manager.list<Weapon_comp>()),
 		  _healths(entity_manager.list<Health_comp>()),
@@ -31,7 +29,6 @@ namespace combat {
 		  _ts(ts),
 		  _collision_slot(&Combat_system::_on_collision, this),
 		  _reaper(entity_manager, state_system),
-	      _collectables(assets, entity_manager, ts, particles),
 	      _ray_renderer(assets)
 	{
 
@@ -42,14 +39,12 @@ namespace combat {
 		_em.register_component_type<Health_comp>();
 		_em.register_component_type<Explosive_comp>();
 		_em.register_component_type<Score_comp>();
-		_em.register_component_type<Collector_comp>();
 	}
 
 	void Combat_system::update(Time dt) {
 		_shoot_something(dt);
 		_explode_explosives(dt);
 		_health_care(dt);
-		_collectables.update(dt);
 	}
 	void Combat_system::draw(const renderer::Camera& cam) {
 		_ray_renderer.set_vp(cam.vp());
@@ -262,8 +257,6 @@ namespace combat {
 	}
 
 	void Combat_system::_on_collision(physics::Manifold& m) {
-		_collectables._on_collision(m);
-
 		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
 			if(e._activate_on_contact) {
 				if(e._delay>0_s) {

@@ -86,6 +86,24 @@ namespace util {
 	template<typename T>
 	auto scerp(T value, T max_deviation = T(0)) -> Interpolation<T>;
 
+
+	template<typename T>
+	auto operator*(Interpolation<T> i, float f) -> Interpolation<T> {
+		auto cpoints = std::vector<T>(i.cpoints);
+		for(auto& p : cpoints) p*=f;
+
+		return {
+			i.initial_value * f,
+			i.final_value * f,
+			i.type,
+			i.max_deviation * f,
+			std::move(cpoints)
+		};
+	}
+	template<typename T>
+	auto operator/(Interpolation<T> i, float f) -> Interpolation<T> {
+		return i * (1/f);
+	}
 }
 }
 

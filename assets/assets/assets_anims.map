@@ -10,3 +10,5 @@ anim:ball = animations/ball_anim.json
 anim:coin = animations/coin_anim.json
 anim:fireball = animations/fireball.json
 anim:vomitball = animations/vomitball.json
+
+anim:health_potion = animations/health_potion.json

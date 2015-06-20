@@ -44,9 +44,7 @@
         "occlusion": 64,
         "width": 0.06
     },
-    "Score":{
-        "collector": true
-    },
+    "Score",
     "Collector":{
         "force": 500,
         "near": 0.5,

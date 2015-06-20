@@ -207,8 +207,9 @@ namespace mo {
 		  state(em),
 		  controller(em),
 		  ai(em, transform, level),
-		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
-		  graphics(em, transform, engine.assets(), state),
+		  combat(engine.assets(), em, transform, physics, state),
+	      items(engine.assets(), em, physics, transform, state, particle_renderer),
+		  graphics(em, transform, engine.assets(), particle_renderer, state),
 	      soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
@@ -245,6 +246,7 @@ namespace mo {
 		controller.update(dt);
 		transform.update(dt);
 		physics.update(dt);
+		items.update(dt);
 		combat.update(dt);
 		camera.update(dt);
 		graphics.update(dt);

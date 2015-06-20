@@ -1,5 +1,5 @@
 /**************************************************************************\
- * FRIENDSHIP IS MAGIC! and protects against friendly fire                *
+ * Items such as coins, potions or elements                               *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -18,38 +18,38 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
+#include "../../level/elements.hpp"
+
 namespace mo {
-namespace renderer {class Particle_emiter;}
-
 namespace sys {
-namespace physics{class Transform_system;}
+namespace item {
 
-namespace combat {
+	enum Item_target {
+		health,
+		score,
+		element
+	};
 
-
-
-	class Collector_comp : public ecs::Component<Collector_comp> {
+	class Item_comp : public ecs::Component<Item_comp> {
 		public:
-			static constexpr const char* name() {return "Collector";}
+			static constexpr const char* name() {return "Item";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Collector_comp(ecs::Entity& owner) noexcept : Component(owner) {}
+			Item_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
 
-			void take()noexcept {_active=true;}
 
 			struct Persisted_state;
 			friend struct Persisted_state;
-			friend class Collectable_subsystem;
+			friend class Item_system;
 		private:
-			Force    _force{500};
-			Distance _near{0.5};
-			Distance _far{10};
-			Angle    _near_angle{PI};
-			Angle    _far_angle{PI};
 
-			bool _active=false;
-			std::shared_ptr<renderer::Particle_emiter> _particles;
+			Item_target    _target;
+			level::Element _element;
+			float          _mod;
+			bool           _joinable;
+			bool           _collected = false;
 	};
 
 }

@@ -25,37 +25,35 @@ namespace sys {
 namespace graphic {
 
 	class Sprite_comp : public ecs::Component<Sprite_comp> {
+		public:
+			static constexpr const char* name() {return "Sprite";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-	public:
+			Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
+				Component(owner), _animation(animation) {}
 
-		static constexpr const char* name() {return "Sprite";}
-		void load(ecs::Entity_state&)override;
-		void store(ecs::Entity_state&)override;
+			auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
+			auto animation() const noexcept { return _animation; }
+			auto current_frame() const noexcept { return _current_frame; }
+			auto animation_type() const noexcept { return _anim_type; }
+			auto repeat_animation() const noexcept { return _repeat_animation; }
+			auto repeat_animation(const bool r) noexcept { _repeat_animation = r; }
 
-		Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
-			Component(owner), _animation(animation) {}
+			void current_frame(const float frame) noexcept { _current_frame = frame; }
+			void animation_type(renderer::Animation_type type) noexcept;
 
-		auto sprite() const noexcept -> renderer::Sprite_batch::Sprite;
-		auto animation() const noexcept { return _animation; }
-		auto current_frame() const noexcept { return _current_frame; }
-		auto animation_type() const noexcept { return _anim_type; }
-		auto repeat_animation() const noexcept { return _repeat_animation; }
-		auto repeat_animation(const bool r) noexcept { _repeat_animation = r; }
+			struct Persisted_state;
+			friend struct Persisted_state;
 
-		void current_frame(const float frame) noexcept { _current_frame = frame; }
-		void animation_type(renderer::Animation_type type) noexcept;
+		private:
+			friend class Graphic_system;
 
-		struct Persisted_state;
-		friend struct Persisted_state;
+			float _current_frame = 0;
+			bool  _repeat_animation = true;
 
-	private:
-		friend class Graphic_system;
-
-		float _current_frame = 0;
-		bool _repeat_animation = true;
-
-		asset::Ptr<renderer::Animation> _animation;
-		renderer::Animation_type _anim_type = renderer::Animation_type::idle;
+			asset::Ptr<renderer::Animation> _animation;
+			renderer::Animation_type        _anim_type = renderer::Animation_type::idle;
 
 	};
 

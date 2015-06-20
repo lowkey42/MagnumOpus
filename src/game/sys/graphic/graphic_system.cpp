@@ -2,6 +2,8 @@
 
 #include <core/units.hpp>
 
+#include "../physics/physics_comp.hpp"
+
 
 namespace mo {
 namespace sys {
@@ -9,16 +11,24 @@ namespace graphic {
 
 	using namespace unit_literals;
 
-	Graphic_system::Graphic_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
-								 asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept
-		: _transform(ts),
-		  _sprite_batch(asset_manager),
-		  _sprites(entity_manager.list<Sprite_comp>()),
-		  _state_change_slot(&Graphic_system::_on_state_change, this)
+	Graphic_system::Graphic_system(
+	        ecs::Entity_manager& entity_manager,
+	        sys::physics::Transform_system& ts,
+	        asset::Asset_manager& asset_manager,
+	        renderer::Particle_renderer& particle_renderer,
+	        state::State_system& state_system) noexcept
+		: _assets(asset_manager),
+	      _particle_renderer(particle_renderer),
+	      _transform(ts),
+	      _sprite_batch(asset_manager),
+	      _sprites(entity_manager.list<Sprite_comp>()),
+	      _particles(entity_manager.list<Particle_emiter_comp>()),
+	      _state_change_slot(&Graphic_system::_on_state_change, this)
 	{
 		_state_change_slot.connect(state_system.state_change_events);
 
 		entity_manager.register_component_type<Sprite_comp>();
+		entity_manager.register_component_type<Particle_emiter_comp>();
 	}
 
 	void Graphic_system::draw(const renderer::Camera& camera) noexcept{
@@ -38,18 +48,34 @@ namespace graphic {
 		});
 
 		_sprite_batch.drawAll(camera);
-
 	}
 
 	void Graphic_system::update(Time dt) noexcept{
 		for(auto& sprite : _sprites) {
-
 			sprite.current_frame(
 				sprite._animation->next_frame(
 					sprite.animation_type(), sprite.current_frame(), dt.value(), sprite._repeat_animation
 				)
 			);
+		}
 
+		for(auto& p : _particles) {
+			if(!p.enabled())
+				continue;
+
+			p._create_emiter(_particle_renderer, _assets);
+			if(!p._emiter)
+				continue;
+
+			auto transform = p.owner().get<physics::Transform_comp>();
+			transform.process([&](auto& t) {
+				p._emiter->update_center(t.position(), t.rotation());
+			});
+
+			auto physics = p.owner().get<physics::Physics_comp>();
+			physics.process([&](auto& phys){
+				p.scale(phys.radius());
+			});
 		}
 	}
 
@@ -98,7 +124,7 @@ namespace graphic {
 				break;
 			case state::Entity_state::dead:
 				type = renderer::Animation_type::died;
-				toRepeat = false;
+				toRepeat = true;
 				break;
 			case state::Entity_state::dying:
 				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
