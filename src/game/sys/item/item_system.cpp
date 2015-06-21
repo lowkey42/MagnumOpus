@@ -1,5 +1,8 @@
 #include "item_system.hpp"
 
+#include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
+
 #include <core/asset/asset_manager.hpp>
 #include <core/utils/random.hpp>
 #include <core/renderer/particles.hpp>
@@ -11,6 +14,47 @@
 #include "../combat/comp/health_comp.hpp"
 #include "../combat/comp/score_comp.hpp"
 
+namespace mo {
+namespace sys {
+namespace item {
+	struct Droprate {
+		std::string item_aid;
+		float chance;
+		int min=1;
+		int max=1;
+	};
+
+	struct Droprate_group {
+		std::vector<Droprate> values;
+	};
+	struct Droprate_conf {
+		std::vector<Droprate_group> groups;
+	};
+
+	sf2_structDef(Droprate, sf2_member(item_aid), sf2_member(chance), sf2_member(min), sf2_member(max));
+	sf2_structDef(Droprate_group, sf2_member(values));
+	sf2_structDef(Droprate_conf, sf2_member(groups));
+}
+}
+namespace asset {
+	template<>
+	struct Loader<sys::item::Droprate_conf> {
+		using RT = std::shared_ptr<sys::item::Droprate_conf>;
+
+		static RT load(istream in) throw(Loading_failed) {
+			auto r = std::make_shared<sys::item::Droprate_conf>();
+
+			sf2::parseStream(in, *r);
+
+			return r;
+		}
+
+		static void store(ostream out, const sys::item::Droprate_conf& asset) throw(Loading_failed) {
+			sf2::writeStream(out,asset);
+		}
+	};
+}
+}
 
 namespace mo {
 namespace sys {
@@ -49,6 +93,9 @@ namespace item {
 		entity_manager.register_component_type<Collector_comp>();
 		entity_manager.register_component_type<Item_comp>();
 		entity_manager.register_component_type<Drop_comp>();
+
+		_droprates = assets.load<Droprate_conf>("cfg:drops"_aid);
+		INVARIANT(!_droprates->groups.empty(), "Couldn't load drop configuration");
 	}
 
 	void Item_system::update(Time dt) {
@@ -159,9 +206,21 @@ namespace item {
 			process(e.get<Drop_comp>(),
 			        e.get<physics::Transform_comp>())
 			        >> [&](Drop_comp& d, physics::Transform_comp& t) {
-				auto coin = _em.emplace("blueprint:health_potion"_aid);
-				coin->get<physics::Transform_comp>().get_or_throw().position(t.position());
-				coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *5_N);
+				if(d._group>=0 && d._group<int8_t(_droprates->groups.size())) {
+					auto group = _droprates->groups[d._group];
+
+					for(auto& item : group.values) {
+						if(util::random_bool(rng, item.chance)) {
+							auto count = util::random_int(rng, item.min, item.max);
+
+							while(count-->0) {
+								auto spawned = _em.emplace(asset::AID(asset::Asset_type::blueprint, item.item_aid));
+								spawned->get<physics::Transform_comp>().get_or_throw().position(t.position());
+								spawned->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *5_N);
+							}
+						}
+					}
+				}
 			};
 		}
 	}

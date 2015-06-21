@@ -38,7 +38,5 @@
         "melee_range": 1,
         "melee_angle": 90
     },
-    "Score": {
-        "value": 1
-    }
+    "Drop":{"group":0}
 }

@@ -1,11 +1,11 @@
 {
     "Transform":{"layer":0.2},
 	"Physics":{
-        "radius": 0.2,
-        "mass": 0.25,
+        "radius": 0.4,
+        "mass": 1.0,
         "restitution": 0.01,
 		"friction": 0.00001,
-        "solid":true
+        "solid":false
     },
     "Item": {
         "target": "element",

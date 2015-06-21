@@ -40,7 +40,7 @@ namespace state {
 				case Entity_state::damaged:			return  0.1_s;
 				case Entity_state::healed:			return  0.1_s;
 				case Entity_state::dead:			return  0_s;
-				case Entity_state::dying:			return  0.1_s;
+				case Entity_state::dying:			return  0.05_s;
 				case Entity_state::resurrected:		return  0.1_s;
 			}
 

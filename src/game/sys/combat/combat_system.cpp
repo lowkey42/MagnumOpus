@@ -258,6 +258,11 @@ namespace combat {
 
 	void Combat_system::_on_collision(physics::Manifold& m) {
 		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
+			if(m.is_with_object() &&
+			   m.b.comp->owner().get<physics::Transform_comp>().get_or_throw().layer()<0.5) {
+				return;
+			}
+
 			if(e._activate_on_contact) {
 				if(e._delay>0_s) {
 					if(e._delay_left<=0_s)

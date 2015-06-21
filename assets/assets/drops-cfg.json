@@ -1,0 +1,25 @@
+{"groups":[
+	{"values":[
+		{"item_aid":"coin", "chance":0.25, "max": 1}
+	]},
+	{"values":[
+		{"item_aid":"coin", "chance":1.0, "max": 5, "min":1},
+		{"item_aid":"health_potion", "chance":0.25, "max":2},
+		{"item_aid":"element_fire", "chance":0.1},
+		{"item_aid":"element_frost", "chance":0.1},
+		{"item_aid":"element_water", "chance":0.1},
+		{"item_aid":"element_stone", "chance":0.1},
+		{"item_aid":"element_gas", "chance":0.01},
+		{"item_aid":"element_lightning", "chance":0.01}
+	]},
+	{"values":[
+		{"item_aid":"coin", "chance":1.0, "max": 15, "min":5},
+		{"item_aid":"health_potion", "chance":0.5, "max":2, "min":1},
+		{"item_aid":"element_fire", "chance":0.25},
+		{"item_aid":"element_frost", "chance":0.1},
+		{"item_aid":"element_water", "chance":0.1},
+		{"item_aid":"element_stone", "chance":0.1},
+		{"item_aid":"element_gas", "chance":0.01},
+		{"item_aid":"element_lightning", "chance":0.01}
+	]}
+]}

@@ -25,8 +25,8 @@ namespace item {
 	class Drop_comp : public ecs::Component<Drop_comp> {
 		public:
 			static constexpr const char* name() {return "Drop";}
-			//void load(ecs::Entity_state&)override;
-			//void store(ecs::Entity_state&)override;
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
 			Drop_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}
@@ -35,7 +35,7 @@ namespace item {
 			friend struct Persisted_state;
 			friend class Item_system;
 		private:
-
+			int8_t _group;
 	};
 
 }

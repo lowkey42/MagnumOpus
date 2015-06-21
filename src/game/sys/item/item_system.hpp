@@ -32,6 +32,8 @@ namespace mo {
 namespace sys {
 namespace item {
 
+	struct Droprate_conf;
+
 	class Item_system {
 		public:
 			Item_system(asset::Asset_manager& assets,
@@ -54,7 +56,7 @@ namespace item {
 			Collector_comp::Pool&          _collectors;
 			util::slot<physics::Manifold&> _collision_slot;
 			util::slot<ecs::Entity&, sys::state::State_data&> _drop_loot_slot;
-
+			std::shared_ptr<const Droprate_conf> _droprates;
 	};
 }
 }

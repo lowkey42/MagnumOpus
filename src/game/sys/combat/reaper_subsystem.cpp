@@ -49,10 +49,11 @@ namespace combat {
 				transform.layer(0.1f);
 
 				e.get<Score_comp>().process([&](Score_comp& s){
-					for(int i=0; i<std::min(s._value, 100); ++i) {
+					auto count = std::min(s._value/2, 100);
+					for(int i=0; i<count; ++i) {
 						auto coin = _em.emplace("blueprint:coin"_aid);
 						coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
-						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *20_N);
+						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *10_N);
 					}
 				});
 			});
