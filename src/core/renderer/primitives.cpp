@@ -66,7 +66,9 @@ namespace renderer {
 
 			m.emplace_back(vec2{0,0},vec2{.5f,.5f});
 
-			for(auto phi=0.f; phi<=1; phi+=1.f/steps) {
+			for(int i=0; i<=steps; ++i) {
+				float phi = i/float(steps);
+
 				auto x = std::cos(phi * 2*PI);
 				auto y = std::sin(phi * 2*PI);
 				m.emplace_back(vec2{x,y} * radius, (vec2{x,-y}+1.f)/2.f);
