@@ -1,15 +1,18 @@
-#include "reaper.hpp"
+#include "reaper_subsystem.hpp"
 
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 #include <core/utils/random.hpp>
+#include <core/asset/aid.hpp>
 
-#include "../sprite/sprite_comp.hpp"
 #include "../state/state_comp.hpp"
+#include "../graphic/sprite_comp.hpp"
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
-#include "score_comp.hpp"
-#include "explosive_comp.hpp"
+#include "comp/score_comp.hpp"
+#include "comp/explosive_comp.hpp"
+#include "comp/health_comp.hpp"
+#include "comp/weapon_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -17,7 +20,6 @@ namespace combat {
 
 	using namespace state;
 	using namespace unit_literals;
-	using namespace state;
 
 	namespace {
 		auto rng = util::create_random_generator();
@@ -27,27 +29,31 @@ namespace combat {
 		}
 	}
 
-	Reaper::Reaper(ecs::Entity_manager& entity_manager,
+	Reaper_subsystem::Reaper_subsystem(ecs::Entity_manager& entity_manager,
 				   state::State_system& state_system)
-		: _em(entity_manager), _reap_slot(&Reaper::_reap, this) {
+		: _em(entity_manager), _reap_slot(&Reaper_subsystem::_reap, this) {
 
 		_reap_slot.connect(state_system.state_change_events);
 	}
 
-	void Reaper::_reap(ecs::Entity& e, sys::state::State_data& s) {
+	void Reaper_subsystem::_reap(ecs::Entity& e, sys::state::State_data& s) {
 		if(s.s==Entity_state::dying) {
-			// he's dead jim
+			e.erase<physics::Physics_comp>();
+			e.erase<Health_comp>();
+			e.erase<Weapon_comp>();
+		}
+
+		if(s.s==Entity_state::dead) { // he's dead jim
 
 			e.get<physics::Transform_comp>().process([&](auto& transform){
 				transform.layer(0.1f);
 
-				e.get<Score_comp>().process([&](auto& s){
-					s._collectable = true;
-					s._collected = true;
-					for(int i=0; i<std::min(s._value, 100); ++i) {
+				e.get<Score_comp>().process([&](Score_comp& s){
+					auto count = std::min(s._value/2, 100);
+					for(int i=0; i<count; ++i) {
 						auto coin = _em.emplace("blueprint:coin"_aid);
 						coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
-						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *20_N);
+						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *10_N);
 					}
 				});
 			});
@@ -59,7 +65,7 @@ namespace combat {
 				e.erase_other<
 						Explosive_comp,
 						physics::Transform_comp,
-						sprite::Sprite_comp,
+						graphic::Sprite_comp,
 						state::State_comp>();
 		}
 	}

@@ -166,6 +166,8 @@ namespace renderer {
 		for(auto& s : _attached_shaders)
 			glDetachShader(_handle, s->_handle);
 
+		_uniform_locations.clear();  // clear uniform cache
+
 		return *this;
 	}
 

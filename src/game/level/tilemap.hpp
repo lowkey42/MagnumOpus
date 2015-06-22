@@ -46,17 +46,6 @@ namespace level {
 		void draw(const renderer::Camera& cam);
 
 	private:
-
-		uint16_t _tex_width;
-		uint16_t _tex_height;
-		// TODO -> Automatic tile size?
-		uint16_t _tile_tex_width = 16;
-		uint16_t _tile_tex_height = 16;
-		// texture tiles per line (width / tile width)
-		uint16_t _tpl;
-
-		double _xTexTile, _yTexTile;
-
 		const Level &_level;
 		std::vector<TileVertex> _vertices;
 

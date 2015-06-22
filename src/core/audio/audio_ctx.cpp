@@ -250,7 +250,11 @@ namespace mo {
 			auto c = extract_channel(id);
 			auto v = extract_version(id);
 			if(c>=_dynamic_channels || _channel_versions[c]==v) {
+#ifndef EMSCRIPTEN
 				Mix_FadeOutChannel(c, 100);
+#else
+				Mix_HaltChannel(c);
+#endif
 				_free_channels.push_back(c);
 				_channels[c]=_channels_last[c] = false;
 				_channel_sounds[c] = nullptr;

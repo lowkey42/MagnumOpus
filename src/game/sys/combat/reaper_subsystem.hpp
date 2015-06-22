@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Stores coins                                                           *
+ * Collects the dying entities and kills them off                         *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,36 +15,22 @@
 
 #pragma once
 
-#include <core/ecs/ecs.hpp>
-#include <core/units.hpp>
+#include "../state/state_system.hpp"
 
 namespace mo {
 namespace sys {
 namespace combat {
 
-	class Score_comp : public ecs::Component<Score_comp> {
+	class Reaper_subsystem {
 		public:
-			static constexpr const char* name() {return "Score";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			Reaper_subsystem(ecs::Entity_manager& entity_manager,
+			                 state::State_system& state_system);
 
-			Score_comp(ecs::Entity& owner, int value=0) noexcept
-				: Component(owner), _value(value) {}
-
-			void value(int value)noexcept {_value=value;}
-			auto value()const noexcept {return _value;}
-
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
-			friend class Collectable_subsystem;
-			friend class Reaper;
+			void _reap(ecs::Entity&, sys::state::State_data&);
 
-			int _value;
-			bool _collector=false;
-
-			bool _collectable = false;
-			bool _collected = false;
+			ecs::Entity_manager& _em;
+			util::slot<ecs::Entity&, sys::state::State_data&> _reap_slot;
 	};
 
 }

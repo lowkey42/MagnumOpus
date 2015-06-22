@@ -2,7 +2,7 @@
 	"animations": {
 		"idle": {"row":0, "fps":18, "frames":6},
 		"walking": {"row":0, "fps":18, "frames":6},
-		"died": {"row":1, "fps":18, "frames":9}
+		"died": {"row":1, "fps":30, "frames":9}
 	},
 	
 	"texName": "tex:fireball",

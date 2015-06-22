@@ -1,5 +1,5 @@
 /**************************************************************************\
- * manages collection of collactable                                      *
+ * FRIENDSHIP IS MAGIC! and protects against friendly fire                *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -18,36 +18,38 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
-#include "../physics/transform_system.hpp"
-#include "../physics/physics_system.hpp"
-
-#include "collector_comp.hpp"
-
 namespace mo {
-	namespace asset {class Asset_manager;}
-	namespace renderer {class Particle_renderer;}
+namespace renderer {class Particle_emiter;}
 
 namespace sys {
-namespace combat {
+namespace physics{class Transform_system;}
 
-	class Collectable_subsystem {
+namespace item {
+
+	class Collector_comp : public ecs::Component<Collector_comp> {
 		public:
-			Collectable_subsystem(asset::Asset_manager& assets,
-			                      ecs::Entity_manager& entity_manager,
-			                      physics::Transform_system& transform,
-			                      renderer::Particle_renderer& particles);
+			static constexpr const char* name() {return "Collector";}
+			void load(ecs::Entity_state&)override;
+			void store(ecs::Entity_state&)override;
 
-			void update(Time dt);
-			void _on_collision(physics::Manifold& m);
+			Collector_comp(ecs::Entity& owner) noexcept : Component(owner) {}
 
+			void take()noexcept {_active=true;}
+
+			struct Persisted_state;
+			friend struct Persisted_state;
+			friend class Item_system;
 		private:
-			asset::Asset_manager& _assets;
-			ecs::Entity_manager& _em;
-			physics::Transform_system& _ts;
-			renderer::Particle_renderer& _particles;
-			Collector_comp::Pool& _collectors;
+			Force    _force{500};
+			Distance _near{0.5};
+			Distance _far{10};
+			Angle    _near_angle{PI};
+			Angle    _far_angle{PI};
 
+			bool _active=false;
+			std::shared_ptr<renderer::Particle_emiter> _particles;
 	};
+
 }
 }
 }

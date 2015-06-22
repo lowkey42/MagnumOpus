@@ -7,7 +7,7 @@
 
 namespace mo {
 namespace sys {
-namespace combat {
+namespace item {
 
 	using namespace unit_literals;
 

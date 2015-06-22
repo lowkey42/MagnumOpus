@@ -30,18 +30,44 @@ namespace level {
 			case Tile_type::door_closed_ns:
 			case Tile_type::door_closed_we:
 				return true;
-
-			default:
-				return true;
 		}
+	}
+	auto Tile::height()const -> float {
+		switch(type) {
+			case Tile_type::floor_tile:
+			case Tile_type::floor_stone:
+			case Tile_type::floor_dirt:
+			case Tile_type::door_open_ns:
+			case Tile_type::door_open_we:
+				return 0.f;
+
+			case Tile_type::stairs_up:
+			case Tile_type::stairs_down:
+				return 0.1f;
+
+			case Tile_type::indestructible_wall:
+			case Tile_type::wall_tile:
+			case Tile_type::wall_stone:
+			case Tile_type::wall_dirt:
+			case Tile_type::door_closed_ns:
+			case Tile_type::door_closed_we:
+				return 0.9f;
+		}
+	}
+	auto Tile::solid(float x, float y)const -> bool {
+		if(solid())
+			return x>=dimensions().x && x<dimensions().z &&
+			       y>=dimensions().y && y<dimensions().w;
+
+		return false;
 	}
 	auto Tile::dimensions()const -> glm::vec4 {
 		switch(type) {
 
 			case Tile_type::stairs_up:
-				return {.2f,-.5f, .5f,.5f};
-			case Tile_type::stairs_down:
 				return {-.5f,-.5f, -.2f,.5f};
+			case Tile_type::stairs_down:
+				return {.2f,-.5f, .5f,.5f};
 
 			case Tile_type::door_closed_ns:
 				// TODO

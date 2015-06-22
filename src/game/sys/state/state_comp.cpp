@@ -40,7 +40,7 @@ namespace state {
 				case Entity_state::damaged:			return  0.1_s;
 				case Entity_state::healed:			return  0.1_s;
 				case Entity_state::dead:			return  0_s;
-				case Entity_state::dying:			return  2.0_s;
+				case Entity_state::dying:			return  0.05_s;
 				case Entity_state::resurrected:		return  0.1_s;
 			}
 
@@ -86,8 +86,6 @@ namespace state {
 		Entity_state get_next(Entity_state state)noexcept {
 			switch(state) {
 				case Entity_state::dying:
-					return Entity_state::dead;
-
 				case Entity_state::dead:
 					return Entity_state::dead;
 
@@ -106,6 +104,14 @@ namespace state {
 			return;
 
 		auto& state = is_background(s) ? _state_background : _state_primary;
+
+		if(state.s==Entity_state::dying) {
+			if(s==Entity_state::dying)
+				INFO("dying -> "<<"dying");
+
+			else
+				INFO("dying -> "<<(int)s);
+		}
 
 		state.s=s;
 		state.magnitude=magnitude;

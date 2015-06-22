@@ -24,12 +24,11 @@
 #include "../physics/physics_system.hpp"
 
 #include "../state/state_comp.hpp"
-#include "reaper.hpp"
-#include "collectable_subsystem.hpp"
+#include "reaper_subsystem.hpp"
 
-#include "weapon_comp.hpp"
-#include "health_comp.hpp"
-#include "explosive_comp.hpp"
+#include "comp/weapon_comp.hpp"
+#include "comp/health_comp.hpp"
+#include "comp/explosive_comp.hpp"
 
 namespace mo {
 	namespace asset {class Asset_manager;}
@@ -44,8 +43,7 @@ namespace combat {
 			              ecs::Entity_manager& entity_manager,
 						  physics::Transform_system& transform_system,
 						  physics::Physics_system& physics_system,
-						  state::State_system& state_system,
-			              renderer::Particle_renderer& particles);
+						  state::State_system& state_system);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& cam);
@@ -67,8 +65,7 @@ namespace combat {
 			Laser_sight_comp::Pool& _lsights;
 			physics::Transform_system& _ts;
 			util::slot<physics::Manifold&> _collision_slot;
-			Reaper _reaper;
-			Collectable_subsystem _collectables;
+			Reaper_subsystem _reaper;
 			renderer::Ray_renderer _ray_renderer;
 	};
 

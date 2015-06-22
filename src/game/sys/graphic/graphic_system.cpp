@@ -1,34 +1,43 @@
-#include "sprite_system.hpp"
-#include <game/sys/sprite/sprite_comp.hpp>
+#include "graphic_system.hpp"
 
 #include <core/units.hpp>
+
+#include "../physics/physics_comp.hpp"
 
 
 namespace mo {
 namespace sys {
-namespace sprite {
+namespace graphic {
 
 	using namespace unit_literals;
 
-	Sprite_system::Sprite_system(ecs::Entity_manager& entity_manager, sys::physics::Transform_system& ts,
-								 asset::Asset_manager& asset_manager, state::State_system& state_system) noexcept
-		: _transform(ts),
-		  _sprite_batch(asset_manager),
-		  _sprites(entity_manager.list<Sprite_comp>()),
-		  _state_change_slot(&Sprite_system::_on_state_change, this)
+	Graphic_system::Graphic_system(
+	        ecs::Entity_manager& entity_manager,
+	        sys::physics::Transform_system& ts,
+	        asset::Asset_manager& asset_manager,
+	        renderer::Particle_renderer& particle_renderer,
+	        state::State_system& state_system) noexcept
+		: _assets(asset_manager),
+	      _particle_renderer(particle_renderer),
+	      _transform(ts),
+	      _sprite_batch(asset_manager),
+	      _sprites(entity_manager.list<Sprite_comp>()),
+	      _particles(entity_manager.list<Particle_emiter_comp>()),
+	      _state_change_slot(&Graphic_system::_on_state_change, this)
 	{
 		_state_change_slot.connect(state_system.state_change_events);
 
 		entity_manager.register_component_type<Sprite_comp>();
+		entity_manager.register_component_type<Particle_emiter_comp>();
 	}
 
-	void Sprite_system::draw(const renderer::Camera& camera) noexcept{
+	void Graphic_system::draw(const renderer::Camera& camera) noexcept{
 		glm::vec2 upper_left = camera.screen_to_world({camera.viewport().x, camera.viewport().y});
 		glm::vec2 lower_right = camera.screen_to_world({camera.viewport().z, camera.viewport().w});
 
 		_transform.foreach_in_rect(upper_left, lower_right, [&](ecs::Entity& entity) {
-			process(entity.get<sys::physics::Transform_comp>(),
-	                entity.get<sys::sprite::Sprite_comp>())
+			process(entity.get<physics::Transform_comp>(),
+	                entity.get<Sprite_comp>())
             >> [&](const auto& trans, const auto& sp) {
 				auto sprite = sp.sprite();
 				sprite.position = trans.position();
@@ -39,22 +48,38 @@ namespace sprite {
 		});
 
 		_sprite_batch.drawAll(camera);
-
 	}
 
-	void Sprite_system::update(Time dt) noexcept{
+	void Graphic_system::update(Time dt) noexcept{
 		for(auto& sprite : _sprites) {
-
 			sprite.current_frame(
 				sprite._animation->next_frame(
 					sprite.animation_type(), sprite.current_frame(), dt.value(), sprite._repeat_animation
 				)
 			);
+		}
 
+		for(auto& p : _particles) {
+			if(!p.enabled())
+				continue;
+
+			p._create_emiter(_particle_renderer, _assets);
+			if(!p._emiter)
+				continue;
+
+			auto transform = p.owner().get<physics::Transform_comp>();
+			transform.process([&](auto& t) {
+				p._emiter->update_center(t.position(), t.rotation());
+			});
+
+			auto physics = p.owner().get<physics::Physics_comp>();
+			physics.process([&](auto& phys){
+				p.scale(phys.radius());
+			});
 		}
 	}
 
-	void Sprite_system::_on_state_change(ecs::Entity& entity, state::State_data& data){
+	void Graphic_system::_on_state_change(ecs::Entity& entity, state::State_data& data){
 
 		bool toRepeat = false;
 		renderer::Animation_type type;
@@ -99,7 +124,7 @@ namespace sprite {
 				break;
 			case state::Entity_state::dead:
 				type = renderer::Animation_type::died;
-				toRepeat = false;
+				toRepeat = true;
 				break;
 			case state::Entity_state::dying:
 				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?

@@ -107,7 +107,7 @@ namespace physics{
 		_active = true;
 	}
 	void Physics_comp::apply_force(Dir_force force)noexcept {
-		accelerate(_inv_mass*force);
+		accelerate(_inv_mass*force * _inv_mass.value());
 	}
 	void Physics_comp::velocity(Velocity velocity)noexcept {
 		_velocity = velocity;

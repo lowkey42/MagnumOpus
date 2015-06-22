@@ -136,8 +136,6 @@ namespace physics {
 		auto max_world_x = std::min(static_cast<int>(std::ceil(pos.x.value()+ radius)), _world.width()-1);
 		auto max_world_y = std::min(static_cast<int>(std::ceil(pos.y.value()+ radius)), _world.height()-1);
 
-		constexpr auto tile_min = -0.5f;
-		constexpr auto tile_max = 0.5f;
 
 		for(auto x : util::range(min_world_x, max_world_x)) {
 			for(auto y : util::range(min_world_y, max_world_y)) {
@@ -148,7 +146,7 @@ namespace physics {
 
 					auto closest = n;
 
-					closest = glm::clamp(remove_units(closest), tile_dim.xy(), tile_dim.zw()) * 1_m;
+					closest = glm::clamp(remove_units(closest), -tile_dim.zw(), -tile_dim.xy()) * 1_m;
 					bool inside = false;
 
 					// Circle is inside the AABB, so we need to clamp the circle's center
@@ -158,11 +156,11 @@ namespace physics {
 
 						// Find closest axis
 						if(abs(n.x) > abs(n.y)) {
-							closest.x = closest.x > 0_m ? tile_max*1_m : tile_min*1_m;
+							closest.x = closest.x > 0_m ? tile_dim.z*1_m : tile_dim.x*1_m;
 
 						// y axis is shorter
 						} else {
-							closest.y = closest.y > 0_m ? tile_max*1_m : tile_min*1_m;
+							closest.y = closest.y > 0_m ? tile_dim.w*1_m : tile_dim.y*1_m;
 						}
 					}
 

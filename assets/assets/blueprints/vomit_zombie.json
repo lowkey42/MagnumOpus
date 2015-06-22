@@ -37,7 +37,5 @@
         "recoil": 60,
         "attack_delay": 0.5
     },
-    "Score": {
-        "value": 15
-    }
+    "Drop":{"group":2}
 }

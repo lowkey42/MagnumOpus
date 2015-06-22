@@ -6,6 +6,8 @@
 namespace mo{
 namespace renderer{
 
+	using namespace unit_literals;
+
 	struct Animation_frame_data{
 		int row;
 		float fps;
@@ -84,9 +86,12 @@ namespace renderer{
 
 		Animation_frame_data d = _data->animations.find(type)->second;
 		// calculating remaining time in seconds for current animation
+		if(d.frames<=1)
+			return 0_s;
+
 		float r_time = (d.frames - cur_frame) / (d.modulation * d.fps);
 
-		return (unit_literals::second * r_time);
+		return (second * r_time);
 	}
 
 	int Animation::frame_width() const noexcept{

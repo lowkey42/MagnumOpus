@@ -27,12 +27,13 @@
 
 #include "sys/physics/transform_system.hpp"
 #include "sys/physics/physics_system.hpp"
-#include "sys/sprite/sprite_system.hpp"
+#include "sys/graphic/graphic_system.hpp"
 #include "sys/sound/sound_system.hpp"
 #include "sys/controller/controller_system.hpp"
 #include "sys/cam/camera_system.hpp"
 #include "sys/ai/ai_system.hpp"
 #include "sys/combat/combat_system.hpp"
+#include "sys/item/item_system.hpp"
 #include "sys/state/state_system.hpp"
 #include "sys/ui/ui_system.hpp"
 
@@ -68,7 +69,8 @@ namespace mo {
 		sys::controller::Controller_system controller;
 		sys::ai::Ai_system ai;
 		sys::combat::Combat_system combat;
-		sys::sprite::Sprite_system spritesys;
+		sys::item::Item_system items;
+		sys::graphic::Graphic_system graphics;
 		sys::sound::Sound_system soundsys;
 		sys::ui::Ui_system ui;
 

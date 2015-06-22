@@ -11,7 +11,7 @@ namespace cam {
 
 	using namespace unit_literals;
 
-	constexpr auto world_scale = 16.f*3; // pixel/meter
+	constexpr auto world_scale = 64; // pixel/meter
 	constexpr auto vscreen_height = 512;
 	constexpr auto min_zoom = 0.5f;
 	constexpr auto max_zoom = 0.75f;
@@ -79,11 +79,19 @@ namespace cam {
 		if(pos_count>0) {
 			auto& cam = _cameras.back().camera;
 			auto cam_pos = pos_acc / pos_count;
-			cam.position(cam_pos*0.25f + cam.position()*0.75f);
 			float max_dist = glm::length(pos_max-pos_min) + 1;
-
 			auto new_zoom = glm::clamp((vscreen_height/world_scale)/max_dist, min_zoom, max_zoom);
-			cam.zoom(cam.zoom()*0.8f + new_zoom*0.2f);
+
+			if(!_uninitialized) {
+				cam.position(cam_pos*0.25f + cam.position()*0.75f);
+				cam.zoom(cam.zoom()*0.8f + new_zoom*0.2f);
+
+			} else {
+				_uninitialized = false;
+				cam.zoom(new_zoom);
+				cam.position(cam_pos);
+			}
+
 		}
 
 		_main_camera.position(_cameras.front().camera.position());

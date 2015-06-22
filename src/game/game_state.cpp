@@ -9,7 +9,6 @@
 #include <core/asset/aid.hpp>
 
 #include "sys/physics/transform_comp.hpp"
-#include "sys/sprite/sprite_comp.hpp"
 
 #include "level/level_generator.hpp"
 
@@ -208,8 +207,9 @@ namespace mo {
 		  state(em),
 		  controller(em),
 		  ai(em, transform, level),
-		  combat(engine.assets(), em, transform, physics, state, particle_renderer),
-		  spritesys(em, transform, engine.assets(), state),
+		  combat(engine.assets(), em, transform, physics, state),
+	      items(engine.assets(), em, physics, transform, state, particle_renderer),
+		  graphics(em, transform, engine.assets(), particle_renderer, state),
 	      soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
@@ -246,13 +246,12 @@ namespace mo {
 		controller.update(dt);
 		transform.update(dt);
 		physics.update(dt);
+		items.update(dt);
 		combat.update(dt);
 		camera.update(dt);
-		spritesys.update(dt);
+		graphics.update(dt);
 		state.update(dt);
 		ui.update(dt);
-
-		// TODO: update sprites and tilemap
 
 		main_player->get<sys::physics::Transform_comp>().process(
 			[&](auto& transform){
@@ -288,7 +287,7 @@ namespace mo {
 
 			tilemap.draw(cam);
 			combat.draw(cam);
-			spritesys.draw(cam);
+			graphics.draw(cam);
 			soundsys.play_sounds(cam);
 			particle_renderer.draw(dt, cam);
 		});
@@ -311,13 +310,24 @@ namespace mo {
 			trans.position(pos);
 		});
 
-		if(!main_player) {
-			main_player = p;
-			p->emplace<Player_tag_comp>(0);
+		if(!p->has<Player_tag_comp>()) {
+			if(!main_player) {
+				main_player = p;
+				p->emplace<Player_tag_comp>(0);
+
+			} else {
+				sec_players.emplace_back(p);
+				p->emplace<Player_tag_comp>(sec_players.size());
+			}
 
 		} else {
-			sec_players.emplace_back(p);
-			p->emplace<Player_tag_comp>(sec_players.size());
+			auto& pt = p->get<Player_tag_comp>().get_or_throw();
+			if(pt.id()==0)
+				main_player = p;
+
+			else {
+				sec_players.emplace_back(p);
+			}
 		}
 
 		return p;

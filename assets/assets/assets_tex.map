@@ -1,5 +1,5 @@
 tex: = textures/
-tex:tilemap = textures/tilemap_base_modded.png
+tex:tilemap = textures/tilemap_high.png
 tex:player = textures/player_tmp.png
 tex:enemy_moving = textures/scorpion_move.png
 tex:enemy2_moving = textures/crawler_move.png
@@ -18,3 +18,11 @@ tex:nixie_font = textures/nixie_font.png
 tex:ui_hud_bg = textures/ui_stats_bg.png
 tex:ui_hud_fg = textures/ui_stats_fg.png
 tex:ui_hud_health = textures/ui_stats_health.png
+
+tex:particle_fire = textures/particle_fire.png
+tex:particle_frost = textures/particle_frost.png
+tex:particle_water = textures/particle_water.png
+tex:particle_stone = textures/particle_stone.png
+tex:particle_gas = textures/particle_gas.png
+tex:particle_lightning = textures/particle_lightning.png
+tex:particle_health = textures/particle_health.png

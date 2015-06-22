@@ -55,6 +55,8 @@ namespace level {
 		Elements elements;
 
 		auto solid()const -> bool;
+		auto height()const -> float;
+		auto solid(float x, float y)const -> bool;
 		auto dimensions()const -> glm::vec4;
 		auto friction()const -> float;
 		void toggle();
@@ -102,8 +104,13 @@ namespace level {
 			template<typename F>
 			void foreach_tile(int min_x, int min_y, int max_x, int max_y, F handler)const;
 
-			auto solid   (int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid() : true;}
-			auto friction(int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).friction() : 1.f;}
+			auto solid     (int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid() : true;}
+			auto solid_real(float rx, float ry)const {
+				int x = std::round(rx);
+				int y = std::round(ry);
+				return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid(rx-x, ry-y) : true;
+			}
+			auto friction  (int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).friction() : 1.f;}
 
 			auto width()  const noexcept     {return _width;}
 			auto height() const noexcept     {return _height;}
