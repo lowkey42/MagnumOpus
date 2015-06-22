@@ -31,6 +31,7 @@ namespace level {
 			case Tile_type::door_closed_we:
 				return true;
 		}
+		return false;
 	}
 	auto Tile::height()const -> float {
 		switch(type) {
@@ -40,10 +41,12 @@ namespace level {
 			case Tile_type::door_open_ns:
 			case Tile_type::door_open_we:
 				return 0.f;
+				break;
 
 			case Tile_type::stairs_up:
 			case Tile_type::stairs_down:
 				return 0.1f;
+				break;
 
 			case Tile_type::indestructible_wall:
 			case Tile_type::wall_tile:
@@ -52,7 +55,9 @@ namespace level {
 			case Tile_type::door_closed_ns:
 			case Tile_type::door_closed_we:
 				return 0.9f;
+				break;
 		}
+		return false;
 	}
 	auto Tile::solid(float x, float y)const -> bool {
 		if(solid())
