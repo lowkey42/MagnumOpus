@@ -48,7 +48,6 @@ namespace sound {
 					auto dist = glm::length(p_entity) / max_dist;
 
 					//if(dist<=1.0f) {
-
 						sc._channel = _audio_ctx.play_dynamic(*sound, angle, dist, false, sc._channel);
 						return;
 					//}
