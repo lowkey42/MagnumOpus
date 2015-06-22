@@ -120,16 +120,16 @@ namespace asset {
 		auto r = std::make_unique<sys::sound::Sounds_map>();
 		sf2::parseStream(in, *r);
 
-		std::vector<audio::Sound_ptr> ptrs;
-		using estate = sys::state::Entity_state;
-
 		// TODO [Sebastian]: automatic calculation of enum-class ending
+		using estate = sys::state::Entity_state;
 		int end = static_cast<int>(estate::resurrected);
+
+		std::vector<audio::Sound_ptr> ptrs(end, audio::Sound_ptr());
 
 		// fill array corresponding to Entity-State-Entries with empty Sound_ptrs
 		for(int i = 0; i <= end; i++){
 			auto cur_iter = r->sounds.find(estate(i));
-			ptrs.push_back(audio::Sound_ptr());
+			//ptrs.push_back(audio::Sound_ptr());
 			// if entry for entity_state(i) is given in config-file -> map it into the corresponding array position
 			if(cur_iter != r->sounds.end()){
 				DEBUG("Sound at estate pos " << i << ": " << cur_iter->second.sound_name);

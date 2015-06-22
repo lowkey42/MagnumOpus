@@ -1,13 +1,6 @@
 {
 	"sounds": {	
-		"idle": {"sound_name": "sound:empty"},
-		"walking": {"sound_name": "sound:empty"},
 		"attacking_melee": {"sound_name": "sound:zattack"},
-		"interacting": {"sound_name": "sound:empty"},
-		"change_weapon": {"sound_name": "sound:empty"},
-		"taking": {"sound_name": "sound:empty"},
-		"damaged": {"sound_name": "sound:roar"},
-		"dying": {"sound_name": "sound:empty"},
-		"dead": {"sound_name": "sound:empty"}
+		"damaged": {"sound_name": "sound:roar"}
 	}
 }
