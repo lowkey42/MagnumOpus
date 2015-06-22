@@ -45,6 +45,8 @@ namespace sound {
 				if(sound) {
 					auto p_entity = camera.viewport().zw()/2.f - camera.world_to_screen(remove_units(trans.position()));
 					auto angle = Angle(glm::atan(p_entity.y, p_entity.x));
+					DEBUG("angle in radians: " << angle);
+					DEBUG("angle in degrees:" << angle * (180.f / 3.1415f));
 					auto dist = glm::length(p_entity) / max_dist;
 
 					//if(dist<=1.0f) {
