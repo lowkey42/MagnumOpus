@@ -314,16 +314,16 @@ namespace mo {
 			return Mass(static_cast<float>(v*1000));
 		}
 
-		constexpr Force operator "" _N(long double v) {
+		constexpr Force operator "" _n(long double v) {
 			return Force(static_cast<float>(v));
 		}
-		constexpr Force operator "" _N(unsigned long long v) {
+		constexpr Force operator "" _n(unsigned long long v) {
 			return Force(static_cast<float>(v));
 		}
-		constexpr Force operator "" _kN(long double v) {
+		constexpr Force operator "" _kn(long double v) {
 			return Force(static_cast<float>(v*1000));
 		}
-		constexpr Force operator "" _kN(unsigned long long v) {
+		constexpr Force operator "" _kn(unsigned long long v) {
 			return Force(static_cast<float>(v*1000));
 		}
 
