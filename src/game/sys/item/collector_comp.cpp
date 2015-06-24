@@ -34,7 +34,7 @@ namespace item {
 
 	void Collector_comp::load(ecs::Entity_state& state) {
 		auto s = state.read_to(Persisted_state{*this});
-		_force      = s.force * 1_N;
+		_force      = s.force * 1_n;
 		_near       = s.near * 1_m;
 		_far        = s.far * 1_m;
 		_near_angle = s.near_angle * 1_deg;

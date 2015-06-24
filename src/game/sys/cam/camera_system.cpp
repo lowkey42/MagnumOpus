@@ -13,8 +13,8 @@ namespace cam {
 
 	constexpr auto world_scale = 64; // pixel/meter
 	constexpr auto vscreen_height = 512;
-	constexpr auto min_zoom = 0.5f;
-	constexpr auto max_zoom = 0.75f;
+	constexpr auto min_zoom = 1.f / 2;
+	constexpr auto max_zoom = 1.f;
 
 	VScreen::VScreen(glm::vec2 size, float world_scale)
 		: camera(size, world_scale), vscreen(size.x, size.y, true) {
@@ -82,9 +82,12 @@ namespace cam {
 			float max_dist = glm::length(pos_max-pos_min) + 1;
 			auto new_zoom = glm::clamp((vscreen_height/world_scale)/max_dist, min_zoom, max_zoom);
 
+			if(pos_count>1)
+				new_zoom = min_zoom;
+
 			if(!_uninitialized) {
 				cam.position(cam_pos*0.25f + cam.position()*0.75f);
-				cam.zoom(cam.zoom()*0.8f + new_zoom*0.2f);
+				cam.zoom(cam.zoom()*0.2f + new_zoom*0.8f);
 
 			} else {
 				_uninitialized = false;

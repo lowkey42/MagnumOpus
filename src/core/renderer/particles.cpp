@@ -110,7 +110,7 @@ namespace renderer {
 	void Particle_emiter::spawn_new(Time dt, Environment_callback& env) {
 		_dt_acc+=dt;
 
-		auto to_spawn = static_cast<std::size_t>(std::round(_spawn_rate * _dt_acc.value()));
+		auto to_spawn = static_cast<std::size_t>(_spawn_rate * _dt_acc.value() + 0.5f);
 		_dt_acc-=Time(to_spawn/_spawn_rate);
 
 		to_spawn = glm::min(to_spawn, _max_particles-_particles.size());

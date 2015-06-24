@@ -53,7 +53,7 @@ namespace combat {
 					for(int i=0; i<count; ++i) {
 						auto coin = _em.emplace("blueprint:coin"_aid);
 						coin->get<physics::Transform_comp>().get_or_throw().position(transform.position());
-						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *10_N);
+						coin->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *10_n);
 					}
 				});
 			});

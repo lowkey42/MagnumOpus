@@ -106,8 +106,8 @@ namespace level {
 
 			auto solid     (int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid() : true;}
 			auto solid_real(float rx, float ry)const {
-				int x = std::round(rx);
-				int y = std::round(ry);
+				auto x = static_cast<int>(rx+0.5f);
+				auto y = static_cast<int>(ry+0.5f);
 				return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).solid(rx-x, ry-y) : true;
 			}
 			auto friction  (int x, int y)const {return x>=0 && y>=0 && x<_width && y<_height ? get(x,y).friction() : 1.f;}

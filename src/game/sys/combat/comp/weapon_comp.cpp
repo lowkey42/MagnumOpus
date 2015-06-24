@@ -96,7 +96,7 @@ namespace combat {
 		_melee_range = s.melee_range * 1_m;
 		_melee_angle = s.melee_angle * 1_deg;
 		_attack_delay = s.attack_delay * 1_s;
-		_recoil = s.recoil * 1_N;
+		_recoil = s.recoil * 1_n;
 	}
 	void Weapon_comp::store(ecs::Entity_state& state) {
 		state.write_from(Persisted_state{*this});

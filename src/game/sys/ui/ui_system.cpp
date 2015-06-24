@@ -102,7 +102,7 @@ namespace ui {
 		}
 
 		// draw elements
-		auto element_offsets = {
+		glm::vec2 element_offsets[] = {
 		    glm::vec2{128.f, 5.f+58/2.f},
 		    glm::vec2{222.f, 130},
 		    glm::vec2{128.f, 222},
@@ -115,14 +115,21 @@ namespace ui {
 			auto offset = calc_offset(idx++);
 
 			float fill=0;
-			// TODO[foe]: draw element indicators
-			int element_num = 0;
-			for(auto& o : element_offsets) {
+			for(int element_num = 0; element_num<4; ++element_num) {
+				auto e_offset = element_offsets[element_num];
+
+				if(offset.x>0) {
+					if(element_num%2!=0)
+						e_offset = element_offsets[(element_num+2) % 4];
+
+					e_offset.x*=-1;
+				}
+
 				float activity = 1;
-				_bubble_renderer.draw(offset.xy()+o, fill, activity, _time_acc.value() + element_num/2.f,
+
+				_bubble_renderer.draw(offset.xy()+e_offset, fill, activity, _time_acc.value() + element_num/2.f,
 									  *_assets.load<renderer::Texture>("tex:bubble_test.tga"_aid));
 				fill+=1.f / 3;
-				element_num++;
 			}
 
 		}

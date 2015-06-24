@@ -45,7 +45,7 @@ namespace combat {
 		_activate_on_contact = s.on_contact;
 		_activate_on_damage = s.on_damage;
 		_delay_left = s.explode_after * 1_s;
-		_blast_force = s.blast_force * 1_N;
+		_blast_force = s.blast_force * 1_n;
 	}
 	void Explosive_comp::store(ecs::Entity_state& state) {
 		state.write_from(Persisted_state{*this});

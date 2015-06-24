@@ -216,7 +216,7 @@ namespace item {
 							while(count-->0) {
 								auto spawned = _em.emplace(asset::AID(asset::Asset_type::blueprint, item.item_aid));
 								spawned->get<physics::Transform_comp>().get_or_throw().position(t.position());
-								spawned->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *5_N);
+								spawned->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *5_n);
 							}
 						}
 					}
