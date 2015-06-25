@@ -62,7 +62,7 @@ namespace renderer {
 		auto z = _zoom*_world_scale;
 		auto scale = glm::scale(glm::mat4(1.0f),
 								glm::vec3(z, z, 1.f));
-		auto trans = glm::translate(glm::mat4(1.0f), glm::vec3(std::round(-_pos.x*z)/z, std::round(-_pos.y*z)/z, 0));
+		auto trans = glm::translate(glm::mat4(1.0f), -glm::vec3(static_cast<int>(_pos.x*z+0.5f)/z, static_cast<int>(_pos.y*z+0.5f)/z, 0));
 		_vp = _projection * scale * trans;
 		_dirty = false;
 	}
@@ -88,6 +88,14 @@ namespace renderer {
 
 	void Camera::bind_viewport()const noexcept {
 		glViewport(_viewport[0], _viewport[1], _viewport[2], _viewport[3]);
+	}
+
+	auto Camera::area()const noexcept -> glm::vec4 {
+		auto start = screen_to_world(viewport().xy()) - glm::vec2(0.5f, 0.5f);
+		auto end   = screen_to_world(viewport().xy() +
+									 viewport().zw()) + glm::vec2(1.5f, 1.5f);
+
+		return {start.x, start.y, end.x, end.y};
 	}
 }
 }

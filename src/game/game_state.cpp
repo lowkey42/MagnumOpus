@@ -3,53 +3,63 @@
 #include "game_engine.hpp"
 #include "game_screen.hpp"
 
+#include <core/renderer/particles.hpp>
 
 #include <core/renderer/texture.hpp>
 #include <core/asset/aid.hpp>
 
 #include "sys/physics/transform_comp.hpp"
-#include "sys/sprite/sprite_comp.hpp"
 
 #include "level/level_generator.hpp"
 
 #include "sys/physics/transform_comp.hpp"
 
+#include "tags.hpp"
+
 namespace mo {
 	using namespace util;
 	using namespace unit_literals;
 
-	constexpr auto MinEntitySize = 25_cm;
-	constexpr auto MaxEntitySize = 5_m;
-	constexpr auto MaxEntityVelocity = 180_km/hour;
+	namespace {
+		constexpr auto MinEntitySize = 25_cm;
+		constexpr auto MaxEntitySize = 5_m;
+		constexpr auto MaxEntityVelocity = 180_km/hour;
 
-	static Profile_data im_a_savegame{"default", 42,0,0};
+		static Profile_data im_a_savegame{"default", 42,0,0};
 
-	Game_state::Game_state(Game_engine& engine,
-	                       std::string profile_name,
-				           std::vector<ecs::ETO> players,
-				           util::maybe<int> depth)
-		: engine(engine),
-	      profile(im_a_savegame),
-	      level(level::generate_level(engine.assets(),
-									  profile.seed,
-									  depth.get_or_other(profile.depth),
-									  profile.difficulty)),
-	      em(engine.assets()),
-	      tilemap(engine, level),
-	      transform(em, MaxEntitySize, level.width(), level.height(), level),
-	      camera(em, engine),
-		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
-		  state(em),
-		  controller(em, transform),
-		  ai(em, transform, level),
-		  combat(engine.assets(), em, transform, physics, state),
-		  spritesys(em, transform, engine.assets(), state),
-	      ui(engine, em) {
+		struct My_environment_callback : renderer::Environment_callback {
+			My_environment_callback(const level::Level& level)
+				: level(level) {}
+
+			const level::Level& level;
+
+			bool check_collision(int x, int y)noexcept override {
+				return level.solid(x, y);
+			}
+		};
+
+		void set_controller(ecs::Entity& p, sys::controller::Controller& controller) {
+			if(p.has<sys::controller::Controllable_comp>())
+				p.get<sys::controller::Controllable_comp>()
+						.get_or_throw().set(controller);
+			else
+				p.emplace<sys::controller::Controllable_comp>(&controller);
+		}
+	}
+
+
+	auto Game_state::create(Game_engine& engine,
+	                   std::string profile_name,
+			           std::vector<ecs::ETO> players,
+	                   util::maybe<int> depth) -> std::unique_ptr<Game_state> {
+		auto profile = im_a_savegame;
+
+		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth.get_or_other(profile.depth)));
 
 		auto d = depth.get_or_other(profile.depth);
 
-		auto room_m = level.find_room(d<profile.depth ? level::Room_type::end :
-		                                                level::Room_type::start);
+		auto room_m = state->level.find_room(d<profile.depth ? level::Room_type::end :
+		                                                       level::Room_type::start);
 
 		INVARIANT(room_m.is_some(), "Generated room has no exit/entry-point!?");
 		auto room = room_m.get_or_throw();
@@ -61,6 +71,7 @@ namespace mo {
 		if(!players.empty()) {
 			bool first = true;
 			for(auto& p : players) {
+				// TODO[foe]:  get controller
 				if(!first)
 					break;
 				else
@@ -68,18 +79,19 @@ namespace mo {
 
 				auto& controller = engine.controllers().main_controller();
 
-				add_player(controller,
-				           start_position, em.serializer().import_entity(p));
+				state->add_player(controller,
+				           start_position, state->em.serializer().import_entity(p));
 			}
 
 		} else {
-			add_player(engine.controllers().main_controller(),
+			state->add_player(engine.controllers().main_controller(),
 			           start_position);
 		}
 
 		// TODO[foe]: save profile
 		im_a_savegame = profile;
 
+		/*
 // TODO[foe]: remove
 		auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);
 		log_out<<"World "<<level.width()<<"x"<<level.height()
@@ -96,6 +108,12 @@ namespace mo {
 					case level::Tile_type::floor_tile:
 						log_out<<".";
 						break;
+					case level::Tile_type::stairs_down:
+						log_out<<"<";
+						break;
+					case level::Tile_type::stairs_up:
+						log_out<<">";
+						break;
 					case level::Tile_type::door_closed_ns:
 					case level::Tile_type::door_closed_we:
 						log_out<<"+";
@@ -109,11 +127,11 @@ namespace mo {
 
 		log_out<<std::endl; // end log-line
 // END TODO
-
+*/
 
 		//spawn:
 
-		level.foreach_room([&](const auto& room){
+		state->level.foreach_room([&](const auto& room){
 			auto center = room.center();
 
 			if(room.type==level::Room_type::start) {
@@ -121,22 +139,80 @@ namespace mo {
 
 			} else {
 				for(int i=0; i<5; i++) {
-					ecs::Entity_ptr enemy1 = em.emplace("blueprint:zombie"_aid);
+					ecs::Entity_ptr enemy1 = state->em.emplace("blueprint:zombie"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
 				}
 				for(int i=0; i<10; i++) {
-					ecs::Entity_ptr enemy1 = em.emplace("blueprint:crow"_aid);
+					ecs::Entity_ptr enemy1 = state->em.emplace("blueprint:crow"_aid);
 					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
 				}
 
 				if(room.type==level::Room_type::end) {
 					for(int i=0; i<3; i++) {
-						ecs::Entity_ptr enemy1 = em.emplace("blueprint:vomit_zombie"_aid);
+						ecs::Entity_ptr enemy1 = state->em.emplace("blueprint:vomit_zombie"_aid);
 						enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
 					}
 				}
 			}
 		});
+
+		return state;
+	}
+	auto Game_state::create_from_save(Game_engine& engine,
+	                             const Saveable_state& s) -> std::unique_ptr<Game_state> {
+
+		auto& stream = const_cast<asset::istream&>(s.my_stream.get_or_throw());
+		auto initial_pos = stream.tellg();
+		auto reset_stream = util::cleanup_later([&](){stream.seekg(initial_pos);});
+		(void)reset_stream;
+
+
+		auto depth = 0; // TODO: load depth
+
+		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth));
+
+		state->em.serializer().read(stream);
+
+		for(auto& player : state->em.list<Player_tag_comp>()) {
+			if(player.id()==0) {
+				set_controller(player.owner(), engine.controllers().main_controller());
+				state->main_player = player.owner_ptr();
+
+			} else {
+				// TODO: get controller
+				state->sec_players.push_back(player.owner_ptr());
+			}
+		}
+
+		return state;
+	}
+
+	auto Game_state::save() -> Saveable_state {
+		return Saveable_state{em}; // TODO
+	}
+
+	Game_state::Game_state(Game_engine& engine, int depth)
+		: engine(engine),
+	      profile(im_a_savegame),
+	      level(level::generate_level(engine.assets(),
+									  profile.seed,
+									  depth,
+									  profile.difficulty)),
+	      em(engine.assets()),
+	      tilemap(engine, level),
+	      transform(em, MaxEntitySize, level.width(), level.height(), level),
+	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>(level)),
+	      camera(em, engine),
+		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
+		  state(em),
+		  controller(em),
+		  ai(em, transform, level),
+		  combat(engine.assets(), em, transform, physics, state),
+	      items(engine.assets(), em, physics, transform, state, particle_renderer),
+		  graphics(em, transform, engine.assets(), particle_renderer, state),
+	      soundsys(em, transform, engine.audio_ctx()),
+		  ui(engine, em) {
+		em.register_component_type<Player_tag_comp>();
 	}
 
 	void Game_state::delete_savegame() {
@@ -170,13 +246,12 @@ namespace mo {
 		controller.update(dt);
 		transform.update(dt);
 		physics.update(dt);
+		items.update(dt);
 		combat.update(dt);
 		camera.update(dt);
-		spritesys.update(dt);
+		graphics.update(dt);
 		state.update(dt);
 		ui.update(dt);
-
-		// TODO: update sprites and tilemap
 
 		main_player->get<sys::physics::Transform_comp>().process(
 			[&](auto& transform){
@@ -205,14 +280,16 @@ namespace mo {
 		});
 	}
 
-	auto Game_state::draw() -> util::cvector_range<sys::cam::VScreen> {
+	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {
 		camera.draw(
 			[&](const renderer::Camera& cam,
 				const std::vector<ecs::Entity_ptr>&) {
 
 			tilemap.draw(cam);
 			combat.draw(cam);
-			spritesys.draw(cam);
+			graphics.draw(cam);
+			soundsys.play_sounds(cam);
+			particle_renderer.draw(dt, cam);
 		});
 
 		return camera.vscreens();
@@ -227,22 +304,43 @@ namespace mo {
 		if(!p)
 			p = em.emplace("blueprint:player"_aid);
 
-		if(p->has<sys::controller::Controllable_comp>())
-			p->get<sys::controller::Controllable_comp>()
-			        .get_or_throw().set(controller);
-		else
-			p->emplace<sys::controller::Controllable_comp>(&controller);
+		set_controller(*p, controller);
 
 		p->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 			trans.position(pos);
 		});
 
-		if(!main_player)
-			main_player = p;
-		else
-			sec_players.emplace_back(p);
+		if(!p->has<Player_tag_comp>()) {
+			if(!main_player) {
+				main_player = p;
+				p->emplace<Player_tag_comp>(0);
+
+			} else {
+				sec_players.emplace_back(p);
+				p->emplace<Player_tag_comp>(sec_players.size());
+			}
+
+		} else {
+			auto& pt = p->get<Player_tag_comp>().get_or_throw();
+			if(pt.id()==0)
+				main_player = p;
+
+			else {
+				sec_players.emplace_back(p);
+			}
+		}
 
 		return p;
+	}
+
+	namespace asset {
+		auto Loader<Saveable_state>::load(istream in) throw(Loading_failed) -> std::shared_ptr<Saveable_state> {
+			return std::make_shared<Saveable_state>(std::move(in));
+		}
+
+		void Loader<Saveable_state>::store(ostream out, const Saveable_state& asset) throw(Loading_failed) {
+			asset.em.process([&](auto& em){em.serializer().write(out);});
+		}
 	}
 
 }

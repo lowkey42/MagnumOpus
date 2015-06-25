@@ -15,55 +15,43 @@
 
 #pragma once
 
-#include <core/engine.hpp>
-#include <core/renderer/camera.hpp>                  // TODO[sebastian]: replace with forward declaration
 #include <core/renderer/shader.hpp>
 #include <core/renderer/vertex_object.hpp>
-#include <core/renderer/texture.hpp>                 // TODO[sebastian]: replace with forward declaration
+#include <core/renderer/texture.hpp>
 
 #include <vector>
-#include <glm/glm.hpp>
+#include <glm/vec2.hpp>
+#include <glm/vec3.hpp>
 
 namespace mo {
+	class Engine;
+	namespace renderer{class Camera;}
+
 namespace level {
 
 	class Level;
 
-	class Tilemap{
 
-	public:
+	struct TileVertex {
+		glm::vec3 pos;
+		glm::vec2 uv;
+		TileVertex(glm::vec3 pos, glm::vec2 uv)
+		    : pos(pos), uv(uv) {}
+	};
 
-		struct TileVertex {
-			glm::vec2 pos;
-			glm::vec2 uv;
-			float layer;
-		};
+	class Tilemap {
+		public:
+			Tilemap(Engine &engine, const Level &lev);
 
-		// Constructors
-		Tilemap(Engine &engine, const Level &lev);
+			void draw(const renderer::Camera& cam);
 
-		// Methods
-		void draw(const renderer::Camera& cam);
+		private:
+			const Level &_level;
+			std::vector<TileVertex> _vertices;
 
-	private:
-
-		uint16_t _tex_width;
-		uint16_t _tex_height;
-		// TODO -> Automatic tile size?
-		uint16_t _tile_tex_width = 16;
-		uint16_t _tile_tex_height = 16;
-		// texture tiles per line (width / tile width)
-		uint16_t _tpl;
-
-		double _xTexTile, _yTexTile;
-
-		const Level &_level;
-		std::vector<TileVertex> _vertices;
-
-		renderer::Object _object;
-		renderer::Shader_program _shader;
-		asset::Ptr<renderer::Texture> _texture;
-
+			renderer::Object _object;
+			renderer::Shader_program _shader;
+			renderer::Texture_ptr _texture;
 	};
 
 }

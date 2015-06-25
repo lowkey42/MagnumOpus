@@ -331,7 +331,10 @@ namespace level {
 				for(int y=std::max(node.y-1, 0); y<=std::min(node.y+1, level.height()-1); ++y)
 					for(int x=std::max(node.x-1, 0); x<=std::min(node.x+1, level.width()-1); ++x) {
 						auto& btile = level.get(x, y);
-						if(btile.solid())
+						if(   btile.type==Tile_type::indestructible_wall
+						   || btile.type==Tile_type::wall_dirt
+						   || btile.type==Tile_type::wall_stone
+						   || btile.type==Tile_type::wall_tile )
 							btile.type = Tile_type::wall_tile;
 					}
 			}

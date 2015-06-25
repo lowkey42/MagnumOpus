@@ -21,6 +21,7 @@ namespace asset {
 		else if("vert_shader"==r.first)  _type=Asset_type::vert_shader;
 		else if("frag_shader"==r.first)  _type=Asset_type::frag_shader;
 		else if("sound"==r.first)        _type=Asset_type::sound;
+		else if("sound_data"==r.first)   _type=Asset_type::sound_data;
 		else if("music"==r.first)        _type=Asset_type::music;
 		else if("cfg"==r.first)          _type=Asset_type::cfg;
 		else if("blueprint"==r.first)    _type=Asset_type::blueprint;
@@ -38,6 +39,7 @@ namespace asset {
 			case Asset_type::vert_shader: class_name="vert_shader"; break;
 			case Asset_type::frag_shader: class_name="frag_shader"; break;
 			case Asset_type::sound:       class_name="sound";       break;
+			case Asset_type::sound_data:  class_name="sound_data";  break;
 			case Asset_type::music:       class_name="music";       break;
 			case Asset_type::cfg:         class_name="cfg";         break;
 			case Asset_type::blueprint:   class_name="blueprint";   break;

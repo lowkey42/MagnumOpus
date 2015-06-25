@@ -40,7 +40,7 @@ namespace state {
 				case Entity_state::damaged:			return  0.1_s;
 				case Entity_state::healed:			return  0.1_s;
 				case Entity_state::dead:			return  0_s;
-				case Entity_state::dying:			return  2.0_s;
+				case Entity_state::dying:			return  0.05_s;
 				case Entity_state::resurrected:		return  0.1_s;
 			}
 
@@ -86,6 +86,7 @@ namespace state {
 		Entity_state get_next(Entity_state state)noexcept {
 			switch(state) {
 				case Entity_state::dying:
+				case Entity_state::dead:
 					return Entity_state::dead;
 
 				default:
@@ -95,11 +96,22 @@ namespace state {
 	}
 
 	void State_comp::state(Entity_state s, float magnitude)noexcept {
+		INVARIANT(magnitude>=0 && magnitude<=1, "magnitude is out of range: "+util::to_string(magnitude));
+
 		auto& cstate = _state_primary.left>0_s ? _state_primary : _state_background;
-		if(priority(cstate.s)>priority(s))
+
+		if(priority(cstate.s)>priority(s) && cstate.left>0_s)
 			return;
 
 		auto& state = is_background(s) ? _state_background : _state_primary;
+
+		if(state.s==Entity_state::dying) {
+			if(s==Entity_state::dying)
+				INFO("dying -> "<<"dying");
+
+			else
+				INFO("dying -> "<<(int)s);
+		}
 
 		state.s=s;
 		state.magnitude=magnitude;

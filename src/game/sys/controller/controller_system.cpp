@@ -3,9 +3,9 @@
 
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
-#include "../combat/weapon_comp.hpp"
+#include "../combat/comp/weapon_comp.hpp"
 #include "../state/state_comp.hpp"
-#include "../combat/collector_comp.hpp"
+#include "../item/collector_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -14,9 +14,8 @@ namespace controller {
 	using namespace state;
 	using namespace unit_literals;
 
-	Controller_system::Controller_system(ecs::Entity_manager& entity_manager,
-	                                     physics::Transform_system& ts)
-	  : _controllables(entity_manager.list<Controllable_comp>()), _ts(ts) {
+	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
+	  : _controllables(entity_manager.list<Controllable_comp>()) {
 
 		entity_manager.register_component_type<Controllable_comp>();
 	}
@@ -24,14 +23,12 @@ namespace controller {
 	namespace {
 
 		struct Controllable_interface_impl : public Controllable_interface {
-			Controllable_interface_impl(Time dt, ecs::Entity& entity,
-			                            physics::Transform_system& ts)
+			Controllable_interface_impl(Time dt, ecs::Entity& entity)
 				: _dt(dt), _entity(entity),
 				  _state(entity.get<State_comp>().process(State_data{},
 														   [](auto& s){return s.state();})),
 				  _target_rotation(entity.get<Transform_comp>().process(0_deg,
-																	[](auto& p){return p.rotation();})),
-				  _ts(ts){}
+																	[](auto& p){return p.rotation();})) {}
 
 			~Controllable_interface_impl()noexcept;
 
@@ -55,12 +52,11 @@ namespace controller {
 				ecs::Entity& _entity;
 				const State_data _state;
 				Angle _target_rotation;
-				physics::Transform_system& _ts;
 		};
 	}
 	void Controller_system::update(Time dt) {
 		for(auto& controllable : _controllables) {
-			Controllable_interface_impl c(dt, controllable.owner(), _ts);
+			Controllable_interface_impl c(dt, controllable.owner());
 
 			if(controllable._controller)
 				(*controllable._controller)(c);
@@ -158,12 +154,19 @@ namespace controller {
 		}
 		void Controllable_interface_impl::move(glm::vec2 direction) {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
+				auto len = glm::length(direction);
+				if(len>1) {
+					direction/=len;
+					len = 1;
+				}else if(len<0.00001)
+					return;
+
 				comp.accelerate_active(direction);
 
 				if(_state.s!=Entity_state::attacking_melee && _state.s!=Entity_state::attacking_range)
 					this->look_in_dir(direction);
 
-				this->set_state(Entity_state::walking, glm::length(direction));
+				this->set_state(Entity_state::walking, len);
 			});
 		}
 		void Controllable_interface_impl::look_at(glm::vec2 pos) {
@@ -188,8 +191,8 @@ namespace controller {
 		void Controllable_interface_impl::take() {
 			// TODO: InventoryComponent.take(map.get(TransformComp.getPosition(), TransformComp.getRotation()))
 
-			_entity.get<combat::Collector_comp>().process([&](auto& c){
-				c.take(this->_ts);
+			_entity.get<item::Collector_comp>().process([&](auto& c){
+				c.take();
 			});
 
 			set_state(Entity_state::taking);

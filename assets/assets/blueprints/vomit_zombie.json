@@ -12,7 +12,7 @@
 	},
     "Sprite": {
         "aid": "anim:vomit_zombie"
-    },
+    },		
     "Simple_ai":{
         "attack_distance": 10,
         "near":4,
@@ -37,7 +37,5 @@
         "recoil": 60,
         "attack_delay": 0.5
     },
-    "Score": {
-        "value": 15
-    }
+    "Drop":{"group":2}
 }

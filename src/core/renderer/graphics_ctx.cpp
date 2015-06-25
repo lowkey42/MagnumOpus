@@ -35,8 +35,8 @@ namespace {
 		int width;
 		int height;
 		bool fullscreen;
-	};
-	sf2_structDef(Graphics_cfg,
+		};
+		sf2_structDef(Graphics_cfg,
 		sf2_member(width),
 		sf2_member(height),
 		sf2_member(fullscreen)
@@ -174,6 +174,10 @@ namespace renderer {
 			SDL_SetWindowTitle(_window.get(), osstr.str().c_str());
 		}
 		SDL_GL_SwapWindow(_window.get());
+
+		// unbind texture
+		glActiveTexture(0);
+		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 	void Graphics_ctx::set_clear_color(float r, float g, float b) {
 		_clear_color = glm::vec3(r,g,b);
@@ -183,9 +187,15 @@ namespace renderer {
 	Disable_depthtest::Disable_depthtest() {
 		glDisable(GL_DEPTH_TEST);
 	}
-
 	Disable_depthtest::~Disable_depthtest() {
 		glEnable(GL_DEPTH_TEST);
+	}
+
+	Disable_depthwrite::Disable_depthwrite() {
+		glDepthMask(GL_FALSE);
+	}
+	Disable_depthwrite::~Disable_depthwrite() {
+		glDepthMask(GL_TRUE);
 	}
 }
 }

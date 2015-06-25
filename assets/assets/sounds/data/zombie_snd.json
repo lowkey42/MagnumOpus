@@ -1,0 +1,6 @@
+{
+	"sounds": {	
+		"attacking_melee": {"sound_name": "sound:zattack"},
+		"damaged": {"sound_name": "sound:roar"}
+	}
+}

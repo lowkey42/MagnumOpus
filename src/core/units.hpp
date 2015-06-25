@@ -99,6 +99,7 @@ namespace mo {
 	struct Angle : Value_type<Angle> {
 		constexpr explicit Angle(float radians) : Value_type(radians){}
 		constexpr operator float()const noexcept {return val;}
+		constexpr float in_degrees()const noexcept {return val * (180.f / PI);}
 	};
 
 	inline Angle sin(Angle a)noexcept {return Angle(std::sin(a.value()));}
@@ -142,6 +143,10 @@ namespace mo {
 	struct Angle_per_time : Value_type<Angle_per_time> {
 		constexpr explicit Angle_per_time(float radians) : Value_type(radians){}
 	};
+	using Angle_velocity = Angle_per_time;
+	struct Angle_acceleration : Value_type<Angle_acceleration> {
+		constexpr explicit Angle_acceleration(float radians) : Value_type(radians){}
+	};
 
 	// directed units
 	using Position = glm::detail::tvec2<Distance, glm::highp>;
@@ -174,8 +179,13 @@ namespace mo {
 	constexpr Speed_per_time operator/(Distance s, Time_squared t) noexcept { return Speed_per_time(s.value()/t.value()); }
 	constexpr Speed operator*(Speed_per_time a, Time t) noexcept { return Speed(a.value()*t.value()); }
 
-	constexpr Angle operator*(Angle_per_time at, Time t) noexcept { return Angle(at.value()*t.value()); }
-	constexpr Angle_per_time operator/(Angle a, Time t) noexcept { return Angle_per_time(a.value()/t.value()); }
+	constexpr Angle operator*(Angle_velocity at, Time t) noexcept { return Angle(at.value()*t.value()); }
+	constexpr Angle_velocity operator/(Angle a, Time t) noexcept { return Angle_velocity(a.value()/t.value()); }
+
+	constexpr Angle_acceleration operator/(Angle_velocity a, Time t) noexcept { return Angle_acceleration(a.value()/t.value()); }
+	constexpr Angle_acceleration operator/(Angle a, Time_squared t) noexcept { return Angle_acceleration(a.value()/t.value()); }
+	constexpr Angle_velocity operator*(Angle_acceleration at, Time t) noexcept { return Angle_velocity(at.value()*t.value()); }
+	constexpr Angle operator*(Angle_acceleration at, Time_squared t) noexcept { return Angle(at.value()*t.value()); }
 
 
 	inline Velocity operator*(Acceleration a, Time t) noexcept { return Velocity(a.x*t, a.y*t); }
@@ -304,16 +314,16 @@ namespace mo {
 			return Mass(static_cast<float>(v*1000));
 		}
 
-		constexpr Force operator "" _N(long double v) {
+		constexpr Force operator "" _n(long double v) {
 			return Force(static_cast<float>(v));
 		}
-		constexpr Force operator "" _N(unsigned long long v) {
+		constexpr Force operator "" _n(unsigned long long v) {
 			return Force(static_cast<float>(v));
 		}
-		constexpr Force operator "" _kN(long double v) {
+		constexpr Force operator "" _kn(long double v) {
 			return Force(static_cast<float>(v*1000));
 		}
-		constexpr Force operator "" _kN(unsigned long long v) {
+		constexpr Force operator "" _kn(unsigned long long v) {
 			return Force(static_cast<float>(v*1000));
 		}
 

@@ -11,8 +11,8 @@ include_directories(${ROOT_DIR}/src)
 
 
 if(EMSCRIPTEN)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_SDL=2 -Oz -s DEMANGLE_SUPPORT=1")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s USE_SDL=2 -s DEMANGLE_SUPPORT=1")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_SDL=2 -s TOTAL_MEMORY=67108864 -Oz -s DEMANGLE_SUPPORT=1")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s USE_SDL=2 -s TOTAL_MEMORY=67108864 -s DEMANGLE_SUPPORT=1")
 	set(ZLIB_LIBRARY "")
 	set(GLEW_LIBRARIES "")
 	set(OPENGL_LIBRARIES "")
@@ -26,7 +26,7 @@ else()
 	option(SAN "Build with sanitizers" OFF)
 
 	if("${CMAKE_BUILD_TYPE}" STREQUAL "Debug")
-		MESSAGE("Debug build")
+		MESSAGE("Debug build; Compiler=${CMAKE_CXX_COMPILER_ID}")
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g")
 
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang" AND SAN)
@@ -55,10 +55,11 @@ else()
 	add_definitions(${OpenGL_DEFINITIONS})
 	find_package(SDL2 REQUIRED)
 	include_directories(${SDL2_INCLUDE_DIR})
+	find_package(SDL2_MIXER REQUIRED)
 	
 	
 	if(WIN32)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -limagehlp -lsdl2main -lglew32") # why???
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -limagehlp -lsdl2main -lSDL2_mixer -lglew32") # why???
 		add_definitions(-DWIN)
 
 	else()

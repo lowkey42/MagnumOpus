@@ -2,6 +2,9 @@
 
 #include "tilemap.hpp"
 
+#include <core/engine.hpp>
+#include <core/renderer/camera.hpp>
+
 #include <glm/gtx/transform.hpp>
 #include <glm/ext.hpp>
 #include <math.h>
@@ -12,15 +15,40 @@ namespace mo {
 namespace level {
 
 	using namespace renderer;
+	using namespace glm;
 
-	bool talkative = false;
+	namespace {
+		constexpr bool debug_logging = false;
+
+		constexpr auto vertex_count = 6;
+
+		const vec3 vp[] {
+			{-0.5f, -0.5f, 0},
+			{-0.5f, +0.5f, 0},
+			{+0.5f, -0.5f, 0},
+
+			{+0.5f, +0.5f, 0},
+			{+0.5f, -0.5f, 0},
+			{-0.5f, +0.5f, 0}
+		};
+		const vec2 vuv[] {
+			{0.0f, 1.0f},
+			{0.0f, 0.0f},
+			{1.0f, 1.0f},
+
+			{1.0f, 0.0f},
+			{1.0f, 1.0f},
+			{0.0f, 0.0f}
+		};
+
+	}
+
 
 	// layout description for vertices
 	Vertex_layout layout {
 		Vertex_layout::Mode::triangles,
-		vertex("position",	&Tilemap::TileVertex::pos),
-		vertex("uv",		&Tilemap::TileVertex::uv),
-		vertex("layer",		&Tilemap::TileVertex::layer)
+		vertex("position",	&TileVertex::pos),
+		vertex("uv",		&TileVertex::uv)
 	};
 
 	Tilemap::Tilemap(Engine &engine, const Level &lev)
@@ -34,63 +62,56 @@ namespace level {
 
 		// Load a predefined texture and bind it
 		_texture = engine.assets().load<Texture>("tex:tilemap"_aid);
-
-		_tex_width = _texture->width();
-		_tex_height = _texture->height();
-		_tpl = _tex_width / _tile_tex_width;
-
-		_xTexTile = _tile_tex_width / static_cast<double>(_tex_width);
-		_yTexTile = _tile_tex_height / static_cast<double>(_tex_height);
 	}
 
 
 	void Tilemap::draw(const Camera& cam){
-		auto cam_start = cam.screen_to_world(cam.viewport().xy()) + glm::vec2(0.5f, 0.5f);
-		auto cam_end   = cam.screen_to_world(cam.viewport().xy() +
-											 cam.viewport().zw()) + glm::vec2(1.5f, 1.5f);
+		auto tex_res = vec2{_texture->width(), _texture->height()};
+
+		// Binding tilemap texture
+		_texture->bind();
+
+		auto tile_res = tex_res / cam.world_scale();
+		auto tileset_width = static_cast<int>(tex_res.x / cam.world_scale() + 0.5f);
+		auto pixel_correction = 0.25f / tex_res;
+		auto pcf = (tex_res-(0.5f)) / tex_res;
+
+		auto cam_area  = cam.area();
+		auto cam_start = vec2{cam_area.x, cam_area.y};
+		auto cam_end   = vec2{cam_area.z, cam_area.w};
 
 		auto cam_range = glm::abs(cam_end-cam_start);
 		_vertices.clear();
-		_vertices.reserve(std::ceil(cam_range.x * cam_range.y) * 6);
+		_vertices.reserve(std::ceil(cam_range.x * cam_range.y) * vertex_count);
 
 		// Filling the vector with vertices of the displayed triangles and corresponding uv-data
 		_level.foreach_tile(cam_start.x, cam_start.y, cam_end.x, cam_end.y,
 		                    [&](int x, int y, const auto& tile) {
 
 			int tile_type = static_cast<int>(tile.type);
-			// factor for horizontal selection of texture-part
-			int tile_x = tile_type % _tpl;
-			// factor for vertical selection of texture-part
-			// if x > maximum tile per line --> do a wrap to the next line (y)
-			int tile_y = std::floor(tile_type / _tpl) + 1;
+			auto tileset_pos = vec2 {
+				tile_type % tileset_width,
+				tile_type / tileset_width
+			};
 
-			float layer = 0;
-			if(tile_type == 0 || (tile_type >= 4 && tile_type <= 6))
-				layer = 0.99;
+			auto p  = vec3{x,y, tile.height()};
+			auto uv = tileset_pos / tile_res + pixel_correction;
 
-			// First triangle of the rectangle
-			_vertices.push_back({{ x - 0.5f, y - 0.5f }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
-			_vertices.push_back({{ x - 0.5f, y + 0.5f }, {tile_x*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)} , layer});
-			_vertices.push_back({{ x + 0.5f, y + 0.5f }, {(tile_x+1)*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)}, layer});
-
-			// Second triangle of the rectangle
-			_vertices.push_back({{ x + 0.5f, y + 0.5f }, {(tile_x+1)*(_xTexTile), 1.0-((tile_y - 1) *_yTexTile)}, layer});
-			_vertices.push_back({{ x - 0.5f, y - 0.5f }, {tile_x*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
-			_vertices.push_back({{ x + 0.5f, y - 0.5f }, {(tile_x+1)*(_xTexTile), 1.0-(tile_y*_yTexTile)}, layer});
+			for(auto i : util::range(vertex_count)) {
+				_vertices.emplace_back(vp[i]+p, vuv[i]*pcf/tile_res + uv);
+			}
 		});
+
 
 		// Updating MVP-Matrix and give it to the shader
 		glm::mat4 MVP = cam.vp();
 		_shader.bind().set_uniform("MVP", MVP)
-			   .set_uniform("myTextureSampler", 0);
-
-		// Binding tilemap texture
-		_texture->bind();
+		              .set_uniform("myTextureSampler", 0);
 
 		_object.buffer().set(_vertices);
 		_object.draw();
 
-		if(talkative){
+		if(debug_logging){
 			std::cout << "Drawing Tiles start at X:" << cam_start.x << " | at Y:" << cam_start.y
 			          << "\nends at X:" << cam_end.x << " | at Y:" << cam_end.y << std::endl;
 			std::cout << "CamPos: " << cam.position().x << "/" << cam.position().y << std::endl;

@@ -6,9 +6,8 @@
 
 #include <core/asset/aid.hpp>
 
-#include "friend_comp.hpp"
-#include "score_comp.hpp"
-#include "collector_comp.hpp"
+#include "comp/friend_comp.hpp"
+#include "comp/score_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -40,7 +39,6 @@ namespace combat {
 		_em.register_component_type<Health_comp>();
 		_em.register_component_type<Explosive_comp>();
 		_em.register_component_type<Score_comp>();
-		_em.register_component_type<Collector_comp>();
 	}
 
 	void Combat_system::update(Time dt) {
@@ -259,21 +257,12 @@ namespace combat {
 	}
 
 	void Combat_system::_on_collision(physics::Manifold& m) {
-		if(m.is_with_object()) {
-			m.a->owner().get<Score_comp>().process([&](auto& s){
-				if(s._collectable && !s._collected) {
-					m.b.comp->owner().get<Score_comp>().process([&](auto& os) {
-						if(os._collector) {
-							os._value+=s._value;
-							s._collected = true;
-							_em.erase(s.owner_ptr());
-						}
-					});
-				}
-			});
-		}
-
 		m.a->owner().get<Explosive_comp>().process([&](auto& e) {
+			if(m.is_with_object() &&
+			   m.b.comp->owner().get<physics::Transform_comp>().get_or_throw().layer()<0.5) {
+				return;
+			}
+
 			if(e._activate_on_contact) {
 				if(e._delay>0_s) {
 					if(e._delay_left<=0_s)

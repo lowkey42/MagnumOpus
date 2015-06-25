@@ -13,6 +13,9 @@
     "Sprite": {
         "aid": "anim:soldier"
     },
+	"Sound": {
+		"aid": "sound_data:soldier"
+	},
     "Camera_target": {
         "mass": 5.,
         "damping": 0.2,
@@ -41,10 +44,14 @@
         "occlusion": 64,
         "width": 0.06
     },
-    "Score":{
-        "collector": true
+    "Score",
+    "Collector":{
+        "force": 500,
+        "near": 0.5,
+        "far": 10,
+        "near_angle": 180,
+        "far_angle": 60
     },
-    "Collector",
     "ui",
     "Explosive": {
         "damage": 10,

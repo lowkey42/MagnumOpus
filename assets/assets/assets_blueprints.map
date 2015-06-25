@@ -5,4 +5,13 @@ blueprint:vomit_zombie = blueprints/vomit_zombie.json
 blueprint:crow = blueprints/crow.json
 blueprint:bullet = blueprints/bullet.json
 blueprint:vomit_bullet = blueprints/vomit_bullet.json
+
 blueprint:coin = blueprints/coin.json
+blueprint:health_potion = blueprints/health_potion.json
+
+blueprint:element_fire = blueprints/element_fire.json
+blueprint:element_frost = blueprints/element_frost.json
+blueprint:element_water = blueprints/element_water.json
+blueprint:element_stone = blueprints/element_stone.json
+blueprint:element_gas = blueprints/element_gas.json
+blueprint:element_lightning = blueprints/element_lightning.json

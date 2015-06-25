@@ -123,7 +123,19 @@ namespace util {
 
 	inline bool starts_with(const std::string& str, const std::string& pattern) {
 		if(pattern.length()>str.length())
+			return false;
+
 		for(auto i=0ul; i<pattern.length(); ++i)
+			if(pattern[i]!=str[i])
+				return false;
+
+		return true;
+	}
+	inline bool ends_with(const std::string& str, const std::string& pattern) {
+		if(pattern.length()>str.length())
+			return false;
+
+		for(auto i=str.length()-pattern.length(); i<str.length(); ++i)
 			if(pattern[i]!=str[i])
 				return false;
 

@@ -25,7 +25,7 @@ int main(int argc, char** argv) {
 
 	char* noEnv = nullptr;
 	char** env = &noEnv;
-	Game_engine engine("MagnumOpus", Configuration(argc, argv, env));
+	Game_engine engine("MagnumOpus", argc, argv, env, false);
 
 	auto l = level::generate_level(engine.assets(), nseed, 0, 0);
 

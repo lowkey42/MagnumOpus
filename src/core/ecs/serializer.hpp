@@ -38,8 +38,8 @@ namespace mo {
 				auto apply(const asset::AID& blueprint, Entity_ptr target)const -> Entity_ptr;
 				void detach(Entity_ptr target)const;
 
-				auto write() -> std::string;
-				void read(const std::string& c);
+				void write(std::ostream&);
+				void read(std::istream&);
 
 				void on_reload();
 

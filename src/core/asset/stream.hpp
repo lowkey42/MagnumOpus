@@ -20,8 +20,8 @@
 #include <string>
 #include <vector>
 #include "../utils/template_utils.hpp"
-
 #include "../utils/stacktrace.hpp"
+#include "../utils/maybe.hpp"
 
 #include "aid.hpp"
 
@@ -43,13 +43,17 @@ namespace asset {
 			~stream()noexcept;
 
 			stream& operator=(const stream&) = delete;
-			stream& operator=(stream&&) = default;
+			stream& operator=(stream&&)noexcept;
 
 			auto eof()const noexcept -> bool;
 			auto length()const noexcept -> size_t;
 
 			auto aid()const noexcept {return _aid;}
 			auto& manager()noexcept {return _manager;}
+
+			auto physical_location()const noexcept -> util::maybe<std::string>;
+
+			void close();
 
 		protected:
 			File_handle* _file;
@@ -64,6 +68,8 @@ namespace asset {
 			istream(AID aid, Asset_manager& manager, const std::string& path);
 			istream(istream&&);
 
+			auto operator=(istream&&) -> istream&;
+
 			auto lines() -> std::vector<std::string>;
 			auto content() -> std::string;
 			auto bytes() -> std::vector<uint8_t>;
@@ -72,6 +78,8 @@ namespace asset {
 		public:
 			ostream(AID aid, Asset_manager& manager, const std::string& path);
 			ostream(ostream&&);
+
+			auto operator=(ostream&&) -> ostream&;
 	};
 
 	/**

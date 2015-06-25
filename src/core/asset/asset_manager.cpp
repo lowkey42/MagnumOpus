@@ -61,21 +61,27 @@ namespace {
 	bool exists(const std::string path) {
 		return PHYSFS_exists(path.c_str())!=0 && PHYSFS_isDirectory(path.c_str())==0;
 	}
+	bool exists_dir(const std::string path) {
+		return PHYSFS_exists(path.c_str())!=0 && PHYSFS_isDirectory(path.c_str())!=0;
+	}
 
-	void print_dir_recursiv(const std::string& dir, uint8_t depth) {
+	template<typename Stream>
+	void print_dir_recursiv(const std::string& dir, uint8_t depth, Stream& stream) {
 		std::string p;
 		for(uint8_t i=0; i<depth; i++)
 			p+="  ";
 
-		std::cerr<<p<<dir<<std::endl;
+		stream<<p<<dir<<"\n";
 		depth++;
 		for(auto&& f : list_files(dir, "", "")) {
 			if(depth>=5)
-				std::cerr<<p<<"  "<<f<<std::endl;
+				stream<<p<<"  "<<f<<"\n";
 			else
-				print_dir_recursiv(f, depth);
+				print_dir_recursiv(f, depth, stream);
 		}
 	}
+
+	constexpr auto default_source = {std::make_tuple("assets", false), std::make_tuple("assets.zip", true)};
 }
 
 namespace mo {
@@ -110,20 +116,46 @@ namespace asset {
 		if(!PHYSFS_setWriteDir(write_dir.c_str()))
 			FAIL("Unable to set write-dir to \""<<write_dir<<"\": "<< PHYSFS_getLastError());
 
+
+		auto add_source = [](const char* path){
+			if(!PHYSFS_addToSearchPath(path, 1))
+				WARN("Error adding custom archive \""<<path<<"\": "<<PHYSFS_getLastError());
+		};
+
 		auto archive_file = _open("archives.lst");
 		if(!archive_file) {
-			std::cerr<<"WARN: No archives.lst found."<<std::endl;
-			print_dir_recursiv("/", 0);
-		}
+			bool lost = true;
+			for(auto& s : default_source) {
+				const char* path;
+				bool file;
 
-		// load other archives
-		archive_file.process([](istream& in) {
-			for(auto&& l : in.lines()) {
-				if(!PHYSFS_addToSearchPath(l.c_str(), 1))
-					WARN("Error adding custom archive \""<<l
-							 <<"\": "<<PHYSFS_getLastError());
+				std::tie(path, file) = s;
+
+				if(file ? exists(path) : exists_dir(path)) {
+					add_source(path);
+					lost = false;
+				}
 			}
-		});
+
+			if(lost) {
+				auto& log = ::mo::util::fail (__func__, __FILE__, __LINE__);
+				log<<"No archives.lst found. printing search-path...\n";
+				print_dir_recursiv("/", 0, log);
+
+				log<<std::endl; // crash with error
+
+			} else {
+				INFO("No archives.lst found. Using defaults.");
+			}
+
+		} else {
+			// load other archives
+			archive_file.process([&](istream& in) {
+				for(auto&& l : in.lines()) {
+					add_source(l.c_str());
+				}
+			});
+		}
 
 		for(auto&& df : list_files("", "assets", ".map"))
 			_open(df).process([this](istream& in) {
@@ -138,6 +170,7 @@ namespace asset {
 	}
 
 	Asset_manager::~Asset_manager() {
+		_assets.clear();
 		PHYSFS_deinit();
 	}
 
@@ -196,6 +229,8 @@ namespace asset {
 			auto path = append_file(baseDir.get_or_throw(), id.name());
 			if(exists(path))
 				return util::just(std::move(path));
+			else
+				DEBUG("asset "<<id.str()<<" not found in "<<path);
 		}
 
 		return util::nothing();
@@ -218,7 +253,25 @@ namespace asset {
 
 		//PHYSFS_mkdir(util::split_on_last(path, "/").first.c_str());
 
+		if(exists(path))
+			PHYSFS_delete(path.c_str());
+
 		return {id, *this, path};
+	}
+
+	auto Asset_manager::physical_location(const AID& id)const noexcept -> util::maybe<std::string>{
+		using RT = util::maybe<std::string>;
+		using namespace std::literals;
+		auto location = _locate(id);
+
+		return location.process<RT>(util::nothing(), [&](auto& f) -> RT{
+			auto dir = PHYSFS_getRealDir(f.c_str());
+			if(!dir)
+				return util::nothing();
+
+			auto file = dir+"/"s+f;
+			return exists(file) ? util::just(std::move(file)) : util::nothing();
+		});
 	}
 
 	void Asset_manager::reload() {
@@ -242,7 +295,7 @@ namespace asset {
 	}
 
 	void Asset_manager::shrink_to_fit()noexcept {
-		util::erase_if(_assets, [](const auto& v){return v.second.data.use_count()==1;});
+		util::erase_if(_assets, [](const auto& v){return v.second.data.use_count()<=1;});
 	}
 
 } /* namespace asset */

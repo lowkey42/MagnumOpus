@@ -69,11 +69,11 @@ void init(int argc, char** argv, char** env) {
 	INFO("Nothing to see here!");
 	try {
 		util::init_stacktrace(argv[0]);
-		engine.reset(new mo::Game_engine("MagnumOpus", Configuration(argc, argv, env)));
+		engine.reset(new mo::Game_engine("MagnumOpus", argc, argv, env));
 		// engine->enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
 		engine->enter_screen<Intro_screen>();
-
 	} catch (const util::Error& ex) {
+		CRASH_REPORT("Exception in init: "<<ex.what());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in init", nullptr);
 		shutdown();
 		exit(1);
@@ -85,6 +85,7 @@ void onFrame() {
 		engine->on_frame();
 
 	} catch (const util::Error& ex) {
+		CRASH_REPORT("Exception in onFrame: "<<ex.what());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in onFrame", nullptr);
 		shutdown();
 		exit(2);
@@ -96,6 +97,7 @@ void shutdown() {
 		engine.reset();
 
 	} catch (const util::Error& ex) {
+		CRASH_REPORT("Exception in shutdown: "<<ex.what());
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in shutdown", nullptr);
 		exit(3);
 	}

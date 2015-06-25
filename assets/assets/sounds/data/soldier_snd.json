@@ -1,0 +1,8 @@
+{
+	"sounds": {	
+		"walking": {"sound_name": "sound:footstep"},
+		"healed": {"sound_name": "sound:footstep"},
+		"damaged": {"sound_name": "sound:scream"},
+		"dying": {"sound_name": "sound:player_dying"}
+	}
+}
