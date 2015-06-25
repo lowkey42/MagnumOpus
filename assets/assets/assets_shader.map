@@ -29,3 +29,6 @@ vert_shader:poste = shader/poste.vert
 frag_shader:poste = shader/poste.frag
 frag_shader:lmf = shader/lmf.frag
 frag_shader:blur = shader/blur.frag
+
+vert_shader:intro = shader/intro.vert
+frag_shader:intro = shader/intro.frag
