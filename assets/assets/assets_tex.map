@@ -19,3 +19,4 @@ tex:nixie_font = textures/nixie_font.png
 tex:ui_hud_bg = textures/ui_stats_bg.png
 tex:ui_hud_fg = textures/ui_stats_fg.png
 tex:ui_hud_health = textures/ui_stats_health.png
+tex:ui_intro = textures/ui_intro.png

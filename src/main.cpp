@@ -21,6 +21,8 @@
 
 #include "game/game_engine.hpp"
 #include "game/game_screen.hpp"
+#include "game/example_screen.hpp"
+#include "game/intro_screen.hpp"
 
 
 #include <iostream>
@@ -68,7 +70,8 @@ void init(int argc, char** argv, char** env) {
 	try {
 		util::init_stacktrace(argv[0]);
 		engine.reset(new mo::Game_engine("MagnumOpus", Configuration(argc, argv, env)));
-		engine->enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
+		// engine->enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
+		engine->enter_screen<Intro_screen>();
 
 	} catch (const util::Error& ex) {
 		SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "Sorry :-(", "Error in init", nullptr);
