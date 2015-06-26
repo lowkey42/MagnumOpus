@@ -111,6 +111,7 @@ namespace level {
 		void connect_rooms(Room_list& rooms, random_generator& rng, const Dungeon_cfg& cfg);
 		auto build_level(Room_list& rooms, int width, int height) -> Level;
 		void dig_corridors(Level& level, const Room_list& rooms);
+		void decorate_rooms(Level& level, const Room_list& rooms);
 	}
 
 	Level generate_level(asset::Asset_manager& assets, uint64_t seed,
@@ -140,7 +141,10 @@ namespace level {
 		// 7. Tunnel für vorgesehene Pfade graben
 		dig_corridors(level, rooms);
 
-		// 8. Objekte erstellen
+		// 8. Räume "befüllen"
+		decorate_rooms(level, rooms);
+
+		// 9. Objekte erstellen
 
 
 
@@ -308,14 +312,6 @@ namespace level {
 				r.top-=min_y-border;
 				r.right-=min_x-border;
 				r.bottom-=min_y-border;
-
-				if(r.type==Room_type::start) {
-					auto center = r.center();
-					level.get(center.x, center.y).type = Tile_type::stairs_up;
-				}else if(r.type==Room_type::end) {
-					auto center = r.center();
-					level.get(center.x, center.y).type = Tile_type::stairs_down;
-				}
 			}
 
 			return level;
@@ -362,6 +358,31 @@ namespace level {
 					dig_path(level, path_finder.search(
 							{room.center().x, room.center().y},
 							{rooms[c].center().x, rooms[c].center().y} ));
+				}
+			}
+		}
+
+		void decorate_rooms(Level& level, const Room_list& rooms) {
+			for(auto& r : rooms) {
+				auto center = r.center();
+
+				switch(r.type) {
+					case Room_type::start:
+						level.get(center.x, center.y).type = Tile_type::stairs_up;
+						break;
+
+					case Room_type::end:
+						level.get(center.x, center.y).type = Tile_type::stairs_down;
+						break;
+
+					case Room_type::boss:
+						break;
+
+					case Room_type::normal:
+						break;
+
+					case Room_type::secret:
+						break;
 				}
 			}
 		}
