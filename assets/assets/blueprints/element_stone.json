@@ -10,7 +10,7 @@
     "Item": {
         "target": "element",
         "element": "stone",
-        "mod": 1,
+        "mod": 0.2,
         "joinable": true
     },
     "Particle_emiter":{"type":"element_stone"}

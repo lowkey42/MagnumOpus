@@ -10,6 +10,7 @@
 #include "item_comp.hpp"
 #include "collector_comp.hpp"
 #include "drop_comp.hpp"
+#include "element_comp.hpp"
 
 #include "../combat/comp/health_comp.hpp"
 #include "../combat/comp/score_comp.hpp"
@@ -93,6 +94,7 @@ namespace item {
 		entity_manager.register_component_type<Collector_comp>();
 		entity_manager.register_component_type<Item_comp>();
 		entity_manager.register_component_type<Drop_comp>();
+		entity_manager.register_component_type<Element_comp>();
 
 		_droprates = assets.load<Droprate_conf>("cfg:drops"_aid);
 		INVARIANT(!_droprates->groups.empty(), "Couldn't load drop configuration");
@@ -161,40 +163,49 @@ namespace item {
 						if(other_item._joinable && !other_item._collected &&
 						   item._target==other_item._target && item._element==other_item._element) {
 
-							item._mod+=other_item._mod;
+							other_item._mod+=item._mod;
 							process(item.owner().get<physics::Physics_comp>(),
 							        other.get<physics::Physics_comp>())
 							        >>[&](auto& a, auto& b){
-								a.radius(min(a.radius() + b.radius(), 2_m));
+								b.radius(min(a.radius() + b.radius(), 2_m));
 							};
 
-							other_item._collected = true;
-							_em.erase(other.shared_from_this());
+							item._collected = true;
 						}
 
 					} else if(other.has<Collector_comp>()) {
 						switch(item._target) {
 							case health:
 								other.get<Health_comp>().process([&](Health_comp& h) {
-									if(item._mod>0)
+									if(item._mod>0) {
+										if(!h.damaged())
+											return;
+
 										h.heal(item._mod);
-									else
+									} else
 										h.damage(-item._mod);
+
+									item._collected = true;
 								});
 
 								break;
 							case score:
 								other.get<Score_comp>().process([&](Score_comp& s) {
 									s.add(item._mod);
+									item._collected = true;
 								});
 								break;
 							case element:
-								break;	// TODO: do stuff
+								other.get<Element_comp>().process([&](Element_comp& e) {
+									if(e.add_slot(item._element, item._mod))
+										item._collected = true;
+								});
+								break;
 						}
-
-						item._collected = true;
-						_em.erase(item.owner_ptr());
 					}
+
+					if(item._collected)
+						_em.erase(item.owner_ptr());
 				}
 			});
 		}

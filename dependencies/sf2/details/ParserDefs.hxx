@@ -41,6 +41,8 @@ namespace sf2 {
 					if(c=='"' || c=='\'')
 						c=source();
 
+					buffer[i]='\0';
+
 					return WeakStringRef(buffer, buffer+i);
 				}
 			}

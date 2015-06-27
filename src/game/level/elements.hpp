@@ -41,8 +41,9 @@ namespace level {
 		uint16_t value; //< Bitmask of Element
 		Elements():value(0){};
 		Elements(Element e):value(mask(e)){};
-		Elements(std::initializer_list<Element> l):value(0) {
-			for(auto e : l)
+		template<typename Range>
+		Elements(const Range& r):value(0) {
+			for(auto e : r)
 				value|=mask(e);
 		};
 

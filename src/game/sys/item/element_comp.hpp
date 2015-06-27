@@ -45,10 +45,13 @@ namespace item {
 			auto self_effect()const noexcept {return _self_effects;}
 			auto self_effect()noexcept -> auto& {return _self_effects;}
 
-			void slot(std::size_t i, const Element_slot& s)noexcept {_slots[i]=s;}
-			auto slot(std::size_t i)const noexcept -> auto& {return _slots[i];}
-			auto slot(std::size_t i)noexcept -> auto& {return _slots[i];}
+			void slot(std::size_t i, const Element_slot& s)noexcept {_slots.at(i)=s;}
+			auto slot(std::size_t i)const noexcept -> auto& {return _slots.at(i);}
+			auto slot(std::size_t i)noexcept -> auto& {return _slots.at(i);}
 
+			auto flip_slot    (std::size_t i               )noexcept -> bool;
+			auto mod_slot_fill(std::size_t i, float mod    )noexcept -> bool;
+			auto add_slot     (level::Element e, float fill)noexcept -> bool;
 
 			struct Persisted_state;
 			friend struct Persisted_state;

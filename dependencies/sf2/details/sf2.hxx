@@ -451,6 +451,10 @@ namespace sf2 {
 					return onError(std::string("list definition has to start with '[', found:")+c, cs) ? c : 0;
 
 				while( c!=']' ) {
+					skipCommentLH(cs);
+					if(cs.lookAhead()==']')
+						break;
+
 					SubT elem;
 					if( !(c=MemberParserChooser<SubT>::_parse(cs, elem)) )
 						return 0;

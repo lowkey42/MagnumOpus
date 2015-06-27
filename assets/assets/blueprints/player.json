@@ -59,5 +59,6 @@
         "delay":0.3,
         "on_damage": true,
         "blast_force": 100
-    }
+    },
+    "Element"
 }

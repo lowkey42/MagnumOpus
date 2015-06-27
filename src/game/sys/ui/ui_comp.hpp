@@ -17,6 +17,7 @@
 
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
+#include <core/renderer/texture.hpp>
 
 namespace mo {
 namespace sys {
@@ -25,16 +26,28 @@ namespace ui {
 	class Ui_comp : public ecs::Component<Ui_comp> {
 		public:
 			static constexpr const char* name() {return "ui";}
-			//void load(ecs::Entity_state&)override;
-			//void store(ecs::Entity_state&)override;
 
 			Ui_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {
 			}
 
-			// struct Persisted_state;
-			// friend struct Persisted_state;
+			friend class Ui_system;
 		private:
+			struct Element_state {
+				float activity = 0;
+				float fill = 0.f;
+				renderer::Texture_ptr texture;
+			};
+
+			bool _initialized = false;
+
+			std::array<Element_state,4> _elements;
+			float _health = 0;
+			int _score = 0;
+			glm::vec3 _offset;
+			glm::vec3 _target_offset;
+
+			glm::mat4 _mvp;
 	};
 
 }

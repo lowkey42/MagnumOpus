@@ -189,9 +189,9 @@ void Engine::on_frame() {
 	_audio_ctx->flip();
 	_input_manager->update(delta_time);
 
-	_poll_events();
-
 	_on_frame(delta_time);
+
+	_poll_events();
 
 	auto screen_stack = _screen_stack;
 

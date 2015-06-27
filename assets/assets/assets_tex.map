@@ -19,6 +19,13 @@ tex:ui_hud_bg = textures/ui_stats_bg.png
 tex:ui_hud_fg = textures/ui_stats_fg.png
 tex:ui_hud_health = textures/ui_stats_health.png
 
+tex:element_fire = textures/ui_element_fire.png
+tex:element_frost = textures/ui_element_frost.png
+tex:element_gas = textures/ui_element_gas.png
+tex:element_lightning = textures/ui_element_lightning.png
+tex:element_stone = textures/ui_element_stone.png
+tex:element_water = textures/ui_element_water.png
+
 tex:particle_fire = textures/particle_fire.png
 tex:particle_frost = textures/particle_frost.png
 tex:particle_water = textures/particle_water.png

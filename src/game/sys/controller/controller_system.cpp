@@ -6,6 +6,7 @@
 #include "../combat/comp/weapon_comp.hpp"
 #include "../state/state_comp.hpp"
 #include "../item/collector_comp.hpp"
+#include "../item/element_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -158,7 +159,7 @@ namespace controller {
 				if(len>1) {
 					direction/=len;
 					len = 1;
-				}else if(len<0.00001)
+				}else if(len<0.00001 || isnan(len))
 					return;
 
 				comp.accelerate_active(direction);
@@ -198,9 +199,15 @@ namespace controller {
 			set_state(Entity_state::taking);
 		}
 		void Controllable_interface_impl::switch_weapon(uint32_t weapon_id) {
-			// TODO: WeaponComponent.set(weaponId)
+			auto r = _entity.get<item::Element_comp>().process(false, [&](item::Element_comp& e){
+				return e.flip_slot(weapon_id);
+			});
 
-			set_state(Entity_state::change_weapon);
+			if(r) {
+				set_state(Entity_state::change_weapon);
+				DEBUG("Element "<<weapon_id<<" switched");
+			} else
+				DEBUG("Couldn't switch Element "<<weapon_id);
 		}
 
 		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
