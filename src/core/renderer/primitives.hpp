@@ -20,6 +20,7 @@
 #include "../units.hpp"
 #include "shader.hpp"
 #include "vertex_object.hpp"
+#include "texture.hpp"
 
 namespace mo {
 namespace renderer {
@@ -61,6 +62,21 @@ namespace renderer {
 			const float _radius;
 			Shader_program _prog;
 			Object _obj;
+	};
+
+	class Textured_box {
+		public:
+			Textured_box(asset::Asset_manager& assets, asset::AID tex, int width = 100, int height = 100);
+
+			void set_vp(const glm::mat4& vp);
+
+			void draw(glm::vec2 center);
+
+		private:
+			Shader_program _prog;
+			Object _obj;
+			Texture_ptr _texture;
+
 	};
 
 }
