@@ -15,7 +15,6 @@ namespace mo {
 	using namespace renderer;
 
 	namespace {
-
 		struct ui_controller : sys::controller::Controllable_interface{
 
 			ui_controller(Game_engine& engine) : _engine(engine){}
@@ -35,48 +34,15 @@ namespace mo {
 			Game_engine& _engine;
 
 		};
-
 	}
-
-	struct Intro_vertex {
-		glm::vec2 pos;
-		glm::vec2 uv;
-	};
-
-	Vertex_layout intro_layout {
-		Vertex_layout::Mode::triangles,
-		vertex("position",  &Intro_vertex::pos),
-		vertex("in_uv",     &Intro_vertex::uv)
-	};
-
-
-	auto intro_quad() -> std::vector<Intro_vertex> {
-		return {
-			// Quad Part left
-			{{-1, -1}, {0, 1}},
-			{{-1, 1}, {0, 0}},
-			{{1, 1}, {1, 0}},
-
-			// Quad Part right
-			{{1, 1}, {1, 0}},
-			{{-1, -1}, {0, 1}},
-			{{1, -1}, {1, 1}}
-		};
-	}
-
 
 	Intro_screen::Intro_screen(Game_engine& game_engine) :
 		Screen(game_engine),
 		_game_engine(game_engine),
-		_object(intro_layout, create_buffer(intro_quad()))
+		_box(game_engine.assets(), "tex:ui_intro"_aid, 2.f, 2.f)
 	{
-		_shader.attach_shader(_engine.assets().load<Shader>(("vert_shader:simple"_aid)))
-			   .attach_shader(_engine.assets().load<Shader>(("frag_shader:simple"_aid)))
-			   .bind_all_attribute_locations(intro_layout)
-			   .build();
-
-		_texture = _engine.assets().load<Texture>("tex:ui_intro"_aid);
-		_camera.reset(new renderer::Camera(glm::vec2(2, 2)));
+		glm::vec2 win_size = glm::vec2(2, 2);
+		_camera.reset(new renderer::Camera(win_size));
 	}
 
 
@@ -90,13 +56,10 @@ namespace mo {
 
 	void Intro_screen::_draw(float time ) {
 
-		_shader.bind().set_uniform("VP", _camera->vp())
-				.set_uniform("model",   glm::mat4(1.0f))
-				.set_uniform("texture", 0)
-				.set_uniform("layer",   0.f)
-				.set_uniform("color",   glm::vec4(1,1,1,0.6));
-		_texture->bind();
-		_object.draw();
+		Graphics_ctx& ctx = _game_engine.graphics_ctx();
+
+		_box.set_vp(_camera->vp());
+		_box.draw(glm::vec2(0.f, 0.f));
 
 	}
 }

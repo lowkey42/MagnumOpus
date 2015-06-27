@@ -21,6 +21,7 @@
 #include "../core/renderer/texture.hpp"
 #include "../core/renderer/shader.hpp"
 #include "../core/renderer/vertex_object.hpp"
+#include "../core/renderer/primitives.hpp"
 
 namespace mo {
 
@@ -41,9 +42,9 @@ namespace mo {
 
 			Game_engine& _game_engine;
 			std::unique_ptr<renderer::Camera> _camera;
-			asset::Ptr<renderer::Texture> _texture;
-			renderer::Shader_program _shader;
-			renderer::Object _object;
+
+			renderer::Textured_box _box;
+
 	};
 
 }
