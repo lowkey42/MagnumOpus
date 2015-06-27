@@ -36,7 +36,7 @@ namespace renderer {
 			auto width  = viewport[2];
 
 			return glm::ortho(-width/2.f, width/2.f,
-				              height/2.f, -height/2.f, -1.0f, 1.0f);
+							  height/2.f, -height/2.f, -1.0f, 1.0f);
 		}
 	}
 

@@ -15,7 +15,9 @@
 
 #pragma once
 
+#include "game_engine.hpp"
 #include "../core/engine.hpp"
+#include <core/renderer/camera.hpp>
 #include "../core/renderer/texture.hpp"
 #include "../core/renderer/shader.hpp"
 #include "../core/renderer/vertex_object.hpp"
@@ -24,7 +26,7 @@ namespace mo {
 
 	class Intro_screen : public Screen {
 		public:
-			Intro_screen(Engine& engine);
+			Intro_screen(Game_engine& game_engine);
 			~Intro_screen()noexcept = default;
 
 		protected:
@@ -36,6 +38,9 @@ namespace mo {
 			}
 
 		private:
+
+			Game_engine& _game_engine;
+			std::unique_ptr<renderer::Camera> _camera;
 			asset::Ptr<renderer::Texture> _texture;
 			renderer::Shader_program _shader;
 			renderer::Object _object;

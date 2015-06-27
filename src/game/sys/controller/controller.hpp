@@ -26,7 +26,6 @@ namespace controller {
 
 	struct Controllable_interface {
 		virtual ~Controllable_interface()noexcept = default;
-		virtual auto entity()noexcept -> ecs::Entity& = 0;
 		virtual void move(glm::vec2 direction) = 0;
 		virtual void look_at(glm::vec2 position)=0;
 		virtual void look_in_dir(glm::vec2 direction)=0;
