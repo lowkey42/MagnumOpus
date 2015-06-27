@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Marks entities that drop items on death                                *
+ * Contains elemental effects & available weapon-elements                 *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -18,24 +18,45 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
+#include "../../level/elements.hpp"
+
 namespace mo {
 namespace sys {
 namespace item {
 
-	class Drop_comp : public ecs::Component<Drop_comp> {
+	constexpr auto element_slots = 4u;
+
+	struct Element_slot {
+		level::Element element = level::Element::neutral;
+		float fill = 0.f;
+		bool active = false;
+	};
+
+	class Element_comp : public ecs::Component<Element_comp> {
 		public:
-			static constexpr const char* name() {return "Drop";}
+			static constexpr const char* name() {return "Element";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Drop_comp(ecs::Entity& owner) noexcept
+			Element_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}
+
+			void self_effect(level::Elements e)noexcept {_self_effects=e;}
+			auto self_effect()const noexcept {return _self_effects;}
+			auto self_effect()noexcept -> auto& {return _self_effects;}
+
+			void slot(std::size_t i, const Element_slot& s)noexcept {_slots[i]=s;}
+			auto slot(std::size_t i)const noexcept -> auto& {return _slots[i];}
+			auto slot(std::size_t i)noexcept -> auto& {return _slots[i];}
+
 
 			struct Persisted_state;
 			friend struct Persisted_state;
-			friend class Item_system;
+			friend class Element_system;
 		private:
-			int8_t _group;
+			level::Elements _self_effects;
+			std::array<Element_slot, element_slots> _slots;
+
 	};
 
 }
