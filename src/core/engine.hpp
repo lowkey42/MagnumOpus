@@ -76,7 +76,7 @@ namespace mo {
 
 			template<class T, typename ...Args>
 			auto enter_screen(Args&&... args) -> T& {
-				return static_cast<T&>(enter_screen(std::make_unique<T>(*this, std::forward(args)...)));
+				return static_cast<T&>(enter_screen(std::make_unique<T>(*this, std::forward<Args>(args)...)));
 			}
 
 			auto enter_screen(std::unique_ptr<Screen> screen) -> Screen&;

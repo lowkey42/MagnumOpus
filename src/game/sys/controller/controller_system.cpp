@@ -32,7 +32,6 @@ namespace controller {
 
 			~Controllable_interface_impl()noexcept;
 
-			auto entity()noexcept -> ecs::Entity& override;
 			void move(glm::vec2 target) override;
 			void look_at(glm::vec2 pos) override;
 			void look_in_dir(glm::vec2 direction) override;
@@ -149,9 +148,7 @@ namespace controller {
 	}
 
 	namespace {
-		auto Controllable_interface_impl::entity()noexcept -> ecs::Entity& {
-			return _entity;
-		}
+
 		void Controllable_interface_impl::move(glm::vec2 direction) {
 			_entity.get<Physics_comp>().process([this, &direction](auto& comp){
 				auto len = glm::length(direction);
