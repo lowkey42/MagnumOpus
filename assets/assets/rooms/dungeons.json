@@ -2,24 +2,24 @@
     "levels":{
         0:{
             "room_size": {"min":10, "max": 15},
-            "rooms": {"min":5, "max": 10},
+            "rooms": {"min":6, "max": 12},
             "max_width": 64,
             "max_height": 64,
-            "split_prop_factor": 4
+            "split_prop_factor": 2
         },
         1:{
             "room_size": {"min":10, "max": 20},
-            "rooms": {"min":10, "max": 20},
+            "rooms": {"min":15, "max": 25},
             "max_width": 128,
             "max_height": 128,
-            "split_prop_factor": 5
+            "split_prop_factor": 3
         },
         2:{
-            "room_size": {"min":15, "max": 40},
-            "rooms": {"min":10, "max": 20},
+            "room_size": {"min":10, "max": 15},
+            "rooms": {"min":20, "max": 40},
             "max_width": 256,
             "max_height": 256,
-            "split_prop_factor": 2.5
+            "split_prop_factor": 8
         }
     }
 }

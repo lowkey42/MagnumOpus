@@ -12,6 +12,7 @@
 #include <algorithm>
 #include <random>
 #include <glm/glm.hpp>
+#include <map>
 
 using namespace mo::util;
 
@@ -40,7 +41,7 @@ namespace {
 	)
 
 	struct Dungeon_cfg_map {
-		std::unordered_map<int, Dungeon_cfg> levels;
+		std::map<int, Dungeon_cfg> levels;
 	};
 	sf2_structDef(Dungeon_cfg_map, sf2_member(levels))
 }
@@ -66,7 +67,10 @@ namespace level {
 		Dungeon_cfg load_cfg(asset::Asset_manager& assets, int depth) {
 			auto opts = assets.load<Dungeon_cfg_map>("cfg:dungeons"_aid);
 			auto cfg_iter = opts->levels.find(depth);
-			INVARIANT(cfg_iter!=opts->levels.end(), "You delved too greedily and too deep. Level="+to_string(depth));
+			if(cfg_iter==opts->levels.end())
+				return opts->levels.rbegin()->second;
+
+			// INVARIANT(cfg_iter!=opts->levels.end(), "You delved too greedily and too deep. Level="+to_string(depth));
 
 			return cfg_iter->second;
 		}

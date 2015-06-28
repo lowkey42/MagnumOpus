@@ -53,20 +53,29 @@ namespace mo {
 			           std::vector<ecs::ETO> players,
 	                   util::maybe<int> depth) -> std::unique_ptr<Game_state> {
 		auto profile = im_a_savegame;
-
-		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth.get_or_other(profile.depth)));
+		if(profile.seed==42)
+			profile.seed = time(0);
 
 		auto d = depth.get_or_other(profile.depth);
 
-		auto room_m = state->level.find_room(d<profile.depth ? level::Room_type::end :
-		                                                       level::Room_type::start);
+		bool up = d<profile.depth;
+
+		profile.depth = d;
+
+		// TODO[foe]: save profile
+		im_a_savegame = profile;
+
+		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth.get_or_other(profile.depth)));
+
+
+		auto room_m = state->level.find_room(up ? level::Room_type::end :
+		                                          level::Room_type::start);
 
 		INVARIANT(room_m.is_some(), "Generated room has no exit/entry-point!?");
 		auto room = room_m.get_or_throw();
 
 		auto start_position = room.center() *1_m
-		                      + Position{1_m,0_m};
-		profile.depth = d;
+		                      + Position{1_m,0_m} * (up ? -1 : 1);
 
 		if(!players.empty()) {
 			bool first = true;
@@ -88,46 +97,6 @@ namespace mo {
 			           start_position);
 		}
 
-		// TODO[foe]: save profile
-		im_a_savegame = profile;
-
-		/*
-// TODO[foe]: remove
-		auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);
-		log_out<<"World "<<level.width()<<"x"<<level.height()
-		       <<"\nRooms:\n";
-
-		log_out<<" \n          ";
-
-		for(auto y=0; y<level.height(); y++) {
-			for(auto x=0; x<level.width(); x++) {
-				switch(level.get(x,y).type) {
-					case level::Tile_type::wall_tile:
-						log_out<<"#";
-						break;
-					case level::Tile_type::floor_tile:
-						log_out<<".";
-						break;
-					case level::Tile_type::stairs_down:
-						log_out<<"<";
-						break;
-					case level::Tile_type::stairs_up:
-						log_out<<">";
-						break;
-					case level::Tile_type::door_closed_ns:
-					case level::Tile_type::door_closed_we:
-						log_out<<"+";
-						break;
-					default:
-						log_out<<" ";
-				}
-			}
-			log_out<<"\n          ";
-		}
-
-		log_out<<std::endl; // end log-line
-// END TODO
-*/
 
 		//spawn:
 
@@ -213,6 +182,42 @@ namespace mo {
 	      soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
+
+		// TODO[foe]: remove
+				auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);
+				log_out<<"World "<<level.width()<<"x"<<level.height()
+				       <<"\nRooms:\n";
+
+				log_out<<" \n          ";
+
+				for(auto y=0; y<level.height(); y++) {
+					for(auto x=0; x<level.width(); x++) {
+						switch(level.get(x,y).type) {
+							case level::Tile_type::wall_tile:
+								log_out<<"#";
+								break;
+							case level::Tile_type::floor_tile:
+								log_out<<".";
+								break;
+							case level::Tile_type::stairs_down:
+								log_out<<"<";
+								break;
+							case level::Tile_type::stairs_up:
+								log_out<<">";
+								break;
+							case level::Tile_type::door_closed_ns:
+							case level::Tile_type::door_closed_we:
+								log_out<<"+";
+								break;
+							default:
+								log_out<<" ";
+						}
+					}
+					log_out<<"\n          ";
+				}
+
+				log_out<<std::endl; // end log-line
+		// END TODO
 	}
 
 	void Game_state::delete_savegame() {
@@ -260,12 +265,12 @@ namespace mo {
 
 				auto& tile = level.get(x,y);
 				if(tile.type==level::Tile_type::stairs_down) {
-					if(this->profile.depth>=2) {
+					/*if(this->profile.depth>=2) {
 						INFO("You delved too greedily and too deep");
 						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the bottom", "You delved too greedily and too deep", nullptr);
 						this->engine.leave_screen();
 
-					} else
+					} else*/
 						move_level(*this, 1);
 
 				}else if(tile.type==level::Tile_type::stairs_up) {

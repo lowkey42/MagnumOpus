@@ -26,11 +26,12 @@
 namespace sf2 {
 
 	inline bool onError(std::string error, io::CharSource& source) {
-#ifndef SF2_ERROR_HANDLER
+#ifndef WARN
 		std::cerr<<"SF2-ParserError: \""<<error<<"\" at "<<source.line()<<":"<<source.column()<<"; nextChar="<<static_cast<int>(source())<<std::endl;
 		return false;
 #else
-		return SF2_ERROR_HANDLER(error, source);
+		WARN("SF2-ParserError: \""<<error<<"\" at "<<source.line()<<":"<<source.column()<<"; nextChar="<<static_cast<int>(source()));
+		return false;
 #endif
 	}
 

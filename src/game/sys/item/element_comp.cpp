@@ -34,7 +34,7 @@ namespace item {
 		sf2_member(active),
 	)
 	sf2_structDef(Element_comp::Persisted_state,
-		//sf2_member(self), // FIXME[foe]: crashes on load
+		sf2_member(self),
 		sf2_member(slots)
 	)
 

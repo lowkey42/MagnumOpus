@@ -206,7 +206,7 @@ namespace sf2 {
 		}
 
 		inline bool skipWhitespacesLH( CharSource& cs ) {
-			while( !isgraph(cs.lookAhead()) ) {
+			while( !isgraph(cs.lookAhead()) || cs.lookAhead()=='\n' ) {
 				if(cs()==0) // consume
 					return false;
 			}

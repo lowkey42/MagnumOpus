@@ -3,12 +3,12 @@
         "rot_speed": 720
     },
 	"Physics":{
-		"radius": 0.4,
+		"radius": 0.25,
 		"mass": 60,
 		"restitution": 0.01,
-        "friction": 0.01,
-        "max_active_velocity": 45,
-        "active_acceleration": 5
+        "friction": 0.02,
+        "max_active_velocity": 30,
+        "active_acceleration": 7
 	},
     "Sprite": {
         "aid": "anim:soldier"
@@ -22,7 +22,7 @@
         "freq": 5.0,
         "lazyness":1
     },
-    "Target_tag",
+#    "Target_tag",
     "State",
     "Friend":{
         "group": 2
@@ -38,11 +38,11 @@
         "recoil": 60
     },
     "Laser_sight": {
-        "r": 255,
+        "r": 150,
         "g": 0,
         "b": 0,
-        "occlusion": 64,
-        "width": 0.06
+        "occlusion": 16,
+        "width": 0.05
     },
     "Score",
     "Collector":{

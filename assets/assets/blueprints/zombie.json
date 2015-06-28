@@ -3,12 +3,12 @@
         "rot_speed": 180
     },
 	"Physics":{
-		"radius": 0.3,
+		"radius": 0.25,
 		"mass": 80,
 		"restitution": 0.8,
         "friction": 0.001,
-        "max_active_velocity": 5,
-        "active_acceleration": 2
+        "max_active_velocity": 12,
+        "active_acceleration": 3
 	},
     "Sprite": {
         "aid": "anim:zombie"
@@ -34,11 +34,11 @@
      },
     "Weapon":{
         "type": "melee",
-        "cooldown": 3.0,
+        "cooldown": 1.0,
         "melee_damage": 5.0,
         "melee_range": 1,
         "melee_angle": 90,
-        "attack_delay": 0.5
+        "attack_delay": 0.25
     },
     "Drop":{"group":1}
 }

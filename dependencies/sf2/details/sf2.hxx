@@ -452,8 +452,10 @@ namespace sf2 {
 
 				while( c!=']' ) {
 					skipCommentLH(cs);
-					if(cs.lookAhead()==']')
+					if(cs.lookAhead()==']') {
+						cs();
 						break;
+					}
 
 					SubT elem;
 					if( !(c=MemberParserChooser<SubT>::_parse(cs, elem)) )

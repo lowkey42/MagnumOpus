@@ -15,6 +15,14 @@
 
 #pragma once
 
+#include "../utils/log.hpp"
+template<class CS>
+inline bool parser_error_handler(const std::string& error, CS& source) {
+	WARN("ParserError: "<<error<<"\" at "<<source.line()<<":"<<source.column()<<"; nextChar="<<static_cast<int>(source()));
+	return false;
+}
+#define SF2_ERROR_HANDLER parser_error_handler
+
 #include "../utils/maybe.hpp"
 #include "../utils/log.hpp"
 #include "serializer.hpp"

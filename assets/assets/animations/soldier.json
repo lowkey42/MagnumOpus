@@ -1,7 +1,7 @@
 {
 	"animations": {
 		"idle": {"row":1, "fps":1, "frames":1},
-		"walking": {"row":1, "fps":6, "frames":8},
+		"walking": {"row":1, "fps":12, "frames":8},
 		"attacking_melee": {"row":1, "fps":1, "frames":1},
 		"attacking_range": {"row":1, "fps":1, "frames":1},
 		"interacting": {"row":1, "fps":1, "frames":1},

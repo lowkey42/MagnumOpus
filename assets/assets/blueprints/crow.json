@@ -1,6 +1,6 @@
 {
     "Transform":{
-        "rot_speed": 180,
+        "rot_speed": 360,
         "layer":0.9
     },
 	"Physics":{
@@ -8,8 +8,8 @@
 		"mass": 30,
 		"restitution": 0.8,
         "friction": 0.0005,
-        "max_active_velocity": 40,
-        "active_acceleration": 5,
+        "max_active_velocity": 50,
+        "active_acceleration": 7,
         "solid":false
 	},
     "Sprite": {

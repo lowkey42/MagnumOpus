@@ -105,14 +105,6 @@ namespace state {
 
 		auto& state = is_background(s) ? _state_background : _state_primary;
 
-		if(state.s==Entity_state::dying) {
-			if(s==Entity_state::dying)
-				INFO("dying -> "<<"dying");
-
-			else
-				INFO("dying -> "<<(int)s);
-		}
-
 		state.s=s;
 		state.magnitude=magnitude;
 		state.left=required_time_for(s);
