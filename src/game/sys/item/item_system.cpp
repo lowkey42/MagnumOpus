@@ -32,9 +32,9 @@ namespace item {
 		std::vector<Droprate_group> groups;
 	};
 
-	sf2_structDef(Droprate, sf2_member(item_aid), sf2_member(chance), sf2_member(min), sf2_member(max));
-	sf2_structDef(Droprate_group, sf2_member(values));
-	sf2_structDef(Droprate_conf, sf2_member(groups));
+	sf2_structDef(Droprate, sf2_member(item_aid), sf2_member(chance), sf2_member(min), sf2_member(max))
+	sf2_structDef(Droprate_group, sf2_member(values))
+	sf2_structDef(Droprate_conf, sf2_member(groups))
 }
 }
 namespace asset {

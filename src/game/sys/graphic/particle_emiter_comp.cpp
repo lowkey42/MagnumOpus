@@ -29,7 +29,7 @@ namespace graphic {
 		sf2_value(element_gas),
 		sf2_value(element_lightning),
 		sf2_value(health)
-	);
+	)
 
 	sf2_structDef(Particle_emiter_comp::Persisted_state,
 		sf2_member(type),

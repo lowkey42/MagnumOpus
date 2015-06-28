@@ -99,7 +99,7 @@ namespace mo {
 	struct Angle : Value_type<Angle> {
 		constexpr explicit Angle(float radians) : Value_type(radians){}
 		constexpr operator float()const noexcept {return val;}
-		constexpr float in_degrees()const noexcept {return val*PI/180;}
+		constexpr float in_degrees()const noexcept {return val * (180.f / PI);}
 	};
 
 	inline Angle sin(Angle a)noexcept {return Angle(std::sin(a.value()));}

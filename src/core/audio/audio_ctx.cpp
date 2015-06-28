@@ -232,8 +232,20 @@ namespace mo {
 #ifndef EMSCRIPTEN
 				auto a = angle.in_degrees();
 
-				auto dist = dist_percentage *255;
+				// Converting Coordinate System from game (up = 90, right = 180 / -180, down = -90, left = 0)
+				//								to Mixer  (up = 0, right = 90, down = 180, left = 270)
 
+				// new System is now (up = 0, right = 90 / -270, down = -180, left = -90)
+				a -= 90.f;
+
+				// Checking if value is < 0, if so calculate 360° - absolute of a
+				// new System ist now (up = 0, right = 90, down = 180, left = 270 --> Mixer System)
+
+				if(a - 90.f < 0){
+					a = 360.f - std::abs(a);
+				}
+
+				auto dist = dist_percentage *255;
 				if(!Mix_SetPosition(c, a, dist)) {
 					DEBUG("Mix_SetPosition failed");
 				}

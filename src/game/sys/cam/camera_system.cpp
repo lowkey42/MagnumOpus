@@ -98,7 +98,7 @@ namespace cam {
 		}
 
 		_main_camera.position(_cameras.front().camera.position());
-		_main_camera.zoom(_cameras.front().camera.zoom());
+		_main_camera.zoom(_cameras.front().camera.zoom() * (_main_camera.viewport().w/_cameras.front().camera.viewport().w));
 	}
 
 }
