@@ -22,7 +22,7 @@
         "freq": 5.0,
         "lazyness":1
     },
-#    "Target_tag",
+    "Target_tag",
     "State",
     "Friend":{
         "group": 2

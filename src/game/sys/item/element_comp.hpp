@@ -18,6 +18,8 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
+#include <array>
+
 #include "../../level/elements.hpp"
 
 namespace mo {

@@ -19,6 +19,8 @@
 #include <core/units.hpp>
 #include <core/renderer/texture.hpp>
 
+#include <array>
+
 namespace mo {
 namespace sys {
 namespace ui {

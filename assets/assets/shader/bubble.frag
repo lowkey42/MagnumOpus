@@ -50,11 +50,11 @@ void main() {
 		vec4 line = line(1.0) * line(-1.0);
 
 		if(line.r>0.5) {
-			c.rgb+=line.r/4;
-			c.rgb*=line.r*2;
-			c.r = pow(c.r, line.r*10);
-			c.g = pow(c.g, line.r*10);
-			c.b = pow(c.b, line.r*10);
+			c.rgb+=line.r/4.0;
+			c.rgb*=line.r*2.0;
+			c.r = pow(c.r, line.r*10.0);
+			c.g = pow(c.g, line.r*10.0);
+			c.b = pow(c.b, line.r*10.0);
 		}
 
 		if(0.98-uvl.y<=1.0-fill_level) {
