@@ -9,7 +9,7 @@ uniform mat4 vp;
 uniform mat4 model;
 
 void main() {
-    gl_Position = (vp*model) * vec4(position.x, position.y, 0.5, 1);
+    gl_Position = (vp*model) * vec4(position.x, position.y, 0.5, 1.0);
 
 	uvl = uv;
 }

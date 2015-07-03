@@ -29,12 +29,16 @@ vec4 bg3(vec2 p,float r) {
 	return get(p,r, 0.0, -0.1, -0.3);
 }
 
-vec4 line(float offset) {
+vec4 get_line(float offset) {
 	float x = uvl.x + 0.5*time*offset;
+	x-=floor(x);
 
-	vec2 uv = vec2(x-floor(x), uvl.y + 1.0-fill_level -0.12);
+	float y = uvl.y + 1.0-fill_level -0.12;
 
-	return texture2D(texture, vec2(uv.x/2.0 + 1.0/2.0, uv.y));
+	vec2 uv = vec2(x/2.0 + 0.5, y);
+	uv=clamp(uv, 0.0, 0.9999);
+
+	return texture2D(texture, uv);
 }
 
 void main() {
@@ -47,7 +51,7 @@ void main() {
 	c.rgb /= pow(r*20.0, 1.0-activity);
 
 	if(fill_level<1.0) {
-		vec4 line = line(1.0) * line(-1.0);
+		vec4 line = get_line(1.0)*0.8 + get_line(0.5)*0.4;
 
 		if(line.r>0.5) {
 			c.rgb+=line.r/4.0;
