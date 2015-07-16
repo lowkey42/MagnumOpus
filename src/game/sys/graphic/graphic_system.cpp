@@ -12,6 +12,23 @@ namespace graphic {
 	using namespace renderer;
 	using namespace unit_literals;
 
+	namespace {
+		bool is_lazy_particle(Effect_type t) {
+			switch(t) {
+				case Effect_type::none:              return true;
+				case Effect_type::element_fire:      return true;
+				case Effect_type::element_frost:     return true;
+				case Effect_type::element_water:     return true;
+				case Effect_type::element_stone:     return true;
+				case Effect_type::element_gas:       return true;
+				case Effect_type::element_lightning: return true;
+				case Effect_type::health:            return true;
+
+				case Effect_type::flame_thrower:     return false;
+			}
+		}
+	}
+
 	Graphic_system::Graphic_system(
 	        ecs::Entity_manager& entity_manager,
 	        sys::physics::Transform_system& ts,
@@ -101,7 +118,10 @@ namespace graphic {
 				auto physics = p.owner().get<physics::Physics_comp>();
 
 				transform.process([&](auto& t) {
-					auto vel = physics.process(Velocity{0,0}, [](auto& p){return p.velocity();});
+					auto vel = Velocity{0,0};
+					if(!is_lazy_particle(e._type))
+						vel = physics.process(vel, [](auto& p){return p.velocity();});
+
 					e._emiter->update_center(t.position(), t.rotation(), vel);
 				});
 
@@ -133,7 +153,7 @@ namespace graphic {
 						renderer::Collision_handler::none,
 						100,
 						200,
-						0.5_s, 0.8_s,
+						0.05_s, 0.1_s,
 						util::scerp<Angle>(0_deg, 0_deg),
 						util::scerp<Angle>(0_deg, 0_deg),
 						util::lerp<Speed_per_time>(8_m/second_2, 0_m/second_2),
