@@ -10,7 +10,7 @@
         "friction": 0.0005,
         "max_active_velocity": 50,
         "active_acceleration": 7,
-        "solid":false
+        "group":2
 	},
     "Sprite": {
         "aid": "anim:crow"
@@ -32,11 +32,13 @@
         "max_hp": 2
      },
     "Weapon":{
-        "type": "melee",
-        "cooldown": 1.0,
-        "melee_damage": 1.0,
-        "melee_range": 1,
-        "melee_angle": 90
+        "weapon": {
+            "type": "melee",
+            "cooldown": 1.0,
+            "melee_damage": 1.0,
+            "melee_range": 1,
+            "melee_angle": 90
+        }
     },
     "Drop":{"group":0}
 }

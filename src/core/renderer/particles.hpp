@@ -33,6 +33,7 @@ namespace renderer {
 		uint16_t  seed;
 
 		glm::vec2 position;
+		glm::vec2 initial_velocity;
 		glm::vec4 color;
 		glm::vec2 size;
 		float     rotation;
@@ -44,7 +45,7 @@ namespace renderer {
 		float     time_to_live;
 		float     max_age;
 
-		Particle(glm::vec2 pos, float rot, float ttl, uint16_t seed);
+		Particle(glm::vec2 pos, glm::vec2 velocity, float rot, float ttl, uint16_t seed);
 	};
 
 	struct Environment_callback {
@@ -62,7 +63,7 @@ namespace renderer {
 
 	class Particle_emiter {
 		public:
-			void update_center(Position center, Angle orientation);
+			void update_center(Position center, Angle orientation, Velocity velocity=Velocity{0,0});
 
 			void radius(Distance r)noexcept {_radius=r;}
 			auto radius()const noexcept {return _radius;}
@@ -87,6 +88,7 @@ namespace renderer {
 
 		// private API
 			Particle_emiter(Position center, Angle orientation, Distance radius,
+			                Distance offset,
 			                Collision_handler collision_handler,
 			                float spawn_rate, std::size_t max_particles,
 			                Time min_ttl, Time max_ttl,
@@ -112,11 +114,13 @@ namespace renderer {
 			void spawn_new(Time dt, Environment_callback& env);
 			auto simulate(Time dt, Environment_callback& env) -> std::vector<Particle>::iterator;
 			auto simulate_one(float dt, Environment_callback& env, Particle& p) -> bool;
-			void update_bounds(const Particle& p);
+			void update_bounds(glm::vec2);
 
 			Position          _center;
 			Angle             _orientation;
+			Velocity          _velocity = Velocity{0,0};
 			Distance          _radius;
+			Distance          _offset;
 			float             _spawn_rate;
 			Collision_handler _collision_handler;
 			Time              _min_ttl;
@@ -149,7 +153,7 @@ namespace renderer {
 			Particle_renderer(asset::Asset_manager& assets, std::unique_ptr<Environment_callback> env=std::unique_ptr<Environment_callback>());
 
 			Particle_emiter_ptr create_emiter(Position center, Angle orientation, Distance radius,
-			                                  Collision_handler collision_handler,
+			                                  Distance offset, Collision_handler collision_handler,
 							                  float spawn_rate, std::size_t max_particles,
 							                  Time min_ttl, Time max_ttl,
 							                  util::Xerp<Angle> direction,
@@ -172,7 +176,7 @@ namespace renderer {
 	};
 
 	inline Particle_emiter_ptr Particle_renderer::create_emiter(Position center, Angle orientation,
-	                                                            Distance radius,
+	                                                            Distance radius, Distance offset,
 	                                                     Collision_handler collision_handler,
 										                 float spawn_rate, std::size_t max_particles,
 										                 Time min_ttl, Time max_ttl,
@@ -185,7 +189,7 @@ namespace renderer {
 										                 util::Xerp<int8_t> frame,
 										                 Texture_ptr texture,
 	                                                     bool reverse ) {
-		auto pe = std::make_shared<Particle_emiter>(center, orientation, radius, collision_handler, spawn_rate, max_particles, min_ttl, max_ttl, direction, rotation_offset, acceleration, angular_acceleration, color, size, frame, texture, reverse);
+		auto pe = std::make_shared<Particle_emiter>(center, orientation, radius, offset, collision_handler, spawn_rate, max_particles, min_ttl, max_ttl, direction, rotation_offset, acceleration, angular_acceleration, color, size, frame, texture, reverse);
 		_emiter.emplace_back(pe);
 
 		return pe;

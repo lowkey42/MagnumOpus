@@ -17,22 +17,13 @@
 
 #include <core/ecs/ecs.hpp>
 #include <core/renderer/particles.hpp>
+#include <array>
 
+#include "effects.hpp"
 
 namespace mo {
 namespace sys {
 namespace graphic {
-
-	enum class Particle_emiter_type {
-		element_fire,
-		element_frost,
-		element_water,
-		element_stone,
-		element_gas,
-		element_lightning,
-
-		health
-	};
 
 	class Particle_emiter_comp : public ecs::Component<Particle_emiter_comp> {
 		public:
@@ -40,27 +31,35 @@ namespace graphic {
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Particle_emiter_comp(ecs::Entity& owner, bool enabled=true,
-			                     Particle_emiter_type type=Particle_emiter_type::element_fire)
-			    : Component(owner), _type(type), _enabled(enabled) {}
+			Particle_emiter_comp(ecs::Entity& owner)
+			    : Component(owner) {}
 
-			void enabled(bool);
-			auto enabled()const noexcept {return _enabled;}
+			void enabled(std::size_t i, bool, bool temp=false);
+			auto enabled(std::size_t i)const noexcept;
 
-			void particle_type(Particle_emiter_type t);
-			auto particle_type()const noexcept {return _type;}
-
-			void scale(Distance r);
+			void particle_type(std::size_t i, Effect_type t,
+			                   bool scale=false);
+			auto particle_type(std::size_t i)const noexcept;
 
 			struct Persisted_state;
 			friend struct Persisted_state;
 			friend class Graphic_system;
-		private:
-			void _create_emiter(renderer::Particle_renderer&, asset::Asset_manager&);
 
-			renderer::Particle_emiter_ptr _emiter;
-			Particle_emiter_type          _type;
-			bool                          _enabled;
+		private:
+			static constexpr std::size_t max_emiters = 2;
+
+			struct Emiter {
+				renderer::Particle_emiter_ptr _emiter;
+				Effect_type                   _type = Effect_type::none;
+				bool                          _enabled = false;
+				bool                          _to_be_disabled = false;
+				bool                          _temporary = false;
+				bool                          _scale = false;
+			};
+
+			void scale(std::size_t i,Distance r);
+
+			std::array<Emiter, max_emiters> _emiters;
 	};
 
 }

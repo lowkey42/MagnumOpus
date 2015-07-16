@@ -94,7 +94,6 @@ namespace item {
 		entity_manager.register_component_type<Collector_comp>();
 		entity_manager.register_component_type<Item_comp>();
 		entity_manager.register_component_type<Drop_comp>();
-		entity_manager.register_component_type<Element_comp>();
 
 		_droprates = assets.load<Droprate_conf>("cfg:drops"_aid);
 		INVARIANT(!_droprates->groups.empty(), "Couldn't load drop configuration");
@@ -111,6 +110,7 @@ namespace item {
 								t.position(),
 								0_deg,
 								0.1_m,
+								0.2_m,
 								renderer::Collision_handler::kill,
 								200,
 								100,

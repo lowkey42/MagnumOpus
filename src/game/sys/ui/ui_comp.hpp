@@ -44,7 +44,7 @@ namespace ui {
 			bool _initialized = false;
 
 			std::array<Element_state,4> _elements;
-			float _health = 0;
+			float _health = 0, _health_c=0;
 			int _score = 0;
 			glm::vec3 _offset;
 			glm::vec3 _target_offset;

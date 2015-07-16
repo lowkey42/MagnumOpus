@@ -17,6 +17,7 @@
 
 #include <cstdint>
 #include <initializer_list>
+#include <memory>
 
 namespace mo {
 namespace level {
@@ -91,6 +92,14 @@ namespace level {
 	// TODO: how to map interactions?
 
 }
+}
+
+namespace std {
+	template <> struct hash<mo::level::Elements> {
+		size_t operator()(mo::level::Elements e)const noexcept {
+			return static_cast<size_t>(e.value);
+		}
+	};
 }
 
 #ifdef MO_BUILD_SERIALIZER

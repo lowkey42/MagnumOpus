@@ -31,11 +31,15 @@
         "max_hp": 50
      },
     "Weapon":{
-        "type": "range",
-        "bullet_type": "bullet",
-        "bullet_velocity": 60,
-        "cooldown": 0.8,
-        "recoil": 60
+        "weapon": {
+            "type": "range",
+            "bullet_type": "flame_collider",
+            "bullet_velocity": 10,
+            "cooldown": 0.03,
+            "recoil": 20,
+            "spreading": 30,
+            "effect": "flame_thrower"
+        }
     },
     "Laser_sight": {
         "r": 150,

@@ -176,12 +176,14 @@ namespace mo {
 		  state(em),
 		  controller(em),
 		  ai(em, transform, level),
-		  combat(engine.assets(), em, transform, physics, state),
-	      items(engine.assets(), em, physics, transform, state, particle_renderer),
 		  graphics(em, transform, engine.assets(), particle_renderer, state),
+		  combat(engine.assets(), em, transform, physics, state, graphics.effects),
+	      items(engine.assets(), em, physics, transform, state, particle_renderer),
+	      elements(engine.assets(), em, combat),
 	      soundsys(em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
+
 
 		// TODO[foe]: remove
 				auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);

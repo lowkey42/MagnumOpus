@@ -5,7 +5,7 @@
         "mass": 1.0,
         "restitution": 0.01,
 		"friction": 0.00001,
-        "solid":false
+        "group":4
     },
     "Item": {
         "target": "element",
@@ -13,5 +13,9 @@
         "mod": 0.2,
         "joinable": true
     },
-    "Particle_emiter":{"type":"element_stone"}
+    "Particle_emiter":{
+        "emiters":[
+            {"type":"element_stone", "scale":true, "enabled":true}
+         ]
+    }
 }

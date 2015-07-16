@@ -77,6 +77,14 @@ namespace util {
 			c.pop_back();
 		}
 	}
+	template<typename T>
+	void erase_fast_stable(std::vector<T>& c, const T& v) {
+		auto ne = std::remove(c.begin(), c.end(), v);
+
+		if(ne!=c.end()) {
+			c.erase(ne, c.end());
+		}
+	}
 
 	template< typename ContainerT, typename PredicateT >
 	void erase_if(ContainerT& items, const PredicateT& predicate) {

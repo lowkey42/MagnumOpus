@@ -18,6 +18,8 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
+#include "../../level/elements.hpp"
+#include "../combat/comp/weapon_comp.hpp"
 
 namespace mo {
 	namespace asset {class Asset_manager;}
@@ -26,11 +28,21 @@ namespace mo {
 namespace sys {
 namespace item {
 
-	class Element_system {
+	class Element_system : public combat::Weapon_modifier {
 		public:
 			Element_system(asset::Asset_manager& assets,
 			               ecs::Entity_manager& entity_manager,
-			               renderer::Particle_renderer& particles);
+			               combat::Weapon_modifier_collection& collection);
+			~Element_system();
+
+			void process(ecs::Entity& e, combat::Weapon&) override;
+			void on_attack(ecs::Entity& e, const combat::Weapon&) override;
+
+		private:
+			struct Config;
+
+			std::unique_ptr<Config> _config;
+			std::unordered_map<level::Elements, combat::Weapon> _weapons;
 	};
 
 }

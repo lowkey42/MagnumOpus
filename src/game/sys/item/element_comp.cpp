@@ -72,6 +72,16 @@ namespace item {
 		s.fill = glm::clamp(s.fill + mod, 0.f, 1.f);
 		return true;
 	}
+	bool Element_comp::mod_slots_fill(float mod)noexcept {
+		auto r=false;
+		for(auto i : util::range(element_slots)) {
+			if(_slots[i].active) {
+				r|= mod_slot_fill(i, mod);
+			}
+		}
+
+		return r;
+	}
 	bool Element_comp::add_slot(level::Element e, float fill)noexcept {
 		for(auto& s : _slots) {
 			if((s.element==e || s.fill<=0) && s.fill<1.f) {

@@ -5,6 +5,8 @@
 #include "../physics/physics_comp.hpp"
 
 #include <core/asset/aid.hpp>
+#include <core/utils/random.hpp>
+#include <core/utils/template_utils.hpp>
 
 #include "comp/friend_comp.hpp"
 #include "comp/score_comp.hpp"
@@ -16,20 +18,30 @@ namespace combat {
 	using namespace state;
 	using namespace unit_literals;
 
+	namespace {
+		auto rng = util::create_random_generator();
+
+		Angle random_angle(Angle min_max) {
+			return Angle{util::random_real(rng, remove_unit(-min_max), remove_unit(min_max))};
+		}
+	}
+
 	Combat_system::Combat_system(asset::Asset_manager& assets,
 	                             ecs::Entity_manager& entity_manager,
-								 physics::Transform_system& ts,
-								 physics::Physics_system& physics_system,
-								 state::State_system& state_system)
-		: _em(entity_manager),
-		  _weapons(entity_manager.list<Weapon_comp>()),
-		  _healths(entity_manager.list<Health_comp>()),
-		  _explosives(entity_manager.list<Explosive_comp>()),
+	                             physics::Transform_system& ts,
+	                             physics::Physics_system& physics_system,
+	                             state::State_system& state_system,
+	                             graphic::Effect_factory& effects)
+	    : _em(entity_manager),
+	      _weapons(entity_manager.list<Weapon_comp>()),
+	      _healths(entity_manager.list<Health_comp>()),
+	      _explosives(entity_manager.list<Explosive_comp>()),
 	      _lsights(entity_manager.list<Laser_sight_comp>()),
-		  _ts(ts),
-		  _collision_slot(&Combat_system::_on_collision, this),
-		  _reaper(entity_manager, state_system),
-	      _ray_renderer(assets)
+	      _ts(ts),
+	      _collision_slot(&Combat_system::_on_collision, this),
+	      _reaper(entity_manager, state_system),
+	      _ray_renderer(assets),
+	      _effects(effects)
 	{
 
 		_collision_slot.connect(physics_system.collisions);
@@ -98,6 +110,12 @@ namespace combat {
 
 	void Combat_system::_shoot_something(Time dt) {
 		for(auto& w : _weapons) {
+			auto weapon = w._weapon;
+
+			for(auto& m : _modifiers) {
+				m->process(w.owner(), weapon);
+			}
+
 			if(w._cooldown_left>0_s) {
 				w._cooldown_left = w._cooldown_left-dt;
 				if(w._cooldown_left<0_s)
@@ -110,17 +128,18 @@ namespace combat {
 			bool attack_now = false;
 
 			if(w._attack) {
-				w.owner().get<State_comp>().process([&w](auto& s){
-					if(w.weapon_type()==combat::Weapon_type::melee)
+				_effects.inform(w.owner(), weapon.effect);
+				w.owner().get<State_comp>().process([&](auto& s){
+					if(weapon.type==combat::Weapon_type::melee)
 						s.state(Entity_state::attacking_melee);
 					else
 						s.state(Entity_state::attacking_range);
 				});
 
-				if(w._attack_delay==0_s)
+				if(weapon.attack_delay==0_s)
 					attack_now = true;
 				else if(w._attack_delay_left<=0_s)
-					w._attack_delay_left = w._attack_delay;
+					w._attack_delay_left = weapon.attack_delay;
 
 				w._attack = false;
 			}
@@ -134,6 +153,9 @@ namespace combat {
 			}
 
 			if(attack_now) {
+				// TODO: play sound
+				on_attack(w.owner(), weapon);
+
 				auto& transform = w.owner().get<physics::Transform_comp>().get_or_throw();
 				auto position = transform.position();
 				auto rotation = transform.rotation();
@@ -143,39 +165,42 @@ namespace combat {
 
 				auto group = w.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
 
-				switch(w._type) {
+				switch(weapon.type) {
 					case Weapon_type::melee:
-						_ts.foreach_in_range(position, rotation, w._melee_range,
-											 w._melee_range, w._melee_angle, w._melee_angle,
-						                     [&](ecs::Entity& t){
+						_ts.foreach_in_range(position, rotation, weapon.melee_range,
+						                     weapon.melee_range, weapon.melee_angle,
+						                     weapon.melee_angle,
+						                     [&](ecs::Entity& t) {
 							if(&t!=&w.owner()) {
-								_deal_damage(t, group, w._melee_damage);
+								_deal_damage(t, group, weapon.melee_damage);
 							}
 						});
 						break;
 
 					case Weapon_type::range:
-						if(w._bullet_type) {
-							physics.impulse(rotate(glm::vec2(-1,0), rotation) * w._recoil);
-							auto bullet = _em.emplace(w._bullet_type);
+						if(weapon.bullet_type) {
+							physics.impulse(rotate(glm::vec2(-1,0), rotation) * weapon.recoil);
+							auto bullet = _em.emplace(weapon.bullet_type);
 							bullet->get<Friend_comp>().process([&](auto& f) {
 								f.group(group);
 							});
 
+							auto bullet_rot = rotation + random_angle(weapon.spreading);
+
 							auto& bullet_phys = bullet->get<physics::Physics_comp>().get_or_throw();
 							auto bullet_radius = bullet_phys.radius();
 
-							bullet_phys.velocity(physics.velocity() + rotate(Velocity{w._bullet_vel,0}, rotation));
+							bullet_phys.velocity(physics.velocity() + rotate(Velocity{weapon.bullet_vel,0}, bullet_rot));
 
 							bullet->get<physics::Transform_comp>().process([&](auto& t){
-								t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, rotation));
-								t.rotation(rotation);
+								t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, bullet_rot));
+								t.rotation(bullet_rot);
 							});
 						}
 						break;
 				}
 
-				w._cooldown_left = w._cooldown;
+				w._cooldown_left = weapon.cooldown;
 			}
 		}
 	}

@@ -30,6 +30,8 @@
 #include "comp/health_comp.hpp"
 #include "comp/explosive_comp.hpp"
 
+#include "../graphic/effects.hpp"
+
 namespace mo {
 	namespace asset {class Asset_manager;}
 	namespace renderer {class Particle_renderer;}
@@ -37,13 +39,14 @@ namespace mo {
 namespace sys {
 namespace combat {
 
-	class Combat_system {
+	class Combat_system : public Weapon_modifier_collection {
 		public:
 			Combat_system(asset::Asset_manager& assets,
 			              ecs::Entity_manager& entity_manager,
-						  physics::Transform_system& transform_system,
-						  physics::Physics_system& physics_system,
-						  state::State_system& state_system);
+			              physics::Transform_system& transform_system,
+			              physics::Physics_system& physics_system,
+			              state::State_system& state_system,
+			              graphic::Effect_factory& effects);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& cam);
@@ -58,15 +61,16 @@ namespace combat {
 
 			void _on_collision(physics::Manifold& m);
 
-			ecs::Entity_manager&  _em;
-			Weapon_comp::Pool& _weapons;
-			Health_comp::Pool& _healths;
-			Explosive_comp::Pool& _explosives;
-			Laser_sight_comp::Pool& _lsights;
-			physics::Transform_system& _ts;
+			ecs::Entity_manager&           _em;
+			Weapon_comp::Pool&             _weapons;
+			Health_comp::Pool&             _healths;
+			Explosive_comp::Pool&          _explosives;
+			Laser_sight_comp::Pool&        _lsights;
+			physics::Transform_system&     _ts;
 			util::slot<physics::Manifold&> _collision_slot;
-			Reaper_subsystem _reaper;
-			renderer::Ray_renderer _ray_renderer;
+			Reaper_subsystem               _reaper;
+			renderer::Ray_renderer         _ray_renderer;
+			graphic::Effect_source         _effects;
 	};
 
 }

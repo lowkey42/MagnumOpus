@@ -25,7 +25,7 @@ namespace physics{
 		float max_active_velocity;
 		float active_acceleration;
 
-		bool solid;
+		uint8_t group;
 
 		DFloatS velocity;
 		DFloatS acceleration;
@@ -37,7 +37,7 @@ namespace physics{
 			friction(c._friction),
 			max_active_velocity(glm::sqrt(c._max_active_velocity2.value()) / (1_km/hour).value()),
 			active_acceleration(c._active_acceleration.value()),
-			solid(c._solid),
+			group(c._group),
 			velocity(DFloatS{c._velocity.x.value(), c._velocity.y.value()}),
 			acceleration(DFloatS{c._acceleration.x.value(), c._acceleration.y.value()}) {
 		}
@@ -50,7 +50,7 @@ namespace physics{
 		sf2_member(friction),
 		sf2_member(max_active_velocity),
 		sf2_member(active_acceleration),
-		sf2_member(solid),
+		sf2_member(group),
 		sf2_member(velocity),
 		sf2_member(acceleration)
 	)
@@ -65,7 +65,7 @@ namespace physics{
 		_max_active_velocity2 = Speed((s.max_active_velocity * (1_km/hour).value()) *
 								 (s.max_active_velocity * (1_km/hour).value()));
 		_active_acceleration = Speed_per_time(s.active_acceleration),
-		_solid = s.solid;
+		_group = s.group;
 		_velocity = {Speed(s.velocity.x), Speed(s.velocity.y)};
 		_acceleration = {Speed_per_time(s.acceleration.x), Speed_per_time(s.acceleration.y)};
 		_active = true;
@@ -77,13 +77,13 @@ namespace physics{
 
 
 	Physics_comp::Physics_comp(ecs::Entity& owner, Distance body_radius,
-				Mass mass, float restitution, float friction, bool solid) noexcept
+				Mass mass, float restitution, float friction, uint8_t group) noexcept
 		: Component(owner),
 		  _body_radius(body_radius),
 		  _inv_mass(1.f/mass),
 		  _restitution(restitution),
 		  _friction(friction),
-		  _solid(solid),
+		  _group(group),
 		  _active(true) {}
 
 	void Physics_comp::accelerate_active(glm::vec2 dir)noexcept {

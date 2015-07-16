@@ -29,6 +29,9 @@ namespace util {
 	class signal_source {
 		friend class slot<ET...>;
 		public:
+			signal_source() = default;
+			signal_source(slot<ET...>& s);
+
 			void inform(ET... e) {
 				for(auto&& s : _slots)
 					if(s->func)
@@ -78,6 +81,12 @@ namespace util {
 			const std::function<void(ET...)> func;
 			std::vector<signal_source<ET...>*> connections;
 	};
+
+
+	template<typename... ET>
+	signal_source<ET...>::signal_source(slot<ET...>& s) {
+		s.connect(*this);
+	}
 
 }
 }

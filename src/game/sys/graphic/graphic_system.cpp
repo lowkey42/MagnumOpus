@@ -9,6 +9,7 @@ namespace mo {
 namespace sys {
 namespace graphic {
 
+	using namespace renderer;
 	using namespace unit_literals;
 
 	Graphic_system::Graphic_system(
@@ -17,7 +18,8 @@ namespace graphic {
 	        asset::Asset_manager& asset_manager,
 	        renderer::Particle_renderer& particle_renderer,
 	        state::State_system& state_system) noexcept
-		: _assets(asset_manager),
+		: effects(&Graphic_system::add_effect, this),
+	      _assets(asset_manager),
 	      _particle_renderer(particle_renderer),
 	      _transform(ts),
 	      _sprite_batch(asset_manager),
@@ -29,6 +31,31 @@ namespace graphic {
 
 		entity_manager.register_component_type<Sprite_comp>();
 		entity_manager.register_component_type<Particle_emiter_comp>();
+	}
+
+
+	void Graphic_system::add_effect(ecs::Entity& entity, Effect_type type) {
+		auto emiter_m = entity.get<Particle_emiter_comp>();
+		auto& emiter = emiter_m.is_some() ? emiter_m.get_or_throw()
+		                                  : entity.emplace<Particle_emiter_comp>();
+
+		for(auto i : util::range(Particle_emiter_comp::max_emiters)) {
+			auto& e = emiter._emiters[i];
+			if(e._type==type) {
+				emiter.particle_type(i, type, false);
+				emiter.enabled(i, true, true);
+				return;
+			}
+		}
+
+		for(auto i : util::range(Particle_emiter_comp::max_emiters)) {
+			auto& e = emiter._emiters[i];
+			if(!e._enabled) {
+				emiter.particle_type(i, type, false);
+				emiter.enabled(i, true, true);
+				return;
+			}
+		}
 	}
 
 	void Graphic_system::draw(const renderer::Camera& camera) noexcept{
@@ -60,96 +87,207 @@ namespace graphic {
 		}
 
 		for(auto& p : _particles) {
-			if(!p.enabled())
-				continue;
+			int i = -1;
+			for(auto& e : p._emiters) {
+				i++;
+				if(!e._enabled)
+					continue;
 
-			p._create_emiter(_particle_renderer, _assets);
-			if(!p._emiter)
-				continue;
+				_create_emiter(e);
+				if(!e._emiter)
+					continue;
 
-			auto transform = p.owner().get<physics::Transform_comp>();
-			transform.process([&](auto& t) {
-				p._emiter->update_center(t.position(), t.rotation());
-			});
+				auto transform = p.owner().get<physics::Transform_comp>();
+				auto physics = p.owner().get<physics::Physics_comp>();
 
-			auto physics = p.owner().get<physics::Physics_comp>();
-			physics.process([&](auto& phys){
-				p.scale(phys.radius());
-			});
+				transform.process([&](auto& t) {
+					auto vel = physics.process(Velocity{0,0}, [](auto& p){return p.velocity();});
+					e._emiter->update_center(t.position(), t.rotation(), vel);
+				});
+
+				if(e._scale) {
+					physics.process([&](auto& phys){
+						p.scale(i, phys.radius());
+					});
+				}
+
+				if(e._temporary) {
+					if(e._to_be_disabled)
+						p.enabled(i, false);
+					else
+						e._to_be_disabled = true;
+				}
+			}
+		}
+	}
+
+	namespace {
+		Particle_emiter_ptr create_orb_emiter(Texture_ptr tex,
+		                                      Particle_renderer& particle_renderer) {
+			if(tex) {
+				return particle_renderer.create_emiter(
+						{0_m,0_m},
+						0_deg,
+						0.5_m,
+						0_m,
+						renderer::Collision_handler::none,
+						100,
+						200,
+						0.5_s, 0.8_s,
+						util::scerp<Angle>(0_deg, 0_deg),
+						util::scerp<Angle>(0_deg, 0_deg),
+						util::lerp<Speed_per_time>(8_m/second_2, 0_m/second_2),
+						util::lerp<Angle_acceleration>(3000_deg/second_2, 0_deg/second_2),
+						util::lerp<glm::vec4>({0.6,0.6,0.6,0}, {0,0,0,0.0}),
+						util::lerp<Position>({25_cm, 25_cm}, {60_cm, 60_cm}, {2_cm, 2_cm}),
+						util::scerp<int8_t>(0),
+						tex
+				);
+			}
+
+			return {};
+		}
+
+		Texture_ptr load_tex(asset::Asset_manager& a, std::string tex_name) {
+			return a.load<renderer::Texture>(asset::AID(
+					asset::Asset_type::tex, std::move(tex_name)));
+		}
+	}
+
+	void Graphic_system::_create_emiter(Particle_emiter_comp::Emiter& e) {
+		if(!e._emiter && e._enabled) {
+			switch(e._type) {
+				case Effect_type::none:
+					e._enabled = false;
+					return;
+
+				case Effect_type::element_fire:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_fire"),
+					                              _particle_renderer);
+					break;
+				case Effect_type::element_frost:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_frost"),
+					                              _particle_renderer);
+					break;
+				case Effect_type::element_water:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_water"),
+					                              _particle_renderer);
+					break;
+				case Effect_type::element_stone:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_stone"),
+					                              _particle_renderer);
+					break;
+				case Effect_type::element_gas:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_gas"),
+					                              _particle_renderer);
+					break;
+				case Effect_type::element_lightning:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_lightning"),
+					                              _particle_renderer);
+					break;
+				case Effect_type::health:
+					e._emiter = create_orb_emiter(load_tex(_assets,"particle_health"),
+					                              _particle_renderer);
+					break;
+
+				case Effect_type::flame_thrower:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.01_m,
+							0.55_m,
+							renderer::Collision_handler::bounce,
+							400,
+							500,
+							1.0_s, 1.2_s,
+							util::scerp<Angle>(0_deg, 15_deg),
+							util::scerp<Angle>(0_deg, 0_deg),
+							util::lerp<Speed_per_time>(10_m/second_2, 0_m/second_2),
+							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+							util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.5}),
+							util::lerp<Position>({20_cm, 20_cm}, {100_cm, 100_cm}, {10_cm, 10_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets,"particle_fire")
+					);
+					break;
+
+					// TODO
+			}
 		}
 	}
 
 	void Graphic_system::_on_state_change(ecs::Entity& entity, state::State_data& data){
 
-		bool toRepeat = false;
-		renderer::Animation_type type;
+		entity.get<Sprite_comp>().process([&](Sprite_comp& sprite) {
+			bool toRepeat = false;
+			renderer::Animation_type type;
 
-		// Map Entity-State to Animation-Type
-		switch(data.s){
-			case state::Entity_state::idle:
-				type = renderer::Animation_type::idle;
-				toRepeat = true;
-				break;
-			case state::Entity_state::walking:
-				type = renderer::Animation_type::walking;
-				toRepeat = true;
-				break;
-			case state::Entity_state::attacking_melee:
-				type = renderer::Animation_type::attacking_melee;
-				toRepeat = false;
-				break;
-			case state::Entity_state::attacking_range:
-				type = renderer::Animation_type::attacking_range;
-				toRepeat = true;
-				break;
-			case state::Entity_state::change_weapon:
-				type = renderer::Animation_type::change_weapon;
-				toRepeat = false;
-				break;
-			case state::Entity_state::taking:
-				type = renderer::Animation_type::taking;
-				toRepeat = false;
-				break;
-			case state::Entity_state::interacting:
-				type = renderer::Animation_type::interacting;
-				toRepeat = false;
-				break;
-			case state::Entity_state::damaged:
-				type = renderer::Animation_type::damaged;
-				toRepeat = false;
-				break;
-			case state::Entity_state::healed:
-				type = renderer::Animation_type::healed;
-				toRepeat = false;
-				break;
-			case state::Entity_state::dead:
-				type = renderer::Animation_type::died;
-				toRepeat = true;
-				break;
-			case state::Entity_state::dying:
-				type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
-				toRepeat = false;
-				break;
-			case state::Entity_state::resurrected:
-				type = renderer::Animation_type::resurrected;
-				toRepeat = false;
-				break;
-			default:
-				type = renderer::Animation_type::idle;
-				toRepeat = false;
-				break;
-		}
+			// Map Entity-State to Animation-Type
+			switch(data.s){
+				case state::Entity_state::idle:
+					type = renderer::Animation_type::idle;
+					toRepeat = true;
+					break;
+				case state::Entity_state::walking:
+					type = renderer::Animation_type::walking;
+					toRepeat = true;
+					break;
+				case state::Entity_state::attacking_melee:
+					type = renderer::Animation_type::attacking_melee;
+					toRepeat = false;
+					break;
+				case state::Entity_state::attacking_range:
+					type = renderer::Animation_type::attacking_range;
+					toRepeat = true;
+					break;
+				case state::Entity_state::change_weapon:
+					type = renderer::Animation_type::change_weapon;
+					toRepeat = false;
+					break;
+				case state::Entity_state::taking:
+					type = renderer::Animation_type::taking;
+					toRepeat = false;
+					break;
+				case state::Entity_state::interacting:
+					type = renderer::Animation_type::interacting;
+					toRepeat = false;
+					break;
+				case state::Entity_state::damaged:
+					type = renderer::Animation_type::damaged;
+					toRepeat = false;
+					break;
+				case state::Entity_state::healed:
+					type = renderer::Animation_type::healed;
+					toRepeat = false;
+					break;
+				case state::Entity_state::dead:
+					type = renderer::Animation_type::died;
+					toRepeat = true;
+					break;
+				case state::Entity_state::dying:
+					type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
+					toRepeat = false;
+					break;
+				case state::Entity_state::resurrected:
+					type = renderer::Animation_type::resurrected;
+					toRepeat = false;
+					break;
+				default:
+					type = renderer::Animation_type::idle;
+					toRepeat = false;
+					break;
+			}
 
-		// applying new animation type
-		Sprite_comp& sprite = entity.get<Sprite_comp>().get_or_throw();
-		sprite._repeat_animation = toRepeat;
-		sprite.animation_type(type);
+			// applying new animation type
+			sprite._repeat_animation = toRepeat;
+			sprite.animation_type(type);
 
-		// applying magnitude
-		sprite.animation()->modulation(type, data.magnitude);
+			// applying magnitude
+			sprite.animation()->modulation(type, data.magnitude);
 
-		// calculating remaining time for current animation and inform state_comp about it
-		data.min_time(sprite.animation()->remaining_time(sprite.animation_type(), sprite.current_frame()));
+			// calculating remaining time for current animation and inform state_comp about it
+			data.min_time(sprite.animation()->remaining_time(sprite.animation_type(), sprite.current_frame()));
+		});
 	}
 
 }

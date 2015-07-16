@@ -34,6 +34,7 @@
 #include "sys/ai/ai_system.hpp"
 #include "sys/combat/combat_system.hpp"
 #include "sys/item/item_system.hpp"
+#include "sys/item/element_system.hpp"
 #include "sys/state/state_system.hpp"
 #include "sys/ui/ui_system.hpp"
 
@@ -68,9 +69,10 @@ namespace mo {
 		sys::state::State_system state;
 		sys::controller::Controller_system controller;
 		sys::ai::Ai_system ai;
+		sys::graphic::Graphic_system graphics;
 		sys::combat::Combat_system combat;
 		sys::item::Item_system items;
-		sys::graphic::Graphic_system graphics;
+		sys::item::Element_system elements;
 		sys::sound::Sound_system soundsys;
 		sys::ui::Ui_system ui;
 

@@ -30,12 +30,14 @@
         "max_hp": 20
      },
     "Weapon":{
-        "type": "range",
-        "bullet_type": "vomit_bullet",
-        "bullet_velocity": 30,
-        "cooldown": 0.5,
-        "recoil": 60,
-        "attack_delay": 0.5
+        "weapon": {
+            "type": "range",
+            "bullet_type": "vomit_bullet",
+            "bullet_velocity": 30,
+            "cooldown": 0.5,
+            "recoil": 60,
+            "attack_delay": 0.5
+        }
     },
     "Drop":{"group":2}
 }

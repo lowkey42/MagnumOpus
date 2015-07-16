@@ -147,6 +147,7 @@ namespace ui {
 				}
 
 				hud._health = current_health;
+				hud._health_c = current_health;
 				hud._score = current_score;
 
 				auto offset = calc_offset(i);
@@ -155,7 +156,7 @@ namespace ui {
 
 			} else {
 				auto lerp = [dt](auto& a, auto b) {
-					auto t = glm::clamp(gui_delay_inv * dt.value(), 0.01f, 1.f);
+					auto t = glm::clamp(gui_delay_inv * dt.value(), 0.01f, 1.f) * 0.5f;
 
 					a = a*(1-t) + b*t;
 				};
@@ -169,6 +170,7 @@ namespace ui {
 				}
 
 				lerp(hud._health, current_health);
+				hud._health_c = current_health;
 				hud._score = current_score;
 				lerp(hud._offset, hud._target_offset);
 			}
@@ -235,7 +237,8 @@ namespace ui {
 		_hud_health_tex->bind();
 		for(auto& hud : _ui_comps) {
 			_health_shader.set_uniform("mvp", hud._mvp)
-			              .set_uniform("health", hud._health);
+			              .set_uniform("health", hud._health_c)
+			              .set_uniform("health_anim", hud._health);
 
 			_hud.draw();
 		}

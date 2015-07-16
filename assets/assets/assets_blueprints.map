@@ -15,3 +15,6 @@ blueprint:element_water = blueprints/element_water.json
 blueprint:element_stone = blueprints/element_stone.json
 blueprint:element_gas = blueprints/element_gas.json
 blueprint:element_lightning = blueprints/element_lightning.json
+
+
+blueprint:flame_collider = blueprints/flame_collider.json

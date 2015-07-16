@@ -40,7 +40,7 @@ namespace physics {
 			Physics_comp(ecs::Entity& owner,
 						 Distance body_radius=Distance(1),
 						 Mass mass=Mass(1), float restitution=1,
-						 float friction=1, bool solid=true) noexcept;
+						 float friction=1, uint8_t group=1) noexcept;
 
 			void accelerate_active(glm::vec2 dir)noexcept;
 			void accelerate(Acceleration acc)noexcept;
@@ -74,7 +74,7 @@ namespace physics {
 			Speed _max_active_velocity2 = Speed(0);
 			Speed_per_time _active_acceleration = Speed_per_time(0);
 
-			bool _solid;
+			uint8_t _group;
 			bool _active;
 
 			Velocity _velocity;

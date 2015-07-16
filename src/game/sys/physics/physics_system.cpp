@@ -211,7 +211,7 @@ namespace physics {
 		auto inv_mass_sum = m.a->_inv_mass;
 
 		if(m.is_with_object()) {
-			if(m.a->_solid!=m.b.comp->_solid)
+			if((m.a->_group & m.b.comp->_group) == 0)
 				return;
 
 			relVel+=m.b.comp->_velocity;

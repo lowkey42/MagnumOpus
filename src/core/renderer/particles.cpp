@@ -61,14 +61,16 @@ namespace renderer {
 		}
 	}
 
-	Particle::Particle(glm::vec2 pos, float rot, float ttl, uint16_t seed)
-	    : seed(seed), position(pos), color{0}, size{0}, orientation{rot}, frame{0},
+	Particle::Particle(glm::vec2 pos, glm::vec2 velocity, float rot, float ttl, uint16_t seed)
+	    : seed(seed), position(pos), initial_velocity(velocity),
+	      color{0}, size{0}, orientation{rot}, frame{0},
 	      velocity{0}, angular_velocity{0}, time_to_live(ttl), max_age(ttl)
 	{
 	}
 
 	Particle_emiter::Particle_emiter(
 	        Position center, Angle orientation, Distance radius,
+	        Distance offset,
 	        Collision_handler collision_handler,
 	        float spawn_rate, std::size_t max_particles,
 	        Time min_ttl, Time max_ttl,
@@ -81,8 +83,8 @@ namespace renderer {
 	        util::Xerp<int8_t> frame,
 	        Texture_ptr texture,
 	        bool reverse)
-	    : _center(center), _orientation(orientation), _radius(radius), _spawn_rate(spawn_rate),
-	      _collision_handler(collision_handler),
+	    : _center(center), _orientation(orientation), _radius(radius), _offset(offset),
+	      _spawn_rate(spawn_rate), _collision_handler(collision_handler),
 	      _min_ttl(min_ttl), _max_ttl(max_ttl), _max_particles(max_particles), _reverse(reverse),
 	      _frame(frame), _direction(direction), _rotation_offset(rotation_offset),
 	      _acceleration(acceleration), _angular_acceleration(angular_acceleration),
@@ -93,9 +95,11 @@ namespace renderer {
 		_bottom_right = _top_left = remove_units(_center);
 	}
 
-	void Particle_emiter::update_center(Position center, Angle orientation) {
+	void Particle_emiter::update_center(Position center, Angle orientation, Velocity velocity) {
 		_center = center;
 		_orientation = normalize(orientation);
+		_velocity = velocity;
+		update_bounds(remove_units(center));
 	}
 
 	void Particle_emiter::update(bool active, Time dt, Environment_callback& env) {
@@ -118,8 +122,10 @@ namespace renderer {
 		for(std::size_t i=0; i<to_spawn; ++i) {
 			auto seed = next_pseed();
 
-			auto start = remove_units(_center)+rand_point(_radius.value());
+			auto start = remove_units(_center+rotate(Position{_offset,0_m}, _orientation))
+			             + rand_point(_radius.value());
 			auto dir = normalize(_direction(0, seed) + _orientation).value();
+
 			auto ttl = random_int(rng, _min_ttl, _max_ttl).value();
 
 			if(_reverse) {
@@ -149,6 +155,7 @@ namespace renderer {
 
 			_particles.emplace_back(
 				start,
+				remove_units(_velocity),
 				dir,
 				ttl, seed);
 		}
@@ -215,9 +222,9 @@ namespace renderer {
 					dv.y=-dv.y;
 				}
 
-				auto np = p.position+ dv*p.velocity * (1/30.f);
-				if(env.check_collision(np.x+0.5f, y+0.5f))
-					return false;
+				//auto np = p.position+ dv*p.velocity * (1/30.f);
+				//if(env.check_collision(np.x+0.5f, y+0.5f))
+				//	return false;
 
 				p.orientation = glm::atan(dv.y, dv.x);
 
@@ -235,24 +242,25 @@ namespace renderer {
 
 		auto r = p.velocity * dt;
 		p.position += r*glm::vec2{glm::cos(p.orientation), glm::sin(p.orientation)};
+		p.position += p.initial_velocity * dt;
 
-		update_bounds(p);
+		update_bounds(p.position);
 
 		p.time_to_live=glm::max(p.time_to_live-dt, 0.f);
 		return p.time_to_live>0;
 	}
-	void Particle_emiter::update_bounds(const Particle& p) {
-		if(p.position.x<_top_left.x)
-			_top_left.x = p.position.x;
+	void Particle_emiter::update_bounds(glm::vec2 p) {
+		if(p.x<_top_left.x)
+			_top_left.x = p.x;
 
-		if(p.position.y<_top_left.y)
-			_top_left.y = p.position.y;
+		if(p.y<_top_left.y)
+			_top_left.y = p.y;
 
-		if(p.position.x>_bottom_right.x)
-			_bottom_right.x = p.position.x;
+		if(p.x>_bottom_right.x)
+			_bottom_right.x = p.x;
 
-		if(p.position.y>_bottom_right.y)
-			_bottom_right.y = p.position.y;
+		if(p.y>_bottom_right.y)
+			_bottom_right.y = p.y;
 	}
 
 	void Particle_emiter::draw(Shader_program& prog) {
