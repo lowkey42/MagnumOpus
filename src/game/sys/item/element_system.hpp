@@ -38,11 +38,11 @@ namespace item {
 			void process(ecs::Entity& e, combat::Weapon&) override;
 			void on_attack(ecs::Entity& e, const combat::Weapon&) override;
 
-		private:
+
 			struct Config;
 
-			std::unique_ptr<Config> _config;
-			std::unordered_map<level::Elements, combat::Weapon> _weapons;
+		private:
+			std::shared_ptr<const Config> _config;
 	};
 
 }

@@ -70,6 +70,9 @@ namespace item {
 			return false;
 
 		s.fill = glm::clamp(s.fill + mod, 0.f, 1.f);
+		if(s.fill<=0)
+			s.active = false;
+
 		return true;
 	}
 	bool Element_comp::mod_slots_fill(float mod)noexcept {

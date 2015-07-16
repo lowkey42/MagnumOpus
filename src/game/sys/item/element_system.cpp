@@ -1,53 +1,131 @@
+#define MO_BUILD_SERIALIZER
 #include "element_system.hpp"
 
 #include "element_comp.hpp"
+#include "../combat/comp/weapon_comp.hpp"
+
+#include <core/asset/asset_manager.hpp>
+#include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
 
 #include <vector>
+
 
 namespace mo {
 namespace sys {
 namespace item {
 
+	using namespace level;
+
 	namespace {
 
+		struct Config_data {
+			std::map<std::vector<Element>, combat::Weapon::Persisted_state> weapons;
+		};
+		sf2_structDef(Config_data,
+			sf2_member(weapons)
+		)
 	}
 
+	using Reaction_table = std::unordered_map<Elements, combat::Weapon>;
+
 	struct Element_system::Config {
-		float per_use = 0.1f;
+		Reaction_table weapons;
 	};
+
+}
+}
+}
+
+namespace mo {
+namespace asset {
+	using Type = sys::item::Element_system::Config;
+
+	template<>
+	struct Loader<Type> {
+		using RT = std::shared_ptr<Type>;
+
+		static RT load(istream in) throw(Loading_failed) {
+			auto r = std::make_shared<Type>();
+
+			sys::item::Config_data data;
+			sf2::parseStream(in, data);
+
+			for(auto& rec : data.weapons) {
+				r->weapons.emplace(rec.first, rec.second.to_weapon());
+			}
+
+			return r;
+		}
+
+		static void store(ostream out, const Type& asset) throw(Loading_failed) {
+			//sf2::writeStream(out,asset);
+			INVARIANT(false, "NOT IMPLEMENTED");
+		}
+	};
+}
+}
+
+namespace mo {
+namespace sys {
+namespace item {
 
 	Element_system::Element_system(
 	        asset::Asset_manager& assets,
 	        ecs::Entity_manager& entity_manager,
 	        combat::Weapon_modifier_collection& collection)
-	    : combat::Weapon_modifier(collection, 50), _config(std::make_unique<Config>()) {
+	    : combat::Weapon_modifier(collection, 50) {
 
 		entity_manager.register_component_type<Element_comp>();
 
-		// TODO: load _weapons
+		_config = assets.load<Element_system::Config>("cfg:element_interactions"_aid);
 	}
 	Element_system::~Element_system() = default;
 
+	namespace {
+		auto lookup_reaction(Elements elements,
+		                     const Reaction_table& reactions) -> util::maybe<const combat::Weapon&> {
+			if(!elements)
+				return util::nothing();
+
+			auto rec = reactions.find(elements);
+			if(rec!=reactions.end()) {
+				return util::just(rec->second);
+
+			} else {
+				for(auto e : elements) {
+					auto r = lookup_reaction(elements.without(e), reactions);
+					if(r.is_some())
+						return r;
+				}
+			}
+
+			return util::nothing();
+		}
+	}
+
 	void Element_system::process(ecs::Entity& e, combat::Weapon& w) {
 		e.get<Element_comp>().process([&](Element_comp& elem) {
-			std::vector<level::Element> elements;
-			elements.reserve(element_slots);
+			std::vector<level::Element> elements_vec;
+			elements_vec.reserve(element_slots);
 
 			for(auto i : util::range(element_slots)) {
 				auto& slot = elem.slot(i);
 				if(slot.active) {
-					elements.push_back(slot.element);
+					elements_vec.push_back(slot.element);
 				}
 			}
+			const auto& reactions = _config->weapons;
 
-			// TODO: lookup elements and mod w
-
+			lookup_reaction(elements_vec, reactions).process([&w](auto& nw){
+				w = nw;
+			});
 		});
 	}
 
-	void Element_system::on_attack(ecs::Entity& e, const combat::Weapon&) {
+	void Element_system::on_attack(ecs::Entity& e, const combat::Weapon& w) {
 		e.get<Element_comp>().process([&](Element_comp& elem) {
-			elem.mod_slots_fill(-_config->per_use);
+			elem.mod_slots_fill(-w.fuel_usage);
 		});
 	}
 

@@ -70,6 +70,8 @@ namespace combat {
 
 		Force       recoil        = Force(0);
 
+		float       fuel_usage    = 1.f;
+
 		struct Persisted_state;
 	};
 
@@ -140,20 +142,23 @@ namespace combat {
 		Weapon_type type;
 		std::string bullet_type;
 		float bullet_velocity;
-		float spreading;
+		float spreading = 0;
 
-		Effect_type effect;
+		Effect_type effect = Effect_type::none;
 		std::string sound;
 
-		float melee_damage;
-		float melee_range;
-		float melee_angle;
+		float melee_damage = 0;
+		float melee_range = 1;
+		float melee_angle = 90;
 
-		float attack_delay;
-		float cooldown;
+		float attack_delay = 0;
+		float cooldown = 1;
 
-		float recoil;
+		float recoil = 0;
 
+		float fuel_usage = 0.f;
+
+		Persisted_state() = default;
 		Persisted_state(const Weapon& c)
 		    : type(c.type),
 		      bullet_type(c.bullet_type ? c.bullet_type.name() : ""),
@@ -164,7 +169,8 @@ namespace combat {
 		      melee_angle(c.melee_angle / (1_deg).value()),
 		      attack_delay(c.attack_delay.value()),
 		      cooldown(c.cooldown.value()),
-		      recoil(c.recoil.value()) {}
+		      recoil(c.recoil.value()),
+		      fuel_usage(c.fuel_usage) {}
 
 		auto to_weapon()const noexcept -> Weapon {
 			return {
@@ -181,7 +187,8 @@ namespace combat {
 				melee_angle * 1_deg,
 				attack_delay * 1_s,
 				cooldown * 1_s,
-				recoil * 1_n
+				recoil * 1_n,
+				fuel_usage
 			};
 		}
 	};
@@ -200,7 +207,8 @@ namespace combat {
 		sf2_member(melee_range),
 		sf2_member(melee_angle),
 		sf2_member(attack_delay),
-		sf2_member(recoil)
+		sf2_member(recoil),
+		sf2_member(fuel_usage)
 	)
 }
 }

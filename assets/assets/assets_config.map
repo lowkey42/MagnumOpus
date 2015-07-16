@@ -3,3 +3,4 @@ cfg:dungeons = rooms/dungeons.json
 cfg:graphics = graphics-cfg.json
 cfg:sounds = sounds-cfg.json
 cfg:drops  = drops-cfg.json
+cfg:element_interactions = elements-cfg.json

@@ -18,6 +18,7 @@
 #include <cstdint>
 #include <initializer_list>
 #include <memory>
+#include <iterator>
 
 namespace mo {
 namespace level {
@@ -38,9 +39,31 @@ namespace level {
 		return e!=Element::neutral ? 1<<(static_cast<uint16_t>(e)-1) : 0;
 	}
 
+	struct Elements;
+	class Elements_iterator
+	        : std::iterator<std::forward_iterator_tag, const Element> {
+
+		public:
+			Elements_iterator(const Elements& e, std::size_t i);
+
+			auto operator*() const -> const Element&;
+			auto operator->() const -> const Element*;
+
+			auto operator++() -> Elements_iterator&;
+			auto operator++(int) -> Elements_iterator;
+
+			bool operator==(const Elements_iterator& rhs);
+			bool operator!=(const Elements_iterator& rhs);
+
+		private:
+			const Elements* e;
+			Element i;
+	};
+
 	struct Elements {
 		uint16_t value; //< Bitmask of Element
 		Elements():value(0){};
+		Elements(uint16_t v):value(v){};
 		Elements(Element e):value(mask(e)){};
 		template<typename Range>
 		Elements(const Range& r):value(0) {
@@ -56,6 +79,17 @@ namespace level {
 		}
 		void operator|=(Element e)noexcept {
 			value|=mask(e);
+		}
+
+		auto without(Element e)const noexcept {
+			return Elements{static_cast<uint16_t>(value & ~mask(e))};
+		}
+
+		bool operator==(Elements rhs)const noexcept {
+			return value==rhs.value;
+		}
+		bool operator!=(Elements rhs)const noexcept {
+			return !(*this==rhs);
 		}
 
 		std::size_t size()const noexcept {
@@ -87,9 +121,14 @@ namespace level {
 
 			return Element::neutral;
 		}
-	};
 
-	// TODO: how to map interactions?
+		auto begin()const -> Elements_iterator {
+			return {*this, 0};
+		}
+		auto end()const -> Elements_iterator {
+			return {*this, element_count};
+		}
+	};
 
 }
 }
