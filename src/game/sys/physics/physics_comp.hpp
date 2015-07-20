@@ -74,7 +74,8 @@ namespace physics {
 			Speed _max_active_velocity2 = Speed(0);
 			Speed_per_time _active_acceleration = Speed_per_time(0);
 
-			uint8_t _group;
+			uint8_t _group = 1;
+			uint8_t _group_exclude = 0;
 			bool _active;
 
 			Velocity _velocity;

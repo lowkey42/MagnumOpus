@@ -189,6 +189,9 @@ namespace physics {
 	}
 
 	auto Physics_system::_check_collision(Physics_comp& a, Physics_comp& b) -> util::maybe<Manifold> {
+		if(a._group_exclude & b._group_exclude)
+			return util::nothing();
+
 		auto diff = remove_units(a.owner().get<Transform_comp>().get_or_throw().position() - b.owner().get<Transform_comp>().get_or_throw().position());
 		auto rs = (a.radius()+b.radius()).value();
 		auto dist_sqr = (diff.x*diff.x + diff.y*diff.y);

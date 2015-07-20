@@ -1,26 +1,26 @@
 {
     "Transform":{"layer":0.5},
 	"Physics":{
-        "radius": 0.01,
+        "radius": 0.1,
         "mass": 10,
         "restitution": 0.9,
-		"friction": 0.0001,
-        "group_exclude": 8,
-        "group": 1
+		"friction": 0.0001
     },
     "Explosive": {
-        "damage": 2,
-        "range": 1,
+        "damage": 5,
+        "range": 2,
         "delay":0,
         "on_contact": true,
-        "blast_force": 10,
-        "explode_after": 1.0
+        "blast_force": 100
     },
     "Friend",
     "State": {
         "delete_dead":true
     },
     "Sprite": {
-        "aid": "anim:bullet"
-    }
+        "aid": "anim:fireball"
+    },
+	"Sound": {
+		"aid": "sound_data:firebolt"
+	}
 }

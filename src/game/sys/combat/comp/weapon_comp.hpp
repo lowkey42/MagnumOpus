@@ -57,6 +57,7 @@ namespace combat {
 		asset::AID  bullet_type   = asset::AID{};
 		Speed       bullet_vel    = Speed{0};
 		Angle       spreading     = Angle{0};
+		int         bullet_count  = 1;
 
 		Effect_type effect        = Effect_type::none;
 		asset::AID  sound         = asset::AID{};
@@ -72,17 +73,18 @@ namespace combat {
 
 		float       fuel_usage    = 1.f;
 
-        Weapon() = default;
-        ~Weapon() = default;
-        Weapon(const Weapon&) = default;
-        Weapon& operator=(const Weapon&) = default;
+		Weapon() = default;
+		~Weapon() = default;
+		Weapon(const Weapon&) = default;
+		Weapon& operator=(const Weapon&) = default;
 
-        Weapon(Weapon_type type, asset::AID bullet_type, Speed bullet_vel, Angle spreading, Effect_type effect,
-               asset::AID sound, float melee_damage, Distance melee_range, Angle melee_angle, Time attack_delay,
-               Time cooldown, Force recoil, float fuel_usage)
-            : type(type), bullet_type(bullet_type), bullet_vel(bullet_vel), spreading(spreading), effect(effect),
-              sound(sound), melee_damage(melee_damage), melee_range(melee_range), melee_angle(melee_angle),
-              attack_delay(attack_delay), cooldown(cooldown), recoil(recoil), fuel_usage(fuel_usage){}
+		Weapon(Weapon_type type, asset::AID bullet_type, Speed bullet_vel, Angle spreading, int bullet_count,
+		       Effect_type effect, asset::AID sound, float melee_damage, Distance melee_range, Angle melee_angle,
+		       Time attack_delay, Time cooldown, Force recoil, float fuel_usage)
+		    : type(type), bullet_type(bullet_type), bullet_vel(bullet_vel), spreading(spreading),
+		      bullet_count(bullet_count), effect(effect), sound(sound), melee_damage(melee_damage),
+		      melee_range(melee_range), melee_angle(melee_angle), attack_delay(attack_delay), cooldown(cooldown),
+		      recoil(recoil), fuel_usage(fuel_usage){}
 
 		struct Persisted_state;
 	};
@@ -155,6 +157,7 @@ namespace combat {
 		std::string bullet_type;
 		float bullet_velocity;
 		float spreading = 0;
+		int bullet_count = 1;
 
 		Effect_type effect = Effect_type::none;
 		std::string sound;
@@ -176,6 +179,7 @@ namespace combat {
 		      bullet_type(c.bullet_type ? c.bullet_type.name() : ""),
 		      bullet_velocity(c.bullet_vel / (1_km/hour)),
 		      spreading(c.spreading.in_degrees()*2),
+		      bullet_count(c.bullet_count),
 		      melee_damage(c.melee_damage),
 		      melee_range(c.melee_range.value()),
 		      melee_angle(c.melee_angle / (1_deg).value()),
@@ -191,6 +195,7 @@ namespace combat {
 				                    : asset::AID{asset::Asset_type::blueprint, bullet_type},
 				bullet_velocity * (1_km/hour),
 				spreading/2.f * 1_deg,
+				bullet_count,
 				effect,
 				sound.empty() ? asset::AID()
 				              : asset::AID{asset::Asset_type::sound, sound},
@@ -212,6 +217,7 @@ namespace combat {
 		sf2_member(bullet_type),
 		sf2_member(bullet_velocity),
 		sf2_member(spreading),
+		sf2_member(bullet_count),
 		sf2_member(effect),
 		sf2_member(sound),
 		sf2_member(cooldown),

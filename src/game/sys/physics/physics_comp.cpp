@@ -26,6 +26,7 @@ namespace physics{
 		float active_acceleration;
 
 		uint8_t group;
+		uint8_t group_exclude;
 
 		DFloatS velocity;
 		DFloatS acceleration;
@@ -38,6 +39,7 @@ namespace physics{
 			max_active_velocity(glm::sqrt(c._max_active_velocity2.value()) / (1_km/hour).value()),
 			active_acceleration(c._active_acceleration.value()),
 			group(c._group),
+			group_exclude(c._group_exclude),
 			velocity(DFloatS{c._velocity.x.value(), c._velocity.y.value()}),
 			acceleration(DFloatS{c._acceleration.x.value(), c._acceleration.y.value()}) {
 		}
@@ -52,7 +54,8 @@ namespace physics{
 		sf2_member(active_acceleration),
 		sf2_member(group),
 		sf2_member(velocity),
-		sf2_member(acceleration)
+		sf2_member(acceleration),
+		sf2_member(group_exclude)
 	)
 
 	void Physics_comp::load(ecs::Entity_state& state){
@@ -66,6 +69,7 @@ namespace physics{
 								 (s.max_active_velocity * (1_km/hour).value()));
 		_active_acceleration = Speed_per_time(s.active_acceleration),
 		_group = s.group;
+		_group_exclude = s.group_exclude;
 		_velocity = {Speed(s.velocity.x), Speed(s.velocity.y)};
 		_acceleration = {Speed_per_time(s.acceleration.x), Speed_per_time(s.acceleration.y)};
 		_active = true;

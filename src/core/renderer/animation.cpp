@@ -72,7 +72,8 @@ namespace renderer{
 	}
 
 	void Animation::modulation(Animation_type type, float mod) const noexcept {
-		_data->animations.find(type)->second.modulation = mod;
+		// TODO[SEB]: FIXME: uncheckt out-of-range access, move to sprite_comp (_data should be immutable)
+		// _data->animations.find(type)->second.modulation = mod;
 	}
 
 	bool Animation::animation_exists(Animation_type type) const noexcept {

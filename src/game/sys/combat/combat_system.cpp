@@ -180,22 +180,25 @@ namespace combat {
 					case Weapon_type::range:
 						if(weapon.bullet_type) {
 							physics.impulse(rotate(glm::vec2(-1,0), rotation) * weapon.recoil);
-							auto bullet = _em.emplace(weapon.bullet_type);
-							bullet->get<Friend_comp>().process([&](auto& f) {
-								f.group(group);
-							});
 
-							auto bullet_rot = rotation + random_angle(weapon.spreading);
+							for(int c=0; c<weapon.bullet_count; ++c) {
+								auto bullet = _em.emplace(weapon.bullet_type);
+								bullet->get<Friend_comp>().process([&](auto& f) {
+									f.group(group);
+								});
 
-							auto& bullet_phys = bullet->get<physics::Physics_comp>().get_or_throw();
-							auto bullet_radius = bullet_phys.radius();
+								auto bullet_rot = rotation + random_angle(weapon.spreading);
 
-							bullet_phys.velocity(physics.velocity() + rotate(Velocity{weapon.bullet_vel,0}, bullet_rot));
+								auto& bullet_phys = bullet->get<physics::Physics_comp>().get_or_throw();
+								auto bullet_radius = bullet_phys.radius();
 
-							bullet->get<physics::Transform_comp>().process([&](auto& t){
-								t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, bullet_rot));
-								t.rotation(bullet_rot);
-							});
+								bullet_phys.velocity(physics.velocity() + rotate(Velocity{weapon.bullet_vel,0}, bullet_rot));
+
+								bullet->get<physics::Transform_comp>().process([&](auto& t){
+									t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, bullet_rot));
+									t.rotation(bullet_rot);
+								});
+							}
 						}
 						break;
 				}

@@ -33,12 +33,12 @@
     "Weapon":{
         "weapon": {
             "type": "range",
-            "bullet_type": "flame_collider",
-            "bullet_velocity": 10,
-            "cooldown": 0.03,
-            "recoil": 20,
-            "spreading": 30,
-            "effect": "flame_thrower"
+            "bullet_type": "bullet",
+            "bullet_velocity": 40,
+            "cooldown": 1.2,
+            "recoil": 200,
+            "spreading": 20,
+            "bullet_count": 5
         }
     },
     "Laser_sight": {

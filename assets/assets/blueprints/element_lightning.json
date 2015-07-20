@@ -10,7 +10,7 @@
     "Item": {
         "target": "element",
         "element": "lightning",
-        "mod": 0.2,
+        "mod": 0.4,
         "joinable": true
     },
     "Particle_emiter":{
