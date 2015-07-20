@@ -159,7 +159,7 @@ namespace controller {
 				if(len>1) {
 					direction/=len;
 					len = 1;
-				}else if(len<0.00001 || isnan(len))
+                }else if(len<0.00001 || std::isnan(len))
 					return;
 
 				comp.accelerate_active(direction);

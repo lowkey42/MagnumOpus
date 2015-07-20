@@ -61,8 +61,9 @@ namespace ui {
 				case level::Element::lightning:
 					return a.load<Texture>("tex:element_lightning"_aid);
 
-			}
-		}
+            }
+            FAIL("Unreachable code");
+        }
 	}
 
 	Ui_system::Ui_system(Engine& e, ecs::Entity_manager& em)

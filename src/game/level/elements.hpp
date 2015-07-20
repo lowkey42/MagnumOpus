@@ -69,7 +69,7 @@ namespace level {
 		Elements(const Range& r):value(0) {
 			for(auto e : r)
 				value|=mask(e);
-		};
+        }
 
 		operator bool()const noexcept {
 			return value;

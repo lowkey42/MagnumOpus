@@ -72,6 +72,18 @@ namespace combat {
 
 		float       fuel_usage    = 1.f;
 
+        Weapon() = default;
+        ~Weapon() = default;
+        Weapon(const Weapon&) = default;
+        Weapon& operator=(const Weapon&) = default;
+
+        Weapon(Weapon_type type, asset::AID bullet_type, Speed bullet_vel, Angle spreading, Effect_type effect,
+               asset::AID sound, float melee_damage, Distance melee_range, Angle melee_angle, Time attack_delay,
+               Time cooldown, Force recoil, float fuel_usage)
+            : type(type), bullet_type(bullet_type), bullet_vel(bullet_vel), spreading(spreading), effect(effect),
+              sound(sound), melee_damage(melee_damage), melee_range(melee_range), melee_angle(melee_angle),
+              attack_delay(attack_delay), cooldown(cooldown), recoil(recoil), fuel_usage(fuel_usage){}
+
 		struct Persisted_state;
 	};
 
@@ -173,7 +185,7 @@ namespace combat {
 		      fuel_usage(c.fuel_usage) {}
 
 		auto to_weapon()const noexcept -> Weapon {
-			return {
+            return Weapon{
 				type,
 				bullet_type.empty() ? asset::AID()
 				                    : asset::AID{asset::Asset_type::blueprint, bullet_type},

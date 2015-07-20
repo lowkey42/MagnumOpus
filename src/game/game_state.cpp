@@ -8,6 +8,8 @@
 #include <core/renderer/texture.hpp>
 #include <core/asset/aid.hpp>
 
+#include <ctime>
+
 #include "sys/physics/transform_comp.hpp"
 
 #include "level/level_generator.hpp"
@@ -15,6 +17,7 @@
 #include "sys/physics/transform_comp.hpp"
 
 #include "tags.hpp"
+
 
 namespace mo {
 	using namespace util;
@@ -54,7 +57,7 @@ namespace mo {
 	                   util::maybe<int> depth) -> std::unique_ptr<Game_state> {
 		auto profile = im_a_savegame;
 		if(profile.seed==42)
-			profile.seed = time(0);
+            profile.seed = time(0);
 
 		auto d = depth.get_or_other(profile.depth);
 
