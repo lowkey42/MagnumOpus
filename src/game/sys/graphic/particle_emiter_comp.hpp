@@ -19,7 +19,7 @@
 #include <core/renderer/particles.hpp>
 #include <array>
 
-#include "effects.hpp"
+#include "../../effects.hpp"
 
 namespace mo {
 namespace sys {

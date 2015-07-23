@@ -17,6 +17,8 @@
 
 #include "game_engine.hpp"
 
+#include "effects.hpp"
+
 #include "../core/units.hpp"
 #include "../core/ecs/ecs.hpp"
 #include "../core/ecs/serializer.hpp"
@@ -63,6 +65,8 @@ namespace mo {
 		sys::physics::Transform_system transform;
 
 		renderer::Particle_renderer particle_renderer;
+
+		Effect_source effect_bus;
 
 		sys::cam::Camera_system camera;
 		sys::physics::Physics_system physics;

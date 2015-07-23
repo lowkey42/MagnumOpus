@@ -19,13 +19,11 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
-#include "../../graphic/effects.hpp"
+#include "../../../effects.hpp"
 
 namespace mo {
 namespace sys {
 namespace combat {
-
-	using graphic::Effect_type;
 
 	class Laser_sight_comp : public ecs::Component<Laser_sight_comp> {
 		public:

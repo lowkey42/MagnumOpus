@@ -180,13 +180,15 @@ namespace mo {
 		  controller(em),
 		  ai(em, transform, level),
 		  graphics(em, transform, engine.assets(), particle_renderer, state),
-		  combat(engine.assets(), em, transform, physics, state, graphics.effects),
+		  combat(engine.assets(), em, transform, physics, state, effect_bus),
 	      items(engine.assets(), em, physics, transform, state, particle_renderer),
 	      elements(engine.assets(), em, combat),
-	      soundsys(em, transform, engine.audio_ctx()),
+	      soundsys(engine.assets(), em, transform, engine.audio_ctx()),
 		  ui(engine, em) {
 		em.register_component_type<Player_tag_comp>();
 
+		graphics.effects.connect(effect_bus);
+		soundsys.effects.connect(effect_bus);
 
 		// TODO[foe]: remove
 				auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);
@@ -260,6 +262,7 @@ namespace mo {
 		combat.update(dt);
 		camera.update(dt);
 		graphics.update(dt);
+		soundsys.update(dt);
 		state.update(dt);
 		ui.update(dt);
 

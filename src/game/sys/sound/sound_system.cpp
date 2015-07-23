@@ -1,10 +1,14 @@
 #define GLM_SWIZZLE
+#define MO_BUILD_SERIALIZER
 
 #include "sound_system.hpp"
 
 #include "../state/state_comp.hpp"
 
 #include <core/units.hpp>
+
+#include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
 
 
 namespace mo {
@@ -13,13 +17,79 @@ namespace sound {
 
 	using namespace unit_literals;
 
-	Sound_system::Sound_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
+	namespace {
+		auto effect_time(Effect_type e) -> Time {
+			switch(e) {
+				case Effect_type::none:              return 1_s;
+				case Effect_type::element_fire:      return 0.1_s;
+				case Effect_type::element_frost:     return 0.1_s;
+				case Effect_type::element_water:     return 0.1_s;
+				case Effect_type::element_stone:     return 0.1_s;
+				case Effect_type::element_gas:       return 0.1_s;
+				case Effect_type::element_lightning: return 0.1_s;
+				case Effect_type::health:            return 0.1_s;
+
+				case Effect_type::flame_thrower:     return 0.6_s;
+			}
+			FAIL("UNREACHABLE, maybe");
+		}
+
+		struct Sound_effect_data {
+			std::unordered_map<Effect_type, std::string> effects;
+		};
+
+		sf2_structDef(Sound_effect_data, sf2_member(effects))
+	}
+}
+}
+}
+
+namespace mo {
+namespace asset {
+	template<>
+	struct Loader<sys::sound::Sound_effect_data> {
+		using RT = std::shared_ptr<sys::sound::Sound_effect_data>;
+
+		static RT load(istream in) throw(Loading_failed) {
+			auto r = std::make_shared<sys::sound::Sound_effect_data>();
+
+			sf2::parseStream(in, *r);
+
+			return r;
+		}
+
+		static void store(ostream out, const sys::sound::Sound_effect_data& asset) throw(Loading_failed) {
+			sf2::writeStream(out,asset);
+		}
+	};
+}
+}
+
+
+namespace mo {
+namespace sys {
+namespace sound {
+
+	Sound_system::Sound_system(asset::Asset_manager& assets,
+	                           ecs::Entity_manager& entity_manager,
+	                           physics::Transform_system& ts,
 							   audio::Audio_ctx& audio_ctx) noexcept
-		: _transform(ts),
+		: effects(&Sound_system::add_effect, this),
+	      _transform(ts),
 		  _audio_ctx(audio_ctx),
-		  _sounds(entity_manager.list<Sound_comp>())
+		  _sounds(entity_manager.list<Sound_comp>()),
+	      _sound_effects(effect_type_count)
 	{
 		entity_manager.register_component_type<Sound_comp>();
+
+		auto se_data = assets.load<Sound_effect_data>("cfg:sound_effects"_aid);
+
+		for(std::size_t i=0; i<effect_type_count; ++i) {
+			auto iter = se_data->effects.find(static_cast<Effect_type>(i));
+			if(iter!=se_data->effects.end()) {
+				_sound_effects[i] = assets.load<audio::Sound>(asset::AID(iter->second));
+			}
+		}
 	}
 
 	namespace {
@@ -42,24 +112,65 @@ namespace sound {
 
 				auto sound = determine_sound(sc, state);
 
-				if(sound) {
+				if(sound || sc._effect) {
 					auto p_entity = camera.viewport().zw()/2.f - camera.world_to_screen(remove_units(trans.position()));
 					auto angle = Angle(glm::atan(p_entity.y, p_entity.x));
 					auto dist = glm::length(p_entity) / max_dist;
 
-					//if(dist<=1.0f) {
-						sc._channel = _audio_ctx.play_dynamic(*sound, angle, dist, false, sc._channel);
+					if(dist<=1.0f) {
+						if(sound)
+							sc._channel = _audio_ctx.play_dynamic(*sound, angle,
+							                                      dist, false, sc._channel);
+
+						if(sc._effect)
+							sc._channel = _audio_ctx.play_dynamic(*sc._effect, angle,
+							                                      dist, false, sc._channel);
 						return;
-					//}
+					}
 				}
 
-				_audio_ctx.stop(sc._channel);
-				sc._channel = -1;
+				if(!sound && sc._channel!=-1) {
+					_audio_ctx.stop(sc._channel);
+					sc._channel = -1;
+				}
+
+				if(!sc._effect && sc._effect_channel!=-1) {
+					_audio_ctx.stop(sc._effect_channel);
+					sc._effect_channel = -1;
+				}
+
 			};
 		});
 
-
 	}
+
+	void Sound_system::update(Time dt) noexcept {
+		for(auto& sound : _sounds) {
+			if(sound._effect) {
+				sound._effect_left -= dt;
+
+				if(sound._effect_left<=0_s) {
+					sound._effect.reset();
+				}
+			}
+		}
+	}
+
+
+	void Sound_system::add_effect(ecs::Entity& e, Effect_type effect) {
+		e.get<sys::sound::Sound_comp>().process([&](auto& sound) {
+			auto idx = static_cast<std::size_t>(effect);
+
+			if(idx<_sound_effects.size()) {
+				auto& sound_effect = _sound_effects[idx];
+				if(sound_effect) {
+					sound._effect = sound_effect;
+					sound._effect_left = effect_time(effect);
+				}
+			}
+		});
+	}
+
 }
 }
 }

@@ -19,28 +19,34 @@
 #include <core/audio/audio_ctx.hpp>
 #include <core/renderer/camera.hpp>
 
+#include "../../effects.hpp"
+
 #include "sound_comp.hpp"
 
 namespace mo{
 namespace sys{
 namespace sound{
 
-	class Sound_system{
-
+	class Sound_system {
 		public:
+			Sound_system(asset::Asset_manager& assets,
+			             ecs::Entity_manager& entity_manager,
+			             physics::Transform_system& ts,
+			             audio::Audio_ctx& audio_ctx) noexcept;
 
-			// Constructors
-			Sound_system(ecs::Entity_manager& entity_manager, physics::Transform_system& ts,
-						 audio::Audio_ctx& audio_ctx) noexcept;
-
-			// Methods
 			void play_sounds(const renderer::Camera& camera) noexcept;
 
+			void add_effect(ecs::Entity& e, Effect_type);
+
+			void update(Time dt) noexcept;
+
+			Effect_slot effects;
 
 		private:
 			physics::Transform_system& _transform;
 			audio::Audio_ctx& _audio_ctx;
 			sound::Sound_comp::Pool& _sounds;
+			std::vector<audio::Sound_ptr> _sound_effects;
 
 	};
 

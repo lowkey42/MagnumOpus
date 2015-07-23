@@ -40,7 +40,7 @@ namespace graphic{
 
 			void add_effect(ecs::Entity& e, Effect_type);
 
-			Effect_factory effects;
+			Effect_slot effects;
 
 		private:
 			void _on_state_change(ecs::Entity& e, state::State_data& data);

@@ -31,7 +31,7 @@ namespace combat {
 	                             physics::Transform_system& ts,
 	                             physics::Physics_system& physics_system,
 	                             state::State_system& state_system,
-	                             graphic::Effect_factory& effects)
+	                             Effect_source& effects)
 	    : _em(entity_manager),
 	      _weapons(entity_manager.list<Weapon_comp>()),
 	      _healths(entity_manager.list<Health_comp>()),

@@ -19,8 +19,6 @@
 
 namespace mo {
 namespace ecs{class Entity;}
-namespace sys {
-namespace graphic {
 
 	enum class Effect_type : uint16_t {
 		none,
@@ -37,20 +35,26 @@ namespace graphic {
 
 		flame_thrower
 	};
+	constexpr auto effect_type_count = static_cast<uint16_t>(Effect_type::flame_thrower)+1;
 
-	using Effect_factory = util::slot<ecs::Entity&,Effect_type>;
+	using Effect_slot   = util::slot<ecs::Entity&,Effect_type>;
 	using Effect_source = util::signal_source<ecs::Entity&,Effect_type>;
 
 }
+
+namespace std {
+	template <> struct hash<mo::Effect_type> {
+		size_t operator()(mo::Effect_type e)const noexcept {
+			return static_cast<size_t>(e);
+		}
+	};
 }
-}
+
 
 #ifdef MO_BUILD_SERIALIZER
 #include <sf2/sf2.hpp>
 
 namespace mo {
-namespace sys {
-namespace graphic {
 	sf2_enumDef(Effect_type,
 		sf2_value(none),
 		sf2_value(element_fire),
@@ -63,7 +67,5 @@ namespace graphic {
 		sf2_value(health),
 		sf2_value(flame_thrower)
 	)
-}
-}
 }
 #endif

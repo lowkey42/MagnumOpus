@@ -66,6 +66,10 @@ namespace sound {
 		audio::Channel_id _channel = -1;
 		asset::Ptr<Sound_comp_data> _sc_data;
 
+		audio::Sound_ptr _effect;
+		audio::Channel_id _effect_channel = -1;
+		Time _effect_left = Time(0);
+
 	};
 
 }

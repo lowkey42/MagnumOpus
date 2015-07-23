@@ -30,7 +30,7 @@
 #include "comp/health_comp.hpp"
 #include "comp/explosive_comp.hpp"
 
-#include "../graphic/effects.hpp"
+#include "../../effects.hpp"
 
 namespace mo {
 	namespace asset {class Asset_manager;}
@@ -46,7 +46,7 @@ namespace combat {
 			              physics::Transform_system& transform_system,
 			              physics::Physics_system& physics_system,
 			              state::State_system& state_system,
-			              graphic::Effect_factory& effects);
+			              Effect_source& effects);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& cam);
@@ -70,7 +70,7 @@ namespace combat {
 			util::slot<physics::Manifold&> _collision_slot;
 			Reaper_subsystem               _reaper;
 			renderer::Ray_renderer         _ray_renderer;
-			graphic::Effect_source         _effects;
+			Effect_source&                 _effects;
 	};
 
 }

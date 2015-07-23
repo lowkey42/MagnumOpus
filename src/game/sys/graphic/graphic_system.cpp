@@ -26,7 +26,7 @@ namespace graphic {
 
 				case Effect_type::flame_thrower:     return false;
 			}
-            FAIL("UNREACHABLE, maybe");
+			FAIL("UNREACHABLE, maybe");
 		}
 	}
 
