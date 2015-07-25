@@ -9,12 +9,14 @@
         "group": 1
     },
     "Explosive": {
-        "damage": 2,
+        "damage": 0,
         "range": 1,
         "delay":0,
-        "on_contact": true,
         "blast_force": 10,
         "explode_after": 1.0
+    },
+    "Bullet": {
+        "damage": 1
     },
     "Friend",
     "State": {

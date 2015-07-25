@@ -1,5 +1,5 @@
 /**************************************************************************\
- * The component that goes BOOM! (timed) area effects on contact/damage   *
+ * The component that causes pain! deals damage on contact                *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -25,19 +25,17 @@ namespace mo {
 namespace sys {
 namespace combat {
 
-	class Explosive_comp : public ecs::Component<Explosive_comp> {
+	class Bullet_comp : public ecs::Component<Bullet_comp> {
 		public:
-			static constexpr const char* name() {return "Explosive";}
+			static constexpr const char* name() {return "Bullet";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Explosive_comp(ecs::Entity& owner, float damage=10, Distance range=Distance(2),
-						   Time delay=Time(0), bool on_contact=false, bool on_damage=false) noexcept
-				: Component(owner), _damage(damage), _range(range), _delay(delay),
-				  _activate_on_contact(on_contact), _activate_on_damage(on_damage) {}
-			Explosive_comp(Explosive_comp&&)noexcept = default;
-			~Explosive_comp()noexcept = default;
-			Explosive_comp& operator=(Explosive_comp&&)noexcept = default;
+			Bullet_comp(ecs::Entity& owner) noexcept
+				: Component(owner) {}
+			Bullet_comp(Bullet_comp&&)noexcept = default;
+			~Bullet_comp()noexcept = default;
+			Bullet_comp& operator=(Bullet_comp&&)noexcept = default;
 
 			struct Persisted_state;
 			friend struct Persisted_state;
@@ -45,19 +43,13 @@ namespace combat {
 			friend class Combat_system;
 			friend class Reaper_subsystem;
 
-			float _damage;
-			Distance _range;
-			Time _delay;
-			bool _activate_on_contact;
-			bool _activate_on_damage;
-
-			Time _delay_left = Time(0);
-			bool _exloded = false;
-
-			Force _blast_force = Force(0);
-
+			float _damage = 1;
 			level::Element _damage_type   = level::Element::neutral;
-			Effect_type _explosion_effect = Effect_type::none;
+
+			int _break_after_entities = 1;
+			int _break_after_walls = 1;
+
+			Effect_type _effect = Effect_type::none;
 	};
 
 }

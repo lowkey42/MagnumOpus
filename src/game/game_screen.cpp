@@ -105,8 +105,6 @@ namespace mo {
 	}
 
 	void Game_screen::_update(float delta_time) {
-		//_engine.assets().reload(); //< TODO[foe]: to do only do this on key-press (e.g. F12)
-
 		_state->update(delta_time*second);
 	}
 

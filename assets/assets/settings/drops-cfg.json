@@ -1,10 +1,11 @@
 {"groups":[
 	{"values":[
-		{"item_aid":"coin", "chance":0.25, "max": 1}
+		{"item_aid":"coin", "chance":0.25, "max": 1},
+		{"item_aid":"health_potion", "chance":0.05, "max":1}
 	]},
 	{"values":[
 		{"item_aid":"coin", "chance":1.0, "max": 5, "min":1},
-		{"item_aid":"health_potion", "chance":0.25, "max":2},
+		{"item_aid":"health_potion", "chance":0.3, "max":2},
 		{"item_aid":"element_fire", "chance":0.2},
 		{"item_aid":"element_frost", "chance":0.2},
 		{"item_aid":"element_water", "chance":0.2},

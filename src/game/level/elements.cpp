@@ -1,3 +1,4 @@
+#define MO_BUILD_SERIALIZER
 #include "elements.hpp"
 
 #include <core/utils/log.hpp>
@@ -19,6 +20,40 @@ namespace level {
 
 			return i;
 		}
+	}
+
+	std::ostream& operator<<(std::ostream& s, Element e) {
+		switch(e) {
+			case Element::neutral:
+				s<<"neutral";
+				break;
+
+			case Element::fire:
+				s<<"fire";
+				break;
+
+			case Element::frost:
+				s<<"frost";
+				break;
+
+			case Element::water:
+				s<<"water";
+				break;
+
+			case Element::stone:
+				s<<"stone";
+				break;
+
+			case Element::gas:
+				s<<"gas";
+				break;
+
+			case Element::lightning:
+				s<<"lightning";
+				break;
+		}
+
+		return s;
 	}
 
 	Elements_iterator::Elements_iterator(const Elements& e, std::size_t i)

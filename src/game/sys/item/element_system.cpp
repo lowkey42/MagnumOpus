@@ -117,9 +117,20 @@ namespace item {
 			}
 			const auto& reactions = _config->weapons;
 
-			lookup_reaction(elements_vec, reactions).process([&w](auto& nw){
+			auto found_weapon = lookup_reaction(elements_vec, reactions);
+			found_weapon.process([&w](auto& nw){
 				w = nw;
 			});
+
+			if(!elements_vec.empty() && found_weapon.is_nothing()) {
+				auto& msg = ::mo::util::debug(__func__, __FILE__, __LINE__);
+				msg<<"No reaction for: ";
+				for(auto e : elements_vec)
+					msg<<e<<", ";
+
+				msg<<std::endl;
+			}
+
 		});
 	}
 

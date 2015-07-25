@@ -38,6 +38,7 @@ namespace level {
 	constexpr uint16_t mask(Element e) {
 		return e!=Element::neutral ? 1<<(static_cast<uint16_t>(e)-1) : 0;
 	}
+	extern std::ostream& operator<<(std::ostream& s, Element e);
 
 	struct Elements;
 	class Elements_iterator

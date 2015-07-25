@@ -48,7 +48,8 @@ void main() {
 
 	vec4 c = (bg1(p,f) * bg2(p,f) *2.0)* bg3(p,f) *3.0;
 
-	c.rgb /= pow(r*20.0, 1.0-activity);
+	c.rgb *= 1.1;
+	c.rgb /= pow(r*15.0, 1.0-activity);
 
 	if(fill_level<1.0) {
 		vec4 line = get_line(1.0)*0.8 + get_line(0.5)*0.4;

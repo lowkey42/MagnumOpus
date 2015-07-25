@@ -55,7 +55,8 @@ namespace combat {
 			void _health_care(Time dt);
 			void _shoot_something(Time dt);
 			void _explode_explosives(Time dt);
-			void _deal_damage(ecs::Entity& target, int group, float damage);
+			bool _deal_damage(ecs::Entity& target, int group, float damage,
+			                  level::Element type = level::Element::neutral);
 			void _explode(Explosive_comp& e);
 			void _draw_ray(Laser_sight_comp& l);
 

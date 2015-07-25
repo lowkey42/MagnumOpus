@@ -230,6 +230,11 @@ void Engine::_poll_events() {
 			_quit = true;
 		else
 			_input_manager->handle_event(event);
+
+		if(event.type==SDL_KEYDOWN) {
+			if(event.key.keysym.sym==SDLK_F12)
+				assets().reload();
+		}
 	}
 }
 

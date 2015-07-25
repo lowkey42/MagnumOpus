@@ -23,6 +23,17 @@
 namespace mo {
 namespace util {
 
+	namespace details {
+		struct maybe_else_callable {
+			bool is_nothing;
+
+			template<typename Func>
+			void on_nothing(Func f) {
+				f();
+			}
+		};
+	}
+
 	template<typename T>
 	class maybe {
 		public:
@@ -93,9 +104,11 @@ namespace util {
 			}
 
 			template<typename Func>
-			void process(Func f) {
+			auto process(Func f) {
 				if(is_some())
 					f(_data);
+
+				return details::maybe_else_callable{is_nothing()};
 			}
 
 			template<typename RT, typename Func>
@@ -194,9 +207,11 @@ namespace util {
 			}
 
 			template<typename Func>
-			void process(Func f)const {
+			auto process(Func f)const {
 				if(is_some())
 					f(get_or_throw());
+
+				return details::maybe_else_callable{is_nothing()};
 			}
 
 			template<typename RT, typename Func>

@@ -11,6 +11,9 @@
 #include "comp/friend_comp.hpp"
 #include "comp/score_comp.hpp"
 
+#include "comp/bullet_comp.hpp"
+
+
 namespace mo {
 namespace sys {
 namespace combat {
@@ -50,6 +53,7 @@ namespace combat {
 		_em.register_component_type<Weapon_comp>();
 		_em.register_component_type<Health_comp>();
 		_em.register_component_type<Explosive_comp>();
+		_em.register_component_type<Bullet_comp>();
 		_em.register_component_type<Score_comp>();
 	}
 
@@ -153,7 +157,6 @@ namespace combat {
 			}
 
 			if(attack_now) {
-				// TODO: play sound
 				on_attack(w.owner(), weapon);
 
 				auto& transform = w.owner().get<physics::Transform_comp>().get_or_throw();
@@ -233,7 +236,7 @@ namespace combat {
 		_ts.foreach_in_range(position, rotation, e._range, e._range, 360_deg, 360_deg,
 							 [&](ecs::Entity& t){
 			if(&t!=&e.owner()) {
-				this->_deal_damage(t, group, e._damage);
+				this->_deal_damage(t, group, e._damage, e._damage_type);
 				t.get<physics::Physics_comp>().process([&](auto& p){
 					auto dir = remove_units(t.get<physics::Transform_comp>().get_or_throw().position()-position);
 					glm::normalize(dir);
@@ -245,9 +248,14 @@ namespace combat {
 		e.owner().get<State_comp>().process([](auto& s) {
 			s.state(Entity_state::dying);
 		});
+
+		_effects.inform(e.owner(), e._explosion_effect);
 	}
 
-	void Combat_system::_deal_damage(ecs::Entity& target, int group, float damage) {
+	bool Combat_system::_deal_damage(ecs::Entity& target, int group, float damage,
+	                                 level::Element type) {
+		bool dealed = false;
+
 		target.get<Health_comp>().process([&](Health_comp& h){
 			if(group!=0) {
 				auto tgroup = target.get<Friend_comp>().process(0,
@@ -256,8 +264,11 @@ namespace combat {
 					return;
 			}
 
-			h.damage(damage);
+			h.damage(damage, type);
+			dealed = true;
 		});
+
+		return dealed;
 	}
 
 	void Combat_system::_draw_ray(Laser_sight_comp& l) {
@@ -298,6 +309,38 @@ namespace combat {
 
 				} else
 					this->_explode(e);
+			}
+		});
+
+
+		m.a->owner().get<Bullet_comp>().process([&](Bullet_comp& b) {
+			bool broken = false;
+
+			if(m.is_with_object()) {
+
+				auto group = b.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
+
+				this->_deal_damage(m.b.comp->owner(), group, b._damage, b._damage_type);
+
+				if(m.b.comp->owner().get<physics::Transform_comp>().get_or_throw().layer()>=0.5) {
+					broken = --b._break_after_entities <=0;
+
+					_effects.inform(b.owner(), b._effect);
+				}
+
+			}else {
+				broken = --b._break_after_walls <=0;
+
+				_effects.inform(b.owner(), b._effect);
+			}
+
+			if(broken) {
+				b.owner().get<State_comp>().process([](auto& s){
+					s.state(Entity_state::dying);
+
+				}).on_nothing([&](){
+					b.owner().erase<Bullet_comp>();
+				});
 			}
 		});
 	}

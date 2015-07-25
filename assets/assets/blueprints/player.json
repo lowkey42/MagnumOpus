@@ -37,7 +37,7 @@
             "bullet_velocity": 40,
             "cooldown": 1.2,
             "recoil": 200,
-            "spreading": 20,
+            "spreading": 15,
             "bullet_count": 5
         }
     },

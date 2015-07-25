@@ -18,6 +18,8 @@
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
 
+#include "../../../level/elements.hpp"
+
 namespace mo {
 namespace sys {
 namespace combat {
@@ -32,7 +34,7 @@ namespace combat {
 				: Component(owner) {}
 
 			void heal(float hp)noexcept {_heal+=hp;}
-			void damage(float hp)noexcept{_damage+=hp;}
+			void damage(float hp, level::Element type=level::Element::neutral)noexcept;
 
 			auto hp()const noexcept {return _current_hp;}
 			auto max_hp()const noexcept {return _max_hp;}
@@ -52,6 +54,10 @@ namespace combat {
 			float _current_hp = 0;
 
 			float _damage=0, _heal=0;
+
+			float _physical_resistence = 0.f;
+			level::Elements _resistences;
+			level::Elements _vulnerabilities;
 	};
 
 }

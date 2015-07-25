@@ -11,7 +11,8 @@
         "range": 2,
         "delay":0,
         "on_contact": true,
-        "blast_force": 200
+        "blast_force": 200,
+        "damage_type": "gas"
     },
     "Friend",
     "State": {
