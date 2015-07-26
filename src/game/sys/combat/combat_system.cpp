@@ -184,13 +184,20 @@ namespace combat {
 						if(weapon.bullet_type) {
 							physics.impulse(rotate(glm::vec2(-1,0), rotation) * weapon.recoil);
 
+							Angle angle = -weapon.spreading;
+							Angle angle_step = 0_deg;
+							if(weapon.bullet_count==1) {
+								angle = random_angle(weapon.spreading);
+							} else
+								angle_step = weapon.spreading / float(weapon.bullet_count-1) *2.f;
+
 							for(int c=0; c<weapon.bullet_count; ++c) {
 								auto bullet = _em.emplace(weapon.bullet_type);
 								bullet->get<Friend_comp>().process([&](auto& f) {
 									f.group(group);
 								});
 
-								auto bullet_rot = rotation + random_angle(weapon.spreading);
+								auto bullet_rot = rotation + angle;
 
 								auto& bullet_phys = bullet->get<physics::Physics_comp>().get_or_throw();
 								auto bullet_radius = bullet_phys.radius();
@@ -201,6 +208,8 @@ namespace combat {
 									t.position(position + rotate(Position{radius+bullet_radius+10_cm, 0_m}, bullet_rot));
 									t.rotation(bullet_rot);
 								});
+
+								angle+= angle_step;
 							}
 						}
 						break;
