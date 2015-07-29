@@ -1,4 +1,10 @@
+#define MO_BUILD_SERIALIZER
 #include "combat_system.hpp"
+
+#include <map>
+
+#include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
 
 #include "../state/state_comp.hpp"
 #include "../physics/transform_comp.hpp"
@@ -27,8 +33,69 @@ namespace combat {
 		Angle random_angle(Angle min_max) {
 			return Angle{util::random_real(rng, remove_unit(-min_max), remove_unit(min_max))};
 		}
+
+
+		struct Damage_effect_data {
+			float time = 0.f;
+			float confusion = 0.f;
+			float dmg_per_sec = 0.f;
+			level::Element dmg_type = level::Element::neutral;
+			Effect_type effect = Effect_type::none;
+		};
+
+		struct Ot_effect_datas {
+			std::map<Damage_effect, Damage_effect_data> effects;
+		};
+
+		sf2_structDef(Damage_effect_data,
+			sf2_member(time),
+			sf2_member(confusion),
+			sf2_member(dmg_per_sec),
+			sf2_member(dmg_type),
+			sf2_member(effect)
+		)
+		sf2_structDef(Ot_effect_datas, sf2_member(effects))
 	}
 
+	struct Dmg_effect_data {
+		std::vector<Damage_effect_data> effects;
+	};
+
+}
+}
+
+namespace asset {
+	template<>
+	struct Loader<sys::combat::Dmg_effect_data> {
+		using RT = std::shared_ptr<sys::combat::Dmg_effect_data>;
+
+		static RT load(istream in) throw(Loading_failed) {
+			using namespace sys::combat;
+			auto r = std::make_shared<Dmg_effect_data>();
+
+			Ot_effect_datas d;
+			sf2::parseStream(in, d);
+
+			r->effects.resize(damge_effect_count);
+
+			for(auto i : util::range(damge_effect_count)) {
+				auto e = d.effects.find(static_cast<Damage_effect>(i));
+				if(e!=d.effects.end()) {
+					r->effects[i] = e->second;
+				}
+			}
+
+			return r;
+		}
+
+		static void store(ostream out, const sys::combat::Dmg_effect_data& asset) throw(Loading_failed) {
+			INVARIANT(false, "Not implemented");
+		}
+	};
+}
+
+namespace sys {
+namespace combat {
 	Combat_system::Combat_system(asset::Asset_manager& assets,
 	                             ecs::Entity_manager& entity_manager,
 	                             physics::Transform_system& ts,
@@ -40,6 +107,7 @@ namespace combat {
 	      _healths(entity_manager.list<Health_comp>()),
 	      _explosives(entity_manager.list<Explosive_comp>()),
 	      _lsights(entity_manager.list<Laser_sight_comp>()),
+	      _dmg_effects(entity_manager.list<Damage_effect_comp>()),
 	      _ts(ts),
 	      _collision_slot(&Combat_system::_on_collision, this),
 	      _reaper(entity_manager, state_system),
@@ -55,18 +123,50 @@ namespace combat {
 		_em.register_component_type<Explosive_comp>();
 		_em.register_component_type<Bullet_comp>();
 		_em.register_component_type<Score_comp>();
+		_em.register_component_type<Laser_sight_comp>();
+		_em.register_component_type<Damage_effect_comp>();
+
+		_dmg_effect_data = assets.load<Dmg_effect_data>("cfg:damage_effects"_aid);
 	}
 
 	void Combat_system::update(Time dt) {
 		_shoot_something(dt);
 		_explode_explosives(dt);
 		_health_care(dt);
+		_deal_ot_effects(dt);
 	}
 	void Combat_system::draw(const renderer::Camera& cam) {
 		_ray_renderer.set_vp(cam.vp());
 
 		for(auto& l : _lsights) {
 			_draw_ray(l);
+		}
+	}
+
+	void Combat_system::_deal_ot_effects(Time dt) {
+		for(auto& dmge : _dmg_effects) {
+			if(dmge._type!=Damage_effect::none) {
+				auto& data = _dmg_effect_data->effects[int(dmge._type)];
+				dmge._time_left-=dt;
+				_deal_damage(dmge.owner(), 0, data.dmg_per_sec*dt.value(), data.dmg_type);
+
+				if(data.effect!=Effect_type::none) {
+					_effects.inform(dmge.owner(), data.effect);
+				}
+
+				dmge._time_left -= dt;
+				if(dmge._time_left <= 1_s)
+					dmge._type = Damage_effect::none;
+			}
+
+			if(dmge._next_type!=Damage_effect::none) {
+				auto& data = _dmg_effect_data->effects[int(dmge._next_type)];
+
+				dmge._type = dmge._next_type;
+				dmge._time_left = data.time * 1_s;
+				dmge._confusion = data.confusion;
+				dmge._next_type = Damage_effect::none;
+			}
 		}
 	}
 
@@ -175,7 +275,7 @@ namespace combat {
 						                     weapon.melee_angle,
 						                     [&](ecs::Entity& t) {
 							if(&t!=&w.owner()) {
-								_deal_damage(t, group, weapon.melee_damage);
+								_deal_damage(t, group, weapon.melee_damage, weapon.damage_type, weapon.damage_effect);
 							}
 						});
 						break;
@@ -245,7 +345,7 @@ namespace combat {
 		_ts.foreach_in_range(position, rotation, e._range, e._range, 360_deg, 360_deg,
 							 [&](ecs::Entity& t){
 			if(&t!=&e.owner()) {
-				this->_deal_damage(t, group, e._damage, e._damage_type);
+				this->_deal_damage(t, group, e._damage, e._damage_type, e._damage_effect);
 				t.get<physics::Physics_comp>().process([&](auto& p){
 					auto dir = remove_units(t.get<physics::Transform_comp>().get_or_throw().position()-position);
 					glm::normalize(dir);
@@ -262,7 +362,7 @@ namespace combat {
 	}
 
 	bool Combat_system::_deal_damage(ecs::Entity& target, int group, float damage,
-	                                 level::Element type) {
+	                                 level::Element type, Damage_effect dmge) {
 		bool dealed = false;
 
 		target.get<Health_comp>().process([&](Health_comp& h){
@@ -275,6 +375,15 @@ namespace combat {
 
 			h.damage(damage, type);
 			dealed = true;
+
+			if(dmge!=Damage_effect::none) {
+				target.get<Damage_effect_comp>().process([&](auto& dmge_comp) {
+					dmge_comp.effect_type(dmge);
+
+				}).on_nothing([&]{
+					target.emplace<Damage_effect_comp>(dmge);
+				});
+			}
 		});
 
 		return dealed;

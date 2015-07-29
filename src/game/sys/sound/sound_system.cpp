@@ -30,6 +30,7 @@ namespace sound {
 				case Effect_type::health:            return 0.1_s;
 
 				case Effect_type::flame_thrower:     return 0.6_s;
+				case Effect_type::burning:           return 0.6_s;
 			}
 			FAIL("UNREACHABLE, maybe");
 		}
@@ -123,8 +124,8 @@ namespace sound {
 							                                      dist, false, sc._channel);
 
 						if(sc._effect)
-							sc._channel = _audio_ctx.play_dynamic(*sc._effect, angle,
-							                                      dist, false, sc._channel);
+							sc._effect_channel = _audio_ctx.play_dynamic(*sc._effect, angle,
+							                                             dist, false, sc._effect_channel);
 						return;
 					}
 				}

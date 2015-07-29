@@ -8,7 +8,9 @@
             "recoil": 10,
             "spreading": 30,
             "effect": "flame_thrower",
-            "fuel_usage": 0.01
+            "fuel_usage": 0.005,
+            "damage_type": "fire",
+            "damage_effect": "burning"
         },
 
         [fire, stone]: {

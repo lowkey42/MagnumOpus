@@ -29,6 +29,7 @@
 #include "comp/weapon_comp.hpp"
 #include "comp/health_comp.hpp"
 #include "comp/explosive_comp.hpp"
+#include "comp/damage_effect_comp.hpp"
 
 #include "../../effects.hpp"
 
@@ -38,6 +39,8 @@ namespace mo {
 
 namespace sys {
 namespace combat {
+
+	struct Dmg_effect_data;
 
 	class Combat_system : public Weapon_modifier_collection {
 		public:
@@ -55,8 +58,10 @@ namespace combat {
 			void _health_care(Time dt);
 			void _shoot_something(Time dt);
 			void _explode_explosives(Time dt);
+			void _deal_ot_effects(Time dt);
 			bool _deal_damage(ecs::Entity& target, int group, float damage,
-			                  level::Element type = level::Element::neutral);
+			                  level::Element type = level::Element::neutral,
+			                  Damage_effect dmge = Damage_effect::none);
 			void _explode(Explosive_comp& e);
 			void _draw_ray(Laser_sight_comp& l);
 
@@ -67,11 +72,14 @@ namespace combat {
 			Health_comp::Pool&             _healths;
 			Explosive_comp::Pool&          _explosives;
 			Laser_sight_comp::Pool&        _lsights;
+			Damage_effect_comp::Pool&      _dmg_effects;
 			physics::Transform_system&     _ts;
 			util::slot<physics::Manifold&> _collision_slot;
 			Reaper_subsystem               _reaper;
 			renderer::Ray_renderer         _ray_renderer;
 			Effect_source&                 _effects;
+
+			std::shared_ptr<const Dmg_effect_data> _dmg_effect_data;
 	};
 
 }

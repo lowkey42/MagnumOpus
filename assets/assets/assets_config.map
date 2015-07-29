@@ -5,3 +5,4 @@ cfg:sounds = sounds-cfg.json
 cfg:drops  = settings/drops-cfg.json
 cfg:element_interactions = settings/elements-cfg.json
 cfg:sound_effects = settings/sound_effects.json
+cfg:damage_effects = settings/damage_effects.json

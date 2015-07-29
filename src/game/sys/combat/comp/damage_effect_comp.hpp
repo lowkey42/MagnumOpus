@@ -1,5 +1,5 @@
 /**************************************************************************\
- * The component that causes pain! deals damage on contact                *
+ * lasting effects like burning, poisoned, ...                            *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -21,40 +21,67 @@
 #include "../../../level/elements.hpp"
 #include "../../../effects.hpp"
 
-#include "damage_effect_comp.hpp"
-
 namespace mo {
 namespace sys {
 namespace combat {
 
-	class Bullet_comp : public ecs::Component<Bullet_comp> {
+	enum Damage_effect {
+		none,
+		burning,
+		poisoned,
+		wet,
+		frozen,
+		blinded
+	};
+	constexpr auto damge_effect_count = std::size_t(Damage_effect::blinded) +1;
+
+	class Damage_effect_comp : public ecs::Component<Damage_effect_comp> {
 		public:
-			static constexpr const char* name() {return "Bullet";}
+			static constexpr const char* name() {return "DmgEffect";}
 			void load(ecs::Entity_state&)override;
 			void store(ecs::Entity_state&)override;
 
-			Bullet_comp(ecs::Entity& owner) noexcept
-				: Component(owner) {}
-			Bullet_comp(Bullet_comp&&)noexcept = default;
-			~Bullet_comp()noexcept = default;
-			Bullet_comp& operator=(Bullet_comp&&)noexcept = default;
+			Damage_effect_comp(ecs::Entity& owner,
+			                   Damage_effect etype=Damage_effect::none) noexcept
+				: Component(owner) {effect_type(etype);}
 
+			void effect_type(Damage_effect type)noexcept {_next_type=type;}
+			auto effect_type()const noexcept {return _type;}
+
+			auto confusion()const noexcept {return _confusion;}
+
+			friend class Combat_system;
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
-			friend class Combat_system;
-			friend class Reaper_subsystem;
+			Damage_effect _type = Damage_effect::none;
 
-			float _damage = 1;
-			level::Element _damage_type   = level::Element::neutral;
-
-			int _break_after_entities = 1;
-			int _break_after_walls = 1;
-
-			Effect_type   _effect         = Effect_type::none;
-			Damage_effect _damage_effect  = Damage_effect::none;
+			Damage_effect _next_type   = Damage_effect::none;
+			Time          _time_left   = Time{0};
+			float         _confusion   = 0;
 	};
 
 }
 }
 }
+
+#ifdef MO_BUILD_SERIALIZER
+#include <sf2/sf2.hpp>
+
+namespace mo {
+namespace sys {
+namespace combat {
+
+	sf2_enumDef(Damage_effect,
+		sf2_value(none),
+		sf2_value(burning),
+		sf2_value(poisoned),
+		sf2_value(wet),
+		sf2_value(frozen),
+		sf2_value(blinded)
+	)
+
+}
+}
+}
+#endif

@@ -29,7 +29,8 @@ namespace util {
 
 			template<typename Func>
 			void on_nothing(Func f) {
-				f();
+				if(is_nothing)
+					f();
 			}
 		};
 	}
