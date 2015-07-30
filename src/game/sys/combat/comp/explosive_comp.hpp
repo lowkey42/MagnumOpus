@@ -21,6 +21,8 @@
 #include "../../../level/elements.hpp"
 #include "../../../effects.hpp"
 
+#include "damage_effect_comp.hpp"
+
 namespace mo {
 namespace sys {
 namespace combat {
@@ -58,6 +60,7 @@ namespace combat {
 
 			level::Element _damage_type   = level::Element::neutral;
 			Effect_type _explosion_effect = Effect_type::none;
+			Damage_effect _damage_effect  = Damage_effect::none;
 	};
 
 }

@@ -151,9 +151,9 @@ void Engine::leave_screen(uint8_t depth) {
 
 	auto last = std::shared_ptr<Screen>{};
 	if(!_screen_stack.empty())
-		last = std::move(_screen_stack.back());
+		last = _screen_stack.back();
 
-	for(;depth>0; depth--)
+	for(int32_t i = std::min(std::size_t(depth), _screen_stack.size()); i>0; i--)
 		_screen_stack.pop_back();
 
 	if(_screen_stack.empty()) {

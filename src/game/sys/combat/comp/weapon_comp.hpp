@@ -21,6 +21,7 @@
 
 #include "../../../level/elements.hpp"
 #include "../../../effects.hpp"
+#include "damage_effect_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -60,8 +61,9 @@ namespace combat {
 		Angle       spreading     = Angle{0};
 		int         bullet_count  = 1;
 
-		Effect_type effect        = Effect_type::none;
-		Element     damage_type   = Element::neutral;
+		Effect_type   effect        = Effect_type::none;
+		Element       damage_type   = Element::neutral;
+		Damage_effect damage_effect = Damage_effect::none;
 
 		float       melee_damage  = 5;
 		Distance    melee_range   = Distance{1};
@@ -81,10 +83,10 @@ namespace combat {
 		// Weapon& operator=(const Weapon&) = default;
 
 		Weapon(Weapon_type type, asset::AID bullet_type, Speed bullet_vel, Angle spreading, int bullet_count,
-		       Effect_type effect, Element damage_type, float melee_damage, Distance melee_range, Angle melee_angle,
+		       Effect_type effect, Element damage_type, Damage_effect damage_effect, float melee_damage, Distance melee_range, Angle melee_angle,
 		       Time attack_delay, Time cooldown, Force recoil, float fuel_usage)
 		    : type(type), bullet_type(bullet_type), bullet_vel(bullet_vel), spreading(spreading),
-		      bullet_count(bullet_count), effect(effect), damage_type(damage_type), melee_damage(melee_damage),
+		      bullet_count(bullet_count), effect(effect), damage_type(damage_type), damage_effect(damage_effect), melee_damage(melee_damage),
 		      melee_range(melee_range), melee_angle(melee_angle), attack_delay(attack_delay), cooldown(cooldown),
 		      recoil(recoil), fuel_usage(fuel_usage){}
 
@@ -163,6 +165,7 @@ namespace combat {
 
 		Effect_type effect = Effect_type::none;
 		Element damage_type   = Element::neutral;
+		Damage_effect damage_effect = Damage_effect::none;
 
 		float melee_damage = 0;
 		float melee_range = 1;
@@ -184,6 +187,7 @@ namespace combat {
 		      bullet_count(c.bullet_count),
 		      effect(c.effect),
 		      damage_type(c.damage_type),
+		      damage_effect(c.damage_effect),
 		      melee_damage(c.melee_damage),
 		      melee_range(c.melee_range.value()),
 		      melee_angle(c.melee_angle / (1_deg).value()),
@@ -202,6 +206,7 @@ namespace combat {
 				bullet_count,
 				effect,
 				damage_type,
+				damage_effect,
 				melee_damage,
 				melee_range * 1_m,
 				melee_angle * 1_deg,
@@ -223,6 +228,7 @@ namespace combat {
 		sf2_member(bullet_count),
 		sf2_member(effect),
 		sf2_member(damage_type),
+		sf2_member(damage_effect),
 		sf2_member(cooldown),
 		sf2_member(melee_damage),
 		sf2_member(melee_range),

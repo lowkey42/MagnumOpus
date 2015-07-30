@@ -8,12 +8,14 @@
         "group":0
     },
     "Explosive": {
-        "damage": 1,
+        "damage": 0.2,
         "range": 1,
         "delay":0.0,
         "on_contact": true,
         "explode_after": 0.8,
-        "blast_force": 0
+        "blast_force": 0,
+        "damage_type": "fire",
+        "damage_effect": "burning"
     },
     "Friend",
     "State": {

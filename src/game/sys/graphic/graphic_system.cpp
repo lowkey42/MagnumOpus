@@ -25,6 +25,7 @@ namespace graphic {
 				case Effect_type::health:            return true;
 
 				case Effect_type::flame_thrower:     return false;
+				case Effect_type::burning:           return false;
 			}
 			FAIL("UNREACHABLE, maybe");
 		}
@@ -227,6 +228,27 @@ namespace graphic {
 							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
 							util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.5}),
 							util::lerp<Position>({20_cm, 20_cm}, {100_cm, 100_cm}, {10_cm, 10_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets,"particle_fire")
+					);
+					break;
+
+				case Effect_type::burning:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.01_m,
+							0.0_m,
+							renderer::Collision_handler::bounce,
+							50,
+							100,
+							0.8_s, 1.0_s,
+							util::scerp<Angle>(0_deg, 360_deg),
+							util::scerp<Angle>(0_deg, 0_deg),
+							util::lerp<Speed_per_time>(2_m/second_2, 0_m/second_2),
+							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+							util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.2}),
+							util::lerp<Position>({40_cm, 40_cm}, {80_cm, 80_cm}, {10_cm, 10_cm}),
 							util::scerp<int8_t>(0),
 							load_tex(_assets,"particle_fire")
 					);

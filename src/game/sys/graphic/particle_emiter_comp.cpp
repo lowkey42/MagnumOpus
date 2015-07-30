@@ -25,14 +25,16 @@ namespace graphic {
 	struct Particle_emiter_comp::Persisted_state {
 		std::vector<Emiter_state> emiters;
 
-		Persisted_state(const Particle_emiter_comp& p) {
-/* Particle Emiters are currently not serialised
+		Persisted_state(const Particle_emiter_comp& p, bool save=false) {
+/* Particle Emiters are currently not serialised */
 
-			emiters.reserve(max_emiters);
-			for(auto i : range(max_emiters)) {
-				auto& e = p._emiters[i];
-				emiters.push_back({e._type, e._enabled, e._scale});
-			}*/
+			if(save) {
+				emiters.reserve(max_emiters);
+				for(auto i : range(max_emiters)) {
+					auto& e = p._emiters[i];
+					emiters.push_back({e._type, e._enabled, e._scale});
+				}
+			}
 		}
 	};
 
@@ -59,7 +61,7 @@ namespace graphic {
 		}
 	}
 	void Particle_emiter_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+		state.write_from(Persisted_state{*this, true});
 	}
 
 	void Particle_emiter_comp::enabled(std::size_t i, bool e, bool temp) {

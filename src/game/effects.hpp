@@ -33,7 +33,10 @@ namespace ecs{class Entity;}
 		health,
 
 
-		flame_thrower
+		flame_thrower,
+
+
+		burning
 	};
 	constexpr auto effect_type_count = static_cast<uint16_t>(Effect_type::flame_thrower)+1;
 
@@ -65,7 +68,8 @@ namespace mo {
 		sf2_value(element_gas),
 		sf2_value(element_lightning),
 		sf2_value(health),
-		sf2_value(flame_thrower)
+		sf2_value(flame_thrower),
+		sf2_value(burning)
 	)
 }
 #endif

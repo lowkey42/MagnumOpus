@@ -1,0 +1,38 @@
+{
+    "effects":{
+        "burning":{
+            "time": 5,
+            "confusion": 0.5,
+            "dmg_per_sec": 4,
+            "dmg_type": "fire",
+            "effect": "burning"
+        },
+
+        "poisoned":{
+            "time": 1,
+            "confusion": 0.5,
+            "dmg_per_sec": 1,
+            "dmg_type": "gas"
+        },
+
+        "wet":{
+            "time": 3,
+            "confusion": 0.1,
+            "dmg_per_sec": 0,
+            "dmg_type": "water"
+        },
+
+        "frozen":{
+            "time": 3,
+            "confusion": 0.2,
+            "dmg_per_sec": 0.5,
+            "dmg_type": "frost"
+        },
+
+        "blinded":{
+            "time": 0.1,
+            "confusion": 1.0,
+            "dmg_per_sec": 0
+        }
+    }
+}

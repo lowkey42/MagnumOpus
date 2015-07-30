@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Items such as coins, potions or elements                               *
+ * Manages the highscore list (load, store, add)                          *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -15,43 +15,22 @@
 
 #pragma once
 
-#include <core/ecs/ecs.hpp>
-#include <core/units.hpp>
-
-#include "../../level/elements.hpp"
+#include <string>
+#include <vector>
 
 namespace mo {
-namespace sys {
-namespace item {
+	namespace asset{class Asset_manager;}
 
-	enum Item_target {
-		health,
-		score,
-		element
+
+	struct Score {
+		std::string name;
+		int32_t     score;
+		int32_t     level;
+		uint64_t    seed;
 	};
 
-	class Item_comp : public ecs::Component<Item_comp> {
-		public:
-			static constexpr const char* name() {return "Item";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+	extern void add_score(asset::Asset_manager& assets, Score score);
 
-			Item_comp(ecs::Entity& owner) noexcept
-				: Component(owner) {}
+	extern auto list_scores(asset::Asset_manager& assets) -> std::vector<Score>;
 
-
-			struct Persisted_state;
-			friend struct Persisted_state;
-			friend class Item_system;
-		private:
-
-			Item_target    _target = Item_target::score;
-			level::Element _element = level::Element::neutral;
-			float          _mod = 0.f;
-			bool           _joinable = false;
-			bool           _collected = false;
-	};
-
-}
-}
 }

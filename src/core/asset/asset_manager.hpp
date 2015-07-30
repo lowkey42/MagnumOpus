@@ -87,6 +87,8 @@ namespace asset {
 			template<typename T>
 			void save(const AID& id, const T& asset) throw(Loading_failed);
 
+			bool exists(const AID& id)const noexcept;
+
 			auto physical_location(const AID& id)const noexcept -> util::maybe<std::string>;
 
 			void reload();

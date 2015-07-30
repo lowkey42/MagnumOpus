@@ -29,7 +29,8 @@ namespace util {
 
 			template<typename Func>
 			void on_nothing(Func f) {
-				f();
+				if(is_nothing)
+					f();
 			}
 		};
 	}
@@ -101,6 +102,14 @@ namespace util {
 			}
 			T get_or_other(T other)const noexcept {
 				return is_some() ? _data : other;
+			}
+
+			template<typename Func>
+			auto process(Func f)const {
+				if(is_some())
+					f(_data);
+
+				return details::maybe_else_callable{is_nothing()};
 			}
 
 			template<typename Func>
