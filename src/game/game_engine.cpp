@@ -28,9 +28,18 @@ namespace mo {
 			enter_screen<Game_screen>(*s);
 
 		} else if(start_game) {
-			enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
+			if(Game_screen::save_exists(*this))
+				enter_screen<Game_screen>();
+			else {
+				INFO("no savegame");
+				enter_screen<Game_screen>("default");
+			}
 		}
 
+	}
+
+	Game_engine::~Game_engine() {
+		leave_screen(255);
 	}
 
 	auto Game_engine::_on_reload() -> std::tuple<bool, std::string> {

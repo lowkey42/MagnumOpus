@@ -105,6 +105,14 @@ namespace util {
 			}
 
 			template<typename Func>
+			auto process(Func f)const {
+				if(is_some())
+					f(_data);
+
+				return details::maybe_else_callable{is_nothing()};
+			}
+
+			template<typename Func>
 			auto process(Func f) {
 				if(is_some())
 					f(_data);

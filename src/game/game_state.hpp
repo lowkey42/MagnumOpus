@@ -91,29 +91,37 @@ namespace mo {
 		auto add_player(sys::controller::Controller& controller, Position pos,
 		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;
 
-		void delete_savegame();
-		auto save() -> Saveable_state;
+		void delete_save();
+		void save();
+		auto save_to() -> Saveable_state;
 
 
 		static auto create(Game_engine& engine,
-		                   std::string profile,
-				           std::vector<ecs::ETO> players,
-		                   util::maybe<int> depth) -> std::unique_ptr<Game_state>;
+		                   std::string name) -> std::unique_ptr<Game_state>;
+		static auto create(Game_engine& engine,
+		                   Profile_data profile,
+		                   std::vector<ecs::ETO> players,
+		                   int depth) -> std::unique_ptr<Game_state>;
 		static auto create_from_save(Game_engine& engine,
 		                             const Saveable_state&) -> std::unique_ptr<Game_state>;
+		static auto load(Game_engine& engine) -> std::unique_ptr<Game_state>;
+		static bool save_exists(Game_engine& engine);
 
 		private:
-			Game_state(Game_engine& engine, int depth);
+			Game_state(Game_engine& engine, Profile_data profile);
 	};
 
 	struct Saveable_state {
-		Saveable_state(ecs::Entity_manager& em) : em(em), my_stream(util::nothing()) {}
-		Saveable_state(asset::istream stream) : em(util::nothing()), my_stream(std::move(stream)) {}
+		Saveable_state(ecs::Entity_manager& em, Profile_data profile)
+		    : em(em), profile(profile), my_stream(util::nothing()) {}
+		Saveable_state(asset::istream stream)
+		    : em(util::nothing()), profile(util::nothing()), my_stream(std::move(stream)) {}
 		Saveable_state(Saveable_state&&)noexcept = default;
 
-		auto operator=(Saveable_state&&)noexcept -> Saveable_state& = default;
+		auto operator=(Saveable_state&&) -> Saveable_state& = default;
 
 		util::maybe<ecs::Entity_manager&> em;
+		util::maybe<Profile_data> profile;
 		util::maybe<asset::istream> my_stream;
 	};
 

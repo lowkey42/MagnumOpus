@@ -16,8 +16,10 @@
 #include "sys/graphic/sprite_comp.hpp"
 #include "sys/sound/sound_comp.hpp"
 
-#include "game_state.hpp"
+#include "sys/combat/comp/score_comp.hpp"
 
+#include "game_state.hpp"
+#include "highscore.hpp"
 
 namespace mo {
 	using namespace util;
@@ -35,12 +37,31 @@ namespace mo {
 		};
 	}
 
+
+	bool Game_screen::save_exists(Game_engine& engine) {
+		return Game_state::save_exists(engine);
+	}
+
+	Game_screen::Game_screen(Game_engine& engine)
+	    : Game_screen(engine, Game_state::load(engine))
+	{}
+
 	Game_screen::Game_screen(Game_engine& engine,
-							 std::string profile,
+							 std::string name)
+	    : Game_screen(engine, Game_state::create(engine, std::move(name)))
+	{}
+
+	Game_screen::Game_screen(Game_engine& engine,
+							 Profile_data profile,
 							 std::vector<ecs::ETO> players,
-							 util::maybe<int> depth) :
-		Screen(engine), _engine(engine),
-	    _state(Game_state::create(engine,profile,players,depth)),
+							 int depth)
+	    : Game_screen(engine, Game_state::create(engine,profile,players,depth))
+	{}
+
+	Game_screen::Game_screen(Game_engine& engine,
+	                         std::unique_ptr<Game_state> state)
+	    : Screen(engine), _engine(engine),
+	    _state(std::move(state)),
 		_player_sc_slot(&Game_screen::_on_state_change, this),
 		_join_slot(&Game_screen::_join, this),
 		_unjoin_slot(&Game_screen::_unjoin, this),
@@ -82,7 +103,7 @@ namespace mo {
 					 .build();
 	}
 	auto Game_screen::save() -> Saveable_state {
-		return _state->save();
+		return _state->save_to();
 	}
 
 	void Game_screen::_on_enter(util::maybe<Screen&> prev) {
@@ -98,6 +119,8 @@ namespace mo {
 
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {
+		_state->save();
+
 		_engine.controllers().screen_to_world_coords([](glm::vec2 p){
 			return p;
 		});
@@ -133,9 +156,13 @@ namespace mo {
 	void Game_screen::_on_state_change(ecs::Entity& e, sys::state::State_data& s) {
 		if(&e==_state->main_player.get()) {
 			if(s.s==sys::state::Entity_state::dead) {
+				auto score = e.get<sys::combat::Score_comp>().process(0, [](auto& s){return s.value();});
+				add_score(_engine.assets(), Score{_state->profile.name, score, _state->profile.depth,
+				                                  _state->profile.seed});
+
 				INFO("The segfault bites. You die!");
-				_state->delete_savegame();
-				_engine.enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
+				_state->delete_save();
+				_engine.enter_screen<Game_screen>("default");
 			}
 		}
 	}
@@ -147,10 +174,6 @@ namespace mo {
 
 	void Game_screen::_unjoin(sys::controller::Controller_removed_event e) {
 		// TODO
-	}
-
-	void Game_screen::_save()const {
-		// TODO[foe]: write save file (level_save + ecs_save)
 	}
 
 }

@@ -9,18 +9,45 @@ namespace state {
 	using namespace unit_literals;
 
 	struct State_comp::Persisted_state {
+		Entity_state state, state_background;
+		float state_left, state_bg_left;
 		bool delete_dead;
 
 		Persisted_state(const State_comp& c)
-			: delete_dead(c._delete_dead) {}
+			: state(c._state_primary.s),
+		      state_background(c._state_background.s),
+		      state_left(c._state_primary.left /1_s),
+		      state_bg_left(c._state_background.left/1_s),
+		      delete_dead(c._delete_dead) {}
 	};
 
+	sf2_enumDef(Entity_state,
+		sf2_value(idle),
+		sf2_value(walking),
+		sf2_value(attacking_melee),
+		sf2_value(attacking_range),
+		sf2_value(interacting),
+		sf2_value(taking),
+		sf2_value(change_weapon),
+		sf2_value(damaged),
+		sf2_value(healed),
+		sf2_value(dying),
+		sf2_value(dead),
+		sf2_value(resurrected)
+	)
+
 	sf2_structDef(State_comp::Persisted_state,
+		sf2_member(state),
+		sf2_member(state_background),
+		sf2_member(state_left),
+		sf2_member(state_bg_left),
 		sf2_member(delete_dead)
 	)
 
 	void State_comp::load(ecs::Entity_state& state) {
 		auto s = state.read_to(Persisted_state{*this});
+		_state_primary = {s.state, 1.0f, s.state_left*1_s};
+		_state_background = {s.state_background, 1.0f, s.state_bg_left*1_s};
 		_delete_dead = s.delete_dead;
 	}
 	void State_comp::store(ecs::Entity_state& state) {

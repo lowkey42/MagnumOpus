@@ -58,7 +58,7 @@ namespace {
 		return res;
 	}
 
-	bool exists(const std::string path) {
+	bool exists_file(const std::string path) {
 		return PHYSFS_exists(path.c_str())!=0 && PHYSFS_isDirectory(path.c_str())==0;
 	}
 	bool exists_dir(const std::string path) {
@@ -131,7 +131,7 @@ namespace asset {
 
 				std::tie(path, file) = s;
 
-				if(file ? exists(path) : exists_dir(path)) {
+				if(file ? exists_file(path) : exists_dir(path)) {
 					add_source(path);
 					lost = false;
 				}
@@ -199,7 +199,7 @@ namespace asset {
 		return _open(path, AID{Asset_type::gen, path});
 	}
 	util::maybe<istream> Asset_manager::_open(const std::string& path, const AID& aid) {
-		return exists(path) ? util::just(istream{aid, *this, path}) : util::nothing();
+		return exists_file(path) ? util::just(istream{aid, *this, path}) : util::nothing();
 	}
 
 	Asset_manager::Asset::Asset(std::shared_ptr<void> data, Reloader reloader, int64_t last_modified)
@@ -214,20 +214,20 @@ namespace asset {
 		auto res = _dispatcher.find(id);
 
 		if(res!=_dispatcher.end()) {
-			if(exists(res->second))
+			if(exists_file(res->second))
 				return res->second;
 			else
 				INFO("Asset not found in configured place: "<<res->second);
 		}
 
-		if(exists(id.name()))
+		if(exists_file(id.name()))
 			return id.name();
 
 		auto baseDir = _base_dir(id.type());
 
 		if(baseDir.is_some()) {
 			auto path = append_file(baseDir.get_or_throw(), id.name());
-			if(exists(path))
+			if(exists_file(path))
 				return util::just(std::move(path));
 			else
 				DEBUG("asset "<<id.str()<<" not found in "<<path);
@@ -253,7 +253,7 @@ namespace asset {
 
 		//PHYSFS_mkdir(util::split_on_last(path, "/").first.c_str());
 
-		if(exists(path))
+		if(exists_file(path))
 			PHYSFS_delete(path.c_str());
 
 		return {id, *this, path};
@@ -270,7 +270,7 @@ namespace asset {
 				return util::nothing();
 
 			auto file = dir+"/"s+f;
-			return exists(file) ? util::just(std::move(file)) : util::nothing();
+			return exists_file(file) ? util::just(std::move(file)) : util::nothing();
 		});
 	}
 
@@ -296,6 +296,14 @@ namespace asset {
 
 	void Asset_manager::shrink_to_fit()noexcept {
 		util::erase_if(_assets, [](const auto& v){return v.second.data.use_count()<=1;});
+	}
+
+	bool Asset_manager::exists(const AID& id)const noexcept {
+		auto path = _locate(id);
+		if(!path)
+			return false;
+
+		return exists_file(path.get_or_throw());
 	}
 
 } /* namespace asset */

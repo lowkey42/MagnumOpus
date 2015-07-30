@@ -26,9 +26,7 @@ namespace mo {
 		public:
 			Game_engine(const std::string& title, int argc, char** argv, char** env,
 			            bool start_game=true);
-			~Game_engine() {
-				_screen_stack.clear();
-			}
+			~Game_engine();
 
 			/// re-define enter_screen to inject Game_engine instead of Engine into screens
 			using Engine::enter_screen;
@@ -50,7 +48,7 @@ namespace mo {
 				_controllers.update(Time(dt));
 			}
 			void _on_quit(sys::controller::Quit_event) {
-				leave_screen();
+				exit();
 			}
 			auto _on_reload() -> std::tuple<bool, std::string> override;
 

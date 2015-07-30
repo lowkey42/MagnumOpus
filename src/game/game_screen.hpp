@@ -24,6 +24,9 @@
 
 #include "../core/units.hpp"
 
+#include "game_state.hpp"
+
+
 namespace mo {
 	namespace renderer{ class Camera; }
 
@@ -32,9 +35,15 @@ namespace mo {
 
 	class Game_screen : public Screen {
 		public:
-			Game_screen(Game_engine& engine, std::string profile,
+			static bool save_exists(Game_engine& engine);
+
+			Game_screen(Game_engine& engine, Profile_data profile,
 			            std::vector<ecs::ETO> players,
-			            util::maybe<int> depth=util::nothing());
+			            int depth);
+
+			Game_screen(Game_engine& engine);
+
+			Game_screen(Game_engine& engine, std::string name);
 
 			Game_screen(Game_engine& engine, const Saveable_state& state);
 			~Game_screen()noexcept;
@@ -42,6 +51,8 @@ namespace mo {
 			auto save() -> Saveable_state;
 
 		protected:
+			Game_screen(Game_engine& engine, std::unique_ptr<Game_state> state);
+
 			void _update(float delta_time)override;
 			void _draw(float delta_time)override;
 
@@ -56,8 +67,6 @@ namespace mo {
 
 			void _join(sys::controller::Controller_added_event e);
 			void _unjoin(sys::controller::Controller_removed_event e);
-
-			void _save()const;
 
 		private:
 			Game_engine& _engine;

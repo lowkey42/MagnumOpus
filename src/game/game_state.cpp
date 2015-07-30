@@ -18,6 +18,9 @@
 
 #include "tags.hpp"
 
+#include <sf2/sf2.hpp>
+#include <sf2/FileParser.hpp>
+
 
 namespace mo {
 	using namespace util;
@@ -51,24 +54,26 @@ namespace mo {
 	}
 
 
+	auto Game_state::create(Game_engine& engine, std::string name) -> std::unique_ptr<Game_state> {
+		auto profile = Profile_data{
+			name,
+			(uint64_t) time(0),
+			0,
+			0
+		};
+
+		return create(engine, profile, {}, 0);
+	}
 	auto Game_state::create(Game_engine& engine,
-	                   std::string profile_name,
-			           std::vector<ecs::ETO> players,
-	                   util::maybe<int> depth) -> std::unique_ptr<Game_state> {
-		auto profile = im_a_savegame;
-		if(profile.seed==42)
-            profile.seed = time(0);
+	                   Profile_data profile,
+	                   std::vector<ecs::ETO> players,
+	                   int depth) -> std::unique_ptr<Game_state> {
 
-		auto d = depth.get_or_other(profile.depth);
+		bool up = depth<profile.depth;
 
-		bool up = d<profile.depth;
+		profile.depth = depth;
 
-		profile.depth = d;
-
-		// TODO[foe]: save profile
-		im_a_savegame = profile;
-
-		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth.get_or_other(profile.depth)));
+		auto state = std::unique_ptr<Game_state>(new Game_state(engine, profile));
 
 
 		auto room_m = state->level.find_room(up ? level::Room_type::end :
@@ -128,8 +133,21 @@ namespace mo {
 			}
 		});
 
+		state->save();
+
 		return state;
 	}
+
+	auto Game_state::load(Game_engine& engine) -> std::unique_ptr<Game_state> {
+		return create_from_save(engine, *engine.assets().load<Saveable_state>("cfg:savegame"_aid));
+	}
+	bool Game_state::save_exists(Game_engine& engine) {
+		return engine.assets().exists("cfg:savegame"_aid);
+	}
+	void Game_state::save() {
+		engine.assets().save("cfg:savegame"_aid, save_to());
+	}
+
 	auto Game_state::create_from_save(Game_engine& engine,
 	                             const Saveable_state& s) -> std::unique_ptr<Game_state> {
 
@@ -139,9 +157,10 @@ namespace mo {
 		(void)reset_stream;
 
 
-		auto depth = 0; // TODO: load depth
+		auto profile = Profile_data{};
+		sf2::parseStream(stream, profile);
 
-		auto state = std::unique_ptr<Game_state>(new Game_state(engine, depth));
+		auto state = std::unique_ptr<Game_state>(new Game_state(engine, profile));
 
 		state->em.serializer().read(stream);
 
@@ -159,16 +178,16 @@ namespace mo {
 		return state;
 	}
 
-	auto Game_state::save() -> Saveable_state {
-		return Saveable_state{em}; // TODO
+	auto Game_state::save_to() -> Saveable_state {
+		return Saveable_state{em, profile};
 	}
 
-	Game_state::Game_state(Game_engine& engine, int depth)
+	Game_state::Game_state(Game_engine& engine, Profile_data profile)
 		: engine(engine),
-	      profile(im_a_savegame),
+	      profile(profile),
 	      level(level::generate_level(engine.assets(),
 									  profile.seed,
-									  depth,
+									  profile.depth,
 									  profile.difficulty)),
 	      em(engine.assets()),
 	      tilemap(engine, level),
@@ -227,7 +246,7 @@ namespace mo {
 		// END TODO
 	}
 
-	void Game_state::delete_savegame() {
+	void Game_state::delete_save() {
 		im_a_savegame = Profile_data{"default", 42,0,0};
 	}
 
@@ -245,9 +264,9 @@ namespace mo {
 				DEBUG("PLAYER: "<<p);
 
 			state.engine.enter_screen<Game_screen>(
-			            state.profile.name,
+			            state.profile,
 			            players,
-			            util::just(state.profile.depth+offset));
+			            state.profile.depth+offset);
 		}
 	}
 
@@ -346,12 +365,23 @@ namespace mo {
 		return p;
 	}
 
+	sf2_structDef(Profile_data,
+		sf2_member(name),
+		sf2_member(seed),
+		sf2_member(difficulty),
+		sf2_member(depth)
+	)
+
 	namespace asset {
 		auto Loader<Saveable_state>::load(istream in) throw(Loading_failed) -> std::shared_ptr<Saveable_state> {
 			return std::make_shared<Saveable_state>(std::move(in));
 		}
 
 		void Loader<Saveable_state>::store(ostream out, const Saveable_state& asset) throw(Loading_failed) {
+			asset.profile.process([&](auto& p){
+				sf2::writeStream(out, p);
+			});
+			out<<std::endl;
 			asset.em.process([&](auto& em){em.serializer().write(out);});
 		}
 	}
