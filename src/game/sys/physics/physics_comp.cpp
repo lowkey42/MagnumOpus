@@ -91,7 +91,7 @@ namespace physics{
 		  _active(true) {}
 
 	void Physics_comp::accelerate_active(glm::vec2 dir)noexcept {
-		if(glm::length2(remove_units(_velocity)) > _max_active_velocity2.value())
+		if(glm::length2(remove_units(_velocity)) > _max_active_velocity2.value()*_active_velocity_mod)
 			return;
 
 		auto len = glm::length2(dir);
@@ -117,6 +117,18 @@ namespace physics{
 		_velocity = velocity;
 		if(!is_zero(velocity))
 			_active = true;
+	}
+
+	void Physics_comp::mod_max_active_velocity(float fac)noexcept {
+		_active_velocity_mod=fac;
+		if(fac<1.f && !is_zero(_velocity)) {
+			float req_slowd = _max_active_velocity2.value()*_active_velocity_mod / glm::length2(remove_units(_velocity));
+
+			if(req_slowd<1.f) {
+				_velocity.x *= req_slowd;
+				_velocity.y *= req_slowd;
+			}
+		}
 	}
 
 }

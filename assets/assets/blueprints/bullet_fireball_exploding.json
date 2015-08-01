@@ -7,13 +7,14 @@
 		"friction": 0.0001
     },
     "Explosive": {
-        "damage": 1,
-        "range": 1,
+        "damage": 3,
+        "range": 3,
         "delay":0,
         "on_contact": true,
         "blast_force": 100,
         "damage_type": "fire",
-        "damage_effect": "burning"
+        "damage_effect": "burning",
+        "effect": "explosion_fire"
     },
     "Friend",
     "State": {

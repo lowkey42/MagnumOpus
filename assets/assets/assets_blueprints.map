@@ -3,9 +3,18 @@ blueprint:player = blueprints/player.json
 blueprint:zombie = blueprints/zombie.json
 blueprint:vomit_zombie = blueprints/vomit_zombie.json
 blueprint:crow = blueprints/crow.json
+
 blueprint:bullet = blueprints/bullet.json
+blueprint:bullet_stone_shard = blueprints/bullet_stone_shard.json
+blueprint:bullet_ice_shard = blueprints/bullet_ice_shard.json
 blueprint:bullet_fireball = blueprints/bullet_fireball.json
+blueprint:bullet_fireball_exploding = blueprints/bullet_fireball_exploding.json
+blueprint:bullet_iceball = blueprints/bullet_iceball.json
+blueprint:bullet_iceball_exploding = blueprints/bullet_iceball_exploding.json
+blueprint:bullet_stoneball = blueprints/bullet_stoneball.json
 blueprint:vomit_bullet = blueprints/vomit_bullet.json
+blueprint:vomit_bullet_exploding = blueprints/vomit_bullet_exploding.json
+blueprint:steam = blueprints/steam.json
 
 blueprint:coin = blueprints/coin.json
 blueprint:health_potion = blueprints/health_potion.json

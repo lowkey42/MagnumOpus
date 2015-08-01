@@ -122,7 +122,8 @@ namespace physics {
 				};
 
 				// reset acceleration
-			   self._acceleration=self._acceleration*0.0f;
+				self._acceleration=self._acceleration*0.0f;
+				self._active_velocity_mod = 1.f;
 			}
 		});
 	}

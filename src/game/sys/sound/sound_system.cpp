@@ -30,7 +30,22 @@ namespace sound {
 				case Effect_type::health:            return 0.1_s;
 
 				case Effect_type::flame_thrower:     return 0.6_s;
+				case Effect_type::poison_thrower:    return 0.6_s;
+				case Effect_type::frost_thrower:     return 0.6_s;
+				case Effect_type::water_thrower:     return 0.6_s;
+				case Effect_type::wind_thrower:      return 0.6_s;
+
+				case Effect_type::steam:             return 1.0_s;
+
 				case Effect_type::burning:           return 0.6_s;
+				case Effect_type::poisoned:          return 0.6_s;
+				case Effect_type::frozen:            return 0.6_s;
+				case Effect_type::confused:          return 0.6_s;
+
+				case Effect_type::explosion_fire:    return 0.6_s;
+				case Effect_type::explosion_poison:  return 0.6_s;
+				case Effect_type::explosion_ice:     return 0.6_s;
+				case Effect_type::explosion_stone:   return 0.6_s;
 			}
 			FAIL("UNREACHABLE, maybe");
 		}

@@ -122,7 +122,7 @@ namespace item {
 								util::lerp<glm::vec4>({0.4,0.4,0.4,0}, {0,0,0,0}, {0,0,0,0}),
 								util::lerp<Position>({50_cm, 50_cm}, {5_cm, 5_cm}, {2_cm, 2_cm}),
 								util::lerp<int8_t>(0, 0),
-								_assets.load<renderer::Texture>("tex:particle_line.png"_aid),
+								_assets.load<renderer::Texture>("tex:particle_wind"_aid),
 								true
 						);
 					}

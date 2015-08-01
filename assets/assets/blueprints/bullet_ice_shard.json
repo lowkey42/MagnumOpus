@@ -1,0 +1,32 @@
+{
+    "Transform":{"layer":0.5},
+	"Physics":{
+        "radius": 0.01,
+        "mass": 10,
+        "restitution": 0.9,
+		"friction": 0.0001,
+        "group_exclude": 8,
+        "group": 1
+    },
+    "Explosive": {
+        "damage": 0,
+        "range": 2,
+        "delay":0,
+        "blast_force": 20,
+        "explode_after": 2.0,
+        "damage_type": "frost",
+        "damage_effect": "frozen"
+    },
+    "Bullet": {
+        "damage": 2,
+        "damage_type": "frost",
+        "damage_effect": "frozen"
+    },
+    "Friend",
+    "State": {
+        "delete_dead":true
+    },
+    "Sprite": {
+        "aid": "anim:bullet_ice_shard"
+    }
+}

@@ -1,0 +1,12 @@
+﻿{
+	"animations": {
+		"idle": {"row":0, "fps":18, "frames":6},
+		"walking": {"row":0, "fps":18, "frames":6},
+		"died": {"row":1, "fps":30, "frames":9}
+	},
+	
+	"texName": "tex:iceball",
+
+	"frame_width": 64,
+	"frame_height": 64
+}

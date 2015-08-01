@@ -34,9 +34,22 @@ namespace ecs{class Entity;}
 
 
 		flame_thrower,
+		poison_thrower,
+		frost_thrower,
+		water_thrower,
+		wind_thrower,
 
+		steam,
 
-		burning
+		burning,
+		poisoned,
+		frozen,
+		confused,
+
+		explosion_fire,
+		explosion_poison,
+		explosion_ice,
+		explosion_stone,
 	};
 	constexpr auto effect_type_count = static_cast<uint16_t>(Effect_type::flame_thrower)+1;
 
@@ -67,9 +80,26 @@ namespace mo {
 		sf2_value(element_stone),
 		sf2_value(element_gas),
 		sf2_value(element_lightning),
+
 		sf2_value(health),
+
 		sf2_value(flame_thrower),
-		sf2_value(burning)
+		sf2_value(poison_thrower),
+		sf2_value(frost_thrower),
+		sf2_value(water_thrower),
+		sf2_value(wind_thrower),
+
+		sf2_value(steam),
+
+		sf2_value(burning),
+		sf2_value(poisoned),
+		sf2_value(frozen),
+		sf2_value(confused),
+
+		sf2_value(explosion_fire),
+		sf2_value(explosion_poison),
+		sf2_value(explosion_ice),
+		sf2_value(explosion_stone)
 	)
 }
 #endif
