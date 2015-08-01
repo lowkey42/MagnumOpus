@@ -24,8 +24,20 @@ namespace graphic {
 				case Effect_type::element_lightning: return true;
 				case Effect_type::health:            return true;
 
+
 				case Effect_type::flame_thrower:     return false;
 				case Effect_type::burning:           return false;
+				case Effect_type::poisoned:          return false;
+				case Effect_type::frozen:            return false;
+				case Effect_type::confused:          return false;
+
+				case Effect_type::explosion_fire:    return true;
+				case Effect_type::explosion_poison:  return true;
+				case Effect_type::explosion_ice:     return true;
+				case Effect_type::explosion_stone:   return true;
+
+				default:
+					return false;
 			}
 			FAIL("UNREACHABLE, maybe");
 		}
@@ -170,6 +182,60 @@ namespace graphic {
 			return {};
 		}
 
+		Particle_emiter_ptr create_thrower_emiter(Texture_ptr tex,
+		                                      Particle_renderer& particle_renderer) {
+			if(tex) {
+				return particle_renderer.create_emiter(
+						{0_m,0_m},
+						0_deg,
+						0.01_m,
+						0.55_m,
+						renderer::Collision_handler::bounce,
+						400,
+						500,
+						1.0_s, 1.2_s,
+						util::scerp<Angle>(0_deg, 15_deg),
+						util::scerp<Angle>(0_deg, 0_deg),
+						util::lerp<Speed_per_time>(10_m/second_2, 0_m/second_2),
+						util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+						util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.5}),
+						util::lerp<Position>({20_cm, 20_cm}, {100_cm, 100_cm}, {10_cm, 10_cm}),
+						util::scerp<int8_t>(0),
+						tex
+				);
+			}
+
+			return {};
+		}
+
+		Particle_emiter_ptr create_explosion_emiter(Texture_ptr tex,
+		                                      Particle_renderer& particle_renderer, float zoom=1.f) {
+			if(tex) {
+				return particle_renderer.create_emiter(
+						{0_m,0_m},
+						0_deg,
+						0.1_m,
+						0._m,
+						renderer::Collision_handler::bounce,
+						200 * 60 / zoom,
+						600 / zoom,
+						0.3_s, 1.0_s,
+						util::scerp<Angle>(0_deg, 360_deg),
+						util::scerp<Angle>(0_deg, 0_deg),
+						util::lerp<Speed_per_time>(8_m/second_2, 2_m/second_2, 2_m/second_2),
+						util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+						util::lerp<glm::vec4>({1,1,1,0}, {0,0,0,0}),
+						util::lerp<Position>({ 20_cm*zoom,  20_cm*zoom},
+						                     {100_cm*zoom, 100_cm*zoom},
+						                     { 10_cm*zoom,  10_cm*zoom}),
+						util::scerp<int8_t>(0),
+						tex
+				);
+			}
+
+			return {};
+		}
+
 		Texture_ptr load_tex(asset::Asset_manager& a, std::string tex_name) {
 			return a.load<renderer::Texture>(asset::AID(
 					asset::Asset_type::tex, std::move(tex_name)));
@@ -213,31 +279,58 @@ namespace graphic {
 					break;
 
 				case Effect_type::flame_thrower:
+					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_fire"),
+					                                  _particle_renderer);
+					break;
+
+				case Effect_type::poison_thrower:
+					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_gas"),
+					                                  _particle_renderer);
+					break;
+
+				case Effect_type::frost_thrower:
+					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_frost"),
+					                                  _particle_renderer);
+					break;
+
+				case Effect_type::water_thrower:
+					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_water"),
+					                                  _particle_renderer);
+					break;
+
+				case Effect_type::wind_thrower:
+					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_wind"),
+					                                  _particle_renderer);
+					break;
+
+
+				case Effect_type::steam:
 					e._emiter = _particle_renderer.create_emiter(
 							{0_m,0_m},
 							0_deg,
-							0.01_m,
-							0.55_m,
+							0.8_m,
+							0_m,
 							renderer::Collision_handler::bounce,
-							400,
-							500,
-							1.0_s, 1.2_s,
-							util::scerp<Angle>(0_deg, 15_deg),
+							20,
+							60,
+							0.8_s, 1.0_s,
+							util::scerp<Angle>(0_deg, 360_deg),
 							util::scerp<Angle>(0_deg, 0_deg),
-							util::lerp<Speed_per_time>(10_m/second_2, 0_m/second_2),
-							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
-							util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.5}),
-							util::lerp<Position>({20_cm, 20_cm}, {100_cm, 100_cm}, {10_cm, 10_cm}),
+							util::lerp<Speed_per_time>(4_m/second_2, 2_m/second_2),
+							util::lerp<Angle_acceleration>(0_deg/second_2, 10_deg/second_2),
+							util::lerp<glm::vec4>({0.8,0.8,0.8,0.3}, {0,0,0,0}),
+							util::lerp<Position>({50_cm, 50_cm}, {80_cm, 80_cm}, {20_cm, 20_cm}),
 							util::scerp<int8_t>(0),
-							load_tex(_assets,"particle_fire")
+							load_tex(_assets, "particle_steam")
 					);
 					break;
+
 
 				case Effect_type::burning:
 					e._emiter = _particle_renderer.create_emiter(
 							{0_m,0_m},
 							0_deg,
-							0.01_m,
+							0.2_m,
 							0.0_m,
 							renderer::Collision_handler::bounce,
 							50,
@@ -247,11 +340,94 @@ namespace graphic {
 							util::scerp<Angle>(0_deg, 0_deg),
 							util::lerp<Speed_per_time>(2_m/second_2, 0_m/second_2),
 							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
-							util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.2}),
+							util::lerp<glm::vec4>({0.5,0.2,0.2,0}, {0,0,0,0.2}),
 							util::lerp<Position>({40_cm, 40_cm}, {80_cm, 80_cm}, {10_cm, 10_cm}),
 							util::scerp<int8_t>(0),
 							load_tex(_assets,"particle_fire")
 					);
+					break;
+
+				case Effect_type::poisoned:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.2_m,
+							0.0_m,
+							renderer::Collision_handler::kill,
+							50,
+							100,
+							0.5_s, 0.8_s,
+							util::scerp<Angle>(0_deg, 360_deg),
+							util::scerp<Angle>(0_deg, 0_deg),
+							util::lerp<Speed_per_time>(2_m/second_2, 0_m/second_2),
+							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+							util::lerp<glm::vec4>({0.5,0.5,0.5,0}, {0,0,0,0}),
+							util::lerp<Position>({40_cm, 40_cm}, {80_cm, 80_cm}, {10_cm, 10_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets,"particle_gas")
+					);
+					break;
+
+				case Effect_type::frozen:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.2_m,
+							0.0_m,
+							renderer::Collision_handler::kill,
+							50,
+							100,
+							0.5_s, 0.8_s,
+							util::scerp<Angle>(0_deg, 360_deg),
+							util::scerp<Angle>(0_deg, 0_deg),
+							util::lerp<Speed_per_time>(2_m/second_2, 0_m/second_2),
+							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+							util::lerp<glm::vec4>({0.5,0.5,0.5,0}, {0,0,0,0}),
+							util::lerp<Position>({40_cm, 40_cm}, {80_cm, 80_cm}, {10_cm, 10_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets,"particle_frost")
+					);
+					break;
+
+				case Effect_type::confused:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.3_m,
+							0.0_m,
+							renderer::Collision_handler::kill,
+							2,
+							20,
+							0.8_s, 1.0_s,
+							util::scerp<Angle>(180_deg, 80_deg),
+							util::scerp<Angle>(90_deg, 0_deg),
+							util::lerp<Speed_per_time>(4_m/second_2, 1_m/second_2),
+							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+							util::lerp<glm::vec4>({1.0,1.0,1.0,0}, {0,0,0,0}),
+							util::lerp<Position>({60_cm, 60_cm}, {80_cm, 80_cm}, {10_cm, 10_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets,"particle_questionmark")
+					);
+					break;
+
+				case Effect_type::explosion_fire:
+					e._emiter = create_explosion_emiter(load_tex(_assets,"particle_fire"),
+					                                    _particle_renderer);
+					break;
+
+				case Effect_type::explosion_poison:
+					e._emiter = create_explosion_emiter(load_tex(_assets,"particle_gas"),
+					                                    _particle_renderer);
+					break;
+
+				case Effect_type::explosion_ice:
+					e._emiter = create_explosion_emiter(load_tex(_assets,"particle_ice"),
+					                                    _particle_renderer, 0.3f);
+					break;
+
+				case Effect_type::explosion_stone:
+					e._emiter = create_explosion_emiter(load_tex(_assets,"particle_stone_shard"),
+					                                    _particle_renderer, 0.3f);
 					break;
 
 					// TODO

@@ -1,0 +1,33 @@
+{
+    "Transform":{"layer":0.9},
+	"Physics":{
+        "radius": 1.0,
+        "mass": 1.0,
+        "restitution": 0.1,
+		"friction": 0.01,
+        "group":16,
+        "group_exclude": 8
+    },
+    "Explosive": {
+        "damage": 0,
+        "range": 2,
+        "delay":0,
+        "blast_force": 0,
+        "explode_after": 8.0,
+        "damage_effect": "blinded"
+    },
+    "State": {
+        "delete_dead":true
+    },
+    "Bullet": {
+        "damage": 0,
+        "damage_effect": "blinded",
+        "break_after_entities": 9999,
+        "break_after_walls": 9999
+    },
+    "Particle_emiter":{
+        "emiters":[
+            {"type":"steam", "scale":false, "enabled":true}
+         ]
+    }
+}

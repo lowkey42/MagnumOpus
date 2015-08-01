@@ -61,6 +61,7 @@ namespace physics {
 			auto acceleration()const noexcept {return _acceleration;}
 			auto active()const noexcept {return _active;}
 
+			void mod_max_active_velocity(float fac)noexcept;
 
 			struct Persisted_state;
 		private:
@@ -73,6 +74,7 @@ namespace physics {
 			float _friction;
 			Speed _max_active_velocity2 = Speed(0);
 			Speed_per_time _active_acceleration = Speed_per_time(0);
+			float _active_velocity_mod = 1.f;
 
 			uint8_t _group = 1;
 			uint8_t _group_exclude = 0;

@@ -33,7 +33,7 @@
     "Weapon":{
         "weapon": {
             "type": "range",
-            "bullet_type": "vomit_bullet",
+            "bullet_type": "vomit_bullet_exploding",
             "bullet_velocity": 30,
             "cooldown": 0.5,
             "recoil": 60,

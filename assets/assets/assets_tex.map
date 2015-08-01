@@ -10,6 +10,8 @@ tex:vomit_zombie = textures/vomit_zombie.png
 tex:crow = textures/crow.png
 tex:soldier = textures/soldier.png
 tex:fireball = textures/fireball.png
+tex:iceball = textures/iceball.png
+tex:stoneball = textures/stoneball.png
 tex:vomitball = textures/vomitball.png
 
 tex:x_font = textures/x.template_regular_48.tga
@@ -33,3 +35,8 @@ tex:particle_stone = textures/particle_stone.png
 tex:particle_gas = textures/particle_gas.png
 tex:particle_lightning = textures/particle_lightning.png
 tex:particle_health = textures/particle_health.png
+tex:particle_questionmark = textures/particle_questionmark.png
+tex:particle_wind = textures/particle_line.png
+tex:particle_steam = textures/particle_steam.png
+tex:particle_ice = textures/particle_ice.png
+tex:particle_stone_shard = textures/particle_stone_shard.png

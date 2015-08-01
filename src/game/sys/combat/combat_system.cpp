@@ -38,6 +38,7 @@ namespace combat {
 		struct Damage_effect_data {
 			float time = 0.f;
 			float confusion = 0.f;
+			float slow_down_factor = 0.f;
 			float dmg_per_sec = 0.f;
 			level::Element dmg_type = level::Element::neutral;
 			Effect_type effect = Effect_type::none;
@@ -50,6 +51,7 @@ namespace combat {
 		sf2_structDef(Damage_effect_data,
 			sf2_member(time),
 			sf2_member(confusion),
+			sf2_member(slow_down_factor),
 			sf2_member(dmg_per_sec),
 			sf2_member(dmg_type),
 			sf2_member(effect)
@@ -154,9 +156,17 @@ namespace combat {
 					_effects.inform(dmge.owner(), data.effect);
 				}
 
+				if(data.slow_down_factor!=0.f) {
+					dmge.owner().get<physics::Physics_comp>().process([&](auto& pc) {
+						pc.mod_max_active_velocity(1.f - data.slow_down_factor);
+					});
+				}
+
 				dmge._time_left -= dt;
-				if(dmge._time_left <= 1_s)
+				if(dmge._time_left <= 1_s) {
 					dmge._type = Damage_effect::none;
+					dmge._confusion = 0;
+				}
 			}
 
 			if(dmge._next_type!=Damage_effect::none) {
@@ -438,7 +448,7 @@ namespace combat {
 
 				auto group = b.owner().get<Friend_comp>().process(0, [](const auto& f){return f.group();});
 
-				this->_deal_damage(m.b.comp->owner(), group, b._damage, b._damage_type);
+				this->_deal_damage(m.b.comp->owner(), group, b._damage, b._damage_type, b._damage_effect);
 
 				if(m.b.comp->owner().get<physics::Transform_comp>().get_or_throw().layer()>=0.5) {
 					broken = --b._break_after_entities <=0;

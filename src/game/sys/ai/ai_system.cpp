@@ -2,6 +2,7 @@
 
 #include "target_tag_comp.hpp"
 #include "../physics/transform_system.hpp"
+#include "../combat/comp/damage_effect_comp.hpp"
 
 #include "../../level/level.hpp"
 
@@ -54,7 +55,23 @@ namespace ai {
 					});
 				});
 
-				e._wander_dir = e._wander_dir*0.5f + (flocking/flocking_count)*0.5f;
+				auto confusion = e.owner().get<combat::Damage_effect_comp>().process(0.f, [](auto& dec){
+					return dec.confusion();
+				});
+
+				if(confusion < 0.5f) {
+					e._wander_dir = e._wander_dir*0.5f + (flocking/flocking_count)*0.5f;
+				}
+
+				if(target_entity) {
+					confusion += target_entity->get<combat::Damage_effect_comp>().process(0.f, [](auto& dec){
+						return dec.confusion();
+					});
+				}
+
+				if(confusion > 0.2f) {
+					target_entity = nullptr;
+				}
 
 				if(target_entity) {
 					e.target(target_entity->shared_from_this());

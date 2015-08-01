@@ -7,22 +7,18 @@
 		"friction": 0.0001
     },
     "Explosive": {
-        "damage": 1,
-        "range": 1,
+        "damage": 2,
+        "range": 3,
         "delay":0,
         "on_contact": true,
         "blast_force": 100,
-        "damage_type": "fire",
-        "damage_effect": "burning"
+        "effect": "explosion_stone"
     },
     "Friend",
     "State": {
         "delete_dead":true
     },
     "Sprite": {
-        "aid": "anim:fireball"
-    },
-	"Sound": {
-		"aid": "sound_data:firebolt"
-	}
+        "aid": "anim:stoneball"
+    }
 }

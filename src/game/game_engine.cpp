@@ -28,7 +28,7 @@ namespace mo {
 			enter_screen<Game_screen>(*s);
 
 		} else if(start_game) {
-			if(Game_screen::save_exists(*this))
+			if(Game_screen::save_exists(*this) && false)
 				enter_screen<Game_screen>();
 			else {
 				INFO("no savegame");
