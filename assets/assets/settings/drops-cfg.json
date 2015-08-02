@@ -11,7 +11,7 @@
 		{"item_aid":"element_water", "chance":0.2},
 		{"item_aid":"element_stone", "chance":0.2},
 		{"item_aid":"element_gas", "chance":0.2},
-		{"item_aid":"element_lightning", "chance":0.2}
+		{"item_aid":"element_lightning", "chance":0.0}
 	]},
 	{"values":[
 		{"item_aid":"coin", "chance":1.0, "max": 15, "min":5},
@@ -21,6 +21,6 @@
 		{"item_aid":"element_water", "chance":0.3},
 		{"item_aid":"element_stone", "chance":0.3},
 		{"item_aid":"element_gas", "chance":0.3},
-		{"item_aid":"element_lightning", "chance":0.3}
+		{"item_aid":"element_lightning", "chance":0.0}
 	]}
 ]}

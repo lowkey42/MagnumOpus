@@ -50,7 +50,7 @@ namespace mo {
 
 		score_list.push_back(score);
 
-		std::stable_sort(std::begin(score_list), std::end(score_list), [](auto& a, auto& b){
+		std::stable_sort(std::begin(score_list), std::end(score_list), [](const Score& a, const Score& b){
 			return a.score > b.score;
 		});
 

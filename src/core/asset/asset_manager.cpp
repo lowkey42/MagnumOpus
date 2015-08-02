@@ -88,7 +88,7 @@ namespace mo {
 namespace asset {
 
 	Asset_manager::Asset_manager(const std::string& exe_name, const std::string& app_name) {
-		if(!PHYSFS_init(exe_name.c_str()))
+		if(!PHYSFS_init(exe_name.empty() ? nullptr : exe_name.c_str()))
 			FAIL("PhysFS-Init failed: "<< PHYSFS_getLastError());
 
 		std::string write_dir_parent = append_file(PHYSFS_getUserDir(),

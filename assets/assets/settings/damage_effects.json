@@ -3,7 +3,6 @@
         "burning":{
             "time": 5,
             "confusion": 0.5,
-            "slow_down_factor": 1.5,
             "dmg_per_sec": 4,
             "dmg_type": "fire",
             "effect": "burning"

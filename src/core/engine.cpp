@@ -112,7 +112,7 @@ struct Engine::Reload_handler {
 };
 
 Engine::Engine(const std::string& title, int argc, char** argv, char** env)
-  : _asset_manager(std::make_unique<asset::Asset_manager>(argv[0], title)),
+  : _asset_manager(std::make_unique<asset::Asset_manager>(argc>0 ? argv[0] : "", title)),
     _sdl(),
 	_graphics_ctx(std::make_unique<renderer::Graphics_ctx>(title, *_asset_manager)),
 	_audio_ctx(std::make_unique<audio::Audio_ctx>(*_asset_manager)),
