@@ -36,6 +36,7 @@ namespace cam {
 			auto cam_position()const noexcept {return _cam_pos;}
 
 			void chase(Position target, Time dt);
+			void reset();
 
 			struct Persisted_state;
 			friend struct Persisted_state;

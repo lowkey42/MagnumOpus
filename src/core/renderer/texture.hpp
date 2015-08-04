@@ -70,6 +70,7 @@ namespace renderer {
 			void clear(glm::vec3 color=glm::vec3(0,0,0));
 			void bind_target();
 			void unbind_target();
+			void set_viewport();
 
 		private:
 			unsigned int _fb_handle;

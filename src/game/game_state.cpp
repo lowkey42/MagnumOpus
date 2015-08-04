@@ -250,26 +250,6 @@ namespace mo {
 		im_a_savegame = Profile_data{"default", 42,0,0};
 	}
 
-	namespace {
-		void move_level(Game_state& state, int offset) {
-			auto players = std::vector<ecs::ETO>{
-				state.em.serializer().export_entity(*state.main_player)
-			};
-
-			for(auto& p : state.sec_players) {
-				players.push_back(state.em.serializer().export_entity(*p));
-			}
-
-			for(auto& p : players)
-				DEBUG("PLAYER: "<<p);
-
-			state.engine.enter_screen<Game_screen>(
-			            state.profile,
-			            players,
-			            state.profile.depth+offset);
-		}
-	}
-
 	void Game_state::update(Time dt) {
 		em.process_queued_actions();
 
@@ -284,32 +264,6 @@ namespace mo {
 		soundsys.update(dt);
 		state.update(dt);
 		ui.update(dt);
-
-		main_player->get<sys::physics::Transform_comp>().process(
-			[&](auto& transform){
-				auto x = static_cast<int>(transform.position().x.value()+0.5f);
-				auto y = static_cast<int>(transform.position().y.value()+0.5f);
-
-				auto& tile = level.get(x,y);
-				if(tile.type==level::Tile_type::stairs_down) {
-					/*if(this->profile.depth>=2) {
-						INFO("You delved too greedily and too deep");
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the bottom", "You delved too greedily and too deep", nullptr);
-						this->engine.leave_screen();
-
-					} else*/
-						move_level(*this, 1);
-
-				}else if(tile.type==level::Tile_type::stairs_up) {
-					if(this->profile.depth==0) {
-						INFO("You have reached the top");
-						SDL_ShowSimpleMessageBox(SDL_MESSAGEBOX_ERROR, "You have reached the top", "You have reached the top", nullptr);
-						this->engine.leave_screen();
-
-					} else
-						move_level(*this, -1);
-				}
-		});
 	}
 
 	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {

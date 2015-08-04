@@ -10,6 +10,8 @@ uniform float fill_level;
 
 uniform float activity;
 
+uniform vec4 color;
+
 vec4 get(vec2 rp,float r, float offset, float speedX, float speedY) {
 	vec2 p = vec2(speedX * time, speedY * time);
 
@@ -48,8 +50,7 @@ void main() {
 
 	vec4 c = (bg1(p,f) * bg2(p,f) *2.0)* bg3(p,f) *3.0;
 
-	c.rgb *= 1.1;
-	c.rgb /= pow(r*15.0, 1.0-activity);
+	c.rgb /= pow(r*16.0, 1.0-activity);
 
 	if(fill_level<1.0) {
 		vec4 line = get_line(1.0)*0.8 + get_line(0.5)*0.4;
@@ -70,5 +71,5 @@ void main() {
 	if(c.a<0.1)
 		discard;
 	else
-		gl_FragColor = c;
+		gl_FragColor = c * color;
 }

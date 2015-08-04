@@ -228,7 +228,6 @@ namespace ui {
 				_bubble_renderer.draw(hud._offset.xy()+e_offset,
 				                      e.fill, e.activity, _time_acc.value() + i/2.f,
 				                      *e.texture);
-
 			}
 		}
 
@@ -254,6 +253,30 @@ namespace ui {
 			_hud.draw();
 		}
 
+		// draw bubble-glow
+		_bubble_renderer.set_vp(_cam.vp());
+		for(auto& hud : _ui_comps) {
+			int i=-1;
+			for(const auto& e : hud._elements) {
+				i++;
+
+				if(!e.texture)
+					continue;
+
+				auto e_offset = element_offsets[i];
+
+				if(hud._offset.x>0) {
+					if(i%2!=0)
+						e_offset = element_offsets[(i+2) % 4];
+
+					e_offset.x*=-1;
+				}
+
+				_bubble_renderer.draw_glow(hud._offset.xy()+e_offset,
+				                      e.fill, e.activity, _time_acc.value() + i/2.f,
+				                      *e.texture);
+			}
+		}
 
 
 		// draw score

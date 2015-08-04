@@ -35,6 +35,8 @@ namespace mo {
 			{{1,0}, {1,1}},
 			{{0,1}, {0,0}}
 		};
+
+		constexpr Time fade_time = 1_s;
 	}
 
 
@@ -66,7 +68,11 @@ namespace mo {
 		_join_slot(&Game_screen::_join, this),
 		_unjoin_slot(&Game_screen::_unjoin, this),
 		_post_effect_obj(renderer::simple_vertex_layout,
-						 renderer::create_buffer(posteffect_buffer))
+						 renderer::create_buffer(posteffect_buffer)),
+	    _lightmap{
+				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false),
+				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false)
+		}
 	{
 
 
@@ -75,10 +81,22 @@ namespace mo {
 		_join_slot.connect(engine.controllers().join_events);
 		_unjoin_slot.connect(engine.controllers().unjoin_events);
 
-		_post_effects.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:simple"_aid))
-					 .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:simple"_aid))
+		_post_effects.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:poste"_aid))
+					 .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:poste"_aid))
 					 .bind_all_attribute_locations(renderer::simple_vertex_layout)
 					 .build();
+
+		_lightmap_filter.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:poste"_aid))
+		                .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:lmf"_aid))
+		                .bind_all_attribute_locations(renderer::simple_vertex_layout)
+		                .build();
+
+		_blur_filter.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:poste"_aid))
+		            .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:blur"_aid))
+		            .bind_all_attribute_locations(renderer::simple_vertex_layout)
+		            .build();
+
+		_fadein_left = fade_time;
 	}
 
 	Game_screen::~Game_screen()noexcept {
@@ -91,16 +109,32 @@ namespace mo {
 	    _join_slot(&Game_screen::_join, this),
 	    _unjoin_slot(&Game_screen::_unjoin, this),
 		_post_effect_obj(renderer::simple_vertex_layout,
-						 renderer::create_buffer(posteffect_buffer))
+						 renderer::create_buffer(posteffect_buffer)),
+	    _lightmap{
+				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false),
+				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false)
+		}
 	{
 		_player_sc_slot.connect(_state->state.state_change_events);
 		_join_slot.connect(engine.controllers().join_events);
 		_unjoin_slot.connect(engine.controllers().unjoin_events);
 
-		_post_effects.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:simple"_aid))
-					 .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:simple"_aid))
-					 .bind_all_attribute_locations(renderer::simple_vertex_layout)
-					 .build();
+		_post_effects.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:poste"_aid))
+		             .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:poste"_aid))
+		             .bind_all_attribute_locations(renderer::simple_vertex_layout)
+		             .build();
+
+		_lightmap_filter.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:poste"_aid))
+		                .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:lmf"_aid))
+		                .bind_all_attribute_locations(renderer::simple_vertex_layout)
+		                .build();
+
+		_blur_filter.attach_shader(engine.assets().load<renderer::Shader>("vert_shader:poste"_aid))
+		            .attach_shader(engine.assets().load<renderer::Shader>("frag_shader:blur"_aid))
+		            .bind_all_attribute_locations(renderer::simple_vertex_layout)
+		            .build();
+
+		_fadein_left = fade_time;
 	}
 	auto Game_screen::save() -> Saveable_state {
 		return _state->save_to();
@@ -117,6 +151,12 @@ namespace mo {
 			return main_camera.screen_to_world(p);
 		});
 
+		_fadein_left = fade_time;
+
+		// evil hack: camera jumps on initialization => skip first 4 seconds
+		_state->camera.reset();
+		for(int i=0; i<60*4; ++i)
+			_state->camera.update(1_s / 60);
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {
 		_state->save();
@@ -127,8 +167,61 @@ namespace mo {
 		_engine.audio_ctx().stop_music();
 	}
 
+	namespace {
+		void move_level(Game_state& state, int offset) {
+			auto players = std::vector<ecs::ETO>{
+				state.em.serializer().export_entity(*state.main_player)
+			};
+
+			for(auto& p : state.sec_players) {
+				players.push_back(state.em.serializer().export_entity(*p));
+			}
+
+			state.engine.enter_screen<Game_screen>(
+			            state.profile,
+			            players,
+			            state.profile.depth+offset);
+		}
+	}
+
 	void Game_screen::_update(float delta_time) {
+		if(_fadein_left>0_s) {
+
+			_fadein_left-=delta_time*second;
+
+			auto left = (fade_time - _fadein_left) / fade_time;
+
+
+			if(_moving_down)
+				left = 1.f-left;
+
+			delta_time *= left/2;
+
+			if(_fadein_left<=0_s) {
+				_fadein_left = 0_s;
+				if(_moving_down) {
+					move_level(*_state, 1);
+				}
+			}
+
+		}
+
 		_state->update(delta_time*second);
+
+
+		_state->main_player->get<sys::physics::Transform_comp>().process(
+			[&](auto& transform){
+				auto x = static_cast<int>(transform.position().x.value()+0.5f);
+				auto y = static_cast<int>(transform.position().y.value()+0.5f);
+
+				auto& tile = _state->level.get(x,y);
+				if(tile.type==level::Tile_type::stairs_down) {
+					if(!this->_moving_down) {
+						this->_moving_down = true;
+						this->_fadein_left = fade_time;
+					}
+				}
+		});
 	}
 
 	class Camera {};
@@ -139,13 +232,51 @@ namespace mo {
 		for(auto& screen : vscreens) {
 			glm::mat4 vp = glm::ortho(0.f,1.f,1.f,0.f,-1.f,1.f);
 
-			_post_effects.bind().set_uniform("VP", vp)
-					.set_uniform("layer",   1.0f)
-					.set_uniform("texture", 0)
-					.set_uniform("model", glm::mat4())
-					.set_uniform("color", glm::vec4(1,1,1,1));
+			_lightmap_filter.bind().set_uniform("VP", vp)
+					.set_uniform("texture", 0);
 			screen.vscreen.bind();
+
+			_lightmap[0].bind_target();
+			_lightmap[0].set_viewport();
+			_lightmap[0].clear();
 			_post_effect_obj.draw();
+			_lightmap[0].unbind_target();
+
+			// blur _lightmap
+			constexpr int blur_iterations = 6;
+			_blur_filter.bind().set_uniform("VP", vp)
+					.set_uniform("texture", 0);
+
+			int lidx = 0;
+			for(int i=0; i<blur_iterations; ++i) {
+				lidx = lidx==1 ? 0 : 1;
+
+				_blur_filter.bind().set_uniform("horiz", lidx==1);
+
+				_lightmap[lidx].bind_target();
+				_lightmap[lidx].set_viewport();
+				_lightmap[lidx].clear();
+				_lightmap[lidx==1 ? 0 : 1].bind();
+				_post_effect_obj.draw();
+				_lightmap[lidx].unbind_target();
+			}
+
+			_engine.graphics_ctx().reset_viewport();
+
+			auto fade = std::abs(_fadein_left/fade_time);
+
+			if(_moving_down)
+				fade = 1.f-fade;
+
+			_post_effects.bind().set_uniform("VP", vp)
+			        .set_uniform("fade", fade)
+					.set_uniform("texture", 0)
+			        .set_uniform("lightmap", 1);
+			screen.vscreen.bind();
+			_lightmap[lidx].bind(1);
+			_post_effect_obj.draw();
+
+			_lightmap[lidx].unbind(1);
 		}
 
 		_state->draw_ui();

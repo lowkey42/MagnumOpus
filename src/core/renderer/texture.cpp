@@ -162,6 +162,10 @@ namespace renderer {
 		return *this;
 	}
 
+	void Framebuffer::set_viewport() {
+		glViewport(0,0, width(), height());
+	}
+
 	void Framebuffer::clear(glm::vec3 color) {
 		glClearColor(color.r, color.g, color.b, 0.f);
 		glClear(GL_COLOR_BUFFER_BIT | (_db_handle ? GL_DEPTH_BUFFER_BIT : 0));

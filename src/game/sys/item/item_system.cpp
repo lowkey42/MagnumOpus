@@ -139,7 +139,16 @@ namespace item {
 						util::process(e.get<physics::Transform_comp>(),
 						              e.get<physics::Physics_comp>())
 						>> [&](auto& tt, auto& tp){
-							tp.apply_force(c._force * remove_units(t.position()-tt.position()) );
+							auto diff = remove_units(t.position()-tt.position());
+
+							auto diff_len = glm::length(diff);
+							if(diff_len>0.01f) {
+								auto normal = (diff/diff_len);
+
+								if(glm::length2(glm::dot(remove_units(tp.velocity()), normal)) <= (50_km/hour).value()) {
+									tp.apply_force(c._force * normal * 0.05 );
+								}
+							}
 						};
 					});
 

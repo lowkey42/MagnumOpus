@@ -9,7 +9,7 @@
     },
     "Item": {
         "target": "health",
-        "mod": 5,
+        "mod": 15,
         "joinable": true
     },
     "Particle_emiter":{

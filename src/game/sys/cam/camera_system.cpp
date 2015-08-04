@@ -101,6 +101,13 @@ namespace cam {
 		_main_camera.zoom(_cameras.front().camera.zoom() * (_main_camera.viewport().w/_cameras.front().camera.viewport().w));
 	}
 
+	void Camera_system::reset() {
+		for(auto& target : _targets) {
+			target.reset();
+		}
+		_uninitialized = false;
+	}
+
 }
 }
 }

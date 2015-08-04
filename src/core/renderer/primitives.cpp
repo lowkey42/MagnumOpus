@@ -85,7 +85,7 @@ namespace renderer {
 	}
 
 	Bubble_renderer::Bubble_renderer(asset::Asset_manager& assets, float radius)
-	    : _obj(bubble_vertex_layout, create_buffer(create_bubble_mesh(radius)))
+	    : _radius(radius), _obj(bubble_vertex_layout, create_buffer(create_bubble_mesh(radius)))
 	{
 		_prog.attach_shader(assets.load<Shader>("frag_shader:bubble"_aid))
 			 .attach_shader(assets.load<Shader>("vert_shader:bubble"_aid))
@@ -102,12 +102,29 @@ namespace renderer {
 
 		texture.bind();
 		_prog.bind()
-				.set_uniform("model", trans)
-		        .set_uniform("fill_level", glm::clamp(fill_level, 0.f, 1.f))
-		        .set_uniform("time", time)
-		        .set_uniform("activity", glm::clamp(activity, 0.f, 1.f))
-		        .set_uniform("texture", 0);
+		     .set_uniform("model", trans)
+		     .set_uniform("fill_level", glm::clamp(fill_level, 0.f, 1.f))
+		     .set_uniform("time", time)
+		     .set_uniform("activity", glm::clamp(activity, 0.f, 1.f))
+		     .set_uniform("color", glm::vec4(1,1,1,1))
+		     .set_uniform("texture", 0);
 		_obj.draw();
+	}
+
+	void Bubble_renderer::draw_glow(glm::vec2 center, float fill_level, float activity, float time, const Texture& texture) {
+		if(activity>0) {
+			auto trans = glm::translate(glm::mat4(), {center.x+_radius*0, center.y-2, 0});
+
+			texture.bind();
+			_prog.bind()
+			     .set_uniform("model", trans)
+			     .set_uniform("fill_level", glm::clamp(fill_level, 0.f, 1.f))
+			     .set_uniform("time", time)
+			     .set_uniform("activity", glm::clamp(activity, 0.f, 1.f))
+			     .set_uniform("color", glm::vec4(0.2 * activity,0.2 * activity,0.2 * activity, 0.0))
+			     .set_uniform("texture", 0);
+			_obj.draw();
+		}
 	}
 
 }

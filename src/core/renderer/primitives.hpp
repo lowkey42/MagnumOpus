@@ -55,7 +55,10 @@ namespace renderer {
 
 			void draw(glm::vec2 center, float fill_level, float activity, float time, const Texture& texture);
 
+			void draw_glow(glm::vec2 center, float fill_level, float activity, float time, const Texture& texture);
+
 		private:
+			const float _radius;
 			Shader_program _prog;
 			Object _obj;
 	};

@@ -24,3 +24,8 @@ frag_shader:hud_health = shader/hud_health.frag
 
 vert_shader:particles = shader/particles.vert
 frag_shader:particles = shader/particles.frag
+
+vert_shader:poste = shader/poste.vert
+frag_shader:poste = shader/poste.frag
+frag_shader:lmf = shader/lmf.frag
+frag_shader:blur = shader/blur.frag

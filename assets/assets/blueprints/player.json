@@ -42,11 +42,11 @@
         }
     },
     "Laser_sight": {
-        "r": 150,
+        "r": 255,
         "g": 0,
         "b": 0,
-        "occlusion": 16,
-        "width": 0.05
+        "occlusion": 200,
+        "width": 0.06
     },
     "Score",
     "Collector":{

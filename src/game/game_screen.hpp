@@ -78,7 +78,13 @@ namespace mo {
 			util::slot<sys::controller::Controller_removed_event> _unjoin_slot;
 
 			renderer::Shader_program _post_effects;
+			renderer::Shader_program _lightmap_filter;
+			renderer::Shader_program _blur_filter;
 			renderer::Object _post_effect_obj;
+			renderer::Framebuffer _lightmap[2];
+
+			Time _fadein_left = Time{0};
+			bool _moving_down = false;
 	};
 
 }

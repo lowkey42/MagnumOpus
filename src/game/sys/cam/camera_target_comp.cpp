@@ -60,6 +60,9 @@ namespace cam {
 		else
 			_sleeping = 500_ms;
 	}
+	void Camera_target_comp::reset() {
+		_unset = true;
+	}
 }
 }
 }

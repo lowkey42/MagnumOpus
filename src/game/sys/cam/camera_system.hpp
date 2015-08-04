@@ -69,6 +69,8 @@ namespace cam {
 				return _main_camera;
 			}
 
+			void reset();
+
 		private:
 			bool _uninitialized = true;
 			renderer::Graphics_ctx& _gctx;

@@ -90,17 +90,19 @@ namespace physics {
 
 		if(!is_zero(self._acceleration)) {
 			self._velocity+=self._acceleration*dt;
-			auto vx = self._velocity.x.value();
-			auto vy = self._velocity.y.value();
-			auto speed = Speed(vx*vx + vy*vy);
-			if(speed>_max_body_velocity) {
-				self._velocity=self._velocity * (_max_body_velocity/speed);
-			}
 
 		} else if(is_zero(self._velocity)) {
 			self._active = false;
 			return;
 		}
+
+		auto vx = self._velocity.x.value();
+		auto vy = self._velocity.y.value();
+		auto speed = vx*vx + vy*vy;
+		if(speed>_max_body_velocity.value()*_max_body_velocity.value()) {
+			self._velocity=self._velocity * (_max_body_velocity.value()/std::sqrt(speed));
+		}
+
 
 		auto transform = self.owner().get<Transform_comp>();
 
