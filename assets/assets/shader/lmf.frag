@@ -11,7 +11,7 @@ void main() {
 	
 	float maxc = max(max(c.r, c.g), c.b);
 
-	if(c.a>0 && maxc>0.85 && lum>0.3) {
+	if(c.a>0.0 && maxc>0.85 && lum>0.3) {
 		gl_FragColor = c * maxc;
 	}else
 		discard;

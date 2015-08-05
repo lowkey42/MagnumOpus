@@ -142,7 +142,7 @@ namespace item {
 							auto diff = remove_units(t.position()-tt.position());
 
 							auto diff_len = glm::length(diff);
-							if(diff_len>0.01f) {
+							if(diff_len>0.0f) {
 								auto normal = (diff/diff_len);
 
 								if(glm::length2(glm::dot(remove_units(tp.velocity()), normal)) <= (50_km/hour).value()) {

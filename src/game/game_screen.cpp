@@ -36,6 +36,14 @@ namespace mo {
 			{{0,1}, {0,0}}
 		};
 
+		auto create_framebuffer(Game_engine& engine) {
+#ifdef SLOW_SYSTEM
+			return renderer::Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
+#else
+			return renderer::Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
+#endif
+		}
+
 		constexpr Time fade_time = 1_s;
 	}
 
@@ -70,8 +78,8 @@ namespace mo {
 		_post_effect_obj(renderer::simple_vertex_layout,
 						 renderer::create_buffer(posteffect_buffer)),
 	    _lightmap{
-				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false),
-				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false)
+				create_framebuffer(engine),
+				create_framebuffer(engine)
 		}
 	{
 
@@ -111,8 +119,8 @@ namespace mo {
 		_post_effect_obj(renderer::simple_vertex_layout,
 						 renderer::create_buffer(posteffect_buffer)),
 	    _lightmap{
-				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false),
-				renderer::Framebuffer(engine.graphics_ctx().win_width()/1, engine.graphics_ctx().win_height()/1, false)
+				create_framebuffer(engine),
+				create_framebuffer(engine)
 		}
 	{
 		_player_sc_slot.connect(_state->state.state_change_events);
@@ -243,7 +251,11 @@ namespace mo {
 			_lightmap[0].unbind_target();
 
 			// blur _lightmap
+#ifdef SLOW_SYSTEM
+			constexpr int blur_iterations = 4;
+#else
 			constexpr int blur_iterations = 6;
+#endif
 			_blur_filter.bind().set_uniform("VP", vp)
 					.set_uniform("texture", 0);
 
@@ -251,7 +263,7 @@ namespace mo {
 			for(int i=0; i<blur_iterations; ++i) {
 				lidx = lidx==1 ? 0 : 1;
 
-				_blur_filter.bind().set_uniform("horiz", lidx==1);
+				_blur_filter.bind().set_uniform("horiz", lidx==0);
 
 				_lightmap[lidx].bind_target();
 				_lightmap[lidx].set_viewport();

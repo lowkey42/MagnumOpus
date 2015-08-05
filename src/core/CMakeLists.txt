@@ -13,6 +13,7 @@ if(EMSCRIPTEN)
 	set(GLEW_LIBRARIES "")
 	set(OPENGL_LIBRARIES "")
 	set(SDL2_LIBRARY "")
+	add_definitions(-DSLOW_SYSTEM)
 	
 else()
 	if(NOT CMAKE_BUILD_TYPE)
