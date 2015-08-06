@@ -13,8 +13,8 @@ vec4 my_read_px(float o, float w) {
 }
 
 void main() {
-	gl_FragColor = texture2D( texture, vec2(uvl) ) * 0.2270270270
+	gl_FragColor = (texture2D( texture, vec2(uvl) ) * 0.2270270270
 	             + my_read_px(1.3846153846, 0.3162162162)
-	             + my_read_px(3.2307692308, 0.0702702703);
+	             + my_read_px(3.2307692308, 0.0702702703)) * 1.1;
 }
 

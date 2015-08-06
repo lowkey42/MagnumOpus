@@ -252,9 +252,9 @@ namespace mo {
 
 			// blur _lightmap
 #ifdef SLOW_SYSTEM
-			constexpr int blur_iterations = 4;
+			constexpr int blur_iterations = 3;
 #else
-			constexpr int blur_iterations = 6;
+			constexpr int blur_iterations = 7;
 #endif
 			_blur_filter.bind().set_uniform("VP", vp)
 					.set_uniform("texture", 0);
