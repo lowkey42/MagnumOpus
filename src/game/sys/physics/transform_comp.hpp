@@ -37,7 +37,7 @@ namespace physics {
 			auto position()const noexcept {return _position;}
 			void position(Position pos)noexcept {_position=pos; _dirty=true;}
 			auto rotation()const noexcept {return _rotation;}
-			void rotation(Angle a)noexcept {_rotation = a;}
+			void rotation(Angle a)noexcept {if(!_rotation_fixed) _rotation = a;}
 			void rotate(Angle offset, Time dt) noexcept{
 				auto max_rot = _max_rotation_speed*dt;
 
@@ -61,6 +61,7 @@ namespace physics {
 			Position _position;
 			float _layer = 0.5f;
 			Angle _rotation;
+			bool _rotation_fixed = false;
 			Angle_per_time _max_rotation_speed;
 			int32_t _cell_idx = -1;
 			bool _dirty = true;

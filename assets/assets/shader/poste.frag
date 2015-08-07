@@ -23,7 +23,7 @@ void main() {
 		float x = (uvl.x - 0.5) * 2.0;
 		float y = (uvl.y - 0.5) * 2.0;
 		gl_FragColor -= sqrt(x*x + y*y) * 0.3 - 0.04;
-		
+
 	}else
 		discard;
 }

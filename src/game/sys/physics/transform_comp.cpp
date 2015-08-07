@@ -11,11 +11,12 @@ namespace physics {
 
 	struct Transform_comp::Persisted_state {
 		float x, y, rot, rot_speed, layer;
+		bool rotation_fixed;
 
 		Persisted_state(const Transform_comp& c)
 				: x(c._position.x.value()), y(c._position.y.value()),
 		          rot(c._rotation.value()), rot_speed(c._max_rotation_speed/ (1_deg/second)),
-		          layer(c._layer){}
+		          layer(c._layer), rotation_fixed(c._rotation_fixed) {}
 	};
 
 	sf2_structDef(Transform_comp::Persisted_state,
@@ -23,7 +24,8 @@ namespace physics {
 		sf2_member(y),
 		sf2_member(rot),
 		sf2_member(rot_speed),
-		sf2_member(layer)
+		sf2_member(layer),
+		sf2_member(rotation_fixed)
 	)
 
 	void Transform_comp::load(ecs::Entity_state& state){
@@ -32,6 +34,7 @@ namespace physics {
 		_position.y = Distance(s.y);
 		_rotation = Angle(s.rot);
 		_max_rotation_speed = s.rot_speed * (1_deg/second);
+		_rotation_fixed = s.rotation_fixed;
 		layer(s.layer);
 		_dirty = true;
 	}

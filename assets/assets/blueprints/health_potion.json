@@ -1,20 +1,18 @@
 {
-    "Transform":{"layer":0.2},
+    "Transform":{"layer":0.2, "rot":135, "rotation_fixed":true},
 	"Physics":{
         "radius": 0.2,
         "mass": 1.0,
         "restitution": 0.01,
-		"friction": 0.0001,
+		"friction": 0.01,
         "group":4
     },
     "Item": {
         "target": "health",
         "mod": 15,
-        "joinable": true
+        "joinable": false
     },
-    "Particle_emiter":{
-        "emiters":[
-            {"type":"health", "scale":true, "enabled":true}
-         ]
+    "Sprite": {
+        "aid": "anim:healthpotion"
     }
 }

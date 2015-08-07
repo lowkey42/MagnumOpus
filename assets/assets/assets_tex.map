@@ -5,6 +5,7 @@ tex:enemy_moving = textures/scorpion_move.png
 tex:enemy2_moving = textures/crawler_move.png
 tex:bullet = textures/bullet.png
 tex:coin = textures/coin.tga
+tex:healthpotion = textures/healthpotion.png
 tex:zombie = textures/zombie.png
 tex:vomit_zombie = textures/vomit_zombie.png
 tex:crow = textures/crow.png
