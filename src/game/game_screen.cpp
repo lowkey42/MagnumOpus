@@ -200,7 +200,7 @@ namespace mo {
 			auto left = (fade_time - _fadein_left) / fade_time;
 
 
-			if(_moving_down)
+			if(_moving_down || _dying)
 				left = 1.f-left;
 
 			delta_time *= left/2;
@@ -209,6 +209,9 @@ namespace mo {
 				_fadein_left = 0_s;
 				if(_moving_down) {
 					move_level(*_state, 1);
+
+				} else if(_dying) {
+					_engine.enter_screen<Game_screen>("default");
 				}
 			}
 
@@ -277,7 +280,7 @@ namespace mo {
 
 			auto fade = std::abs(_fadein_left/fade_time);
 
-			if(_moving_down)
+			if(_moving_down || _dying)
 				fade = 1.f-fade;
 
 			_post_effects.bind().set_uniform("VP", vp)
@@ -305,7 +308,9 @@ namespace mo {
 
 				INFO("The segfault bites. You die!");
 				_state->delete_save();
-				_engine.enter_screen<Game_screen>("default");
+				_dying = true;
+				this->_fadein_left = fade_time*3.f;
+				_engine.audio_ctx().play_static(*_engine.assets().load<audio::Sound>("sound:player_dying"_aid));
 			}
 		}
 	}

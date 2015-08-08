@@ -3,6 +3,7 @@
 		"idle": {"row":0, "fps":1, "frames":1},
 		"walking": {"row":0, "fps":16, "frames":8},
 		"attacking_melee": {"row":0, "fps":1, "frames":1},
+        "dying": {"row":1, "fps":4, "frames":8},
 		"died": {"row":1, "fps":8, "frames":8}
 	},
 	

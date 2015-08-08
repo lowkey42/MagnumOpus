@@ -84,7 +84,7 @@ namespace mo {
 			renderer::Framebuffer _lightmap[2];
 
 			Time _fadein_left = Time{0};
-			bool _moving_down = false;
+			bool _moving_down = false, _dying = false;
 	};
 
 }

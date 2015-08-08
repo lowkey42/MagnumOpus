@@ -28,3 +28,6 @@ blueprint:element_lightning = blueprints/element_lightning.json
 
 
 blueprint:flame_collider = blueprints/flame_collider.json
+blueprint:frost_collider = blueprints/frost_collider.json
+blueprint:poison_collider = blueprints/poison_collider.json
+blueprint:water_collider = blueprints/water_collider.json

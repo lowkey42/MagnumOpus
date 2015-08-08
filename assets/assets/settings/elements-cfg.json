@@ -12,6 +12,54 @@
             "damage_type": "fire",
             "damage_effect": "burning"
         },
+        [frost]: {
+            "type": "range",
+            "bullet_type": "frost_collider",
+            "bullet_velocity": 10,
+            "cooldown": 0.03,
+            "recoil": 10,
+            "spreading": 30,
+            "effect": "frost_thrower",
+            "fuel_usage": 0.005,
+            "damage_type": "frost",
+            "damage_effect": "frozen"
+        },
+        [gas]: {
+            "type": "range",
+            "bullet_type": "poison_collider",
+            "bullet_velocity": 10,
+            "cooldown": 0.03,
+            "recoil": 10,
+            "spreading": 30,
+            "effect": "poison_thrower",
+            "fuel_usage": 0.005,
+            "damage_type": "gas",
+            "damage_effect": "poisoned"
+        },
+        [water]: {
+            "type": "range",
+            "bullet_type": "water_collider",
+            "bullet_velocity": 10,
+            "cooldown": 0.03,
+            "recoil": 10,
+            "spreading": 30,
+            "effect": "water_thrower",
+            "fuel_usage": 0.005,
+            "damage_type": "water",
+            "damage_effect": "wet"
+        },
+
+        [fire, frost]: {
+            "type": "range",
+            "bullet_type": "bullet",
+            "bullet_velocity": 60,
+            "cooldown": 0.1,
+            "recoil": 200,
+            "spreading": 20,
+            "bullet_count": 5
+            "effect": "wind_thrower",
+            "fuel_usage": 0.01
+        },
 
         [stone]: {
             "type": "range",
@@ -98,5 +146,27 @@
             "fuel_usage": 0.15
         }
     }
-	# TODO: missing: (fire,gas), (fire,frost), (water,lightning), (lightning,fire), (frost), (water), (lightning), (gas)
+
+    # TODO: ('fire', 'frost')
+    #        ('fire', 'gas')
+    #        ('frost', 'gas')
+    #        ('frost', 'water')
+    #        ('frost', 'stone')
+    #        ('gas', 'stone')
+    #        ('water', 'stone')
+    #        ('fire', 'frost', 'gas')
+    #        ('fire', 'frost', 'water')
+    #        ('fire', 'frost', 'stone')
+    #        ('fire', 'gas', 'water')
+    #        ('fire', 'water', 'stone')
+    #        ('frost', 'gas', 'water')
+    #        ('frost', 'gas', 'stone')
+    #        ('fire', 'frost', 'gas', 'water')
+    #        ('fire', 'frost', 'gas', 'stone')
+    #        ('fire', 'frost', 'water', 'stone')
+    #        ('fire', 'gas', 'water', 'stone')
+    #        ('frost', 'gas', 'water', 'stone')
+
+
+    # TODO maybe add: (water,lightning), (lightning,fire), (lightning)
 }

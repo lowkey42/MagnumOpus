@@ -64,7 +64,7 @@ namespace state {
 				case Entity_state::interacting:		return  0.1_s;
 				case Entity_state::taking:			return  0.5_s;
 				case Entity_state::change_weapon:	return  0.5_s;
-				case Entity_state::damaged:			return  0.1_s;
+				case Entity_state::damaged:			return  0.3_s;
 				case Entity_state::healed:			return  0.1_s;
 				case Entity_state::dead:			return  0_s;
 				case Entity_state::dying:			return  0.05_s;

@@ -183,7 +183,7 @@ namespace graphic {
 		}
 
 		Particle_emiter_ptr create_thrower_emiter(Texture_ptr tex,
-		                                      Particle_renderer& particle_renderer) {
+		                                      Particle_renderer& particle_renderer, float count_fac=1) {
 			if(tex) {
 				return particle_renderer.create_emiter(
 						{0_m,0_m},
@@ -191,14 +191,14 @@ namespace graphic {
 						0.01_m,
 						0.55_m,
 						renderer::Collision_handler::bounce,
-						400,
+						400 * count_fac,
 						500,
 						1.0_s, 1.2_s,
 						util::scerp<Angle>(0_deg, 15_deg),
 						util::scerp<Angle>(0_deg, 0_deg),
 						util::lerp<Speed_per_time>(10_m/second_2, 0_m/second_2),
 						util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
-						util::lerp<glm::vec4>({1,0.5,0.5,0}, {0,0,0,0.5}),
+						util::lerp<glm::vec4>({0.8,0.8,0.8,0}, {0,0,0,0.5}),
 						util::lerp<Position>({20_cm, 20_cm}, {100_cm, 100_cm}, {10_cm, 10_cm}),
 						util::scerp<int8_t>(0),
 						tex
@@ -300,7 +300,7 @@ namespace graphic {
 
 				case Effect_type::wind_thrower:
 					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_wind"),
-					                                  _particle_renderer);
+					                                  _particle_renderer, 0.2f);
 					break;
 
 
