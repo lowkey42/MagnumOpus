@@ -31,6 +31,7 @@ namespace ecs{class Entity;}
 		element_lightning,
 
 		health,
+		blood,
 
 
 		flame_thrower,
@@ -82,6 +83,7 @@ namespace mo {
 		sf2_value(element_lightning),
 
 		sf2_value(health),
+		sf2_value(blood),
 
 		sf2_value(flame_thrower),
 		sf2_value(poison_thrower),

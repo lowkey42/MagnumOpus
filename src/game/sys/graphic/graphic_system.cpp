@@ -278,6 +278,30 @@ namespace graphic {
 					                              _particle_renderer);
 					break;
 
+				case Effect_type::blood:
+					e._emiter = _particle_renderer.create_emiter(
+						{0_m,0_m},
+						0_deg,
+						0.1_m,
+						0._m,
+						renderer::Collision_handler::kill,
+						200 * 60,
+						600,
+						0.3_s, 0.5_s,
+						util::scerp<Angle>(0_deg, 360_deg),
+						util::scerp<Angle>(0_deg, 0_deg),
+						util::lerp<Speed_per_time>(15_m/second_2, 2_m/second_2, 4_m/second_2),
+						util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+						util::lerp<glm::vec4>({1,1,1,0}, {0,0,0,0}),
+						util::lerp<Position>({ 50_cm,  50_cm},
+						                     {100_cm, 100_cm},
+						                     { 10_cm,  10_cm}),
+						util::scerp<int8_t>(0),
+						load_tex(_assets,"particle_blood")
+					);
+					break;
+
+
 				case Effect_type::flame_thrower:
 					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_fire"),
 					                                  _particle_renderer);

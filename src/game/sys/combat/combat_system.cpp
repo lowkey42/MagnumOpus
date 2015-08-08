@@ -112,7 +112,7 @@ namespace combat {
 	      _dmg_effects(entity_manager.list<Damage_effect_comp>()),
 	      _ts(ts),
 	      _collision_slot(&Combat_system::_on_collision, this),
-	      _reaper(entity_manager, state_system),
+	      _reaper(entity_manager, state_system, effects),
 	      _ray_renderer(assets),
 	      _effects(effects)
 	{

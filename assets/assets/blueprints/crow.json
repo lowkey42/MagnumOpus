@@ -29,7 +29,7 @@
         "group": 1
     },
     "Health":{
-        "max_hp": 2
+        "max_hp": 0.1
      },
     "Weapon":{
         "weapon": {
@@ -40,6 +40,5 @@
             "melee_angle": 90
         }
     },
-    "Drop":{"group":0},
-    "ui_min"
+    "Drop":{"group":0}
 }

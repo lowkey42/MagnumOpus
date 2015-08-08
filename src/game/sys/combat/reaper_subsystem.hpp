@@ -16,6 +16,7 @@
 #pragma once
 
 #include "../state/state_system.hpp"
+#include "../../effects.hpp"
 
 namespace mo {
 namespace sys {
@@ -24,13 +25,15 @@ namespace combat {
 	class Reaper_subsystem {
 		public:
 			Reaper_subsystem(ecs::Entity_manager& entity_manager,
-			                 state::State_system& state_system);
+			                 state::State_system& state_system,
+			                 Effect_source& effect);
 
 		private:
 			void _reap(ecs::Entity&, sys::state::State_data&);
 
 			ecs::Entity_manager& _em;
 			util::slot<ecs::Entity&, sys::state::State_data&> _reap_slot;
+			Effect_source&                 _effects;
 	};
 
 }

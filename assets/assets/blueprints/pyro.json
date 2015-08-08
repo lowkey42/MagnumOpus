@@ -11,7 +11,7 @@
         "active_acceleration": 2
 	},
     "Sprite": {
-        "aid": "anim:vomit_zombie"
+        "aid": "anim:pyro"
     },		
     "Simple_ai":{
         "attack_distance": 10,
@@ -28,19 +28,19 @@
     },
     "Health":{
         "max_hp": 20,
-        "physical_resistence": 0.8,
-        "vulnerabilities": [fire],
-        "resistences": [gas],
+        "physical_resistence": 0.5,
+        "vulnerabilities": [water],
+        "resistences": [fire],
         "death_effect": blood
      },
     "Weapon":{
         "weapon": {
             "type": "range",
-            "bullet_type": "vomit_bullet_exploding",
+            "bullet_type": "bullet_fireball_exploding",
             "bullet_velocity": 30,
             "cooldown": 1.0,
             "recoil": 60,
-            "attack_delay": 0.5
+            "attack_delay": 0.25
         }
     },
     "Drop":{"group":2},

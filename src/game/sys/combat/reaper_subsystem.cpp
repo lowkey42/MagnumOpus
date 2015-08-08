@@ -29,21 +29,25 @@ namespace combat {
 		}
 	}
 
-	Reaper_subsystem::Reaper_subsystem(ecs::Entity_manager& entity_manager,
-				   state::State_system& state_system)
-		: _em(entity_manager), _reap_slot(&Reaper_subsystem::_reap, this) {
+	Reaper_subsystem::Reaper_subsystem(
+	        ecs::Entity_manager& entity_manager,
+	        state::State_system& state_system,
+	        Effect_source& effect)
+		: _em(entity_manager), _reap_slot(&Reaper_subsystem::_reap, this), _effects(effect) {
 
 		_reap_slot.connect(state_system.state_change_events);
 	}
 
 	void Reaper_subsystem::_reap(ecs::Entity& e, sys::state::State_data& s) {
 		if(s.s==Entity_state::dying) {
+			e.get<Health_comp>().process([&](auto& hc) {
+				if(hc.death_effect()!=Effect_type::none)
+					_effects.inform(e, hc.death_effect());
+			});
+
 			e.erase<physics::Physics_comp>();
 			e.erase<Health_comp>();
 			e.erase<Weapon_comp>();
-		}
-
-		if(s.s==Entity_state::dead) { // he's dead jim
 
 			e.get<physics::Transform_comp>().process([&](auto& transform){
 				transform.layer(0.1f);
@@ -57,6 +61,9 @@ namespace combat {
 					}
 				});
 			});
+		}
+
+		if(s.s==Entity_state::dead) { // he's dead jim
 
 			if(e.get<State_comp>().get_or_throw().delete_dead())
 				_em.erase(e.shared_from_this());

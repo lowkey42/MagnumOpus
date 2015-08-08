@@ -30,7 +30,8 @@
         "group": 1
     },
     "Health":{
-        "max_hp": 10
+        "max_hp": 10,
+        "death_effect": blood
      },
     "Weapon":{
         "weapon":{

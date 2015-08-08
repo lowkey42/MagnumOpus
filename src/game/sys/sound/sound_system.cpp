@@ -28,6 +28,7 @@ namespace sound {
 				case Effect_type::element_gas:       return 0.1_s;
 				case Effect_type::element_lightning: return 0.1_s;
 				case Effect_type::health:            return 0.1_s;
+				case Effect_type::blood:             return 0.1_s;
 
 				case Effect_type::flame_thrower:     return 0.6_s;
 				case Effect_type::poison_thrower:    return 0.6_s;

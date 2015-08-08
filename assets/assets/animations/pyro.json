@@ -1,0 +1,15 @@
+{
+	"animations": {
+		"idle": {"row":0, "fps":4, "frames":2},
+		"walking": {"row":1, "fps":3, "frames":4},
+        "attacking_melee": {"row":2, "fps":4, "frames":2},
+        "attacking_range": {"row":2, "fps":4, "frames":2},
+		"damaged": {"row":4, "fps":1, "frames":1},
+        "died": {"row":3, "fps":4, "frames":4}
+	},
+	
+	"texName": "tex:pyro",
+	
+	"frame_width": 64,
+	"frame_height": 64
+}

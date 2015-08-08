@@ -9,7 +9,13 @@ tex:healthpotion = textures/healthpotion.png
 tex:zombie = textures/zombie.png
 tex:vomit_zombie = textures/vomit_zombie.png
 tex:crow = textures/crow.png
+tex:pyro = textures/pyro.png
+tex:turret_ice = textures/turret_ice.png
 tex:soldier = textures/soldier.png
+
+tex:box = textures/box.png
+tex:barrel = textures/barrel.png
+
 tex:fireball = textures/fireball.png
 tex:iceball = textures/iceball.png
 tex:stoneball = textures/stoneball.png
@@ -42,3 +48,4 @@ tex:particle_wind = textures/particle_line.png
 tex:particle_steam = textures/particle_steam.png
 tex:particle_ice = textures/particle_ice.png
 tex:particle_stone_shard = textures/particle_stone_shard.png
+tex:particle_blood = textures/particle_blood.png

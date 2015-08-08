@@ -19,6 +19,7 @@
 #include <core/units.hpp>
 
 #include "../../../level/elements.hpp"
+#include "../../../effects.hpp"
 
 namespace mo {
 namespace sys {
@@ -42,6 +43,8 @@ namespace combat {
 
 			auto damaged()const noexcept {return _current_hp<_max_hp;}
 
+			auto death_effect()const noexcept {return _death_effect;}
+
 			struct Persisted_state;
 			friend struct Persisted_state;
 		private:
@@ -58,6 +61,8 @@ namespace combat {
 			float _physical_resistence = 0.f;
 			level::Elements _resistences;
 			level::Elements _vulnerabilities;
+
+			Effect_type _death_effect = Effect_type::none;
 	};
 
 }

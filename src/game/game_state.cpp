@@ -7,6 +7,7 @@
 
 #include <core/renderer/texture.hpp>
 #include <core/asset/aid.hpp>
+#include <core/utils/random.hpp>
 
 #include <ctime>
 
@@ -30,6 +31,8 @@ namespace mo {
 		constexpr auto MinEntitySize = 25_cm;
 		constexpr auto MaxEntitySize = 5_m;
 		constexpr auto MaxEntityVelocity = 180_km/hour;
+
+		auto rng = util::create_random_generator();
 
 		static Profile_data im_a_savegame{"default", 42,0,0};
 
@@ -109,26 +112,68 @@ namespace mo {
 		//spawn:
 
 		state->level.foreach_room([&](const auto& room){
+			auto w = room.width();
+			auto h = room.height();
 			auto center = room.center();
 
+			auto rand_pos = [center,w,h](){
+				return center + glm::vec2{
+					util::random_int(rng,-w/2,w/2),
+					util::random_int(rng,-h/2,h/2)
+				};
+			};
+
+			auto spawn = [&](const asset::AID& aid) {
+				ecs::Entity_ptr e = state->em.emplace(aid);
+				e->get<sys::physics::Transform_comp>().get_or_throw().position(rand_pos());
+			};
+
+
+			auto box_count = util::random_int(rng, 0, 3);
+			for(int i=0; i<box_count; i++) {
+				spawn("blueprint:box"_aid);
+			}
+
+			auto barrel_count = util::random_int(rng, 0, 2);
+			for(int i=0; i<barrel_count; i++) {
+				spawn("blueprint:barrel"_aid);
+			}
+
 			if(room.type==level::Room_type::start) {
-				// TODO[foe]
+				// TODO[foe] ?
 
 			} else {
-				for(int i=0; i<5; i++) {
-					ecs::Entity_ptr enemy1 = state->em.emplace("blueprint:zombie"_aid);
-					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+				auto zombie_count = util::random_int(rng, 2, 5);
+				auto crow_count   = util::random_int(rng, 0, 15);
+
+				for(int i=0; i<zombie_count; i++) {
+					spawn("blueprint:zombie"_aid);
 				}
-				for(int i=0; i<10; i++) {
-					ecs::Entity_ptr enemy1 = state->em.emplace("blueprint:crow"_aid);
-					enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+				for(int i=0; i<crow_count; i++) {
+					spawn("blueprint:crow"_aid);
 				}
 
 				if(room.type==level::Room_type::end) {
-					for(int i=0; i<3; i++) {
-						ecs::Entity_ptr enemy1 = state->em.emplace("blueprint:vomit_zombie"_aid);
-						enemy1->get<sys::physics::Transform_comp>().get_or_throw().position(center);
+					auto enemy_count = util::random_int(rng, 1, 4);
+
+					switch(util::random_int(rng, 0, 1)) {
+						case 0:
+							for(int i=0; i<enemy_count; i++)
+								spawn("blueprint:pyro"_aid);
+							break;
+
+						case 1:
+							for(int i=0; i<enemy_count; i++)
+								spawn("blueprint:vomit_zombie"_aid);
+							break;
+
+						case 2:
+						default:
+							for(int i=0; i<enemy_count; i++)
+								spawn("blueprint:turret_ice"_aid);
+							break;
 					}
+
 				}
 			}
 		});

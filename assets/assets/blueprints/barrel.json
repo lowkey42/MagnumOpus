@@ -1,0 +1,29 @@
+{
+    "Transform":{"layer":0.5},
+	"Physics":{
+        "radius": 0.3,
+        "mass": 80,
+        "restitution": 0.1,
+		"friction": 0.01
+    },
+    "Explosive": {
+        "damage": 5,
+        "range": 3,
+        "delay":0.5,
+        "on_damage": true,
+        "blast_force": 100,
+        "damage_type": "fire",
+        "damage_effect": "burning",
+        "effect": "explosion_fire"
+    },
+    "Health":{
+        "max_hp": 1,
+        "vulnerabilities": [fire]
+     },
+    "State": {
+        "delete_dead":true
+    },
+    "Sprite": {
+        "aid": "anim:barrel"
+    }
+}

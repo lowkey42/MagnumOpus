@@ -1,0 +1,21 @@
+{
+    "Transform":{"layer":0.5},
+	"Physics":{
+        "radius": 0.8,
+        "mass": 80,
+        "restitution": 0.1,
+		"friction": 0.01
+    },
+    "Health":{
+        "max_hp": 50,
+        "vulnerabilities": [fire]
+    },
+    "State": {
+        "delete_dead":false
+    },
+    "Drop":{"group":2},
+    "ui_min",
+    "Sprite": {
+        "aid": "anim:box"
+    }
+}

@@ -6,6 +6,12 @@ anim:crawler = animations/crawler_anim.json
 anim:zombie = animations/zombie.json
 anim:vomit_zombie = animations/vomit_zombie.json
 anim:crow = animations/crow.json
+anim:pyro = animations/pyro.json
+anim:turret_ice = animations/turret_ice.json
+
+anim:box = animations/box.json
+anim:barrel = animations/barrel.json
+
 anim:bullet = animations/bullet.json
 anim:bullet_stone_shard = animations/bullet_stone_shard.json
 anim:bullet_ice_shard = animations/bullet_ice_shard.json
