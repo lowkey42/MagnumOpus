@@ -24,6 +24,8 @@
 #include <core/renderer/camera.hpp>
 #include <core/renderer/primitives.hpp>
 
+#include "../physics/transform_system.hpp"
+
 #include "ui_comp.hpp"
 
 namespace mo {
@@ -32,10 +34,10 @@ namespace ui {
 
 	class Ui_system {
 		public:
-			Ui_system(Engine& e, ecs::Entity_manager& em);
+			Ui_system(Engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms);
 
 			void update(Time dt);
-			void draw();
+			void draw(const renderer::Camera& world_cam);
 
 		private:
 			Ui_comp::Pool& _ui_comps;
@@ -47,6 +49,7 @@ namespace ui {
 			renderer::Texture_ptr _hud_bg_tex;
 			renderer::Texture_ptr _hud_fg_tex;
 			renderer::Texture_ptr _hud_health_tex;
+			renderer::Texture_ptr _hud_health_min_tex;
 
 			renderer::Shader_program _score_shader;
 			renderer::Font_ptr    _score_font;
@@ -54,6 +57,7 @@ namespace ui {
 
 			renderer::Bubble_renderer _bubble_renderer;
 			asset::Asset_manager& _assets;
+			physics::Transform_system& _transforms;
 
 			Time _time_acc = Time{0};
 	};

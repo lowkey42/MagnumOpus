@@ -21,6 +21,7 @@ tex:nixie_font = textures/nixie_font.png
 tex:ui_hud_bg = textures/ui_stats_bg.png
 tex:ui_hud_fg = textures/ui_stats_fg.png
 tex:ui_hud_health = textures/ui_stats_health.png
+tex:ui_hud_health_min = textures/ui_small_health.png
 
 tex:element_fire = textures/ui_element_fire.png
 tex:element_frost = textures/ui_element_frost.png

@@ -145,8 +145,14 @@ namespace item {
 							if(diff_len>0.0f) {
 								auto normal = (diff/diff_len);
 
-								if(glm::length2(glm::dot(remove_units(tp.velocity()), normal)) <= (50_km/hour).value()) {
-									tp.apply_force(c._force * normal * 0.05 );
+								tp.apply_force(c._force * normal * 0.05 );
+
+								constexpr auto max_body_velocity = (40_km/hour).value();
+								auto vx = tp.velocity().x.value();
+								auto vy = tp.velocity().y.value();
+								auto speed = vx*vx + vy*vy;
+								if(speed>max_body_velocity*max_body_velocity) {
+									tp.velocity(tp.velocity() * (max_body_velocity/std::sqrt(speed)));
 								}
 							}
 						};

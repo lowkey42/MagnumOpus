@@ -40,5 +40,6 @@
             "melee_angle": 90
         }
     },
-    "Drop":{"group":0}
+    "Drop":{"group":0},
+    "ui_min"
 }

@@ -42,5 +42,6 @@
             "attack_delay": 0.25
         }
     },
-    "Drop":{"group":1}
+    "Drop":{"group":1},
+    "ui_min"
 }

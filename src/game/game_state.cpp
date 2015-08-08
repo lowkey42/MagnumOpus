@@ -203,7 +203,7 @@ namespace mo {
 	      items(engine.assets(), em, physics, transform, state, particle_renderer),
 	      elements(engine.assets(), em, combat),
 	      soundsys(engine.assets(), em, transform, engine.audio_ctx()),
-		  ui(engine, em) {
+		  ui(engine, em, transform) {
 		em.register_component_type<Player_tag_comp>();
 
 		graphics.effects.connect(effect_bus);
@@ -281,7 +281,7 @@ namespace mo {
 		return camera.vscreens();
 	}
 	void Game_state::draw_ui() {
-		ui.draw();
+		ui.draw(camera.main_camera());
 	}
 
 	auto Game_state::add_player(sys::controller::Controller& controller,

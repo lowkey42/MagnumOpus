@@ -2,6 +2,8 @@
 
 #include "ui_system.hpp"
 
+#include "ui_minmal_comp.hpp"
+
 #include <core/renderer/primitives.hpp>
 
 #include "../combat/comp/health_comp.hpp"
@@ -66,17 +68,21 @@ namespace ui {
         }
 	}
 
-	Ui_system::Ui_system(Engine& e, ecs::Entity_manager& em)
+	Ui_system::Ui_system(Engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms)
 	    : _ui_comps(em.list<Ui_comp>()),
 	      _cam(calculate_vscreen(e, 512)),
 	      _hud(simple_vertex_layout, create_buffer(hud_vert)),
 	      _hud_bg_tex(e.assets().load<Texture>("tex:ui_hud_bg"_aid)),
 	      _hud_fg_tex(e.assets().load<Texture>("tex:ui_hud_fg"_aid)),
 	      _hud_health_tex(e.assets().load<Texture>("tex:ui_hud_health"_aid)),
+	      _hud_health_min_tex(e.assets().load<Texture>("tex:ui_hud_health_min"_aid)),
 	      _score_font(e.assets().load<Font>("font:nixie"_aid)),
 	      _score_text(_score_font),
 	      _bubble_renderer(e.assets(), 58/2.f),
-	      _assets(e.assets()) {
+	      _assets(e.assets()),
+	      _transforms(transforms) {
+
+		em.register_component_type<Ui_minimal_comp>();
 
 		_score_shader.attach_shader(e.assets().load<renderer::Shader>("vert_shader:simple"_aid))
 		             .attach_shader(e.assets().load<renderer::Shader>("frag_shader:simple"_aid))
@@ -180,7 +186,7 @@ namespace ui {
 		}
 	}
 
-	void Ui_system::draw() {
+	void Ui_system::draw(const renderer::Camera& world_cam) {
 		renderer::Disable_depthtest ddt{};
 		(void)ddt;
 
@@ -195,6 +201,40 @@ namespace ui {
 
 			hud._mvp = _cam.vp()*model;
 		}
+
+		glm::vec2 upper_left  = world_cam.screen_to_world({world_cam.viewport().x, world_cam.viewport().y});
+		glm::vec2 lower_right = world_cam.screen_to_world({world_cam.viewport().z, world_cam.viewport().w});
+
+		_health_shader.bind().set_uniform("tex", 0);
+		_hud_health_min_tex->bind();
+		auto min_health_scale = glm::vec3(
+			_hud_health_min_tex->width()  / world_cam.world_scale() /2.f,
+			_hud_health_min_tex->height() / world_cam.world_scale() /2.f,
+			1
+		);
+
+		_transforms.foreach_in_rect(upper_left, lower_right, [&](ecs::Entity& entity) {
+			if(!entity.has<Ui_minimal_comp>())
+				return;
+
+			process(entity.get<physics::Transform_comp>(),
+			        entity.get<combat::Health_comp>())
+            >> [&](const auto& trans, const auto& health) {
+
+				if(health.damaged()) {
+					auto pos = remove_units(trans.position());
+
+					auto model = glm::scale(glm::translate(glm::mat4{}, {pos.x-min_health_scale.x/2, pos.y-min_health_scale.y, 0.f}), min_health_scale);
+
+					_health_shader.set_uniform("mvp", world_cam.vp() * model)
+								  .set_uniform("health", health.hp_percent())
+								  .set_uniform("health_anim", health.hp_percent());
+
+					_hud.draw();
+				}
+
+			};
+		});
 
 		// draw bg
 		_hud_bg_tex->bind(0);
