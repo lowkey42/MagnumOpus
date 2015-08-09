@@ -39,13 +39,15 @@ namespace physics {
 			auto rotation()const noexcept {return _rotation;}
 			void rotation(Angle a)noexcept {if(!_rotation_fixed) _rotation = a;}
 			void rotate(Angle offset, Time dt) noexcept{
-				auto max_rot = _max_rotation_speed*dt;
+				auto max_rot = _max_rotation_speed*_max_rotation_speed_factor*dt;
 
 				if(abs(offset)>max_rot)
 					offset = sign(offset).value() * max_rot;
 
 				rotation(rotation() + offset);
 			}
+
+			void set_max_rot_factor(float f) {_max_rotation_speed_factor = f;}
 
 			auto layer()const noexcept {return _layer;}
 			void layer(float layer)noexcept {
@@ -63,6 +65,7 @@ namespace physics {
 			Angle _rotation;
 			bool _rotation_fixed = false;
 			Angle_per_time _max_rotation_speed;
+			float _max_rotation_speed_factor = 1.f;
 			int32_t _cell_idx = -1;
 			bool _dirty = true;
 	};

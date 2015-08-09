@@ -50,6 +50,7 @@ namespace physics {
 
 	void Transform_system::update(Time) {
 		for(auto& c : _pool) {
+			c._max_rotation_speed_factor = 1.f;
 			if(c._dirty) {
 				_clamp_position(c._position);
 				c._dirty = false;

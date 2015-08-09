@@ -160,6 +160,9 @@ namespace combat {
 					dmge.owner().get<physics::Physics_comp>().process([&](auto& pc) {
 						pc.mod_max_active_velocity(1.f - data.slow_down_factor);
 					});
+					dmge.owner().get<physics::Transform_comp>().process([&](auto& t) {
+						t.set_max_rot_factor(1.f - data.slow_down_factor);
+					});
 				}
 
 				dmge._time_left -= dt;

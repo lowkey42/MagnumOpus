@@ -118,8 +118,8 @@ namespace mo {
 
 			auto rand_pos = [center,w,h](){
 				return center + glm::vec2{
-					util::random_int(rng,-w/2,w/2),
-					util::random_int(rng,-h/2,h/2)
+					util::random_int(rng,-w/2+2,w/2-2),
+					util::random_int(rng,-h/2+2,h/2-2)
 				};
 			};
 
@@ -144,7 +144,7 @@ namespace mo {
 
 			} else {
 				auto zombie_count = util::random_int(rng, 2, 5);
-				auto crow_count   = util::random_int(rng, 0, 15);
+				auto crow_count   = util::random_int(rng, 0, 10);
 
 				for(int i=0; i<zombie_count; i++) {
 					spawn("blueprint:zombie"_aid);
@@ -154,9 +154,9 @@ namespace mo {
 				}
 
 				if(room.type==level::Room_type::end) {
-					auto enemy_count = util::random_int(rng, 1, 4);
+					auto enemy_count = util::random_int(rng, 1, 2);
 
-					switch(util::random_int(rng, 0, 1)) {
+					switch(util::random_int(rng, 0, 3)) {
 						case 0:
 							for(int i=0; i<enemy_count; i++)
 								spawn("blueprint:pyro"_aid);

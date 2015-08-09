@@ -3,7 +3,7 @@
         [fire]: {
             "type": "range",
             "bullet_type": "flame_collider",
-            "bullet_velocity": 10,
+            "bullet_velocity": 12,
             "cooldown": 0.03,
             "recoil": 10,
             "spreading": 30,
@@ -78,7 +78,7 @@
             "recoil": 10,
             "spreading": 20,
             "bullet_count": 4,
-            "fuel_usage": 0.01,
+            "fuel_usage": 0.05,
             "damage_type": "frost",
             "damage_effect": "frozen"
         },
