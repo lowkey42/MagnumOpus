@@ -147,11 +147,8 @@
         }
     }
 
-    # TODO: ('fire', 'frost')
-    #        ('fire', 'gas')
+    # TODO:  ('fire', 'gas')
     #        ('frost', 'gas')
-    #        ('frost', 'water')
-    #        ('frost', 'stone')
     #        ('gas', 'stone')
     #        ('water', 'stone')
     #        ('fire', 'frost', 'gas')
