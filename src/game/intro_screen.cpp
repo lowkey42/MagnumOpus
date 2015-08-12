@@ -56,8 +56,6 @@ namespace mo {
 
 	void Intro_screen::_draw(float time ) {
 
-		Graphics_ctx& ctx = _game_engine.graphics_ctx();
-
 		_box.set_vp(_camera->vp());
 		_box.draw(glm::vec2(0.f, 0.f));
 
