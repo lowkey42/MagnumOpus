@@ -44,7 +44,9 @@ namespace mo {
 			renderer::Camera _camera;
 
 			renderer::Textured_box _box;
+			renderer::Textured_box _box2;
 
+			Time _fade_left;
 	};
 
 }
