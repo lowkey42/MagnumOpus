@@ -153,28 +153,31 @@ namespace renderer {
 
 	}
 
-	Textured_box::Textured_box(asset::Asset_manager& assets, asset::AID tex, int width, int height)
+	Textured_box::Textured_box(asset::Asset_manager& assets, Texture_ptr tex, int width, int height)
 		: _obj(textured_box_layout, create_buffer(create_box_mesh(width, height)))
 	{
 		_prog.attach_shader(assets.load<Shader>("vert_shader:simple"_aid))
-			 .attach_shader(assets.load<Shader>("frag_shader:simple"_aid))
-			 .bind_all_attribute_locations(simple_vertex_layout)
-			 .build();
+		     .attach_shader(assets.load<Shader>("frag_shader:simple"_aid))
+		     .bind_all_attribute_locations(simple_vertex_layout)
+		     .build()
+		     .set_uniform("color", glm::vec4(1,1,1,1));;
 
-		_texture = assets.load<Texture>(tex);
+		_texture = tex;
 
 	}
 
 	void Textured_box::set_vp(const glm::mat4& vp) {
 		_prog.bind().set_uniform("VP", vp);
 	}
+	void Textured_box::set_color(const glm::vec4& c) {
+		_prog.bind().set_uniform("color", c);
+	}
 
 	void Textured_box::draw(glm::vec2 center) {
 		auto trans = glm::translate(glm::mat4(), glm::vec3(center.x, center.y, 0.f));
 
 		_prog.bind().set_uniform("model", trans)
-					.set_uniform("layer", 0.f)
-					.set_uniform("color", glm::vec4(1,1,1,1));
+					.set_uniform("layer", 0.f);
 		_texture->bind();
 		_obj.draw();
 
