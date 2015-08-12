@@ -67,11 +67,5 @@
         "blast_force": 100,
         "force_feedback": 1.0
     },
-    "Element":{
-        "slots":[
-            {"element":fire, "fill":1},
-            {"element":gas, "fill":1},
-            {"element":stone, "fill":1}
-        ]
-    }
+    "Element"
 }
