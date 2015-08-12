@@ -71,10 +71,9 @@ namespace level {
 		// Binding tilemap texture
 		_texture->bind();
 
-		auto tile_res = tex_res / cam.world_scale();
-		auto tileset_width = static_cast<int>(tex_res.x / cam.world_scale() + 0.5f);
-		auto pixel_correction = 1.0f / 8 / tex_res;
-		auto pcf = (tex_res-(0.5f)) / tex_res;
+		auto tile_res = cam.world_scale();
+		auto tileset_width = static_cast<int>(tex_res.x / cam.world_scale());
+		auto pixel_correction = 0.5f;
 
 		auto cam_area  = cam.area();
 		auto cam_start = vec2{cam_area.x, cam_area.y};
@@ -90,15 +89,20 @@ namespace level {
 
 			int tile_type = static_cast<int>(tile.type);
 			auto tileset_pos = vec2 {
-				tile_type % tileset_width,
-				tile_type / tileset_width
+				(tile_type % tileset_width) * tile_res,
+				0
 			};
 
 			auto p  = vec3{x,y, tile.height()};
-			auto uv = tileset_pos / tile_res + pixel_correction;
 
 			for(auto i : util::range(vertex_count)) {
-				_vertices.emplace_back(vp[i]+p, vuv[i]*pcf/tile_res + uv);
+				auto cor = vec2 {
+					vuv[i].x>0 ? -pixel_correction : pixel_correction,
+					vuv[i].y>0 ? -pixel_correction : pixel_correction
+				};
+				auto uv = ((vuv[i]*tile_res + tileset_pos + cor)/tex_res);
+
+				_vertices.emplace_back(vp[i]+p, uv);
 			}
 		});
 
