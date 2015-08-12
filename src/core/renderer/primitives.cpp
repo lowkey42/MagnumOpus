@@ -135,7 +135,7 @@ namespace renderer {
 			vertex("uv", &Simple_vertex::uv)
 		};
 
-		auto create_box_mesh(int width, int height) -> std::vector<Simple_vertex> {
+		auto create_box_mesh(float width, float height) -> std::vector<Simple_vertex> {
 
 
 			std::vector<Simple_vertex> retVec {

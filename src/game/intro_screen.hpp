@@ -41,7 +41,7 @@ namespace mo {
 		private:
 
 			Game_engine& _game_engine;
-			std::unique_ptr<renderer::Camera> _camera;
+			renderer::Camera _camera;
 
 			renderer::Textured_box _box;
 

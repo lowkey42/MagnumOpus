@@ -44,10 +44,9 @@ namespace mo {
 	Intro_screen::Intro_screen(Game_engine& game_engine) :
 		Screen(game_engine),
 		_game_engine(game_engine),
-		_box(game_engine.assets(), "tex:ui_intro"_aid, 2.f, 2.f)
+	    _camera(calculate_vscreen(game_engine, 512)),
+		_box(game_engine.assets(), "tex:ui_intro"_aid, _camera.viewport().w*2.f, _camera.viewport().w)
 	{
-		glm::vec2 win_size = glm::vec2(2, 2);
-		_camera.reset(new renderer::Camera(win_size));
 	}
 
 
@@ -60,7 +59,7 @@ namespace mo {
 
 
 	void Intro_screen::_draw(float time ) {
-		_box.set_vp(_camera->vp());
+		_box.set_vp(_camera.vp());
 		_box.draw(glm::vec2(0.f, 0.f));
 
 	}
