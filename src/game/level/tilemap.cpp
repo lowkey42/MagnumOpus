@@ -73,7 +73,7 @@ namespace level {
 
 		auto tile_res = tex_res / cam.world_scale();
 		auto tileset_width = static_cast<int>(tex_res.x / cam.world_scale() + 0.5f);
-		auto pixel_correction = 0.25f / tex_res;
+		auto pixel_correction = 1.0f / 8 / tex_res;
 		auto pcf = (tex_res-(0.5f)) / tex_res;
 
 		auto cam_area  = cam.area();
