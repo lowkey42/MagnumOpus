@@ -6,7 +6,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
-#include <game/game_screen.hpp>
+#include "game_screen.hpp"
 #include <game/example_screen.hpp>
 
 
@@ -28,7 +28,13 @@ namespace mo {
 			void switch_weapon(uint32_t weapon_id) override { enter_game(); }
 
 			void enter_game(){
-			 _engine.enter_screen<Game_screen>("default", std::vector<ecs::ETO>{}, util::just(0));
+				// TODO: move to main-menu
+				if(Game_screen::save_exists(_engine))
+					_engine.enter_screen<Game_screen>();
+				else {
+					INFO("no savegame");
+					_engine.enter_screen<Game_screen>("TODO");
+				}
 			}
 
 			Game_engine& _engine;

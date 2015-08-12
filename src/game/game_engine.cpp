@@ -2,6 +2,7 @@
 #include "game_engine.hpp"
 
 #include "game_screen.hpp"
+#include "intro_screen.hpp"
 #include "game_state.hpp"
 
 #include <vector>
@@ -27,15 +28,8 @@ namespace mo {
 
 			enter_screen<Game_screen>(*s);
 
-		} else if(start_game) {
-			if(Game_screen::save_exists(*this))
-				enter_screen<Game_screen>();
-			else {
-				INFO("no savegame");
-				enter_screen<Game_screen>("default");
-			}
-		}
-
+		} else
+			enter_screen<Intro_screen>();
 	}
 
 	Game_engine::~Game_engine() {

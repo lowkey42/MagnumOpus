@@ -114,7 +114,8 @@ namespace controller {
 			  : util::nothing();
 
 		if(ret.is_nothing() && activate && idx<_ready_gamepad_controller.size()+_active_gamepad_controller.size()) {
-			for(std::size_t i=0; i<=idx-_active_gamepad_controller.size(); i++)
+			auto missing = idx-_active_gamepad_controller.size();
+			for(std::size_t i=0; i<=missing; i++)
 				join_events.inform({*_ready_gamepad_controller.back()});
 
 			if(idx<_active_gamepad_controller.size())

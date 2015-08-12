@@ -302,9 +302,10 @@ namespace controller {
 		_keyboard(c);
 
 		for(auto& gp : _gamepads) {
-			(*gp)(c);
 			if(gp->is_used())
 				_keyboard.tmp_disable_mouse_look();
+
+			(*gp)(c);
 		}
 	}
 	void Combined_controller::feedback(float force) {
