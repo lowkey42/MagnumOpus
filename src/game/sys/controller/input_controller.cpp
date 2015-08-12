@@ -271,6 +271,13 @@ namespace controller {
 			SDL_GetError(); // clear error
 	}
 
+	void Gamepad_controller::request_unjoin() {
+		if(_active) {
+			_removed_events.inform(Controller_removed_event{*this});
+			_active = false;
+		}
+	}
+
 	void Gamepad_controller::enter_or_leave() {
 		if(_active) {
 			_removed_events.inform(Controller_removed_event{*this});

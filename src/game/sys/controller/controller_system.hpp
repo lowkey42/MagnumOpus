@@ -37,6 +37,9 @@ namespace controller {
 			void update(Time dt);
 
 			auto& main_controller(){return *_main_controller.get();}
+			auto  gamepad(std::size_t idx, bool activate=false) -> util::maybe<Controller&>;
+
+			bool player_ready()const noexcept {return _ready_gamepad_controller.size();}
 
 			void screen_to_world_coords(std::function<glm::vec2(glm::vec2)> func) {
 				_screen_to_world_coords = func;
@@ -77,7 +80,10 @@ namespace controller {
 			void update(Time dt);
 
 		private:
+			void _on_comp_event(ecs::Component_event e);
+
 			Controllable_comp::Pool& _controllables;
+			util::slot<ecs::Component_event> _on_comp_events;
 		};
 
 }

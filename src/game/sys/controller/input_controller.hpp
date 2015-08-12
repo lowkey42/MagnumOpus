@@ -85,13 +85,15 @@ namespace controller {
 							  util::signal_source<Controller_removed_event>& removed_events);
 			~Gamepad_controller();
 
-			void operator()(Controllable_interface&);
+			void operator()(Controllable_interface&)override;
 
-			void feedback(float force);
+			void feedback(float force)override;
 
 			void on_frame();
 
 			void enter_or_leave();
+
+			void request_unjoin()override;
 
 			auto instance_id()const -> SDL_JoystickID;
 			auto jId()const -> int;

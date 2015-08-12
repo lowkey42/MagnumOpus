@@ -257,7 +257,7 @@ namespace mo {
 #ifdef SLOW_SYSTEM
 			constexpr int blur_iterations = 3;
 #else
-			constexpr int blur_iterations = 7;
+			constexpr int blur_iterations = 10;
 #endif
 			_blur_filter.bind().set_uniform("VP", vp)
 					.set_uniform("texture", 0);
@@ -294,6 +294,8 @@ namespace mo {
 			_lightmap[lidx].unbind(1);
 		}
 
+		// if engine.controllers().player_ready() => show message
+
 		_state->draw_ui();
 	}
 
@@ -316,12 +318,11 @@ namespace mo {
 	}
 
 	void Game_screen::_join(sys::controller::Controller_added_event e) {
-		// TODO
 		_state->add_player(e.controller, _state->main_player->get<sys::physics::Transform_comp>().get_or_throw().position());
 	}
 
 	void Game_screen::_unjoin(sys::controller::Controller_removed_event e) {
-		// TODO
+		_state->remove_player(e.controller);
 	}
 
 }

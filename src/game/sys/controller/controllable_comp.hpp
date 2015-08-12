@@ -58,6 +58,14 @@ namespace controller {
 				_controller_component = controller;
 			}
 
+			bool is(Controller& controller) {
+				return _controller==&controller;
+			}
+			template<class T, typename = std::enable_if_t<ecs::is_component<T>::value>>
+			bool is(T& controller) {
+				return _controller_component==T::type();
+			}
+
 		private:
 			friend class Controller_system;
 

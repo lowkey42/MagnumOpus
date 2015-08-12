@@ -40,6 +40,7 @@ namespace controller {
 		virtual ~Controller()noexcept = default;
 		virtual void operator()(Controllable_interface&) = 0;
 		virtual void feedback(float force) {}
+		virtual void request_unjoin() {}
 	};
 
 

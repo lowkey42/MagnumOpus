@@ -89,18 +89,27 @@ namespace mo {
 		                      + Position{1_m,0_m} * (up ? -1 : 1);
 
 		if(!players.empty()) {
-			bool first = true;
 			for(auto& p : players) {
-				// TODO[foe]:  get controller
-				if(!first)
-					break;
-				else
-					first = false;
+				auto player = state->em.serializer().import_entity(p);
 
-				auto& controller = engine.controllers().main_controller();
+				player->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
+					trans.position(start_position);
+				});
 
-				state->add_player(controller,
-				           start_position, state->em.serializer().import_entity(p));
+				auto& tag = player->get<Player_tag_comp>().get_or_throw();
+
+				if(tag.id()==0)
+					set_controller(*player, engine.controllers().main_controller());
+
+				else {
+					engine.controllers().gamepad(tag.id()-1).process([&](auto& pad){
+						set_controller(*player, pad);
+
+					}).on_nothing([&]{
+						INFO("Dropped player "<<std::size_t(tag.id())<<" on level-switch: Too few controllers");
+						state->em.erase(player);
+					});
+				}
 			}
 
 		} else {
@@ -140,8 +149,6 @@ namespace mo {
 			}
 
 			if(room.type==level::Room_type::start) {
-				spawn("blueprint:turret_ice"_aid);
-				// TODO[foe] ?
 
 			} else {
 				auto zombie_count = util::random_int(rng, 2, 5);
@@ -216,8 +223,13 @@ namespace mo {
 				state->main_player = player.owner_ptr();
 
 			} else {
-				// TODO: get controller
-				state->sec_players.push_back(player.owner_ptr());
+				engine.controllers().gamepad(player.id()-1, true).process([&](auto& pad){
+					set_controller(player.owner(), pad);
+					state->sec_players.push_back(player.owner_ptr());
+				}).on_nothing([&]{
+					INFO("Dropped player "<<std::size_t(player.id())<<" on load: Too few controllers");
+					state->em.erase(player.owner_ptr());
+				});
 			}
 		}
 
@@ -363,6 +375,14 @@ namespace mo {
 		}
 
 		return p;
+	}
+	void Game_state::remove_player(sys::controller::Controller& controller) {
+		for(auto& p : sec_players) {
+			p->get<sys::controller::Controllable_comp>().process([&](auto& cc){
+				if(cc.is(controller))
+					em.erase(p);
+			});
+		}
 	}
 
 	sf2_structDef(Profile_data,

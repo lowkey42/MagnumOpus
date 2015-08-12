@@ -16,9 +16,20 @@ namespace controller {
 	using namespace unit_literals;
 
 	Controller_system::Controller_system(ecs::Entity_manager& entity_manager)
-	  : _controllables(entity_manager.list<Controllable_comp>()) {
+	  : _controllables(entity_manager.list<Controllable_comp>()),
+	    _on_comp_events(&Controller_system::_on_comp_event, this) {
 
 		entity_manager.register_component_type<Controllable_comp>();
+		_on_comp_events.connect(entity_manager.list<Controllable_comp>());
+	}
+
+	void Controller_system::_on_comp_event(ecs::Component_event e) {
+		if(e.type==ecs::Component_event_type::freed) {
+			e.handle.get<Controllable_comp>().process([&](auto& cont){
+				if(cont._controller)
+					cont._controller->request_unjoin();
+			});
+		}
 	}
 
 	namespace {
@@ -96,6 +107,22 @@ namespace controller {
 		_main_controller = std::make_unique<Combined_controller>(
 			*_keyboard_controller,
 			_ready_gamepad_controller );
+	}
+
+	auto Controller_manager::gamepad(std::size_t idx, bool activate) -> util::maybe<Controller&> {
+		auto ret = idx<_active_gamepad_controller.size()
+			  ? util::justPtr<Controller>(_active_gamepad_controller[idx].get())
+			  : util::nothing();
+
+		if(ret.is_nothing() && activate && idx<_ready_gamepad_controller.size()+_active_gamepad_controller.size()) {
+			for(std::size_t i=0; i<=idx-_active_gamepad_controller.size(); i++)
+				join_events.inform({*_ready_gamepad_controller.back()});
+
+			if(idx<_active_gamepad_controller.size())
+				ret = util::justPtr<Controller>(_active_gamepad_controller[idx].get());
+		}
+
+		return ret;
 	}
 
 	void Controller_manager::_join(Controller_added_event e) {
