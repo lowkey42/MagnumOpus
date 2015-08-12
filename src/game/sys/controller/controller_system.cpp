@@ -116,7 +116,7 @@ namespace controller {
 		if(ret.is_nothing() && activate && idx<_ready_gamepad_controller.size()+_active_gamepad_controller.size()) {
 			auto missing = idx-_active_gamepad_controller.size();
 			for(std::size_t i=0; i<=missing; i++)
-				join_events.inform({*_ready_gamepad_controller.back()});
+				_ready_gamepad_controller.back()->request_join();
 
 			if(idx<_active_gamepad_controller.size())
 				ret = util::justPtr<Controller>(_active_gamepad_controller[idx].get());

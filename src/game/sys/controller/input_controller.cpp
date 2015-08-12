@@ -278,6 +278,13 @@ namespace controller {
 		}
 	}
 
+	void Gamepad_controller::request_join() {
+		if(!_active) {
+			_added_events.inform(Controller_added_event{*this});
+			_active = true;
+		}
+	}
+
 	void Gamepad_controller::enter_or_leave() {
 		if(_active) {
 			_removed_events.inform(Controller_removed_event{*this});

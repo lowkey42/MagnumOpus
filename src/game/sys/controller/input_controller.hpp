@@ -94,6 +94,7 @@ namespace controller {
 			void enter_or_leave();
 
 			void request_unjoin()override;
+			void request_join();
 
 			auto instance_id()const -> SDL_JoystickID;
 			auto jId()const -> int;
