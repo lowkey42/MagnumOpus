@@ -19,6 +19,9 @@ frag_shader:bubble = shader/bubble.frag
 vert_shader:hud = shader/hud.vert
 frag_shader:hud = shader/hud.frag
 
+vert_shader:intro = shader/intro.vert
+frag_shader:intro = shader/intro.frag
+
 vert_shader:hud_health = shader/hud_health.vert
 frag_shader:hud_health = shader/hud_health.frag
 

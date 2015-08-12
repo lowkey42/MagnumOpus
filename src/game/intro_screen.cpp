@@ -7,7 +7,6 @@
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "game_screen.hpp"
-#include <game/example_screen.hpp>
 
 
 namespace mo {
@@ -61,7 +60,6 @@ namespace mo {
 
 
 	void Intro_screen::_draw(float time ) {
-
 		_box.set_vp(_camera->vp());
 		_box.draw(glm::vec2(0.f, 0.f));
 
