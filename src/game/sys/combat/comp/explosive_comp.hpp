@@ -61,6 +61,8 @@ namespace combat {
 			level::Element _damage_type   = level::Element::neutral;
 			Effect_type _explosion_effect = Effect_type::none;
 			Damage_effect _damage_effect  = Damage_effect::none;
+
+			float _force_feedback = 0;
 	};
 
 }

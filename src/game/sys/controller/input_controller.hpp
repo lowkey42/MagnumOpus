@@ -62,6 +62,7 @@ namespace controller {
 			void operator()(Controllable_interface&);
 
 			void tmp_disable_mouse_look()noexcept { _mouse_look=false; }
+			bool mouse_look_disabled()const noexcept {return !_mouse_look;}
 
 		private:
 			void _on_key(SDL_KeyboardEvent event);

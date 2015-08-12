@@ -103,7 +103,8 @@ namespace combat {
 	                             physics::Transform_system& ts,
 	                             physics::Physics_system& physics_system,
 	                             state::State_system& state_system,
-	                             Effect_source& effects)
+	                             Effect_source& effects,
+	                             FFeedback_source& ffeedback)
 	    : _em(entity_manager),
 	      _weapons(entity_manager.list<Weapon_comp>()),
 	      _healths(entity_manager.list<Health_comp>()),
@@ -112,9 +113,10 @@ namespace combat {
 	      _dmg_effects(entity_manager.list<Damage_effect_comp>()),
 	      _ts(ts),
 	      _collision_slot(&Combat_system::_on_collision, this),
-	      _reaper(entity_manager, state_system, effects),
+	      _reaper(entity_manager, state_system, effects, ffeedback),
 	      _ray_renderer(assets),
-	      _effects(effects)
+	      _effects(effects),
+	      _ffeedback(ffeedback)
 	{
 
 		_collision_slot.connect(physics_system.collisions);
@@ -276,6 +278,9 @@ namespace combat {
 				auto position = transform.position();
 				auto rotation = transform.rotation();
 
+				if(weapon.force_feedback>0.f)
+					_ffeedback.inform(position, weapon.force_feedback);
+
 				auto& physics = w.owner().get<physics::Physics_comp>().get_or_throw();
 				auto radius = physics.radius();
 
@@ -366,6 +371,9 @@ namespace combat {
 				});
 			}
 		});
+
+		if(e._force_feedback>0.f)
+			_ffeedback.inform(position, e._force_feedback);
 
 		e.owner().get<State_comp>().process([](auto& s) {
 			s.state(Entity_state::dying);

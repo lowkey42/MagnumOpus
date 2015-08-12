@@ -14,7 +14,8 @@
         "blast_force": 100,
         "damage_type": "frost",
         "damage_effect": "frozen",
-        "effect": "explosion_ice"
+        "effect": "explosion_ice",
+        "force_feedback": 0.75
     },
     "Friend",
     "State": {

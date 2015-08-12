@@ -80,6 +80,14 @@ namespace controller {
 		}
 	}
 
+	void Controller_system::feedback(float force) {
+		for(auto& controllable : _controllables) {
+			if(controllable._controller) {
+				controllable._controller->feedback(force);
+			}
+		}
+	}
+
 
 	Controller_manager::Controller_manager(
 			asset::Asset_manager& assets,
@@ -230,9 +238,7 @@ namespace controller {
 
 			if(r) {
 				set_state(Entity_state::change_weapon);
-				DEBUG("Element "<<weapon_id<<" switched");
-			} else
-				DEBUG("Couldn't switch Element "<<weapon_id);
+			}
 		}
 
 		Controllable_interface_impl::~Controllable_interface_impl()noexcept {

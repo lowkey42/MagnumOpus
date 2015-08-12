@@ -21,12 +21,14 @@ namespace combat {
 		std::vector<level::Element> vulnerabilities;
 
 		Effect_type death_effect;
+		float death_force_feedback;
 
 		Persisted_state(const Health_comp& c)
 		    : auto_heal_max(c._auto_heal_max), auto_heal(c._auto_heal),
 		      max_hp(c._max_hp), current_hp(c._current_hp),
 		      physical_resistence(c._physical_resistence),
-		      death_effect(c._death_effect) {
+		      death_effect(c._death_effect),
+		      death_force_feedback(c._death_force_feedback) {
 			for(auto e : c._resistences)
 				resistences.push_back(e);
 
@@ -43,7 +45,8 @@ namespace combat {
 		sf2_member(physical_resistence),
 		sf2_member(resistences),
 		sf2_member(vulnerabilities),
-		sf2_member(death_effect)
+		sf2_member(death_effect),
+		sf2_member(death_force_feedback)
 	)
 
 	void Health_comp::load(ecs::Entity_state& state) {
@@ -54,6 +57,7 @@ namespace combat {
 		_current_hp = s.current_hp==0 ? s.max_hp : s.current_hp;
 		_physical_resistence = s.physical_resistence;
 		_death_effect = s.death_effect;
+		_death_force_feedback = s.death_force_feedback;
 
 		_resistences = level::Elements{s.resistences};
 		_vulnerabilities = level::Elements{s.vulnerabilities};

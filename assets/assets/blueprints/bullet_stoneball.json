@@ -12,7 +12,8 @@
         "delay":0,
         "on_contact": true,
         "blast_force": 100,
-        "effect": "explosion_stone"
+        "effect": "explosion_stone",
+        "force_feedback": 0.5
     },
     "Friend",
     "State": {

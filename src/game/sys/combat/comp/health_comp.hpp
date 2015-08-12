@@ -49,6 +49,7 @@ namespace combat {
 			friend struct Persisted_state;
 		private:
 			friend class Combat_system;
+			friend class Reaper_subsystem;
 
 			float _auto_heal_max=0;
 			float _auto_heal=0;
@@ -63,6 +64,8 @@ namespace combat {
 			level::Elements _vulnerabilities;
 
 			Effect_type _death_effect = Effect_type::none;
+
+			float _death_force_feedback = 0;
 	};
 
 }

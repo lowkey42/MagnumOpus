@@ -32,8 +32,10 @@ namespace combat {
 	Reaper_subsystem::Reaper_subsystem(
 	        ecs::Entity_manager& entity_manager,
 	        state::State_system& state_system,
-	        Effect_source& effect)
-		: _em(entity_manager), _reap_slot(&Reaper_subsystem::_reap, this), _effects(effect) {
+	        Effect_source& effect,
+	        FFeedback_source& ffeedback)
+		: _em(entity_manager), _reap_slot(&Reaper_subsystem::_reap, this),
+	      _effects(effect), _ffeedback(ffeedback) {
 
 		_reap_slot.connect(state_system.state_change_events);
 	}
@@ -43,6 +45,12 @@ namespace combat {
 			e.get<Health_comp>().process([&](auto& hc) {
 				if(hc.death_effect()!=Effect_type::none)
 					_effects.inform(e, hc.death_effect());
+
+				if(hc._death_force_feedback>0.f) {
+					e.get<physics::Transform_comp>().process([&](auto& transform){
+						_ffeedback.inform(transform.position(), hc._death_force_feedback);
+					});
+				}
 			});
 
 			e.erase<physics::Physics_comp>();

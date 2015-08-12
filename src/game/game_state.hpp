@@ -67,6 +67,8 @@ namespace mo {
 		renderer::Particle_renderer particle_renderer;
 
 		Effect_source effect_bus;
+		FFeedback_source forcefeedback_bus;
+		FFeedback_slot forcefeedback_handler;
 
 		sys::cam::Camera_system camera;
 		sys::physics::Physics_system physics;
@@ -96,6 +98,7 @@ namespace mo {
 		void save();
 		auto save_to() -> Saveable_state;
 
+		void forcefeedback(Position, float);
 
 		static auto create(Game_engine& engine,
 		                   std::string name) -> std::unique_ptr<Game_state>;

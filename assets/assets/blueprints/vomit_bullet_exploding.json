@@ -14,7 +14,8 @@
         "blast_force": 200,
         "damage_type": "gas",
         "damage_effect": "poisoned",
-        "effect": "explosion_poison"
+        "effect": "explosion_poison",
+        "force_feedback": 0.75
     },
     "Friend",
     "State": {

@@ -15,6 +15,7 @@
 
 #pragma once
 
+#include <core/units.hpp>
 #include <core/utils/events.hpp>
 
 namespace mo {
@@ -58,6 +59,9 @@ namespace ecs{class Entity;}
 
 	using Effect_slot   = util::slot<ecs::Entity&,Effect_type>;
 	using Effect_source = util::signal_source<ecs::Entity&,Effect_type>;
+
+	using FFeedback_slot   = util::slot<Position, float>;
+	using FFeedback_source = util::signal_source<Position, float>;
 
 }
 

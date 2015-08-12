@@ -57,7 +57,13 @@ namespace cam {
 
 					c.vscreen.clear();
 
+
+					auto old_p = c.camera.position();
+					c.camera.position(old_p + _feedback_offset()/c.camera.world_scale());
+
 					f(c.camera, c.targets);
+
+					c.camera.position(old_p);
 				}
 
 				_gctx.reset_viewport();
@@ -69,9 +75,15 @@ namespace cam {
 				return _main_camera;
 			}
 
+			void feedback(float force)noexcept {
+				_target_force_feedback = std::max(_target_force_feedback, force);
+			}
+
 			void reset();
 
 		private:
+			auto _feedback_offset()const -> glm::vec2;
+
 			bool _uninitialized = true;
 			renderer::Graphics_ctx& _gctx;
 			Camera_target_comp::Pool& _targets;
@@ -79,6 +91,10 @@ namespace cam {
 
 			renderer::Camera _main_camera;
 			std::vector<VScreen> _cameras;
+
+			float _force_feedback  = 0.f;
+			float _target_force_feedback = 0.f;
+			float _max_screenshake = 40.f;
 	};
 
 }

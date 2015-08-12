@@ -39,7 +39,8 @@
             "cooldown": 1.2,
             "recoil": 200,
             "spreading": 15,
-            "bullet_count": 5
+            "bullet_count": 5,
+            "force_feedback": 0.1
         }
     },
     "Laser_sight": {
@@ -63,12 +64,14 @@
         "range": 4,
         "delay":0.3,
         "on_damage": true,
-        "blast_force": 100
+        "blast_force": 100,
+        "force_feedback": 1.0
     },
     "Element":{
         "slots":[
-            {"element":frost, "fill":1},
-            {"element":gas, "fill":1}
+            {"element":fire, "fill":1},
+            {"element":gas, "fill":1},
+            {"element":stone, "fill":1}
         ]
     }
 }

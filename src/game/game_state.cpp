@@ -251,13 +251,14 @@ namespace mo {
 	      tilemap(engine, level),
 	      transform(em, MaxEntitySize, level.width(), level.height(), level),
 	      particle_renderer(engine.assets(), std::make_unique<My_environment_callback>(level)),
+	      forcefeedback_handler(&Game_state::forcefeedback, this),
 	      camera(em, engine),
 		  physics(em, transform, MinEntitySize, MaxEntityVelocity, level),
 		  state(em),
 		  controller(em),
 		  ai(em, transform, level),
 		  graphics(em, transform, engine.assets(), particle_renderer, state),
-		  combat(engine.assets(), em, transform, physics, state, effect_bus),
+		  combat(engine.assets(), em, transform, physics, state, effect_bus, forcefeedback_bus),
 	      items(engine.assets(), em, physics, transform, state, particle_renderer),
 	      elements(engine.assets(), em, combat),
 	      soundsys(engine.assets(), em, transform, engine.audio_ctx()),
@@ -266,6 +267,7 @@ namespace mo {
 
 		graphics.effects.connect(effect_bus);
 		soundsys.effects.connect(effect_bus);
+		forcefeedback_handler.connect(forcefeedback_bus);
 
 		// TODO[foe]: remove
 				auto& log_out = ::mo::util::debug(__func__, __FILE__, __LINE__);
@@ -306,6 +308,19 @@ namespace mo {
 
 	void Game_state::delete_save() {
 		im_a_savegame = Profile_data{"default", 42,0,0};
+	}
+
+	void Game_state::forcefeedback(Position p, float f) {
+		constexpr float max_dist = 20;
+		auto dist = glm::length(camera.main_camera().position()-remove_units(p));
+
+		if(dist<=max_dist) {
+			if(dist>0.25f * max_dist)
+				f*=(dist/(max_dist*0.75f));
+
+			camera.feedback(f);
+			controller.feedback(f);
+		}
 	}
 
 	void Game_state::update(Time dt) {

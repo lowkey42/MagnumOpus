@@ -16,7 +16,8 @@
         "blast_force": 100,
         "damage_type": "fire",
         "damage_effect": "burning",
-        "effect": "explosion_fire"
+        "effect": "explosion_fire",
+        "force_feedback": 1.0
     },
     "Health":{
         "max_hp": 1,

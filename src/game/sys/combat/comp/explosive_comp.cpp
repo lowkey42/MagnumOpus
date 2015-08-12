@@ -21,6 +21,7 @@ namespace combat {
 		level::Element damage_type;
 		Effect_type effect;
 		Damage_effect damage_effect;
+		float force_feedback;
 
 		Persisted_state(const Explosive_comp& c)
 			: damage(c._damage),
@@ -32,7 +33,8 @@ namespace combat {
 			  blast_force(c._blast_force.value()),
 			  damage_type(c._damage_type),
 			  effect(c._explosion_effect),
-			  damage_effect(c._damage_effect) {}
+			  damage_effect(c._damage_effect),
+			  force_feedback(c._force_feedback) {}
 	};
 
 	sf2_structDef(Explosive_comp::Persisted_state,
@@ -45,7 +47,8 @@ namespace combat {
 		sf2_member(blast_force),
 		sf2_member(damage_type),
 		sf2_member(effect),
-		sf2_member(damage_effect)
+		sf2_member(damage_effect),
+		sf2_member(force_feedback)
 	)
 
 	void Explosive_comp::load(ecs::Entity_state& state) {
@@ -60,6 +63,7 @@ namespace combat {
 		_damage_type = s.damage_type;
 		_explosion_effect = s.effect;
 		_damage_effect = s.damage_effect;
+		_force_feedback = s.force_feedback;
 	}
 	void Explosive_comp::store(ecs::Entity_state& state) {
 		state.write_from(Persisted_state{*this});

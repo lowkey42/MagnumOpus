@@ -49,7 +49,8 @@ namespace combat {
 			              physics::Transform_system& transform_system,
 			              physics::Physics_system& physics_system,
 			              state::State_system& state_system,
-			              Effect_source& effects);
+			              Effect_source& effects,
+			              FFeedback_source& ffeedback);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& cam);
@@ -78,6 +79,7 @@ namespace combat {
 			Reaper_subsystem               _reaper;
 			renderer::Ray_renderer         _ray_renderer;
 			Effect_source&                 _effects;
+			FFeedback_source&              _ffeedback;
 
 			std::shared_ptr<const Dmg_effect_data> _dmg_effect_data;
 	};

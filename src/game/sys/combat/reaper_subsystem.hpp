@@ -26,7 +26,8 @@ namespace combat {
 		public:
 			Reaper_subsystem(ecs::Entity_manager& entity_manager,
 			                 state::State_system& state_system,
-			                 Effect_source& effect);
+			                 Effect_source& effect,
+			                 FFeedback_source& ffeedback);
 
 		private:
 			void _reap(ecs::Entity&, sys::state::State_data&);
@@ -34,6 +35,7 @@ namespace combat {
 			ecs::Entity_manager& _em;
 			util::slot<ecs::Entity&, sys::state::State_data&> _reap_slot;
 			Effect_source&                 _effects;
+			FFeedback_source&              _ffeedback;
 	};
 
 }

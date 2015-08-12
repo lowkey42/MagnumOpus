@@ -75,6 +75,7 @@ namespace combat {
 		Force       recoil        = Force(0);
 
 		float       fuel_usage    = 1.f;
+		float       force_feedback=0.f;
 
 		Weapon() = default;
 		// TODO[seb]: remove if not required under windows
@@ -84,11 +85,11 @@ namespace combat {
 
 		Weapon(Weapon_type type, asset::AID bullet_type, Speed bullet_vel, Angle spreading, int bullet_count,
 		       Effect_type effect, Element damage_type, Damage_effect damage_effect, float melee_damage, Distance melee_range, Angle melee_angle,
-		       Time attack_delay, Time cooldown, Force recoil, float fuel_usage)
+		       Time attack_delay, Time cooldown, Force recoil, float fuel_usage, float force_feedback)
 		    : type(type), bullet_type(bullet_type), bullet_vel(bullet_vel), spreading(spreading),
 		      bullet_count(bullet_count), effect(effect), damage_type(damage_type), damage_effect(damage_effect), melee_damage(melee_damage),
 		      melee_range(melee_range), melee_angle(melee_angle), attack_delay(attack_delay), cooldown(cooldown),
-		      recoil(recoil), fuel_usage(fuel_usage){}
+		      recoil(recoil), fuel_usage(fuel_usage), force_feedback(force_feedback) {}
 
 		struct Persisted_state;
 	};
@@ -177,6 +178,7 @@ namespace combat {
 		float recoil = 0;
 
 		float fuel_usage = 0.f;
+		float force_feedback = 0.f;
 
 		Persisted_state() = default;
 		Persisted_state(const Weapon& c)
@@ -194,7 +196,8 @@ namespace combat {
 		      attack_delay(c.attack_delay.value()),
 		      cooldown(c.cooldown.value()),
 		      recoil(c.recoil.value()),
-		      fuel_usage(c.fuel_usage) {}
+		      fuel_usage(c.fuel_usage),
+		      force_feedback(c.force_feedback) {}
 
 		auto to_weapon()const noexcept -> Weapon {
             return Weapon{
@@ -213,7 +216,8 @@ namespace combat {
 				attack_delay * 1_s,
 				cooldown * 1_s,
 				recoil * 1_n,
-				fuel_usage
+				fuel_usage,
+				force_feedback
 			};
 		}
 	};
@@ -235,7 +239,8 @@ namespace combat {
 		sf2_member(melee_angle),
 		sf2_member(attack_delay),
 		sf2_member(recoil),
-		sf2_member(fuel_usage)
+		sf2_member(fuel_usage),
+		sf2_member(force_feedback)
 	)
 }
 }

@@ -31,7 +31,8 @@
         "physical_resistence": 0.5,
         "vulnerabilities": [water],
         "resistences": [fire],
-        "death_effect": blood
+        "death_effect": blood,
+        "death_force_feedback": 1.0
      },
     "Weapon":{
         "weapon": {

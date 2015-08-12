@@ -209,16 +209,15 @@ namespace mo {
 				_fadein_left = 0_s;
 				if(_moving_down) {
 					move_level(*_state, 1);
+					return;
 
 				} else if(_dying) {
 					_engine.enter_screen<Game_screen>("default");
+					return;
 				}
 			}
 
 		}
-
-		_state->update(delta_time*second);
-
 
 		_state->main_player->get<sys::physics::Transform_comp>().process(
 			[&](auto& transform){
@@ -233,6 +232,8 @@ namespace mo {
 					}
 				}
 		});
+
+		_state->update(delta_time*second);
 	}
 
 	class Camera {};

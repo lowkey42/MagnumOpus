@@ -79,6 +79,8 @@ namespace controller {
 
 			void update(Time dt);
 
+			void feedback(float force);
+
 		private:
 			void _on_comp_event(ecs::Component_event e);
 

@@ -267,8 +267,9 @@ namespace controller {
 				c.switch_weapon(w);
 	}
 	void Gamepad_controller::feedback(float force) {
-		if(SDL_HapticRumblePlay(_haptic, force, 500)!=0)
-			SDL_GetError(); // clear error
+		DEBUG("gamepad-feedback: "<<force);
+		if(SDL_HapticRumblePlay(_haptic, glm::clamp(force,0.f,1.f), 500)!=0)
+			DEBUG("Rumble failed: "<<SDL_GetError()); // clear error
 	}
 
 	void Gamepad_controller::request_unjoin() {
@@ -317,7 +318,8 @@ namespace controller {
 	}
 	void Combined_controller::feedback(float force) {
 		for(auto& gp : _gamepads)
-			gp->feedback(force);
+			if(_keyboard.mouse_look_disabled())
+				gp->feedback(force);
 
 		_keyboard.feedback(force);
 	}

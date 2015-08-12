@@ -5,6 +5,8 @@
 #include "../physics/transform_comp.hpp"
 #include "../physics/physics_comp.hpp"
 
+#include <glm/gtc/random.hpp>
+
 namespace mo {
 namespace sys {
 namespace cam {
@@ -33,6 +35,14 @@ namespace cam {
 	}
 
 	void Camera_system::update(Time dt) {
+		auto ffeedback_diff = (_target_force_feedback-_force_feedback);
+		_force_feedback += ffeedback_diff * dt.value() * (ffeedback_diff>0 ? 10 : 3);
+
+		if(_target_force_feedback>0 &&
+		        std::abs(_target_force_feedback-_force_feedback)< 0.01f)
+			_target_force_feedback = 0;
+
+
 		glm::vec2 pos_acc, pos_min{99999.f, 99999.f}, pos_max;
 		float pos_count=0;
 
@@ -106,6 +116,10 @@ namespace cam {
 			target.reset();
 		}
 		_uninitialized = false;
+	}
+
+	auto Camera_system::_feedback_offset()const -> glm::vec2 {
+		return _force_feedback>0.1 ? glm::circularRand(_force_feedback * _max_screenshake) : glm::vec2{0,0};
 	}
 
 }

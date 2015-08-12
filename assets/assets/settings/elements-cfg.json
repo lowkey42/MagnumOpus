@@ -10,7 +10,8 @@
             "effect": "flame_thrower",
             "fuel_usage": 0.005,
             "damage_type": "fire",
-            "damage_effect": "burning"
+            "damage_effect": "burning",
+            "force_feedback": 0.1
         },
         [gas]: {
             "type": "range",
@@ -22,7 +23,8 @@
             "effect": "poison_thrower",
             "fuel_usage": 0.005,
             "damage_type": "gas",
-            "damage_effect": "poisoned"
+            "damage_effect": "poisoned",
+            "force_feedback": 0.1
         },
         [water]: {
             "type": "range",
@@ -34,7 +36,8 @@
             "effect": "water_thrower",
             "fuel_usage": 0.005,
             "damage_type": "water",
-            "damage_effect": "wet"
+            "damage_effect": "wet",
+            "force_feedback": 0.1
         },
 
         [stone]: {
@@ -43,7 +46,8 @@
             "bullet_velocity": 50,
             "cooldown": 1.0,
             "recoil": 80,
-            "fuel_usage": 0.1
+            "fuel_usage": 0.1,
+            "force_feedback": 0.1
         },
         [frost]: {
             "type": "range",
@@ -55,7 +59,8 @@
             "effect": "frost_thrower",
             "fuel_usage": 0.005,
             "damage_type": "frost",
-            "damage_effect": "frozen"
+            "damage_effect": "frozen",
+            "force_feedback": 0.1
         },
         
         [frost, water]: {
@@ -68,7 +73,8 @@
             "bullet_count": 4,
             "fuel_usage": 0.05,
             "damage_type": "frost",
-            "damage_effect": "frozen"
+            "damage_effect": "frozen",
+            "force_feedback": 0.1
         },
 
         [frost, stone]: {
@@ -77,7 +83,8 @@
             "bullet_velocity": 50,
             "cooldown": 1.0,
             "recoil": 80,
-            "fuel_usage": 0.1
+            "fuel_usage": 0.1,
+            "force_feedback": 0.1
         },
 
         [frost, stone, water]: {
@@ -86,7 +93,8 @@
             "bullet_velocity": 80,
             "cooldown": 0.8,
             "recoil": 100,
-            "fuel_usage": 0.15
+            "fuel_usage": 0.15,
+            "force_feedback": 0.2
         },
 
         [frost, stone, water, fire]: {
@@ -97,7 +105,8 @@
             "recoil": 80,
             "fuel_usage": 0.1,
             "spreading": 60,
-            "bullet_count": 5
+            "bullet_count": 5,
+            "force_feedback": 0.2
         },
 
         [fire, gas]: {
@@ -110,7 +119,8 @@
             "bullet_count": 3,
             "fuel_usage": 0.05,
             "damage_type": "fire",
-            "damage_effect": "burning"
+            "damage_effect": "burning",
+            "force_feedback": 0.2
         },
         [fire, stone]: {
             "type": "range",
@@ -118,7 +128,8 @@
             "bullet_velocity": 60,
             "cooldown": 1.0,
             "recoil": 60,
-            "fuel_usage": 0.1
+            "fuel_usage": 0.1,
+            "force_feedback": 0.2
         },
         [fire, stone, gas]: {
             "type": "range",
@@ -126,7 +137,8 @@
             "bullet_velocity": 80,
             "cooldown": 0.8,
             "recoil": 80,
-            "fuel_usage": 0.15
+            "fuel_usage": 0.15,
+            "force_feedback": 0.2
         },
 
 
@@ -153,7 +165,8 @@
             "bullet_velocity": 60,
             "cooldown": 1.0,
             "recoil": 60,
-            "fuel_usage": 0.1
+            "fuel_usage": 0.1,
+            "force_feedback": 0.2
         },
         [gas, water, fire, frost]: {
             "type": "range",
@@ -163,7 +176,8 @@
             "recoil": 80,
             "fuel_usage": 0.1,
             "spreading": 60,
-            "bullet_count": 5
+            "bullet_count": 5,
+            "force_feedback": 0.2
         },
 
         [gas, water, stone]: {
@@ -172,7 +186,8 @@
             "bullet_velocity": 60,
             "cooldown": 0.8,
             "recoil": 80,
-            "fuel_usage": 0.15
+            "fuel_usage": 0.15,
+            "force_feedback": 0.2
         },
 
 
@@ -186,7 +201,8 @@
             "spreading": 20,
             "bullet_count": 5
             "effect": "wind_thrower",
-            "fuel_usage": 0.01
+            "fuel_usage": 0.01,
+            "force_feedback": 0.5
         },
 
         [stone, fire, frost]: {
@@ -198,7 +214,8 @@
             "spreading": 20,
             "bullet_count": 3,
             "effect": "wind_thrower",
-            "fuel_usage": 0.01
+            "fuel_usage": 0.01,
+            "force_feedback": 0.5
         },
         [stone, fire, gas, water]: {
             "type": "range",
@@ -209,7 +226,8 @@
             "spreading": 20,
             "bullet_count": 5
             "effect": "wind_thrower",
-            "fuel_usage": 0.01
+            "fuel_usage": 0.01,
+            "force_feedback": 0.5
         },
         [stone, fire, gas, frost]: {
             "type": "range",
@@ -220,7 +238,8 @@
             "spreading": 20,
             "bullet_count": 5
             "effect": "wind_thrower",
-            "fuel_usage": 0.01
+            "fuel_usage": 0.01,
+            "force_feedback": 0.5
         }
     }
 
