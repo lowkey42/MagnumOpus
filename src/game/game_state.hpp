@@ -94,7 +94,7 @@ namespace mo {
 		                ecs::Entity_ptr e=ecs::Entity_ptr()) -> ecs::Entity_ptr;
 		void remove_player(sys::controller::Controller& controller);
 
-		void delete_save();
+		static void delete_save();
 		void save();
 		auto save_to() -> Saveable_state;
 

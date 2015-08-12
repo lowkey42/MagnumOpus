@@ -66,6 +66,11 @@ namespace controller {
 				return _controller_component==T::type();
 			}
 
+			void feedback(float force) {
+				if(_controller)
+					_controller->feedback(force);
+			}
+
 		private:
 			friend class Controller_system;
 

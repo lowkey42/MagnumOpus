@@ -19,6 +19,7 @@
 
 #include "comp/bullet_comp.hpp"
 
+#include "../controller/controllable_comp.hpp"
 
 namespace mo {
 namespace sys {
@@ -199,6 +200,10 @@ namespace combat {
 				h.owner().get<State_comp>().process([](auto& s){
 					s.state(Entity_state::damaged);
 				});
+				h.owner().get<controller::Controllable_comp>().process([&](auto& c){
+					c.feedback(0.1f);
+				});
+
 			} else if(h._damage < h._heal+auto_heal) {
 				h.owner().get<State_comp>().process([](auto& s){
 					s.state(Entity_state::healed);

@@ -98,12 +98,14 @@ namespace mo {
 
 				auto& tag = player->get<Player_tag_comp>().get_or_throw();
 
-				if(tag.id()==0)
+				if(tag.id()==0) {
 					set_controller(*player, engine.controllers().main_controller());
+					state->main_player = player;
 
-				else {
+				} else {
 					engine.controllers().gamepad(tag.id()-1).process([&](auto& pad){
 						set_controller(*player, pad);
+						state->sec_players.push_back(player);
 
 					}).on_nothing([&]{
 						INFO("Dropped player "<<std::size_t(tag.id())<<" on level-switch: Too few controllers");
@@ -233,6 +235,14 @@ namespace mo {
 			}
 		}
 
+		if(!state->main_player) {
+			state.reset();
+			WARN("Corrupted savefile!");
+			delete_save();
+			throw util::Error("Load failed: Corrupted savefile!");
+		}
+
+
 		return state;
 	}
 
@@ -319,6 +329,10 @@ namespace mo {
 				f*=(dist/(max_dist*0.75f));
 
 			camera.feedback(f);
+
+			if(f<=0.15)
+				f*=2;
+
 			controller.feedback(f);
 		}
 	}
