@@ -35,12 +35,14 @@ namespace ecs{class Entity;}
 
 
 		flame_thrower,
+		flame_thrower_big,
 		poison_thrower,
 		frost_thrower,
 		water_thrower,
 		wind_thrower,
 
 		steam,
+		poison_cloud,
 
 		burning,
 		poisoned,
@@ -86,12 +88,14 @@ namespace mo {
 		sf2_value(blood),
 
 		sf2_value(flame_thrower),
+		sf2_value(flame_thrower_big),
 		sf2_value(poison_thrower),
 		sf2_value(frost_thrower),
 		sf2_value(water_thrower),
 		sf2_value(wind_thrower),
 
 		sf2_value(steam),
+		sf2_value(poison_cloud),
 
 		sf2_value(burning),
 		sf2_value(poisoned),

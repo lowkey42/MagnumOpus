@@ -38,6 +38,7 @@ namespace renderer {
 		damaged,
 		healed,
 		died,
+		dying,
 		resurrected
 	};
 

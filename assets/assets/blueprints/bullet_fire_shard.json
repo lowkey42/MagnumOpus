@@ -10,20 +10,21 @@
     },
     "Explosive": {
         "damage": 0,
-        "range": 1,
+        "range": 2,
         "delay":0,
         "blast_force": 20,
         "explode_after": 2.0
     },
     "Bullet": {
-        "damage": 3,
-        "damage_type": "stone"
+        "damage": 2,
+        "damage_type": "fire",
+        "damage_effect": "burning"
     },
     "Friend",
     "State": {
         "delete_dead":true
     },
     "Sprite": {
-        "aid": "anim:bullet_stone_shard"
+        "aid": "anim:bullet_fire_shard"
     }
 }

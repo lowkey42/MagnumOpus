@@ -31,12 +31,14 @@ namespace sound {
 				case Effect_type::blood:             return 0.1_s;
 
 				case Effect_type::flame_thrower:     return 0.6_s;
+				case Effect_type::flame_thrower_big: return 0.6_s;
 				case Effect_type::poison_thrower:    return 0.6_s;
 				case Effect_type::frost_thrower:     return 0.6_s;
 				case Effect_type::water_thrower:     return 0.6_s;
 				case Effect_type::wind_thrower:      return 0.6_s;
 
 				case Effect_type::steam:             return 1.0_s;
+				case Effect_type::poison_cloud:      return 1.0_s;
 
 				case Effect_type::burning:           return 0.6_s;
 				case Effect_type::poisoned:          return 0.6_s;

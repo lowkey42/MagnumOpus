@@ -14,6 +14,7 @@ anim:barrel = animations/barrel.json
 
 anim:bullet = animations/bullet.json
 anim:bullet_stone_shard = animations/bullet_stone_shard.json
+anim:bullet_fire_shard = animations/bullet_fire_shard.json
 anim:bullet_ice_shard = animations/bullet_ice_shard.json
 anim:coin = animations/coin_anim.json
 anim:healthpotion = animations/healthpotion.json

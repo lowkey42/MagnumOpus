@@ -8,6 +8,7 @@ blueprint:turret_ice = blueprints/turret_ice.json
 
 blueprint:bullet = blueprints/bullet.json
 blueprint:bullet_stone_shard = blueprints/bullet_stone_shard.json
+blueprint:bullet_fire_shard = blueprints/bullet_fire_shard.json
 blueprint:bullet_ice_shard = blueprints/bullet_ice_shard.json
 blueprint:bullet_fireball = blueprints/bullet_fireball.json
 blueprint:bullet_fireball_exploding = blueprints/bullet_fireball_exploding.json
@@ -17,6 +18,7 @@ blueprint:bullet_stoneball = blueprints/bullet_stoneball.json
 blueprint:vomit_bullet = blueprints/vomit_bullet.json
 blueprint:vomit_bullet_exploding = blueprints/vomit_bullet_exploding.json
 blueprint:steam = blueprints/steam.json
+blueprint:gas_cloud = blueprints/gas_cloud.json
 
 blueprint:box = blueprints/box.json
 blueprint:barrel = blueprints/barrel.json

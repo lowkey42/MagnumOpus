@@ -48,4 +48,5 @@ tex:particle_wind = textures/particle_line.png
 tex:particle_steam = textures/particle_steam.png
 tex:particle_ice = textures/particle_ice.png
 tex:particle_stone_shard = textures/particle_stone_shard.png
+tex:particle_fire_shard = textures/particle_fire_shard.png
 tex:particle_blood = textures/particle_blood.png

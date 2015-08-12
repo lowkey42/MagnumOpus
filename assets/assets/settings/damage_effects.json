@@ -9,8 +9,8 @@
         },
 
         "poisoned":{
-            "time": 1,
-            "confusion": 0.5,
+            "time": 2,
+            "confusion": 1.0,
             "slow_down_factor": 0.8,
             "dmg_per_sec": 1,
             "dmg_type": "gas",
@@ -25,7 +25,7 @@
         },
 
         "frozen":{
-            "time": 5,
+            "time": 3,
             "confusion": 0.2,
             "slow_down_factor": 0.99,
             "dmg_per_sec": 0.5,

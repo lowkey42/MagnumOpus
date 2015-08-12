@@ -12,18 +12,6 @@
             "damage_type": "fire",
             "damage_effect": "burning"
         },
-        [frost]: {
-            "type": "range",
-            "bullet_type": "frost_collider",
-            "bullet_velocity": 10,
-            "cooldown": 0.03,
-            "recoil": 10,
-            "spreading": 30,
-            "effect": "frost_thrower",
-            "fuel_usage": 0.005,
-            "damage_type": "frost",
-            "damage_effect": "frozen"
-        },
         [gas]: {
             "type": "range",
             "bullet_type": "poison_collider",
@@ -49,18 +37,6 @@
             "damage_effect": "wet"
         },
 
-        [fire, frost]: {
-            "type": "range",
-            "bullet_type": "bullet",
-            "bullet_velocity": 60,
-            "cooldown": 0.1,
-            "recoil": 200,
-            "spreading": 20,
-            "bullet_count": 5
-            "effect": "wind_thrower",
-            "fuel_usage": 0.01
-        },
-
         [stone]: {
             "type": "range",
             "bullet_type": "bullet_stoneball",
@@ -68,6 +44,18 @@
             "cooldown": 1.0,
             "recoil": 80,
             "fuel_usage": 0.1
+        },
+        [frost]: {
+            "type": "range",
+            "bullet_type": "frost_collider",
+            "bullet_velocity": 10,
+            "cooldown": 0.03,
+            "recoil": 10,
+            "spreading": 30,
+            "effect": "frost_thrower",
+            "fuel_usage": 0.005,
+            "damage_type": "frost",
+            "damage_effect": "frozen"
         },
         
         [frost, water]: {
@@ -101,6 +89,29 @@
             "fuel_usage": 0.15
         },
 
+        [frost, stone, water, fire]: {
+            "type": "range",
+            "bullet_type": "bullet_iceball",
+            "bullet_velocity": 80,
+            "cooldown": 0.6,
+            "recoil": 80,
+            "fuel_usage": 0.1,
+            "spreading": 60,
+            "bullet_count": 5
+        },
+
+        [fire, gas]: {
+            "type": "range",
+            "bullet_type": "bullet_fire_shard",
+            "bullet_velocity": 70,
+            "cooldown": 0.6,
+            "recoil": 15,
+            "spreading": 20,
+            "bullet_count": 3,
+            "fuel_usage": 0.05,
+            "damage_type": "fire",
+            "damage_effect": "burning"
+        },
         [fire, stone]: {
             "type": "range",
             "bullet_type": "bullet_fireball",
@@ -127,6 +138,14 @@
             "spreading": 40,
             "bullet_count": 3
         },
+        [fire, water, gas]: {
+            "type": "range",
+            "bullet_type": "gas_cloud",
+            "bullet_velocity": 20,
+            "cooldown": 1.0,
+            "spreading": 0,
+            "fuel_usage": 0.02
+        },
 
         [gas, water]: {
             "type": "range",
@@ -136,6 +155,16 @@
             "recoil": 60,
             "fuel_usage": 0.1
         },
+        [gas, water, fire, frost]: {
+            "type": "range",
+            "bullet_type": "vomit_bullet",
+            "bullet_velocity": 80,
+            "cooldown": 0.6,
+            "recoil": 80,
+            "fuel_usage": 0.1,
+            "spreading": 60,
+            "bullet_count": 5
+        },
 
         [gas, water, stone]: {
             "type": "range",
@@ -144,26 +173,55 @@
             "cooldown": 0.8,
             "recoil": 80,
             "fuel_usage": 0.15
+        },
+
+
+
+        [fire, frost]: {
+            "type": "range",
+            "bullet_type": "bullet",
+            "bullet_velocity": 60,
+            "cooldown": 0.1,
+            "recoil": 200,
+            "spreading": 20,
+            "bullet_count": 5
+            "effect": "wind_thrower",
+            "fuel_usage": 0.01
+        },
+
+        [stone, fire, frost]: {
+            "type": "range",
+            "bullet_type": "bullet_stoneball",
+            "bullet_velocity": 60,
+            "cooldown": 0.1,
+            "recoil": 200,
+            "spreading": 20,
+            "bullet_count": 3,
+            "effect": "wind_thrower",
+            "fuel_usage": 0.01
+        },
+        [stone, fire, gas, water]: {
+            "type": "range",
+            "bullet_type": "bullet_stone_shard",
+            "bullet_velocity": 60,
+            "cooldown": 0.1,
+            "recoil": 200,
+            "spreading": 20,
+            "bullet_count": 5
+            "effect": "wind_thrower",
+            "fuel_usage": 0.01
+        },
+        [stone, fire, gas, frost]: {
+            "type": "range",
+            "bullet_type": "bullet_stone_shard",
+            "bullet_velocity": 60,
+            "cooldown": 0.1,
+            "recoil": 200,
+            "spreading": 20,
+            "bullet_count": 5
+            "effect": "wind_thrower",
+            "fuel_usage": 0.01
         }
     }
 
-    # TODO:  ('fire', 'gas')
-    #        ('frost', 'gas')
-    #        ('gas', 'stone')
-    #        ('water', 'stone')
-    #        ('fire', 'frost', 'gas')
-    #        ('fire', 'frost', 'water')
-    #        ('fire', 'frost', 'stone')
-    #        ('fire', 'gas', 'water')
-    #        ('fire', 'water', 'stone')
-    #        ('frost', 'gas', 'water')
-    #        ('frost', 'gas', 'stone')
-    #        ('fire', 'frost', 'gas', 'water')
-    #        ('fire', 'frost', 'gas', 'stone')
-    #        ('fire', 'frost', 'water', 'stone')
-    #        ('fire', 'gas', 'water', 'stone')
-    #        ('frost', 'gas', 'water', 'stone')
-
-
-    # TODO maybe add: (water,lightning), (lightning,fire), (lightning)
 }

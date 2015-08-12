@@ -6,7 +6,7 @@
 		"damaged": {"row":0, "fps":1, "frames":1},
 		"healed": {"row":0, "fps":1, "frames":1},
 		"died": {"row":3, "fps":1, "frames":1},
-		"resurrected": {"row":2, "fps":2, "frames":2}
+		"dying": {"row":2, "fps":8, "frames":6}
 	},
 	
 	"texName": "tex:turret_ice",

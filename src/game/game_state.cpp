@@ -140,6 +140,7 @@ namespace mo {
 			}
 
 			if(room.type==level::Room_type::start) {
+				spawn("blueprint:turret_ice"_aid);
 				// TODO[foe] ?
 
 			} else {

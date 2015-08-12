@@ -4,7 +4,8 @@
         "radius": 0.1,
         "mass": 2,
         "restitution": 0.9,
-		"friction": 0.0001
+		"friction": 0.0001,
+        "group_exclude": 16
     },
     "Explosive": {
         "damage": 3,

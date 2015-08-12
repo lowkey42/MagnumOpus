@@ -1,0 +1,10 @@
+﻿{
+	"animations": {
+		"idle": {"row":0, "fps":1, "frames":1}
+	},
+	
+	"texName": "tex:particle_fire_shard",
+
+	"frame_width": 16,
+	"frame_height": 16
+}

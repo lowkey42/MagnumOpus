@@ -26,6 +26,7 @@ namespace graphic {
 
 
 				case Effect_type::flame_thrower:     return false;
+				case Effect_type::flame_thrower_big: return false;
 				case Effect_type::burning:           return false;
 				case Effect_type::poisoned:          return false;
 				case Effect_type::frozen:            return false;
@@ -307,6 +308,28 @@ namespace graphic {
 					                                  _particle_renderer);
 					break;
 
+				case Effect_type::flame_thrower_big:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.01_m,
+							0.55_m,
+							renderer::Collision_handler::bounce,
+							600,
+							1000,
+							1.0_s, 1.2_s,
+							util::scerp<Angle>(0_deg, 25_deg),
+							util::scerp<Angle>(0_deg, 0_deg),
+							util::lerp<Speed_per_time>(20_m/second_2, 0_m/second_2),
+							util::scerp<Angle_acceleration>(0_deg/second_2, 5_deg/second_2),
+							util::lerp<glm::vec4>({0.5,0.1,1.0,0}, {0,0,0,0.5}),
+							util::lerp<Position>({20_cm, 20_cm}, {100_cm, 100_cm}, {10_cm, 10_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets,"particle_fire")
+					);
+					break;
+
+
 				case Effect_type::poison_thrower:
 					e._emiter = create_thrower_emiter(load_tex(_assets,"particle_gas"),
 					                                  _particle_renderer);
@@ -334,7 +357,7 @@ namespace graphic {
 							0_deg,
 							0.8_m,
 							0_m,
-							renderer::Collision_handler::bounce,
+							renderer::Collision_handler::stop,
 							10,
 							60,
 							0.8_s, 1.0_s,
@@ -343,9 +366,30 @@ namespace graphic {
 							util::lerp<Speed_per_time>(4_m/second_2, 2_m/second_2),
 							util::lerp<Angle_acceleration>(0_deg/second_2, 10_deg/second_2),
 							util::lerp<glm::vec4>({0.8,0.8,0.8,0.8}, {0,0,0,0}),
-							util::lerp<Position>({50_cm, 50_cm}, {80_cm, 80_cm}, {20_cm, 20_cm}),
+							util::lerp<Position>({30_cm, 30_cm}, {80_cm, 80_cm}, {10_cm, 10_cm}),
 							util::scerp<int8_t>(0),
 							load_tex(_assets, "particle_steam")
+					);
+					break;
+
+				case Effect_type::poison_cloud:
+					e._emiter = _particle_renderer.create_emiter(
+							{0_m,0_m},
+							0_deg,
+							0.8_m,
+							0_m,
+							renderer::Collision_handler::bounce,
+							30,
+							60,
+							0.8_s, 1.0_s,
+							util::scerp<Angle>(0_deg, 360_deg),
+							util::scerp<Angle>(0_deg, 0_deg),
+							util::lerp<Speed_per_time>(2_m/second_2, 1_m/second_2),
+							util::lerp<Angle_acceleration>(0_deg/second_2, 10_deg/second_2),
+							util::lerp<glm::vec4>({0.8,0.8,0.8,0.2}, {0,0,0,0}),
+							util::lerp<Position>({50_cm, 50_cm}, {80_cm, 80_cm}, {20_cm, 20_cm}),
+							util::scerp<int8_t>(0),
+							load_tex(_assets, "particle_gas")
 					);
 					break;
 
@@ -508,7 +552,7 @@ namespace graphic {
 					toRepeat = true;
 					break;
 				case state::Entity_state::dying:
-					type = renderer::Animation_type::died; // TODO[seb]: dying? last frame from died?
+					type = renderer::Animation_type::dying;
 					toRepeat = false;
 					break;
 				case state::Entity_state::resurrected:

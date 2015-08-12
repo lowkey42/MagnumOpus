@@ -1,0 +1,39 @@
+{
+    "Transform":{"layer":0.9},
+	"Physics":{
+        "radius": 1.0,
+        "mass": 1.0,
+        "restitution": 0.1,
+		"friction": 0.01,
+        "group":16,
+        "group_exclude": 32
+    },
+    "Explosive": {
+        "damage": 5,
+        "range": 3,
+        "delay":0.0,
+        "on_damage": true,
+        "blast_force": 100,
+        "damage_type": "fire",
+        "damage_effect": "burning",
+        "effect": "explosion_fire"
+    },
+    "Health":{
+        "max_hp": 1,
+        "vulnerabilities": [fire]
+     },
+    "State": {
+        "delete_dead":true
+    },
+    "Bullet": {
+        "damage": 0,
+        "damage_effect": "poisoned",
+        "break_after_entities": 9999,
+        "break_after_walls": 9999
+    },
+    "Particle_emiter":{
+        "emiters":[
+            {"type":"poison_cloud", "scale":false, "enabled":true}
+         ]
+    }
+}

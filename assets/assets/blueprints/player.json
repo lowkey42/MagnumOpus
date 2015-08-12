@@ -65,5 +65,10 @@
         "on_damage": true,
         "blast_force": 100
     },
-    "Element"
+    "Element":{
+        "slots":[
+            {"element":frost, "fill":1},
+            {"element":gas, "fill":1}
+        ]
+    }
 }

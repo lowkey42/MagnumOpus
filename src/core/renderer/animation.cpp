@@ -39,6 +39,7 @@ namespace renderer{
 		sf2_value(damaged),
 		sf2_value(healed),
 		sf2_value(died),
+		sf2_value(dying),
 		sf2_value(resurrected)
 	)
 
@@ -85,7 +86,11 @@ namespace renderer{
 
 	Time Animation::remaining_time(const Animation_type type, const float cur_frame) const noexcept {
 
-		Animation_frame_data d = _data->animations.find(type)->second;
+		auto anim = _data->animations.find(type);
+		if(anim == _data->animations.end())
+			return 0_s;
+
+		Animation_frame_data d = anim->second;
 		// calculating remaining time in seconds for current animation
 		if(d.frames<=1)
 			return 0_s;

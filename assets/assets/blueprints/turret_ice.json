@@ -1,6 +1,6 @@
 {
     "Transform":{
-        "rot_speed": 30
+        "rot_speed": 70
     },
 	"Physics":{
 		"radius": 0.3,
@@ -24,23 +24,23 @@
     },
     "State",
     "Friend":{
-        "group": 1
+        "group": 4
     },
     "Health":{
         "max_hp": 20,
         "physical_resistence": 0.5,
         "vulnerabilities": [water, fire],
         "resistences": [frost],
-        "death_effect": explosion_fire
+        "death_effect": explosion_ice
      },
     "Weapon":{
         "weapon": {
             "type": "range",
             "bullet_type": "bullet_iceball_exploding",
             "bullet_velocity": 30,
-            "cooldown": 0.5,
+            "cooldown": 3.2,
             "recoil": 0,
-            "attack_delay": 0.1
+            "attack_delay": 0.4
         }
     },
     "Drop":{"group":2},
