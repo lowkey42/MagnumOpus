@@ -44,10 +44,19 @@ namespace mo {
 	namespace renderer{ class Camera; }
 
 	struct Profile_data {
+		Profile_data(std::string n, uint64_t s, int di, int de){
+			name = n;
+			seed = s;
+			difficulty = di;
+			depth = de;
+		}
+
+		Profile_data(){}
+
 		std::string name;
-		uint64_t seed;
-		int difficulty;
-		int depth;
+		uint64_t seed = 0;
+		int difficulty = 0;
+		int depth = 0;
 
 	};
 
