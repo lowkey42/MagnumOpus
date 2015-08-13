@@ -212,7 +212,7 @@ namespace mo {
 		(void)reset_stream;
 
 
-		auto profile = Profile_data{};
+		Profile_data profile = Profile_data{};
 		sf2::parseStream(stream, profile);
 
 		auto state = std::unique_ptr<Game_state>(new Game_state(engine, profile));

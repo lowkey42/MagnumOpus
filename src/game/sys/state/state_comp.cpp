@@ -46,7 +46,7 @@ namespace state {
 
 	void State_comp::load(ecs::Entity_state& state) {
 		auto s = state.read_to(Persisted_state{*this});
-		_state_primary = {s.state, 1.0f, s.state_left*1_s};
+		_state_primary = State_data{s.state, 1.0f, s.state_left*1_s};
 		_state_background = {s.state_background, 1.0f, s.state_bg_left*1_s};
 		_delete_dead = s.delete_dead;
 	}

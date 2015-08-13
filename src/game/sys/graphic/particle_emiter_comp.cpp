@@ -16,6 +16,15 @@ namespace graphic {
 
 
 	struct Emiter_state {
+		Emiter_state(Effect_type t, bool e, bool s, bool temp = false){
+			type = t;
+			enabled = e;
+			scale = s;
+			temporary = temp;
+		}
+
+		Emiter_state(){}
+
 		Effect_type type=Effect_type::none;
 		bool enabled=true;
 		bool scale=false;

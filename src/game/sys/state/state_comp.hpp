@@ -53,6 +53,13 @@ namespace sys {
 namespace state {
 
 	struct State_data {
+
+		State_data(Entity_state st = Entity_state::idle, float m = 1.f, Time l = Time(0)){
+			s = st;
+			magnitude = m;
+			left = l;
+		}
+
 		Entity_state s = Entity_state::idle;
 		float magnitude = 1.f;
 		Time left = Time(0);
