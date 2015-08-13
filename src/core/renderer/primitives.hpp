@@ -66,12 +66,14 @@ namespace renderer {
 
 	class Textured_box {
 		public:
-			Textured_box(asset::Asset_manager& assets, Texture_ptr tex, int width = 100, int height = 100);
+			Textured_box(asset::Asset_manager& assets, Texture_ptr tex, int width = 0, int height = 0);
 
 			void set_vp(const glm::mat4& vp);
 			void set_color(const glm::vec4& c);
 
 			void draw(glm::vec2 center);
+
+			auto texture()const noexcept {return _texture;}
 
 		private:
 			Shader_program _prog;

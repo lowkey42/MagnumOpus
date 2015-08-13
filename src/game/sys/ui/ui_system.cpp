@@ -1,5 +1,7 @@
 #define GLM_SWIZZLE
 
+#include "../../game_engine.hpp"
+
 #include "ui_system.hpp"
 
 #include "ui_minmal_comp.hpp"
@@ -17,11 +19,13 @@ namespace mo {
 namespace sys {
 namespace ui {
 
+	using namespace unit_literals;
 	using namespace renderer;
 
 	namespace {
 		constexpr auto gui_delay = 0.2f;
 		constexpr auto gui_delay_inv = 1.f / gui_delay;
+		constexpr auto join_msg_delay = 2_s;
 
 		const std::vector<Simple_vertex> hud_vert {
 			{{0,0}, {0,1}},
@@ -68,7 +72,7 @@ namespace ui {
         }
 	}
 
-	Ui_system::Ui_system(Engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms)
+	Ui_system::Ui_system(Game_engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms)
 	    : _ui_comps(em.list<Ui_comp>()),
 	      _cam(calculate_vscreen(e, 512)),
 	      _hud(simple_vertex_layout, create_buffer(hud_vert)),
@@ -78,9 +82,11 @@ namespace ui {
 	      _hud_health_min_tex(e.assets().load<Texture>("tex:ui_hud_health_min"_aid)),
 	      _score_font(e.assets().load<Font>("font:nixie"_aid)),
 	      _score_text(_score_font),
+	      _join_msg(e.assets(), e.assets().load<Texture>("tex:ui_hud_join"_aid)),
 	      _bubble_renderer(e.assets(), 58/2.f),
 	      _assets(e.assets()),
-	      _transforms(transforms) {
+	      _transforms(transforms),
+	      _player_ready([&c=e.controllers()]{return c.player_ready();}) {
 
 		em.register_component_type<Ui_minimal_comp>();
 
@@ -184,6 +190,17 @@ namespace ui {
 
 			i++;
 		}
+
+		if(_player_ready()) {
+			if(!_last_player_ready) {
+				_last_player_ready = true;
+				_join_msg_fade = join_msg_delay;
+			}
+		} else
+			_last_player_ready = false;
+
+		if(join_msg_delay>0_s)
+			_join_msg_fade-=dt;
 	}
 
 	void Ui_system::draw(const renderer::Camera& world_cam) {
@@ -344,6 +361,13 @@ namespace ui {
 
 			_score_shader.set_uniform("model",model);
 			_score_text.draw();
+		}
+
+		if(_join_msg_fade>0_s) {
+			auto join_msg_color = (_join_msg_fade/join_msg_delay) + 0.2f;
+			_join_msg.set_vp(_cam.vp() * glm::scale(glm::mat4{}, {2,2,1} ));
+			_join_msg.set_color({join_msg_color,join_msg_color,join_msg_color,join_msg_color});
+			_join_msg.draw({0,_cam.viewport().w/2-50});
 		}
 	}
 

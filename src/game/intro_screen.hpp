@@ -45,8 +45,10 @@ namespace mo {
 
 			renderer::Textured_box _box;
 			renderer::Textured_box _box2;
+			renderer::Textured_box _circle;
 
 			Time _fade_left;
+			Time _fadein_left;
 	};
 
 }

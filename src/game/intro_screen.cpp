@@ -49,13 +49,16 @@ namespace mo {
 	    _camera(calculate_vscreen(game_engine, 512)),
 		_box(game_engine.assets(),  game_engine.assets().load<Texture>("tex:ui_intro"_aid),  _camera.viewport().w*2.f, _camera.viewport().w),
 	    _box2(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_intro2"_aid), _camera.viewport().w*2.f, _camera.viewport().w),
-	    _fade_left(fade + 1_s)
+	    _circle(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_intro_circle"_aid), _camera.viewport().w*2 *(800/2048.f), _camera.viewport().w*2 *(800/2048.f)),
+	    _fade_left(fade + 0.5_s),
+	    _fadein_left(fade + fade/2 +1.5_s)
 	{
 	}
 
 
 	void Intro_screen::_update(float delta_time) {
 		_fade_left-=delta_time * second;
+		_fadein_left-=delta_time * second;
 
 		ui_controller uic(_game_engine);
 		_game_engine.controllers().main_controller()(uic);
@@ -68,13 +71,21 @@ namespace mo {
 		(void)ddt;
 
 		auto fp = glm::clamp(_fade_left/fade, 0.f, 1.f);
+		auto fg_color = 1-glm::clamp(_fadein_left/(fade/2), 0.f, 1.f);
 
 		_box.set_vp(_camera.vp());
-		_box.set_color({fp,fp,fp,fp});
+		_box.set_color({fp+0.18f,fp+0.18f,fp+0.18f,fp+0.18f});
 		_box.draw(glm::vec2(0.f, 0.f));
 
-		_box2.set_vp(_camera.vp());
-		_box2.set_color({1-fp,1-fp,1-fp,1-fp});
-		_box2.draw(glm::vec2(0.f, 0.f));
+		auto circle_color = (1-fp) - fg_color*0.85f;
+		_circle.set_vp(_camera.vp() * glm::rotate(glm::mat4(), _fade_left/25_s, {0.f,0.f,1.f}));
+		_circle.set_color({circle_color,circle_color,circle_color,0.f});
+		_circle.draw(glm::vec2(0.f, 0.f));
+
+		if(fg_color>0) {
+			_box2.set_vp(_camera.vp());
+			_box2.set_color(glm::vec4{1,1,1,1}*fg_color);
+			_box2.draw(glm::vec2(0.f, 0.f));
+		}
 	}
 }

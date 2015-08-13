@@ -29,12 +29,14 @@
 #include "ui_comp.hpp"
 
 namespace mo {
+	class Game_engine;
+
 namespace sys {
 namespace ui {
 
 	class Ui_system {
 		public:
-			Ui_system(Engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms);
+			Ui_system(Game_engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& world_cam);
@@ -55,11 +57,17 @@ namespace ui {
 			renderer::Font_ptr    _score_font;
 			renderer::Text_dynamic _score_text;
 
+			renderer::Textured_box _join_msg;
+
 			renderer::Bubble_renderer _bubble_renderer;
 			asset::Asset_manager& _assets;
 			physics::Transform_system& _transforms;
 
 			Time _time_acc = Time{0};
+
+			std::function<bool()> _player_ready;
+			bool _last_player_ready = false;
+			Time _join_msg_fade = Time{0};
 	};
 
 }
