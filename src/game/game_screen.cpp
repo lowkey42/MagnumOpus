@@ -24,9 +24,10 @@
 namespace mo {
 	using namespace util;
 	using namespace unit_literals;
+	using namespace renderer;
 
 	namespace {
-		std::vector<renderer::Simple_vertex> posteffect_buffer {
+		std::vector<Simple_vertex> posteffect_buffer {
 			{{0,0}, {0,1}},
 			{{0,1}, {0,0}},
 			{{1,0}, {1,1}},
@@ -38,9 +39,9 @@ namespace mo {
 
 		auto create_framebuffer(Game_engine& engine) {
 #ifdef SLOW_SYSTEM
-			return renderer::Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
+			return Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
 #else
-			return renderer::Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
+			return Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
 #endif
 		}
 
@@ -75,8 +76,8 @@ namespace mo {
 		_player_sc_slot(&Game_screen::_on_state_change, this),
 		_join_slot(&Game_screen::_join, this),
 		_unjoin_slot(&Game_screen::_unjoin, this),
-		_post_effect_obj(renderer::simple_vertex_layout,
-						 renderer::create_buffer(posteffect_buffer)),
+		_post_effect_obj(simple_vertex_layout,
+						 create_buffer(posteffect_buffer)),
 	    _lightmap{
 				create_framebuffer(engine),
 				create_framebuffer(engine)

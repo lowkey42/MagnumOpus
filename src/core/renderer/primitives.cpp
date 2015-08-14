@@ -154,13 +154,13 @@ namespace renderer {
 	}
 
 	Textured_box::Textured_box(asset::Asset_manager& assets, Texture_ptr tex, int width, int height)
-		: _obj(textured_box_layout, create_buffer(create_box_mesh(width, height)))
+		: _obj(textured_box_layout, create_buffer(create_box_mesh(width>0?width:tex->width(), height>0?height:tex->height())))
 	{
 		_prog.attach_shader(assets.load<Shader>("vert_shader:simple"_aid))
 		     .attach_shader(assets.load<Shader>("frag_shader:simple"_aid))
 		     .bind_all_attribute_locations(simple_vertex_layout)
 		     .build()
-		     .set_uniform("color", glm::vec4(1,1,1,1));;
+		     .bind().set_uniform("color", glm::vec4(1,1,1,1));
 
 		_texture = tex;
 
