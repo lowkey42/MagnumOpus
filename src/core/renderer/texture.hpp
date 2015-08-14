@@ -78,14 +78,11 @@ namespace renderer {
 	};
 
 	struct Framebuffer_binder {
-		Framebuffer_binder(Framebuffer& fb) : fb(fb) {
-			fb.bind_target();
-		}
-		~Framebuffer_binder()noexcept {
-			fb.unbind_target();
-		}
+		Framebuffer_binder(Framebuffer& fb);
+		~Framebuffer_binder()noexcept;
 
 		Framebuffer& fb;
+		int old_viewport[4];
 	};
 
 	struct Texture_binder {

@@ -173,9 +173,19 @@ namespace renderer {
 
 	void Framebuffer::bind_target() {
 		glBindFramebuffer(GL_FRAMEBUFFER, _fb_handle);
+		glViewport(0,0, width(), height());
 	}
 	void Framebuffer::unbind_target() {
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	}
+
+	Framebuffer_binder::Framebuffer_binder(Framebuffer& fb) : fb(fb) {
+		glGetIntegerv(GL_VIEWPORT, old_viewport);
+		fb.bind_target();
+	}
+	Framebuffer_binder::~Framebuffer_binder()noexcept {
+		fb.unbind_target();
+		glViewport(old_viewport[0], old_viewport[1], old_viewport[2], old_viewport[3]);
 	}
 
 } /* namespace renderer */

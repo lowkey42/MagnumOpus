@@ -18,19 +18,20 @@ namespace cam {
 	constexpr auto min_zoom = 1.f / 2;
 	constexpr auto max_zoom = 1.0f;
 
-	VScreen::VScreen(glm::vec2 size, float world_scale)
-		: camera(size, world_scale), vscreen(size.x, size.y, true) {
+	VScreen::VScreen(glm::vec2 real_size, glm::vec2 vsize, float world_scale)
+		: camera(vsize, world_scale), vscreen(real_size.x, real_size.y, true) {
 	}
 
 	Camera_system::Camera_system(ecs::Entity_manager& entity_manager, Game_engine& engine)
 		: _gctx(engine.graphics_ctx()),
 	      _targets(entity_manager.list<Camera_target_comp>()),
 		  _vscreen_size(renderer::calculate_vscreen(engine, vscreen_height)),
-	      _main_camera({engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height()}, world_scale) {
+	      _real_screen_size(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height()),
+	      _main_camera(_real_screen_size, world_scale) {
 
 		entity_manager.register_component_type<Camera_target_comp>();
 
-		_cameras.emplace_back(_vscreen_size, world_scale);
+		_cameras.emplace_back(_real_screen_size, _vscreen_size, world_scale);
 		_cameras.back().camera.zoom(max_zoom);
 	}
 
@@ -119,7 +120,7 @@ namespace cam {
 	}
 
 	auto Camera_system::_feedback_offset()const -> glm::vec2 {
-		return _force_feedback>0.1 ? glm::circularRand(_force_feedback * _max_screenshake) : glm::vec2{0,0};
+		return _force_feedback>0.1 ? glm::circularRand(_force_feedback * _max_screenshake * _vscreen_size.y) : glm::vec2{0,0};
 	}
 
 }

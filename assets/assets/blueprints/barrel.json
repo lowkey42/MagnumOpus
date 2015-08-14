@@ -11,7 +11,7 @@
         "range": 3,
         "delay":0.5,
         "on_damage": true,
-        "blast_force": 100,
+        "blast_force": 500,
         "damage_type": "fire",
         "damage_effect": "burning",
         "effect": "explosion_fire",

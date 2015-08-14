@@ -41,6 +41,9 @@ namespace mo {
 #ifdef SLOW_SYSTEM
 			return Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
 #else
+			if(engine.graphics_ctx().win_width()>1280)
+				return Framebuffer(engine.graphics_ctx().win_width()/2.f, engine.graphics_ctx().win_height()/2.f, false);
+
 			return Framebuffer(engine.graphics_ctx().win_width(), engine.graphics_ctx().win_height(), false);
 #endif
 		}
@@ -259,7 +262,7 @@ namespace mo {
 #ifdef SLOW_SYSTEM
 			constexpr int blur_iterations = 3;
 #else
-			constexpr int blur_iterations = 10;
+			constexpr int blur_iterations = 9;
 #endif
 			_blur_filter.bind().set_uniform("VP", vp)
 					.set_uniform("texture", 0);

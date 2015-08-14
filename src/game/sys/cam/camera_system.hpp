@@ -37,7 +37,7 @@ namespace cam {
 
 		renderer::Framebuffer vscreen;
 
-		VScreen(glm::vec2 size, float world_scale);
+		VScreen(glm::vec2 real_size, glm::vec2 vsize, float world_scale);
 		VScreen(VScreen&&) = default;
 	};
 
@@ -53,8 +53,6 @@ namespace cam {
 				for(auto& c : _cameras) {
 					renderer::Framebuffer_binder vsb = c.vscreen;
 
-					c.camera.bind_viewport();
-
 					c.vscreen.clear();
 
 
@@ -65,8 +63,6 @@ namespace cam {
 
 					c.camera.position(old_p);
 				}
-
-				_gctx.reset_viewport();
 			}
 
 			auto vscreens()const noexcept {return util::range(_cameras);}
@@ -88,13 +84,14 @@ namespace cam {
 			renderer::Graphics_ctx& _gctx;
 			Camera_target_comp::Pool& _targets;
 			const glm::vec2 _vscreen_size;
+			const glm::vec2 _real_screen_size;
 
 			renderer::Camera _main_camera;
 			std::vector<VScreen> _cameras;
 
 			float _force_feedback  = 0.f;
 			float _target_force_feedback = 0.f;
-			float _max_screenshake = 40.f;
+			float _max_screenshake = 0.1f;
 	};
 
 }

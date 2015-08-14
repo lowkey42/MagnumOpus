@@ -118,10 +118,17 @@ namespace physics {
 
 				// apply friction
 				auto fric_speed = self._friction*_world.friction(world_x, world_y) *G;
-				self._velocity+=Velocity{
-						-sign(self._velocity.x) * std::min(fric_speed, std::abs(self._velocity.x.value())),
-						-sign(self._velocity.y) * std::min(fric_speed, std::abs(self._velocity.y.value()))
-				};
+
+				auto vel = glm::length(remove_units(self._velocity));
+
+				if(fric_speed >= vel) {
+					self._velocity.x*=0.f;
+					self._velocity.y*=0.f;
+
+				} else {
+					self._velocity.x*= (vel-fric_speed)/vel;
+					self._velocity.y*= (vel-fric_speed)/vel;
+				}
 
 				// reset acceleration
 				self._acceleration=self._acceleration*0.0f;
