@@ -42,9 +42,17 @@ namespace renderer {
 			auto win_width()const noexcept{return _win_width;}
 			auto win_height()const noexcept{return _win_height;}
 
+			auto max_screenshake()const noexcept {return _max_screenshake * _win_height;}
+
+			void resolution(int width, int height, float max_screenshake=-1);
+
+
 		private:
+			asset::Asset_manager& _assets;
 			std::string _name;
 			int _win_width, _win_height;
+			bool _fullscreen;
+			float _max_screenshake;
 
 			std::unique_ptr<SDL_Window,void(*)(SDL_Window*)> _window;
 			SDL_GLContext _gl_ctx;

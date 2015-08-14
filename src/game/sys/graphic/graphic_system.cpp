@@ -88,6 +88,8 @@ namespace graphic {
 				return;
 			}
 		}
+
+		DEBUG("Not enough particle emmiter slots");
 	}
 
 	void Graphic_system::draw(const renderer::Camera& camera) noexcept{

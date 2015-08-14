@@ -11,7 +11,7 @@
     "Explosive": {
         "damage": 5,
         "range": 3,
-        "delay":0.0,
+        "delay":0.1,
         "on_damage": true,
         "blast_force": 100,
         "damage_type": "fire",

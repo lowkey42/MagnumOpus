@@ -53,10 +53,16 @@ namespace sound {
 			FAIL("UNREACHABLE, maybe");
 		}
 
-		struct Sound_effect_data {
-			std::unordered_map<Effect_type, std::string> effects;
+		struct Sound_effect_data_value {
+			std::string sound;
+			bool is_static = false;
 		};
 
+		struct Sound_effect_data {
+			std::unordered_map<Effect_type, Sound_effect_data_value> effects;
+		};
+
+		sf2_structDef(Sound_effect_data_value, sf2_member(sound), sf2_member(is_static))
 		sf2_structDef(Sound_effect_data, sf2_member(effects))
 	}
 }
@@ -106,7 +112,8 @@ namespace sound {
 		for(std::size_t i=0; i<effect_type_count; ++i) {
 			auto iter = se_data->effects.find(static_cast<Effect_type>(i));
 			if(iter!=se_data->effects.end()) {
-				_sound_effects[i] = assets.load<audio::Sound>(asset::AID(iter->second));
+				_sound_effects[i].sound = assets.load<audio::Sound>(asset::AID(iter->second.sound));
+				_sound_effects[i].static_sound = iter->second.is_static;
 			}
 		}
 	}
@@ -177,17 +184,22 @@ namespace sound {
 
 
 	void Sound_system::add_effect(ecs::Entity& e, Effect_type effect) {
-		e.get<sys::sound::Sound_comp>().process([&](auto& sound) {
-			auto idx = static_cast<std::size_t>(effect);
+		auto idx = static_cast<std::size_t>(effect);
 
-			if(idx<_sound_effects.size()) {
-				auto& sound_effect = _sound_effects[idx];
-				if(sound_effect) {
-					sound._effect = sound_effect;
+		INVARIANT(idx<_sound_effects.size(), "Effect_type is too big");
+
+		auto& sound_effect = _sound_effects[idx];
+		if(sound_effect.sound) {
+			if(sound_effect.static_sound) {
+				_audio_ctx.play_static(*sound_effect.sound);
+
+			} else {
+				e.get<sys::sound::Sound_comp>().process([&](auto& sound) {
+					sound._effect = sound_effect.sound;
 					sound._effect_left = effect_time(effect);
-				}
+				});
 			}
-		});
+		}
 	}
 
 }

@@ -269,7 +269,7 @@ namespace mo {
 		  ai(em, transform, level),
 		  graphics(em, transform, engine.assets(), particle_renderer, state),
 		  combat(engine.assets(), em, transform, physics, state, effect_bus, forcefeedback_bus),
-	      items(engine.assets(), em, physics, transform, state, particle_renderer),
+	      items(engine.assets(), engine.audio_ctx(), em, physics, transform, state, particle_renderer),
 	      elements(engine.assets(), em, combat),
 	      soundsys(engine.assets(), em, transform, engine.audio_ctx()),
 		  ui(engine, em, transform) {

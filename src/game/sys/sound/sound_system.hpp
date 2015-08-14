@@ -43,10 +43,17 @@ namespace sound{
 			Effect_slot effects;
 
 		private:
+			struct Sound_effect_info {
+				audio::Sound_ptr sound;
+				bool static_sound;
+				Sound_effect_info() = default;
+				Sound_effect_info(audio::Sound_ptr sound, bool static_sound) : sound(sound), static_sound(static_sound) {}
+			};
+
 			physics::Transform_system& _transform;
 			audio::Audio_ctx& _audio_ctx;
 			sound::Sound_comp::Pool& _sounds;
-			std::vector<audio::Sound_ptr> _sound_effects;
+			std::vector<Sound_effect_info> _sound_effects;
 
 	};
 

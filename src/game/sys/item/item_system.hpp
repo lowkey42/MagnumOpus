@@ -17,6 +17,8 @@
 
 #include <core/ecs/ecs.hpp>
 #include <core/units.hpp>
+#include <core/audio/audio_ctx.hpp>
+#include <core/audio/sound.hpp>
 
 #include "../physics/transform_system.hpp"
 #include "../physics/physics_system.hpp"
@@ -37,6 +39,7 @@ namespace item {
 	class Item_system {
 		public:
 			Item_system(asset::Asset_manager& assets,
+			            audio::Audio_ctx& audio,
 			            ecs::Entity_manager& entity_manager,
 			            physics::Physics_system& physics_system,
 			            physics::Transform_system& transform,
@@ -50,6 +53,7 @@ namespace item {
 			void _drop_loot(ecs::Entity&, sys::state::State_data&);
 
 			asset::Asset_manager&          _assets;
+			audio::Audio_ctx&              _audio;
 			ecs::Entity_manager&           _em;
 			physics::Transform_system&     _ts;
 			renderer::Particle_renderer&   _particles;
@@ -57,6 +61,10 @@ namespace item {
 			util::slot<physics::Manifold&> _collision_slot;
 			util::slot<ecs::Entity&, sys::state::State_data&> _drop_loot_slot;
 			std::shared_ptr<const Droprate_conf> _droprates;
+
+			audio::Sound_ptr _pickup_sound_coin;
+			audio::Sound_ptr _pickup_sound_health;
+			audio::Sound_ptr _pickup_sound_other;
 	};
 }
 }

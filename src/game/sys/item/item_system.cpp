@@ -75,18 +75,23 @@ namespace item {
 
 	Item_system::Item_system(
 	        asset::Asset_manager& assets,
+	        audio::Audio_ctx& audio,
 	        ecs::Entity_manager& entity_manager,
 	        physics::Physics_system& physics_system,
 	        physics::Transform_system& transform,
 	        state::State_system& state_system,
 	        renderer::Particle_renderer& particles)
 	    : _assets(assets),
+	      _audio(audio),
 	      _em(entity_manager),
 	      _ts(transform),
 	      _particles(particles),
 	      _collectors(entity_manager.list<Collector_comp>()),
 	      _collision_slot(&Item_system::_on_collision, this),
-	      _drop_loot_slot(&Item_system::_drop_loot, this)
+	      _drop_loot_slot(&Item_system::_drop_loot, this),
+	      _pickup_sound_coin(assets.load<audio::Sound>("sound:pickup_coin"_aid)),
+	      _pickup_sound_health(assets.load<audio::Sound>("sound:pickup_health"_aid)),
+	      _pickup_sound_other(assets.load<audio::Sound>("sound:pickup_other"_aid))
 	{
 		_collision_slot.connect(physics_system.collisions);
 		_drop_loot_slot.connect(state_system.state_change_events);
@@ -201,6 +206,7 @@ namespace item {
 										h.damage(-item._mod);
 
 									item._collected = true;
+									_audio.play_static(*_pickup_sound_health);
 								});
 
 								break;
@@ -208,12 +214,15 @@ namespace item {
 								other.get<Score_comp>().process([&](Score_comp& s) {
 									s.add(item._mod);
 									item._collected = true;
+									_audio.play_static(*_pickup_sound_coin);
 								});
 								break;
 							case element:
 								other.get<Element_comp>().process([&](Element_comp& e) {
-									if(e.add_slot(item._element, item._mod))
+									if(e.add_slot(item._element, item._mod)) {
 										item._collected = true;
+										_audio.play_static(*_pickup_sound_other);
+									}
 								});
 								break;
 						}

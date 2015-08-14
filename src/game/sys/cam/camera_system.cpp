@@ -120,7 +120,7 @@ namespace cam {
 	}
 
 	auto Camera_system::_feedback_offset()const -> glm::vec2 {
-		return _force_feedback>0.1 ? glm::circularRand(_force_feedback * _max_screenshake * _vscreen_size.y) : glm::vec2{0,0};
+		return _force_feedback>0.1 ? glm::circularRand(_force_feedback * _gctx.max_screenshake()) : glm::vec2{0,0};
 	}
 
 }

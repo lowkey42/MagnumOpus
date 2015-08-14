@@ -60,7 +60,7 @@ namespace audio{
 			auto music_volume()const noexcept {return _music_volume;}
 
 		private:
-			static constexpr int16_t _dynamic_channels = 64;
+			static constexpr int16_t _dynamic_channels = 128;
 			using sptr = const audio::Sound*;
 
 			float _sound_volume;

@@ -46,7 +46,7 @@ namespace graphic {
 			friend class Graphic_system;
 
 		private:
-			static constexpr std::size_t max_emiters = 2;
+			static constexpr std::size_t max_emiters = 3;
 
 			struct Emiter {
 				renderer::Particle_emiter_ptr _emiter;

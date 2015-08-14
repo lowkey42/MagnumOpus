@@ -35,18 +35,20 @@ namespace {
 		int width;
 		int height;
 		bool fullscreen;
+		float max_screenshake = 0.1;
 	};
 
 	sf2_structDef(Graphics_cfg,
 		sf2_member(width),
 		sf2_member(height),
-		sf2_member(fullscreen)
+		sf2_member(fullscreen),
+		sf2_member(max_screenshake)
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Graphics_cfg{960,540,false};
+	constexpr auto default_cfg = Graphics_cfg{960,540,false, 0.1f};
 #else
-	constexpr auto default_cfg = Graphics_cfg{1024,512,false};
+	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.1f};
 #endif
 
 }
@@ -76,7 +78,7 @@ namespace mo {
 namespace renderer {
 
 	Graphics_ctx::Graphics_ctx(const std::string& name, asset::Asset_manager& assets)
-	 : _name(name), _window(nullptr, SDL_DestroyWindow) {
+	 : _assets(assets), _name(name), _window(nullptr, SDL_DestroyWindow) {
 
 		auto& cfg = asset::unpack(assets.load_maybe<Graphics_cfg>("cfg:graphics"_aid)).get_or_other(
 			default_cfg
@@ -84,7 +86,8 @@ namespace renderer {
 
 		_win_width = cfg.width;
 		_win_height = cfg.height;
-		bool fullscreen = cfg.fullscreen;
+		_max_screenshake = cfg.max_screenshake;
+		_fullscreen = cfg.fullscreen;
 
 		if(&cfg==&default_cfg) {
 			assets.save<Graphics_cfg>("cfg:graphics"_aid, cfg);
@@ -99,7 +102,7 @@ namespace renderer {
 		SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
 
 		int win_flags = SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN;
-		if(fullscreen)
+		if(_fullscreen)
 			win_flags|=SDL_WINDOW_FULLSCREEN_DESKTOP;
 
 		_window.reset( SDL_CreateWindow(_name.c_str(), SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
@@ -184,6 +187,11 @@ namespace renderer {
 		_clear_color = glm::vec3(r,g,b);
 	}
 
+
+	void Graphics_ctx::resolution(int width, int height, float max_screenshake) {
+		Graphics_cfg cfg{_win_width, _win_height, _fullscreen, _max_screenshake};
+		_assets.save<Graphics_cfg>("cfg:graphics"_aid, cfg);
+	}
 
 	Disable_depthtest::Disable_depthtest() {
 		glDisable(GL_DEPTH_TEST);

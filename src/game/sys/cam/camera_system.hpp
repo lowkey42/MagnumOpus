@@ -91,7 +91,6 @@ namespace cam {
 
 			float _force_feedback  = 0.f;
 			float _target_force_feedback = 0.f;
-			float _max_screenshake = 0.1f;
 	};
 
 }

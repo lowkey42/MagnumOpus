@@ -55,7 +55,7 @@ namespace ecs{class Entity;}
 		explosion_ice,
 		explosion_stone,
 	};
-	constexpr auto effect_type_count = static_cast<uint16_t>(Effect_type::flame_thrower)+1;
+	constexpr auto effect_type_count = static_cast<uint16_t>(Effect_type::explosion_stone)+1;
 
 	using Effect_slot   = util::slot<ecs::Entity&,Effect_type>;
 	using Effect_source = util::signal_source<ecs::Entity&,Effect_type>;

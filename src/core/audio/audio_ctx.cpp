@@ -44,7 +44,7 @@ namespace mo {
 				return i==1 ? 1 : (create_mask(i-1)<<1 | 1);
 			}
 
-			constexpr auto static_channels = 16;
+			constexpr auto static_channels = 32;
 
 			constexpr auto version_bits = 4u;
 

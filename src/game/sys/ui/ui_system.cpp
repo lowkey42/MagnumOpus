@@ -25,7 +25,7 @@ namespace ui {
 	namespace {
 		constexpr auto gui_delay = 0.2f;
 		constexpr auto gui_delay_inv = 1.f / gui_delay;
-		constexpr auto join_msg_delay = 2_s;
+		constexpr auto join_msg_delay = 4_s;
 
 		const std::vector<Simple_vertex> hud_vert {
 			{{0,0}, {0,1}},
@@ -364,7 +364,7 @@ namespace ui {
 		}
 
 		if(_join_msg_fade>0_s) {
-			auto join_msg_color = (_join_msg_fade/join_msg_delay) + 0.2f;
+			auto join_msg_color = glm::clamp(_join_msg_fade/(join_msg_delay/2), 0.f, 1.f);
 			_join_msg.set_vp(_cam.vp() * glm::scale(glm::mat4{}, {2,2,1} ));
 			_join_msg.set_color({join_msg_color,join_msg_color,join_msg_color,join_msg_color});
 			_join_msg.draw({0,_cam.viewport().w/2-50});

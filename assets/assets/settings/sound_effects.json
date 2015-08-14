@@ -1,5 +1,23 @@
 {
 	"effects":{
-		"flame_thrower": "sound:firebolt"
+        "flame_thrower": {
+            "sound": "sound:firebolt"
+        },
+        "explosion_fire": {
+            "sound": "sound:explosion",
+            "is_static": true
+        },
+        "explosion_poison": {
+            "sound": "sound:explosion",
+            "is_static": true
+        },
+        "explosion_ice": {
+            "sound": "sound:explosion",
+            "is_static": true
+        },
+        "explosion_stone": {
+            "sound": "sound:explosion",
+            "is_static": true
+        }
 	}
 }
