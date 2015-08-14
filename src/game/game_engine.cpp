@@ -3,6 +3,7 @@
 
 #include "game_screen.hpp"
 #include "intro_screen.hpp"
+#include "menu_screen.hpp"
 #include "game_state.hpp"
 
 #include <vector>

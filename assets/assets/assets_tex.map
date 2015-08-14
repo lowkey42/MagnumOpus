@@ -29,6 +29,15 @@ tex:ui_hud_fg = textures/ui_stats_fg.png
 tex:ui_hud_health = textures/ui_stats_health.png
 tex:ui_hud_health_min = textures/ui_small_health.png
 
+tex:ui_load1 = textures/load_game_1.png
+tex:ui_load2 = textures/load_game_2.png
+tex:ui_new1 = textures/new_game_1.png
+tex:ui_new2 = textures/new_game_2.png
+tex:ui_quit1 = textures/quit_game_1.png
+tex:ui_quit2 = textures/quit_game_2.png
+tex:ui_settings1 = textures/settings_1.png
+tex:ui_settings2 = textures/settings_2.png
+
 tex:element_fire = textures/ui_element_fire.png
 tex:element_frost = textures/ui_element_frost.png
 tex:element_gas = textures/ui_element_gas.png

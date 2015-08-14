@@ -1,4 +1,3 @@
-#include "intro_screen.hpp"
 #include "menu_screen.hpp"
 
 #include "../core/units.hpp"
@@ -30,10 +29,11 @@ namespace mo {
 			void enter_game(){
 				// TODO: move to main-menu
 				if(Game_screen::save_exists(_engine))
-					_engine.enter_screen<Menu_Screen>();
+					//_engine.enter_screen<Game_screen>();
+					;
 				else {
 					INFO("no savegame");
-					_engine.enter_screen<Menu_Screen>();
+					//_engine.enter_screen<Game_screen>("TODO");
 				}
 			}
 
@@ -44,18 +44,20 @@ namespace mo {
 		constexpr Time fade = 2_s;
 	}
 
-	Intro_screen::Intro_screen(Game_engine& game_engine) :
+	Menu_Screen::Menu_Screen(Game_engine& game_engine) :
 		Screen(game_engine),
 		_game_engine(game_engine),
 	    _camera(calculate_vscreen(game_engine, 512)),
-		_box(game_engine.assets(),  game_engine.assets().load<Texture>("tex:ui_intro"_aid),  _camera.viewport().w*2.f, _camera.viewport().w),
-		_box2(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_intro2"_aid), _camera.viewport().w*2.f, _camera.viewport().w),
-	    _fade_left(fade + 1_s)
+		_newGame(game_engine.assets(),  game_engine.assets().load<Texture>("tex:ui_new1"_aid), 300, 100),
+		_loadGame(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_load1"_aid), 300, 100),
+		_settings(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_settings1"_aid), 300, 100),
+		_quit(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_quit1"_aid), 300, 100),
+		_fade_left(fade + 1_s)
 	{
 	}
 
 
-	void Intro_screen::_update(float delta_time) {
+	void Menu_Screen::_update(float delta_time) {
 		_fade_left-=delta_time * second;
 
 		ui_controller uic(_game_engine);
@@ -64,18 +66,26 @@ namespace mo {
 	}
 
 
-	void Intro_screen::_draw(float time ) {
+	void Menu_Screen::_draw(float time ) {
 		renderer::Disable_depthtest ddt{};
 		(void)ddt;
 
-		auto fp = glm::clamp(_fade_left/fade, 0.f, 1.f);
+		//auto fp = glm::clamp(_fade_left/fade, 0.f, 1.f);
 
-		_box.set_vp(_camera.vp());
-		_box.set_color({fp,fp,fp,fp});
-		_box.draw(glm::vec2(0.f, 0.f));
+		_newGame.set_vp(_camera.vp());
+		_newGame.set_color({1.f, 1.f, 1.f, 1.f});
+		_newGame.draw(glm::vec2(0.0f, -180));
 
-		_box2.set_vp(_camera.vp());
-		_box2.set_color({1-fp,1-fp,1-fp,1-fp});
-		_box2.draw(glm::vec2(0.f, 0.f));
+		_loadGame.set_vp(_camera.vp());
+		_loadGame.set_color({1.f, 1.f, 1.f, 1.f});
+		_loadGame.draw(glm::vec2(0.f, -60.f));
+
+		_settings.set_vp(_camera.vp());
+		_settings.set_color({1.f, 1.f, 1.f, 1.f});
+		_settings.draw(glm::vec2(0.f, 60.f));
+
+		_quit.set_vp(_camera.vp());
+		_quit.set_color({1.f, 1.f, 1.f, 1.f});
+		_quit.draw(glm::vec2(0.f, 180.f));
 	}
 }
