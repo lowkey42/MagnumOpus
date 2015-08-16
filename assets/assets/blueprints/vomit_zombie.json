@@ -1,6 +1,6 @@
 {
     "Transform":{
-        "rot_speed": 180
+        "rot_speed": 90
     },
 	"Physics":{
 		"radius": 0.3,
@@ -39,7 +39,7 @@
             "type": "range",
             "bullet_type": "vomit_bullet_exploding",
             "bullet_velocity": 30,
-            "cooldown": 1.0,
+            "cooldown": 2.0,
             "recoil": 60,
             "attack_delay": 0.5
         }

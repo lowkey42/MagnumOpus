@@ -127,13 +127,8 @@ namespace renderer {
 		}
 	}
 
-	namespace {
 
-		Vertex_layout textured_box_layout {
-			Vertex_layout::Mode::triangles,
-			vertex("position", &Simple_vertex::xy),
-			vertex("uv", &Simple_vertex::uv)
-		};
+	namespace {
 
 		auto create_box_mesh(float width, float height) -> std::vector<Simple_vertex> {
 
@@ -153,8 +148,46 @@ namespace renderer {
 
 	}
 
+	Sprite_renderer::Sprite_renderer(asset::Asset_manager& assets)
+	    : _obj(simple_vertex_layout, create_buffer(create_box_mesh(1,1))) {
+
+		_prog.attach_shader(assets.load<Shader>("vert_shader:simple"_aid))
+		     .attach_shader(assets.load<Shader>("frag_shader:simple"_aid))
+		     .bind_all_attribute_locations(simple_vertex_layout)
+		     .build();
+	}
+
+	void Sprite_renderer::set_vp(const glm::mat4& vp) {
+		_prog.bind().set_uniform("VP", vp);
+	}
+
+	void Sprite_renderer::draw(Texture_ptr tex, glm::vec2 center,
+	                           glm::vec4 color, glm::vec4 clip, glm::vec2 size,
+	                           glm::mat4 transform) {
+
+		if(size.x==0.f || size.y==0.f) {
+			size.x = tex->width() *clip.z;
+			size.y = tex->height()*clip.w;
+		}
+
+		auto trans = glm::scale(glm::translate(glm::mat4(),
+
+		                            glm::vec3(center.x, center.y, 0.f)), {size.x,size.y,1});
+
+		_prog.bind()
+		     .set_uniform("model", trans * transform)
+		     .set_uniform("color", color)
+		     .set_uniform("clip", clip)
+		     .set_uniform("texture", 0)
+		     .set_uniform("layer", 0.f);
+
+		tex->bind();
+		_obj.draw();
+	}
+
+
 	Textured_box::Textured_box(asset::Asset_manager& assets, Texture_ptr tex, int width, int height)
-		: _obj(textured_box_layout, create_buffer(create_box_mesh(width>0?width:tex->width(), height>0?height:tex->height())))
+		: _obj(simple_vertex_layout, create_buffer(create_box_mesh(width>0?width:tex->width(), height>0?height:tex->height())))
 	{
 		_prog.attach_shader(assets.load<Shader>("vert_shader:simple"_aid))
 		     .attach_shader(assets.load<Shader>("frag_shader:simple"_aid))

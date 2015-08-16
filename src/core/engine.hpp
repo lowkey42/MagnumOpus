@@ -39,6 +39,9 @@ namespace mo {
 	class Screen {
 		public:
 			Screen(Engine& engine) : _engine(engine) {}
+			Screen(const Screen&) = delete;
+			Screen& operator=(const Screen&) = delete;
+
 			virtual ~Screen()noexcept = default;
 
 		protected:

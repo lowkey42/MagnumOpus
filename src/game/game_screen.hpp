@@ -68,6 +68,10 @@ namespace mo {
 			void _join(sys::controller::Controller_added_event e);
 			void _unjoin(sys::controller::Controller_removed_event e);
 
+			void _on_quit(sys::controller::Quit_event) {
+				_quit_to_menu = true;
+			}
+
 		private:
 			Game_engine& _engine;
 
@@ -82,6 +86,9 @@ namespace mo {
 			renderer::Shader_program _blur_filter;
 			renderer::Object _post_effect_obj;
 			renderer::Framebuffer _lightmap[2];
+
+			bool _quit_to_menu = false;
+			util::slot<sys::controller::Quit_event> _on_quit_slot;
 
 			Time _fadein_left = Time{0};
 			bool _moving_down = false, _dying = false;

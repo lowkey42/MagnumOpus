@@ -18,6 +18,7 @@
 #include "../asset/asset_manager.hpp"
 #include "texture.hpp"
 #include "vertex_object.hpp"
+#include "shader.hpp"
 
 namespace mo {
 namespace renderer {
@@ -86,8 +87,11 @@ namespace renderer {
 
 			void draw()const;
 
+			auto size()const noexcept {return _size;}
+
 		protected:
 			Object _obj;
+			glm::vec2 _size;
 	};
 
 	class Text_dynamic {
@@ -97,10 +101,28 @@ namespace renderer {
 			void draw()const;
 			void set(const std::string& str);
 
+			auto size()const noexcept {return _size;}
+
 		protected:
 			Font_ptr _font;
 			std::vector<Font_vertex> _data;
 			Object _obj;
+			glm::vec2 _size;
+	};
+
+
+	class Text_renderer {
+		public:
+			Text_renderer(asset::Asset_manager& assets, Font_ptr font = Font_ptr{});
+
+			void set_vp(const glm::mat4& vp);
+
+			void draw(Text& tex, glm::vec2 center, glm::vec4 color=glm::vec4{1,1,1,1}, float scale=1);
+			void draw(Text_dynamic& tex, glm::vec2 center, glm::vec4 color=glm::vec4{1,1,1,1}, float scale=1);
+
+		private:
+			Shader_program _prog;
+			Font_ptr _font;
 	};
 
 }

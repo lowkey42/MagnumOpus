@@ -158,11 +158,14 @@ void Engine::leave_screen(uint8_t depth) {
 
 	if(_screen_stack.empty()) {
 		_quit=true;
-		last->_on_leave(util::nothing());
+		if(last)
+			last->_on_leave(util::nothing());
 
-	} else {
+	} else if(last) {
 		last->_on_leave(util::justPtr(_screen_stack.back().get()));
 		_screen_stack.back()->_on_enter(util::justPtr(last.get()));
+	} else {
+		_screen_stack.back()->_on_enter(util::nothing());
 	}
 }
 auto Engine::current_screen() -> Screen& {

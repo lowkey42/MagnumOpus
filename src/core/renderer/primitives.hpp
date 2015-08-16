@@ -64,6 +64,23 @@ namespace renderer {
 			Object _obj;
 	};
 
+	class Sprite_renderer {
+		public:
+			Sprite_renderer(asset::Asset_manager& assets);
+
+			void set_vp(const glm::mat4& vp);
+
+			void draw(Texture_ptr tex, glm::vec2 center,
+			          glm::vec4 color=glm::vec4{1,1,1,1},
+			          glm::vec4 clip=glm::vec4{0,0,1,1},
+			          glm::vec2 size=glm::vec2(0,0),
+			          glm::mat4 transform=glm::mat4());
+
+		private:
+			Shader_program _prog;
+			Object _obj;
+	};
+
 	class Textured_box {
 		public:
 			Textured_box(asset::Asset_manager& assets, Texture_ptr tex, int width = 0, int height = 0);

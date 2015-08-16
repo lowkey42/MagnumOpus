@@ -1,5 +1,12 @@
 #include "text.hpp"
 
+#include "shader.hpp"
+#include "../asset/asset_manager.hpp"
+
+#include <glm/glm.hpp>
+
+#include <glm/gtx/rotate_vector.hpp>
+
 
 namespace mo {
 namespace renderer {
@@ -200,6 +207,17 @@ namespace renderer {
 
 	Text::Text(std::vector<Font_vertex> vertices)
 	    : _obj(text_vertex_layout, create_buffer(vertices)) {
+
+		glm::vec2 top_left, bottom_right;
+		for(auto& v : vertices) {
+			if(v.xy.x<top_left.x) top_left.x=v.xy.x;
+			if(v.xy.y<top_left.y) top_left.y=v.xy.y;
+
+			if(v.xy.x>bottom_right.x) bottom_right.x=v.xy.x;
+			if(v.xy.y>bottom_right.y) bottom_right.y=v.xy.y;
+		}
+
+		_size = bottom_right - top_left;
 	}
 	void Text::draw()const {
 		_obj.draw();
@@ -212,12 +230,76 @@ namespace renderer {
 	}
 
 	void Text_dynamic::draw()const {
+		_font->bind();
 		_obj.draw();
 	}
 	void Text_dynamic::set(const std::string& str) {
 		_data.clear();
 		_font->calculate_vertices(str, _data);
 		_obj.buffer().set(_data);
+
+		glm::vec2 top_left, bottom_right;
+		for(auto& v : _data) {
+			if(v.xy.x<top_left.x) top_left.x=v.xy.x;
+			if(v.xy.y<top_left.y) top_left.y=v.xy.y;
+
+			if(v.xy.x>bottom_right.x) bottom_right.x=v.xy.x;
+			if(v.xy.y>bottom_right.y) bottom_right.y=v.xy.y;
+		}
+
+		_size = bottom_right - top_left;
+	}
+
+
+	Text_renderer::Text_renderer(asset::Asset_manager& assets, Font_ptr font)
+	    : _font(font) {
+		_prog.attach_shader(assets.load<renderer::Shader>("vert_shader:simple"_aid))
+		    .attach_shader(assets.load<renderer::Shader>("frag_shader:simple"_aid))
+		    .bind_all_attribute_locations(renderer::text_vertex_layout)
+		    .build()
+		    .detach_all();
+	}
+
+	void Text_renderer::set_vp(const glm::mat4& vp) {
+		_prog.bind().set_uniform("VP", vp);
+	}
+
+	void Text_renderer::draw(Text& text, glm::vec2 center,
+	                         glm::vec4 color, float scale) {
+
+		auto trans = glm::scale(glm::translate(glm::mat4(),
+		                            glm::vec3(center.x-text.size().x/2*scale,
+		                                      center.y+text.size().y/2*scale,
+		                                      0.f)),
+		                            {scale, scale,1});
+
+		_prog.bind()
+		     .set_uniform("model", trans)
+		     .set_uniform("color", color)
+//		     .set_uniform("clip", glm::vec4(0,0,1,1))
+		     .set_uniform("layer", 1.f);
+
+		if(_font)
+			_font->bind();
+
+		text.draw();
+	}
+
+	void Text_renderer::draw(Text_dynamic& text, glm::vec2 center,
+	                         glm::vec4 color, float scale) {
+
+		auto trans = glm::scale(glm::translate(glm::mat4(),
+		                            glm::vec3(center.x-text.size().x/2*scale,
+		                                      center.y+text.size().y/2*scale,
+		                                      0.f)),
+		                            {scale, scale,1});
+		_prog.bind()
+		     .set_uniform("model", trans)
+		     .set_uniform("color", color)
+//		     .set_uniform("clip", glm::vec4(0,0,1,1))
+		     .set_uniform("layer", 1.f);
+
+		text.draw();
 	}
 
 }

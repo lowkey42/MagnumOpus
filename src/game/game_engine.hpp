@@ -47,14 +47,10 @@ namespace mo {
 			void _on_frame(float dt) override {
 				_controllers.update(Time(dt));
 			}
-			void _on_quit(sys::controller::Quit_event) {
-				exit();
-			}
 			auto _on_reload() -> std::tuple<bool, std::string> override;
 
 		private:
 			sys::controller::Controller_manager _controllers;
-			util::slot<sys::controller::Quit_event> _on_quit_slot;
 	};
 
 }

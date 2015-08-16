@@ -291,7 +291,7 @@ namespace renderer {
 		     .build();
 	}
 
-	void Particle_renderer::draw(Time dt, const Camera& cam) {
+	void Particle_renderer::draw(const Camera& cam) {
 		Disable_depthwrite ddw{};
 
 		auto cam_area  = cam.area();
@@ -305,12 +305,23 @@ namespace renderer {
 
 		for(auto& pe : _emiter) {
 			if(pe->visible(top_left, bottom_right)) {
-				pe->update(pe.use_count()>1, dt, *_env);
 				pe->draw(_prog);
 			}
 		}
 
 		_prog.unbind();
+	}
+	void Particle_renderer::update(Time dt, const Camera& cam) {
+		auto cam_area  = cam.area();
+		glm::vec2 top_left    {cam_area.x-5, cam_area.y-5};
+		glm::vec2 bottom_right{cam_area.z+5, cam_area.w+5};
+
+
+		for(auto& pe : _emiter) {
+			if(pe->visible(top_left, bottom_right)) {
+				pe->update(pe.use_count()>1, dt, *_env);
+			}
+		}
 
 		_emiter.erase(
 		            std::remove_if(_emiter.begin(),

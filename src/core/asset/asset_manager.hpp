@@ -57,6 +57,7 @@ namespace asset {
 			operator std::shared_ptr<const R>();
 
 			auto aid()const noexcept -> const AID& {return _aid;}
+			auto mgr()const noexcept -> Asset_manager& {return *_mgr;}
 			void load();
 			void unload();
 

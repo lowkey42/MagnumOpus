@@ -55,3 +55,4 @@ tex:particle_blood = textures/particle_blood.png
 tex:ui_intro = textures/ui_intro.png
 tex:ui_intro2 = textures/ui_intro2.png
 tex:ui_intro_circle = textures/ui_intro_circle.png
+tex:ui_button = textures/button.png

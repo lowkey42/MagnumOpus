@@ -166,7 +166,8 @@ namespace renderer {
 							                  Texture_ptr texture,
 			                                  bool reverse=false);
 
-			void draw(Time dt, const Camera& cam);
+			void draw(const Camera& cam);
+			void update(Time dt, const Camera& cam);
 
 		private:
 			std::unique_ptr<Environment_callback> _env;

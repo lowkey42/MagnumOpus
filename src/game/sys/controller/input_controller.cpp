@@ -125,7 +125,13 @@ namespace controller {
 			case Command::enter_leave_game:
 				break;
 			case Command::quit:
-				quit_events.inform(Quit_event{});
+				if(active)
+					_quit_pressed = true;
+
+				else if(_quit_pressed) {
+					_quit_pressed = false;
+					quit_events.inform(Quit_event{});
+				}
 				break;
 		}
 	}

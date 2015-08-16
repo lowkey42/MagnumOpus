@@ -12,9 +12,7 @@ namespace mo {
 
 	Game_engine::Game_engine(const std::string& title, int argc, char** argv, char** env, bool start_game)
 		: Engine(title, argc, argv, env),
-		  _controllers(assets(), input()),
-		  _on_quit_slot(&Game_engine::_on_quit, this) {
-		_on_quit_slot.connect(_controllers.quit_events);
+		  _controllers(assets(), input()) {
 
 		auto args = std::vector<std::string>();
 		args.reserve(argc);

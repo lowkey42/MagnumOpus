@@ -1,3 +1,5 @@
 font: = fonts/
 font:test = fonts/x.template_regular_48.sfl
 font:nixie = fonts/nixie.sfl
+
+font:menu_font = fonts/x.template_regular_48.sfl

@@ -351,6 +351,7 @@ namespace mo {
 		soundsys.update(dt);
 		state.update(dt);
 		ui.update(dt);
+		particle_renderer.update(dt, camera.main_camera());
 	}
 
 	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {
@@ -362,7 +363,7 @@ namespace mo {
 			combat.draw(cam);
 			graphics.draw(cam);
 			soundsys.play_sounds(cam);
-			particle_renderer.draw(dt, cam);
+			particle_renderer.draw(cam);
 		});
 
 		return camera.vscreens();

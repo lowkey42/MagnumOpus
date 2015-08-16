@@ -46,6 +46,7 @@ namespace controller {
 
 			bool _attack = false;
 			bool _use = false;
+			bool _quit_pressed = false;
 			int _weapon[weapon_count];
 
 			util::signal_source<Quit_event>& quit_events;

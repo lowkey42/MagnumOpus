@@ -21,6 +21,9 @@
 #include "game_state.hpp"
 #include "highscore.hpp"
 
+#include "main_menu_screen.hpp"
+
+
 namespace mo {
 	using namespace util;
 	using namespace unit_literals;
@@ -84,10 +87,9 @@ namespace mo {
 	    _lightmap{
 				create_framebuffer(engine),
 				create_framebuffer(engine)
-		}
+		},
+	    _on_quit_slot(&Game_screen::_on_quit, this)
 	{
-
-
 
 		_player_sc_slot.connect(_state->state.state_change_events);
 		_join_slot.connect(engine.controllers().join_events);
@@ -125,8 +127,11 @@ namespace mo {
 	    _lightmap{
 				create_framebuffer(engine),
 				create_framebuffer(engine)
-		}
+		},
+	    _on_quit_slot(&Game_screen::_on_quit, this)
 	{
+		_on_quit_slot.connect(engine.controllers().quit_events);
+
 		_player_sc_slot.connect(_state->state.state_change_events);
 		_join_slot.connect(engine.controllers().join_events);
 		_unjoin_slot.connect(engine.controllers().unjoin_events);
@@ -169,6 +174,8 @@ namespace mo {
 		_state->camera.reset();
 		for(int i=0; i<60*4; ++i)
 			_state->camera.update(1_s / 60);
+
+		_on_quit_slot.connect(_engine.controllers().quit_events);
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {
 		_state->save();
@@ -177,6 +184,8 @@ namespace mo {
 			return p;
 		});
 		_engine.audio_ctx().stop_music();
+
+		_on_quit_slot.disconnect(_engine.controllers().quit_events);
 	}
 
 	namespace {
@@ -197,6 +206,13 @@ namespace mo {
 	}
 
 	void Game_screen::_update(float delta_time) {
+		if(_quit_to_menu) {
+			DEBUG("=> menu");
+			_quit_to_menu = false;
+			_engine.enter_screen<Main_menu_screen>(true);
+			return;
+		}
+
 		if(_fadein_left>0_s) {
 
 			_fadein_left-=delta_time*second;
@@ -329,5 +345,4 @@ namespace mo {
 	void Game_screen::_unjoin(sys::controller::Controller_removed_event e) {
 		_state->remove_player(e.controller);
 	}
-
 }
