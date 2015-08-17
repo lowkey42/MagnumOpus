@@ -77,12 +77,19 @@ namespace renderer {
 
 		template<typename Func>
 		void parse(const std::string str, int height, int tex_width, int tex_height,
-		           const std::unordered_map<Text_char, Glyph>& glyphs, Func quad_callback) {
+		           const std::unordered_map<Text_char, Glyph>& glyphs, Func quad_callback, bool monospace=false) {
 			glm::vec2 offset{0,-height};
 			Text_char prev = 0;
 
 			auto tw = tex_width;
 			auto th = tex_height;
+
+			int min_advance = 0;
+			if(monospace) {
+				for(auto& g : glyphs) {
+					min_advance = std::max(g.second.advance, min_advance);
+				}
+			}
 
 			auto add_glyph = [&](Text_char c) {
 				if(c=='\n') {
@@ -98,7 +105,7 @@ namespace renderer {
 				auto& glyph = g->second;
 
 				auto k = glyph.kerning.find(prev);
-				if(k!=glyph.kerning.end())
+				if(!monospace && k!=glyph.kerning.end())
 					offset.x+=k->second;
 
 				quad_callback(
@@ -111,7 +118,7 @@ namespace renderer {
 				            tw, th);
 
 
-				offset.x+= glyph.advance;
+				offset.x+= std::max(glyph.advance, min_advance);
 
 				prev = c;
 			};
@@ -161,13 +168,13 @@ namespace renderer {
 	}
 
 	void Font::calculate_vertices(const std::string& str,
-	                              std::vector<Font_vertex>& vertices)const {
+	                              std::vector<Font_vertex>& vertices, bool monospace)const {
 
 		vertices.reserve(str.length()*4);
 
 		parse(str, _height, _texture->width(), _texture->height(), _glyphs, [&](auto... args) {
 			create_quad(vertices, args...);
-		});
+		}, monospace);
 	}
 
 	auto Font::text(const std::string& str)const -> Text_ptr {
@@ -233,9 +240,9 @@ namespace renderer {
 		_font->bind();
 		_obj.draw();
 	}
-	void Text_dynamic::set(const std::string& str) {
+	void Text_dynamic::set(const std::string& str, bool monospace) {
 		_data.clear();
-		_font->calculate_vertices(str, _data);
+		_font->calculate_vertices(str, _data, monospace);
 		_obj.buffer().set(_data);
 
 		glm::vec2 top_left, bottom_right;

@@ -56,6 +56,8 @@ namespace mo {
 
 			renderer::Texture_ptr _background;
 			renderer::Texture_ptr _circle;
+			renderer::Text_dynamic _credits;
+			renderer::Text_dynamic _highscore;
 
 			Time _time_acc = Time{0};
 	};

@@ -3,6 +3,7 @@
 #include "../core/units.hpp"
 #include "../core/renderer/graphics_ctx.hpp"
 
+#include <iomanip>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -10,12 +11,56 @@
 
 #include <core/gui/button.hpp>
 
+#include"highscore.hpp"
+
 namespace mo {
 	using namespace unit_literals;
 	using namespace renderer;
 	using namespace glm;
 
 	namespace {
+		auto load_highscore(asset::Asset_manager& assets) -> std::string {
+			std::stringstream ss;
+			ss<<std::setw((2+2+10+3+4+3+4)/2)<<"HIGH SCORES"<<std::endl<<std::endl;
+
+			int i = 1;
+			auto scores = list_scores(assets);
+			for(auto& s : scores) {
+				ss<<std::setw(2)<<(i++)<<". "
+				  <<std::setw(4)<<s.score<<" +"<<std::setw(4)<<(s.level+1)*100<<" "
+				  <<std::setw(10)<<s.name.substr(0,10)<<std::endl;
+
+				if(i>15)
+					break;
+			}
+
+			return ss.str();
+		}
+
+		auto load_credits(asset::Asset_manager& assets) -> std::string {
+			std::stringstream ss;
+			ss<<std::setw(25/2)<<"CREDITS"<<std::endl<<std::endl;
+			ss<<"LEAD DEVELOPER"<<std::endl
+			  <<" Florian Oetke"<<std::endl<<std::endl;
+
+			ss<<"DEVELOPER"<<std::endl
+			  <<" Sebastian Schalow"<<std::endl<<std::endl;
+
+			ss<<"MUSIC"<<std::endl
+			  <<" soundcloud.com/maxstack"<<std::endl<<std::endl;
+
+			ss<<"GRAPHICS"<<std::endl
+			  <<" BigRookGamesdotCom"<<std::endl
+			  <<" Florian Oetke"<<std::endl<<std::endl;
+
+			ss<<"SOUND EFFECTS"<<std::endl
+			  <<" Mark McCorkle"<<std::endl
+			  <<"  8-bit Platformer SFX"<<std::endl
+			  <<"  for OpenGameArt.org"<<std::endl<<std::endl;
+
+			return ss.str();
+		}
+
 		constexpr Time fade = 2_s;
 	}
 
@@ -32,10 +77,16 @@ namespace mo {
 	      _screen_size(calculate_vscreen(game_engine, 512)),
 	      _on_quit_slot(&Main_menu_screen::_on_quit, this),
 	      _background(game_engine.assets().load<Texture>("tex:ui_intro"_aid)),
-	      _circle(game_engine.assets().load<Texture>("tex:ui_intro_circle"_aid))
+	      _circle(game_engine.assets().load<Texture>("tex:ui_intro_circle"_aid)),
+	      _credits(game_engine.assets().load<Font>("font:menu_font"_aid)),
+	      _highscore(game_engine.assets().load<Font>("font:menu_font"_aid))
 	{
 
-		if(Game_screen::save_exists(game_engine)) {
+		_credits.set(load_credits(game_engine.assets()), false);
+		_highscore.set(load_highscore(game_engine.assets()), false);
+
+
+		if(ingame || Game_screen::save_exists(game_engine)) {
 			_root.add_new<gui::Button>("Continue", [ingame, &game_engine] {
 				if(ingame) {
 					DEBUG("=> game (continue)");
@@ -106,10 +157,23 @@ namespace mo {
 		            glm::vec4{0.15f,0.15f,0.15f,1.f},
 		            glm::vec4(0,0,1,1),
 		            glm::vec2(_camera.viewport().w*2 *(800/2048.f), _camera.viewport().w*2 *(800/2048.f)),
-		            glm::rotate(glm::mat4(), _time_acc/25_s, {0.f,0.f,1.f}));
+		            glm::rotate(glm::mat4(), _time_acc/15_s, {0.f,0.f,1.f}));
 
-		// TODO: draw highscore
-		// TODO: draw credits
+		float cred_scale = 0.3f;
+		float hs_scale = 0.3f;
+
+		if(_time_acc>2_s) {
+			float cred_blend = glm::clamp((_time_acc.value()-2)/3.f, 0.f, 1.f);
+			_text_renderer.draw(_credits,
+			                    glm::vec2(-_screen_size.x/2 + (_credits.size().x*cred_scale)/2 + 20,
+			                              -_credits.size().y*cred_scale),
+			                    glm::vec4(0.4,0,0,1)*cred_blend, cred_scale);
+		}
+
+		_text_renderer.draw(_highscore,
+		                    glm::vec2(+_screen_size.x/2 - (_highscore.size().x*hs_scale)/2 - 20,
+		                              -_highscore.size().y*hs_scale),
+		                    glm::vec4(0.4,0,0,1), hs_scale);
 
 		draw_ui();
 	}

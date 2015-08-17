@@ -44,7 +44,7 @@ namespace mo {
 	    _box2(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_intro2"_aid), _camera.viewport().w*2.f, _camera.viewport().w),
 	    _circle(game_engine.assets(), game_engine.assets().load<Texture>("tex:ui_intro_circle"_aid), _camera.viewport().w*2 *(800/2048.f), _camera.viewport().w*2 *(800/2048.f)),
 	    _fade_left(fade + 0.5_s),
-	    _fadein_left(fade + fade/2 +1.5_s)
+	    _fadein_left(fade + fade/2 +1.0_s)
 	{
 	}
 
@@ -71,7 +71,7 @@ namespace mo {
 		_box.draw(glm::vec2(0.f, 0.f));
 
 		auto circle_color = (1-fp) - fg_color*0.85f;
-		_circle.set_vp(_camera.vp() * glm::rotate(glm::mat4(), _fade_left/25_s, {0.f,0.f,1.f}));
+		_circle.set_vp(_camera.vp() * glm::rotate(glm::mat4(), -_fade_left/20_s, {0.f,0.f,1.f}));
 		_circle.set_color({circle_color,circle_color,circle_color,0.f});
 		_circle.draw(glm::vec2(0.f, 0.f));
 

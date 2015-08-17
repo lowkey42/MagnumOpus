@@ -70,7 +70,7 @@ namespace renderer {
 			friend class Text;
 			friend class Text_dynamic;
 
-			void calculate_vertices(const std::string& str, std::vector<Font_vertex>& out)const;
+			void calculate_vertices(const std::string& str, std::vector<Font_vertex>& out, bool monospace=false)const;
 
 			int _height = 0;
 			int _line_height = 0;
@@ -99,7 +99,7 @@ namespace renderer {
 			Text_dynamic(Font_ptr font);
 
 			void draw()const;
-			void set(const std::string& str);
+			void set(const std::string& str, bool monospace=false);
 
 			auto size()const noexcept {return _size;}
 

@@ -23,6 +23,7 @@ tex:vomitball = textures/vomitball.png
 
 tex:x_font = textures/x.template_regular_48.tga
 tex:nixie_font = textures/nixie_font.png
+tex:satisfy_font = textures/satisfy_regular_20.tga
 
 tex:ui_hud_bg = textures/ui_stats_bg.png
 tex:ui_hud_fg = textures/ui_stats_fg.png
