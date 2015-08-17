@@ -21,21 +21,7 @@ namespace mo {
 
 	namespace {
 		auto load_highscore(asset::Asset_manager& assets) -> std::string {
-			std::stringstream ss;
-			ss<<std::setw((2+2+10+3+4+3+4)/2)<<"HIGH SCORES"<<std::endl<<std::endl;
-
-			int i = 1;
-			auto scores = list_scores(assets);
-			for(auto& s : scores) {
-				ss<<std::setw(2)<<(i++)<<". "
-				  <<std::setw(4)<<s.score<<" +"<<std::setw(4)<<(s.level+1)*100<<" "
-				  <<std::setw(10)<<s.name.substr(0,10)<<std::endl;
-
-				if(i>15)
-					break;
-			}
-
-			return ss.str();
+			return print_scores(list_scores(assets));
 		}
 
 		auto load_credits(asset::Asset_manager& assets) -> std::string {

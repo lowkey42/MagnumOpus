@@ -22,6 +22,7 @@
 #include "highscore.hpp"
 
 #include "main_menu_screen.hpp"
+#include "gameover_screen.hpp"
 
 
 namespace mo {
@@ -208,7 +209,7 @@ namespace mo {
 	}
 
 	void Game_screen::_update(float delta_time) {
-		if(_quit_to_menu) {
+		if(_quit_to_menu && !_dying) {
 			DEBUG("=> menu");
 			_quit_to_menu = false;
 			_engine.enter_screen<Main_menu_screen>(true);
@@ -234,7 +235,7 @@ namespace mo {
 					return;
 
 				} else if(_dying) {
-					_engine.enter_screen<Game_screen>("default");
+					_engine.enter_screen<Gameover_screen>(_score);
 					return;
 				}
 			}
@@ -317,8 +318,6 @@ namespace mo {
 			_lightmap[lidx].unbind(1);
 		}
 
-		// if engine.controllers().player_ready() => show message
-
 		_state->draw_ui();
 	}
 
@@ -328,8 +327,9 @@ namespace mo {
 		if(&e==_state->main_player.get()) {
 			if(s.s==sys::state::Entity_state::dead) {
 				auto score = e.get<sys::combat::Score_comp>().process(0, [](auto& s){return s.value();});
-				add_score(_engine.assets(), Score{_state->profile.name, score, _state->profile.depth,
-				                                  _state->profile.seed});
+
+				_score = Score{_state->profile.name, score, _state->profile.depth,
+				         _state->profile.seed};
 
 				INFO("The segfault bites. You die!");
 				_state->delete_save();

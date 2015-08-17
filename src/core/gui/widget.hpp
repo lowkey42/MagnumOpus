@@ -29,6 +29,8 @@
 namespace mo {
 namespace gui {
 
+	using Listerner = std::function<void()>;
+
 	using Ui_text   = renderer::Text_dynamic;
 	using Ui_texture = renderer::Texture_ptr;
 
@@ -61,7 +63,7 @@ namespace gui {
 			virtual void update(float dt) {}
 
 			virtual void on_activate  () {}
-			virtual void on_input     (const std::string& text) {}
+			virtual void on_input     (const std::string& c) {}
 			virtual void on_move(glm::vec2 point) {}
 			virtual void on_move(Direction dir) {}
 
@@ -102,7 +104,7 @@ namespace gui {
 			void update(float dt)override;
 
 			void on_activate()override;
-			void on_input(const std::string& text)override;
+			void on_input(const std::string& c)override;
 			void on_move(glm::vec2 point)override;
 			void on_move(Direction dir)override;
 

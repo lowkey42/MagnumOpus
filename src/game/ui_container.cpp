@@ -2,6 +2,7 @@
 
 #include "sys/controller/controller.hpp"
 
+#include <core/renderer/graphics_ctx.hpp>
 
 namespace mo {
 
@@ -88,13 +89,15 @@ namespace mo {
 	                           glm::vec2 size, gui::Layout layout)
 	    : _game_engine(game_engine),
 	      _camera(screen_size),
+	      _mouse_camera(glm::vec2{game_engine.graphics_ctx().win_width(),
+	                              game_engine.graphics_ctx().win_height()}),
 	      _sprite_renderer(game_engine.assets()),
 	      _text_renderer(game_engine.assets()),
 	      _font(_game_engine.assets().load<Font>("font:menu_font"_aid)),
 	      _root(*this, position, size, layout),
 	      _updates_to_skip(30),
-	      _controller(std::make_unique<ui_controller>(_root)) {
-
+	      _controller(std::make_unique<ui_controller>(_root)),
+	      _key_events(&Ui_container::_on_key, this) {
 	}
 	Ui_container::~Ui_container() = default;
 
@@ -143,17 +146,39 @@ namespace mo {
 			_updates_to_skip--;
 	}
 
+	void Ui_container::_on_key(SDL_KeyboardEvent e) {
+		if(e.repeat==0 && e.state==SDL_RELEASED) {
+			auto key = e.keysym.sym;
+			if(key>=33 && key<=126) {
+				std::string str;
+				if(key>=97 && key<=122 && (e.keysym.mod==KMOD_LSHIFT || e.keysym.mod==KMOD_RSHIFT))
+					str.push_back(key-32);
+				else
+					str.push_back(key);
+
+				_root.on_input(str);
+
+			} else if(key==SDLK_RETURN || key==SDLK_ESCAPE) {
+				_root.on_input("\r");
+
+			} else if(key==SDLK_BACKSPACE) {
+				_root.on_input("\b");
+			}
+		}
+	}
 
 	void Ui_container::enable() {
 		_game_engine.controllers().screen_to_world_coords([&](glm::vec2 p){
-			return this->_camera.screen_to_world(p);
+			return this->_mouse_camera.screen_to_world(p);
 		});
+		_key_events.connect(_game_engine.input().keyboard_events);
 	}
 
 	void Ui_container::disable() {
 		_game_engine.controllers().screen_to_world_coords([](glm::vec2 p){
 			return p;
 		});
+		_key_events.disconnect(_game_engine.input().keyboard_events);
 	}
 
 }

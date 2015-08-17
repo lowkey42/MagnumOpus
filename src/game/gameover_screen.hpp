@@ -1,5 +1,5 @@
 /**************************************************************************\
- * Container that manages the ui widgets it contains (draw, events, ...)  *
+ * The screen that is shown after the player died to enter his name       *
  *                                               ___                      *
  *    /\/\   __ _  __ _ _ __  _   _ _ __ ___     /___\_ __  _   _ ___     *
  *   /    \ / _` |/ _` | '_ \| | | | '_ ` _ \   //  // '_ \| | | / __|    *
@@ -23,56 +23,38 @@
 #include <core/renderer/primitives.hpp>
 #include <core/renderer/text.hpp>
 
-#include <core/gui/widget.hpp>
-
+#include "ui_container.hpp"
+#include "highscore.hpp"
 
 namespace mo {
 
-	class Ui_container : public gui::Ui_ctx {
+	class Gameover_screen : public Screen, public Ui_container {
 		public:
-			Ui_container(Game_engine& game_engine, glm::vec2 screen_size,
-			             glm::vec2 position,
-			             glm::vec2 size, gui::Layout layout);
-			~Ui_container();
-
-			auto create_texture(const std::string& type) -> gui::Ui_texture override;
-			auto create_text(const std::string& str) -> gui::Ui_text override;
-
-			void draw(gui::Ui_texture& tex, glm::vec2 center, bool highlight,
-				              glm::vec4 clip) override;
-
-			void draw(gui::Ui_text& tex, glm::vec2 center, bool highlight) override;
-
-			void play_activate() override;
-			void play_focus() override;
-
-			void draw_ui();
-			void update_ui();
-
-			void enable();
-			void disable();
+			Gameover_screen(Game_engine& game_engine, Score score);
+			~Gameover_screen()noexcept = default;
 
 		protected:
-			struct ui_controller;
+			void _update(float delta_time)override;
+			void _draw(float delta_time)override;
 
-			void _on_key(SDL_KeyboardEvent);
+			void _on_enter(util::maybe<Screen&> prev) override;
+			void _on_leave(util::maybe<Screen&> next) override;
 
-			Game_engine& _game_engine;
-			renderer::Camera _camera;
-			renderer::Camera _mouse_camera;
+			auto _prev_screen_policy()const noexcept -> Prev_screen_policy override {
+				return Prev_screen_policy::discard;
+			}
 
-			renderer::Sprite_renderer _sprite_renderer;
-			renderer::Text_renderer _text_renderer;
+		private:
+			renderer::Texture_ptr _background;
+			renderer::Texture_ptr _circle;
+			bool _highscore_reached;
+			renderer::Text_dynamic _message;
+			renderer::Text_dynamic _hint;
+			renderer::Text_dynamic _new_highscore;
+			Score _score;
+			bool _quit=false;
 
-			renderer::Font_ptr _font;
-
-			gui::Widget_container _root;
-
-			int _updates_to_skip;
-
-			std::unique_ptr<ui_controller> _controller;
-
-			util::slot<SDL_KeyboardEvent> _key_events;
+			Time _time_acc = Time{0};
 	};
 
 }

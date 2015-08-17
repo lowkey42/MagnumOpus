@@ -33,4 +33,6 @@ namespace mo {
 
 	extern auto list_scores(asset::Asset_manager& assets) -> std::vector<Score>;
 
+	extern auto print_scores(std::vector<Score> scores) -> std::string;
+
 }

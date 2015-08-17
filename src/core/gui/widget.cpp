@@ -66,8 +66,8 @@ namespace gui {
 	void Widget_container::on_activate() {
 		_children.at(_focus)->on_activate();
 	}
-	void Widget_container::on_input(const std::string& text) {
-		_children.at(_focus)->on_input(text);
+	void Widget_container::on_input(const std::string& c) {
+		_children.at(_focus)->on_input(c);
 	}
 	void Widget_container::on_move(vec2 point) {
 		std::size_t i=0;

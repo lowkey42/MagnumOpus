@@ -25,8 +25,6 @@
 namespace mo {
 namespace gui {
 
-	using Listerner = std::function<void()>;
-
 	class Button : public Widget {
 		public:
 			Button(Ui_ctx& ctx, std::string label,

@@ -25,7 +25,7 @@
 #include "../core/units.hpp"
 
 #include "game_state.hpp"
-
+#include "highscore.hpp"
 
 namespace mo {
 	namespace renderer{ class Camera; }
@@ -89,6 +89,7 @@ namespace mo {
 
 			bool _quit_to_menu = false;
 			util::slot<sys::controller::Quit_event> _on_quit_slot;
+			Score _score;
 
 			Time _fadein_left = Time{0};
 			bool _moving_down = false, _dying = false;
