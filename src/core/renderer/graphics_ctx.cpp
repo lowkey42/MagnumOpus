@@ -46,9 +46,9 @@ namespace {
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Graphics_cfg{960,540,false, 0.1f};
-#else
 	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.1f};
+#else
+	constexpr auto default_cfg = Graphics_cfg{1024,512,false};
 #endif
 
 }

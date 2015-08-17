@@ -24,6 +24,9 @@ namespace mo {
 
 	namespace {
 		bool highscore_reached(float score, std::vector<Score> scores) {
+			if(scores.size()<15)
+				return true;
+
 			for(auto& s : scores) {
 				if(s.score<score) {
 					return true;

@@ -342,6 +342,7 @@ namespace ui {
 		             .set_uniform("VP", _cam.vp())
 		             .set_uniform("texture", 0)
 		             .set_uniform("layer",   1.0f)
+		             .set_uniform("clip", glm::vec4(0,0,1,1))
 		             .set_uniform("color",   glm::vec4(2,2,2,1));
 
 		for(auto& hud : _ui_comps) {

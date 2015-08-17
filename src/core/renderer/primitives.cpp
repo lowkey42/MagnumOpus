@@ -210,6 +210,7 @@ namespace renderer {
 		auto trans = glm::translate(glm::mat4(), glm::vec3(center.x, center.y, 0.f));
 
 		_prog.bind().set_uniform("model", trans)
+		            .set_uniform("clip", glm::vec4(0,0,1,1))
 					.set_uniform("layer", 0.f);
 		_texture->bind();
 		_obj.draw();

@@ -4,7 +4,7 @@ in vec2 uvl;
 
 uniform sampler2D texture;
 uniform vec4 color;
-uniform vec4 clip = vec4(0,0,1,1);
+uniform vec4 clip;
 
 void main() {
 	vec4 c = texture2D(texture, uvl*clip.zw + clip.xy);

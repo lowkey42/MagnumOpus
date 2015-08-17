@@ -283,7 +283,7 @@ namespace renderer {
 		_prog.bind()
 		     .set_uniform("model", trans)
 		     .set_uniform("color", color)
-//		     .set_uniform("clip", glm::vec4(0,0,1,1))
+		     .set_uniform("clip", glm::vec4(0,0,1,1))
 		     .set_uniform("layer", 1.f);
 
 		if(_font)
@@ -303,7 +303,7 @@ namespace renderer {
 		_prog.bind()
 		     .set_uniform("model", trans)
 		     .set_uniform("color", color)
-//		     .set_uniform("clip", glm::vec4(0,0,1,1))
+		     .set_uniform("clip", glm::vec4(0,0,1,1))
 		     .set_uniform("layer", 1.f);
 
 		text.draw();

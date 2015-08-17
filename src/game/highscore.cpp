@@ -67,6 +67,9 @@ namespace mo {
 	}
 
 	auto print_scores(std::vector<Score> scores) -> std::string {
+		if(scores.empty())
+			return "";
+
 		std::stringstream ss;
 		ss<<std::setw((2+2+4+2+4+1+10)*0.75f)<<"HIGH SCORES"<<std::endl<<std::endl;
 
