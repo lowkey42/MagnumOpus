@@ -162,6 +162,7 @@ namespace mo {
 		audio::Music_ptr mainMusic = _engine.assets().load<audio::Music>("music:test"_aid);
 
 		_engine.audio_ctx().play_music(mainMusic);
+		_engine.audio_ctx().resume_sounds();
 
 		auto& main_camera = _state->camera.main_camera();
 		_engine.controllers().screen_to_world_coords([&main_camera](glm::vec2 p){
@@ -186,6 +187,7 @@ namespace mo {
 		_engine.audio_ctx().stop_music();
 
 		_on_quit_slot.disconnect(_engine.controllers().quit_events);
+		_engine.audio_ctx().pause_sounds();
 	}
 
 	namespace {

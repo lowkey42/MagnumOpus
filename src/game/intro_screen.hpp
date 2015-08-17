@@ -34,6 +34,9 @@ namespace mo {
 			void _update(float delta_time)override;
 			void _draw(float delta_time)override;
 
+			void _on_enter(util::maybe<Screen&> prev) override;
+			void _on_leave(util::maybe<Screen&> next) override;
+
 			auto _prev_screen_policy()const noexcept -> Prev_screen_policy override {
 				return Prev_screen_policy::discard;
 			}

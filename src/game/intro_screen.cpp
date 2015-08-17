@@ -3,6 +3,8 @@
 #include "../core/units.hpp"
 #include "../core/renderer/graphics_ctx.hpp"
 
+#include <core/audio/music.hpp>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
@@ -48,6 +50,13 @@ namespace mo {
 	{
 	}
 
+	void Intro_screen::_on_enter(util::maybe<Screen&> prev) {
+		_engine.audio_ctx().play_music(_engine.assets().load<audio::Music>("music:intro"_aid));
+	}
+
+	void Intro_screen::_on_leave(util::maybe<Screen&> next) {
+
+	}
 
 	void Intro_screen::_update(float delta_time) {
 		_fade_left-=delta_time * second;

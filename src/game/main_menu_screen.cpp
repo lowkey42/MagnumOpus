@@ -10,6 +10,7 @@
 #include "game_screen.hpp"
 
 #include <core/gui/button.hpp>
+#include <core/audio/music.hpp>
 
 #include"highscore.hpp"
 
@@ -117,6 +118,7 @@ namespace mo {
 	void Main_menu_screen::_on_enter(util::maybe<Screen&> prev) {
 		enable();
 		_on_quit_slot.connect(_game_engine.controllers().quit_events);
+		_engine.audio_ctx().play_music(_engine.assets().load<audio::Music>("music:intro"_aid));
 	}
 	void Main_menu_screen::_on_leave(util::maybe<Screen&> next) {
 		disable();
