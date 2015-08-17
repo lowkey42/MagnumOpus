@@ -17,16 +17,17 @@ namespace mo {
 				w.on_activate();
 
 			if(dir_set) {
-				if((dir_set_counter%90) == 0) {
-					dir_set_counter = 0;
+				if((dir_set_counter%40) == 0) {
 					w.on_move(dir);
 
-				} else
-					dir_set_counter++;
+				}
+				dir_set_counter++;
+
 			} else
 				dir_set_counter = 0;
 
 			activate = false;
+			dir_set = false;
 		}
 
 		void move(glm::vec2 direction) override {
@@ -36,11 +37,14 @@ namespace mo {
 				set_dir(gui::Direction::left);
 			else if(direction.y<0)
 				set_dir(gui::Direction::up);
-			else if(direction.y<0)
+			else if(direction.y>0)
 				set_dir(gui::Direction::down);
 		}
 		void look_at(glm::vec2 position) override {
-			w.on_move(position);
+			if(last_mouse_pos!=position) {
+				last_mouse_pos = position;
+				w.on_move(position);
+			}
 		}
 		void look_in_dir(glm::vec2 direction) override {
 			if(direction.x>0)
@@ -49,7 +53,7 @@ namespace mo {
 				set_dir(gui::Direction::left);
 			else if(direction.y<0)
 				set_dir(gui::Direction::up);
-			else if(direction.y<0)
+			else if(direction.y>0)
 				set_dir(gui::Direction::down);
 		}
 		void attack() override {
@@ -71,6 +75,7 @@ namespace mo {
 		}
 
 		gui::Widget& w;
+		glm::vec2 last_mouse_pos;
 		bool activate = false;
 		gui::Direction dir = gui::Direction::up;
 		bool dir_set = false;
@@ -112,7 +117,7 @@ namespace mo {
 	void Ui_container::draw(gui::Ui_text& tex, glm::vec2 center, bool highlight) {
 		_text_renderer.draw(tex,
 		                    center,
-		                    highlight ? glm::vec4(1.0,0.8,0.8,1) : glm::vec4(0.1,0,0,1), 0.5f );
+		                    highlight ? glm::vec4(1.0,0.8,0.8,1) : glm::vec4(0.6,0.2,0.2,1), 0.5f );
 	}
 
 	void Ui_container::play_activate() {

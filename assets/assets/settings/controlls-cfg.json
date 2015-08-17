@@ -19,7 +19,8 @@
 		"Left": "move_left",
 		"Right": "move_right",
 		"RControl": "attack",
-		"KP_0": "use_or_take",
+        "KP_0": "use_or_take",
+        "Return": "use_or_take",
 		
 		"Escape": "quit"
 	},
