@@ -35,9 +35,9 @@ namespace mo {
 			)
 
 #ifndef EMSCRIPTEN
-			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.5f, 1.0f};
+			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 1.0f, 1.0f};
 #else
-			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.5f, 1.0f};
+			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 1.0f, 1.0f};
 #endif
 
 			constexpr auto create_mask(int i) -> uint16_t {

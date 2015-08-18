@@ -16,7 +16,7 @@ namespace cam {
 	constexpr auto world_scale = 64; // pixel/meter
 	constexpr auto vscreen_height = 512;
 	constexpr auto min_zoom = 1.f / 2;
-	constexpr auto max_zoom = 1.0f;
+	constexpr auto max_zoom = 0.8f;
 
 	VScreen::VScreen(glm::vec2 real_size, glm::vec2 vsize, float world_scale)
 		: camera(vsize, world_scale), vscreen(real_size.x, real_size.y, true) {
