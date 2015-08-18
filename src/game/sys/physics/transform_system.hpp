@@ -275,8 +275,11 @@ namespace physics {
 					}
 
 					// compare with surrounding cells
-					for(auto ny : range(std::max(0,y-1), std::min(_cells_y,y-1)-1)) {
-						for(auto nx : range(std::max(0,x-1), std::min(_cells_x,x-1)-1)) {
+					for(auto ny : range(std::max(0,y-1), y)) {
+						for(auto nx : range(std::max(0,x-1), x)) {
+							if(ny==y && nx==x)
+								continue;
+
 							auto& nce = _cells.at(ny*_cells_x + nx).entities;
 							for( auto& b : nce) {
 								func(**a, *b);

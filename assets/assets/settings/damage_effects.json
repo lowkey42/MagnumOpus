@@ -18,14 +18,14 @@
         },
 
         "wet":{
-            "time": 3,
+            "time": 2,
             "confusion": 0.1,
-            "dmg_per_sec": 0,
+            "dmg_per_sec": 0.1,
             "dmg_type": "water"
         },
 
         "frozen":{
-            "time": 3,
+            "time": 4,
             "confusion": 0.2,
             "slow_down_factor": 0.99,
             "dmg_per_sec": 0.5,

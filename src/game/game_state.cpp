@@ -28,9 +28,9 @@ namespace mo {
 	using namespace unit_literals;
 
 	namespace {
-		constexpr auto MinEntitySize = 25_cm;
+		constexpr auto MinEntitySize = 0.05_m;
 		constexpr auto MaxEntitySize = 5_m;
-		constexpr auto MaxEntityVelocity = 180_km/hour;
+		constexpr auto MaxEntityVelocity = 90_km/hour;
 
 		auto rng = util::create_random_generator();
 

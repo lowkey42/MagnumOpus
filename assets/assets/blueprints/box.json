@@ -1,9 +1,9 @@
 {
     "Transform":{"layer":0.5},
 	"Physics":{
-        "radius": 0.8,
+        "radius": 0.5,
         "mass": 80,
-        "restitution": 0.1,
+        "restitution": 1.0,
 		"friction": 0.01
     },
     "Health":{

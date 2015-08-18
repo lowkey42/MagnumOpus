@@ -86,8 +86,6 @@ namespace physics {
 		if(!self.active())
 			return;
 
-		auto oldVelocity = self._velocity;
-
 		if(!is_zero(self._acceleration)) {
 			self._velocity+=self._acceleration*dt;
 
@@ -108,7 +106,7 @@ namespace physics {
 
 		transform.process([&](auto& tc){
 			auto pos = tc.position();
-			pos+=oldVelocity*dt;
+			pos+=self._velocity*dt;
 
 			tc.position(pos);
 
@@ -208,6 +206,7 @@ namespace physics {
 
 		if( dist_sqr <= (rs*rs)) {
 			float dist = glm::sqrt(dist_sqr);
+
 			return dist>0 ?
 						Manifold(a, b, abs(Distance(rs-dist)), -diff/dist) :
 						Manifold(a, b, a.radius(), Position(1_m, 0_m));
@@ -230,14 +229,15 @@ namespace physics {
 			relVel+=m.b.comp->_velocity;
 			e = std::max(e, m.b.comp->_restitution);
 			inv_mass_sum+=m.b.comp->_inv_mass;
-		}
+		} else
+			e= std::max(e, 0.8f);
 
 		// Calculate relative velocity in terms of the normal direction
 		float vel_along_normal = glm::dot(remove_units(relVel), remove_units(m.normal));
 
 		// Do not resolve if velocities are separating
 		if(vel_along_normal > 0)
-		  return;
+			return;
 
 
 		// Calculate impulse scalar
@@ -253,8 +253,8 @@ namespace physics {
 		}
 
 		// positional correction
-		constexpr float percent = 0.2;
-		constexpr float slop = 0.1;
+		constexpr float percent = 0.1;
+		constexpr float slop = 0.01;
 		if(m.penetration.value() - slop > 0) {
 			auto correction = m.normal * ((m.penetration.value() - slop) / inv_mass_sum.value() * percent);
 
