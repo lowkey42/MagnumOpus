@@ -3,12 +3,28 @@
         "flame_thrower": {
             "sound": "sound:firebolt"
         },
+        "frost_thrower": {
+            "sound": "sound:firebolt"
+        },
+        "poison_thrower": {
+            "sound": "sound:firebolt"
+        },
+        "water_thrower": {
+            "sound": "sound:firebolt"
+        },
+        "wind_thrower": {
+            "sound": "sound:minigun"
+        },
+        "shotgun": {
+            "sound": "sound:shotgun",
+            "is_static": true
+        },
         "explosion_fire": {
             "sound": "sound:explosion",
             "is_static": true
         },
         "explosion_poison": {
-            "sound": "sound:explosion",
+            "sound": "sound:slime",
             "is_static": true
         },
         "explosion_ice": {

@@ -1,6 +1,6 @@
 ﻿{
 	"animations": {
-		"idle": {"row":0, "fps":8, "frames":8}
+		"idle": {"row":0, "fps":2, "frames":2}
 	},
 	
 	"texName": "tex:healthpotion",

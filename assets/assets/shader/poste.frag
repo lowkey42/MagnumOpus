@@ -12,7 +12,7 @@ void main() {
 	vec4 lc = texture2D(lightmap, uvl);
 
 	if(c.a>0.0) {
-		gl_FragColor = c*1.0 + lc*4.0;
+		gl_FragColor = c*1.1 + lc*4.0;
 		
 		if(fade>0.0) {
 			float x = (uvl.x - 0.5) * 2.0;

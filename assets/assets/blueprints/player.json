@@ -40,6 +40,7 @@
             "recoil": 200,
             "spreading": 15,
             "bullet_count": 5,
+            "effect": "shotgun",
             "force_feedback": 0.1
         }
     },

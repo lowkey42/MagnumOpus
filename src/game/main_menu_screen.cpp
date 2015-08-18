@@ -42,8 +42,10 @@ namespace mo {
 
 			ss<<"SOUND EFFECTS"<<std::endl
 			  <<" Mark McCorkle"<<std::endl
-			  <<"  8-bit Platformer SFX"<<std::endl
-			  <<"  for OpenGameArt.org"<<std::endl<<std::endl;
+			  <<"    8-bit Platformer SFX"<<std::endl
+			  <<"    for OpenGameArt.org"<<std::endl
+			  <<" Jim Rogers"<<std::endl
+			  <<" Mike Koenig"<<std::endl<<std::endl;
 
 			return ss.str();
 		}
@@ -147,7 +149,7 @@ namespace mo {
 		            glm::vec2(_camera.viewport().w*2 *(800/2048.f), _camera.viewport().w*2 *(800/2048.f)),
 		            glm::rotate(glm::mat4(), _time_acc/15_s, {0.f,0.f,1.f}));
 
-		float cred_scale = 0.3f;
+		float cred_scale = 0.25f;
 		float hs_scale = 0.3f;
 
 		if(_time_acc>2_s) {

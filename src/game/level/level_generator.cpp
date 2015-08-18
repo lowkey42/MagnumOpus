@@ -44,6 +44,7 @@ namespace {
 		std::map<int, Dungeon_cfg> levels;
 	};
 	sf2_structDef(Dungeon_cfg_map, sf2_member(levels))
+
 }
 
 namespace mo {
@@ -64,6 +65,21 @@ namespace asset {
 
 namespace level {
 	namespace {
+		auto nodoycares_rng = mo::util::create_random_generator();
+
+		auto rand_wall() {
+			if(random_bool(nodoycares_rng, 0.1f))
+				return Tile_type(int(Tile_type::wall_tile) + random_int(nodoycares_rng, 1, 2));
+			else
+				return Tile_type::wall_tile;
+		}
+		auto rand_floor() {
+			if(random_bool(nodoycares_rng, 0.1f))
+				return Tile_type(int(Tile_type::floor_tile) + random_int(nodoycares_rng, 1, 3));
+			else
+				return Tile_type::floor_tile;
+		}
+
 		Dungeon_cfg load_cfg(asset::Asset_manager& assets, int depth) {
 			auto opts = assets.load<Dungeon_cfg_map>("cfg:dungeons"_aid);
 			auto cfg_iter = opts->levels.find(depth);
@@ -302,14 +318,14 @@ namespace level {
 				for(int x=0; x<r.width(); ++x) {
 					auto ex = border+x+r.left-min_x;
 
-					level.get(ex, border+r.top-min_y).type = Tile_type::wall_tile;
-					level.get(ex, border+r.top-min_y+r.height()-1).type = Tile_type::wall_tile;
+					level.get(ex, border+r.top-min_y).type = rand_wall();
+					level.get(ex, border+r.top-min_y+r.height()-1).type = rand_wall();
 
 					for(int y=1; y<r.height()-1; ++y) {
 						if(x==0 || x==r.width()-1)
-							level.get(ex, border+y +r.top-min_y).type = Tile_type::wall_tile;
+							level.get(ex, border+y +r.top-min_y).type = rand_wall();
 						else
-							level.get(ex, border+y +r.top-min_y).type = Tile_type::floor_tile;
+							level.get(ex, border+y +r.top-min_y).type = rand_floor();
 					}
 				}
 				r.left-=min_x-border;
@@ -326,7 +342,7 @@ namespace level {
 				auto& tile = level.get(node.x, node.y);
 
 				if(tile.solid())
-					tile.type = Tile_type::floor_tile; // TODO: use doors, etc. from template
+					tile.type = rand_floor(); // TODO: use doors, etc. from template
 
 				for(int y=std::max(node.y-1, 0); y<=std::min(node.y+1, level.height()-1); ++y)
 					for(int x=std::max(node.x-1, 0); x<=std::min(node.x+1, level.width()-1); ++x) {
@@ -335,7 +351,7 @@ namespace level {
 						   || btile.type==Tile_type::wall_dirt
 						   || btile.type==Tile_type::wall_stone
 						   || btile.type==Tile_type::wall_tile )
-							btile.type = Tile_type::wall_tile;
+							btile.type = rand_wall();
 					}
 			}
 		}

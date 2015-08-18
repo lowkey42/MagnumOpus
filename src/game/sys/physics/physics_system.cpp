@@ -230,7 +230,7 @@ namespace physics {
 			e = std::max(e, m.b.comp->_restitution);
 			inv_mass_sum+=m.b.comp->_inv_mass;
 		} else
-			e= std::max(e, 0.8f);
+			e= std::max(e, 0.4f);
 
 		// Calculate relative velocity in terms of the normal direction
 		float vel_along_normal = glm::dot(remove_units(relVel), remove_units(m.normal));

@@ -5,22 +5,22 @@
 	]},
 	{"values":[
 		{"item_aid":"coin", "chance":1.0, "max": 5, "min":1},
-		{"item_aid":"health_potion", "chance":0.3, "max":2},
-		{"item_aid":"element_fire", "chance":0.2},
-		{"item_aid":"element_frost", "chance":0.2},
-		{"item_aid":"element_water", "chance":0.2},
-		{"item_aid":"element_stone", "chance":0.2},
-		{"item_aid":"element_gas", "chance":0.2},
+		{"item_aid":"health_potion", "chance":0.1, "max":2},
+		{"item_aid":"element_fire", "chance":0.1},
+		{"item_aid":"element_frost", "chance":0.1},
+		{"item_aid":"element_water", "chance":0.1},
+		{"item_aid":"element_stone", "chance":0.1},
+		{"item_aid":"element_gas", "chance":0.1},
 		{"item_aid":"element_lightning", "chance":0.0}
 	]},
 	{"values":[
 		{"item_aid":"coin", "chance":1.0, "max": 15, "min":5},
-		{"item_aid":"health_potion", "chance":0.5, "max":2, "min":1},
-		{"item_aid":"element_fire", "chance":0.4},
-		{"item_aid":"element_frost", "chance":0.3},
-		{"item_aid":"element_water", "chance":0.3},
-		{"item_aid":"element_stone", "chance":0.3},
-		{"item_aid":"element_gas", "chance":0.3},
+		{"item_aid":"health_potion", "chance":1.0, "max":2, "min":1},
+		{"item_aid":"element_fire", "chance":0.3},
+		{"item_aid":"element_frost", "chance":0.2},
+		{"item_aid":"element_water", "chance":0.2},
+		{"item_aid":"element_stone", "chance":0.5},
+		{"item_aid":"element_gas", "chance":0.2},
 		{"item_aid":"element_lightning", "chance":0.0}
 	]}
 ]}

@@ -42,7 +42,7 @@ namespace renderer {
 			auto win_width()const noexcept{return _win_width;}
 			auto win_height()const noexcept{return _win_height;}
 
-			auto max_screenshake()const noexcept {return _max_screenshake * _win_height;}
+			auto max_screenshake()const noexcept -> float;
 
 			void resolution(int width, int height, float max_screenshake=-1);
 

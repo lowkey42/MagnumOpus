@@ -46,9 +46,9 @@ namespace {
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.1f};
+	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f};
 #else
-	constexpr auto default_cfg = Graphics_cfg{1024,512,false};
+	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f};
 #endif
 
 }
@@ -187,6 +187,9 @@ namespace renderer {
 		_clear_color = glm::vec3(r,g,b);
 	}
 
+	auto Graphics_ctx::max_screenshake()const noexcept -> float {
+		return _max_screenshake * 500;
+	}
 
 	void Graphics_ctx::resolution(int width, int height, float max_screenshake) {
 		Graphics_cfg cfg{_win_width, _win_height, _fullscreen, _max_screenshake};

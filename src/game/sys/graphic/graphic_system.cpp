@@ -500,6 +500,8 @@ namespace graphic {
 					                                    _particle_renderer, 0.3f);
 					break;
 
+				default:
+					break;
 					// TODO
 			}
 		}

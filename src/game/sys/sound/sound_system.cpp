@@ -49,6 +49,7 @@ namespace sound {
 				case Effect_type::explosion_poison:  return 0.6_s;
 				case Effect_type::explosion_ice:     return 0.6_s;
 				case Effect_type::explosion_stone:   return 0.6_s;
+				default: return 0.5_s;
 			}
 			FAIL("UNREACHABLE, maybe");
 		}

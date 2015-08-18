@@ -74,6 +74,7 @@
             "fuel_usage": 0.05,
             "damage_type": "frost",
             "damage_effect": "frozen",
+            "effect": "shotgun",
             "force_feedback": 0.1
         },
 
@@ -120,6 +121,7 @@
             "fuel_usage": 0.05,
             "damage_type": "fire",
             "damage_effect": "burning",
+            "effect": "shotgun",
             "force_feedback": 0.2
         },
         [fire, stone]: {
@@ -225,7 +227,7 @@
             "cooldown": 0.1,
             "recoil": 200,
             "spreading": 20,
-            "bullet_count": 5
+            "bullet_count": 5,
             "effect": "wind_thrower",
             "fuel_usage": 0.02,
             "force_feedback": 0.5
@@ -237,7 +239,7 @@
             "cooldown": 0.1,
             "recoil": 200,
             "spreading": 20,
-            "bullet_count": 5
+            "bullet_count": 5,
             "effect": "wind_thrower",
             "fuel_usage": 0.02,
             "force_feedback": 0.5
