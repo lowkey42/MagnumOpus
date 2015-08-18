@@ -29,8 +29,8 @@
         [water]: {
             "type": "range",
             "bullet_type": "water_collider",
-            "bullet_velocity": 10,
-            "cooldown": 0.03,
+            "bullet_velocity": 15,
+            "cooldown": 0.01,
             "recoil": 10,
             "spreading": 30,
             "effect": "water_thrower",
@@ -83,7 +83,7 @@
             "bullet_velocity": 50,
             "cooldown": 1.0,
             "recoil": 80,
-            "fuel_usage": 0.1,
+            "fuel_usage": 0.05,
             "force_feedback": 0.1
         },
 
@@ -93,7 +93,7 @@
             "bullet_velocity": 80,
             "cooldown": 0.8,
             "recoil": 100,
-            "fuel_usage": 0.15,
+            "fuel_usage": 0.1,
             "force_feedback": 0.2
         },
 
@@ -128,7 +128,7 @@
             "bullet_velocity": 60,
             "cooldown": 1.0,
             "recoil": 60,
-            "fuel_usage": 0.1,
+            "fuel_usage": 0.05,
             "force_feedback": 0.2
         },
         [fire, stone, gas]: {
@@ -137,7 +137,7 @@
             "bullet_velocity": 80,
             "cooldown": 0.8,
             "recoil": 80,
-            "fuel_usage": 0.15,
+            "fuel_usage": 0.1,
             "force_feedback": 0.2
         },
 
@@ -148,7 +148,8 @@
             "bullet_velocity": 5,
             "cooldown": 0.2,
             "spreading": 40,
-            "bullet_count": 3
+            "bullet_count": 3,
+            "fuel_usage": 0.02
         },
         [fire, water, gas]: {
             "type": "range",
@@ -165,7 +166,7 @@
             "bullet_velocity": 60,
             "cooldown": 1.0,
             "recoil": 60,
-            "fuel_usage": 0.1,
+            "fuel_usage": 0.05,
             "force_feedback": 0.2
         },
         [gas, water, fire, frost]: {
@@ -201,7 +202,7 @@
             "spreading": 20,
             "bullet_count": 5
             "effect": "wind_thrower",
-            "fuel_usage": 0.01,
+            "fuel_usage": 0.02,
             "force_feedback": 0.5
         },
 
@@ -214,7 +215,7 @@
             "spreading": 20,
             "bullet_count": 3,
             "effect": "wind_thrower",
-            "fuel_usage": 0.01,
+            "fuel_usage": 0.02,
             "force_feedback": 0.5
         },
         [stone, fire, gas, water]: {
@@ -226,7 +227,7 @@
             "spreading": 20,
             "bullet_count": 5
             "effect": "wind_thrower",
-            "fuel_usage": 0.01,
+            "fuel_usage": 0.02,
             "force_feedback": 0.5
         },
         [stone, fire, gas, frost]: {
@@ -238,7 +239,7 @@
             "spreading": 20,
             "bullet_count": 5
             "effect": "wind_thrower",
-            "fuel_usage": 0.01,
+            "fuel_usage": 0.02,
             "force_feedback": 0.5
         }
     }

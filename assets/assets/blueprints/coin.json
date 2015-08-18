@@ -9,7 +9,7 @@
     },
     "Item": {
         "target": "score",
-        "mod": 5
+        "mod": 1
     },
     "Sprite": {
         "aid": "anim:coin"

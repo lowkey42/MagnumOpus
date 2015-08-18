@@ -8,7 +8,7 @@
 		"mass": 30,
 		"restitution": 0.8,
         "friction": 0.0005,
-        "max_active_velocity": 30,
+        "max_active_velocity": 20,
         "active_acceleration": 6,
         "group":2
 	},
