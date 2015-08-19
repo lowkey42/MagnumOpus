@@ -119,6 +119,7 @@ namespace asset {
 			auto _locate(const AID& id)const -> util::maybe<std::string>;
 
 			auto _create(const AID& id)throw(Loading_failed) -> ostream;
+			void _post_write();
 	};
 
 	template<class T>
