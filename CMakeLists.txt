@@ -14,7 +14,10 @@ add_subdirectory(dependencies/physfs)
 add_subdirectory(dependencies/soil)
 add_subdirectory(dependencies/glm)
 add_subdirectory(dependencies/sf2)
-add_subdirectory(dependencies/happyhttp)
+if(NOT EMSCRIPTEN)
+	add_subdirectory(dependencies/happyhttp)
+endif()
+
 add_subdirectory(src)
 
 

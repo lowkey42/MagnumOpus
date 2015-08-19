@@ -76,7 +76,7 @@ namespace mo {
 
 #ifdef EMSCRIPTEN
 		std::stringstream url;
-		url<<"http://"<<base_host<<path;
+		url<<"http://"<<base_host<<path.str();
 
 		emscripten_async_wget_data(url.str().c_str(), nullptr, +[](void* arg, void* data, int len){
 		}, +[](void*){});

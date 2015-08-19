@@ -89,7 +89,12 @@ file(GLOB_RECURSE MAGNUM_SRCS
 		 game/*.h*)
 
 add_executable(MagnumOpus main.cpp ${MAGNUM_SRCS})
-target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core happyhttp)
+
+if(EMSCRIPTEN)
+	target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
+else()
+	target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core happyhttp)
+endif()
 
 
 option(BUILD_TESTS "Build tests" OFF)
