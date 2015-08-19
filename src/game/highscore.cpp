@@ -29,6 +29,8 @@ namespace mo {
 		sf2_structDef(Score_list, sf2_member(scores))
 
 #ifdef EMSCRIPTEN
+		Score_list global_scores;
+
 		constexpr const char* base_url = "http://second-system.de/leaderboard.php";
 #endif
 	}
@@ -67,10 +69,13 @@ namespace mo {
 		emscripten_async_wget_data(url.str().c_str(), nullptr, +[](void* arg, void* data, int len){
 		}, +[](void*){});
 
+		auto score_list = global_scores.scores;
+
 #else
 		auto stored_scores = assets.load_maybe<Score_list>("cfg:highscore"_aid);
 
 		auto score_list = stored_scores.process(std::vector<Score>{}, [](auto& ss){return ss->scores;});
+#endif
 
 		score_list.push_back(score);
 
@@ -80,26 +85,35 @@ namespace mo {
 
 		score_list.resize(std::min(score_list.size(), std::size_t(15)));
 
+#ifndef EMSCRIPTEN
 		assets.save("cfg:highscore"_aid, Score_list{score_list});
+#endif
+	}
+
+	void prepare_list_scores() {
+#ifdef EMSCRIPTEN
+		std::stringstream url;
+		url<<base_url<<"?game=magnumOpus&op=list";
+		DEBUG("prepare_list_scores: "<<url.str());
+
+		emscripten_async_wget_data(url.str().c_str(), nullptr, +[](void* arg, void* data, int len) {
+
+			std::string resp((char*)data, len);
+			DEBUG("prepare_list_scores - success:\n"<<resp);
+
+			sf2::io::StringCharSource source(resp);
+			global_scores.scores.clear();
+			sf2::ParserDefChooser<Score_list>::get().parse(source, global_scores);
+
+		}, +[](void* arg) {
+			DEBUG("prepare_list_scores - fail:");
+		});
 #endif
 	}
 
 	auto list_scores(asset::Asset_manager& assets) -> std::vector<Score> {
 #ifdef EMSCRIPTEN
-		Score_list scores;
-		scores.scores.reserve(15);
-
-		std::stringstream url;
-		url<<base_url<<"?game=magnumOpus&op=list";
-		emscripten_async_wget_data(url.str().c_str(), &scores, +[](void* arg, void* data, int len){
-			auto& target = *(Score_list*)(arg);
-
-			std::string resp((char*)data, len);
-
-			sf2::io::StringCharSource source(resp);
-			sf2::ParserDefChooser<Score_list>::get().parse(source, target);
-
-		}, +[](void*){});
+		return global_scores.scores;
 
 #else
 		auto stored_scores = assets.load_maybe<Score_list>("cfg:highscore"_aid);

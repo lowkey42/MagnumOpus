@@ -58,7 +58,11 @@ namespace mo {
 	      Ui_container(game_engine, calculate_vscreen(game_engine, 512),
 	                    - vec2{
 	                       300,
+                   #ifndef EMSCRIPTEN
 	                       (100*3+5*4)
+	               #else
+	                       (ingame ? 205 : 100)
+	               #endif
 	                   }/2.f,
 	                   vec2{150,0},
 	                   gui::vertical(5)),
@@ -86,21 +90,21 @@ namespace mo {
 						game_engine.enter_screen<Game_screen>();
 
 					} catch(util::Error e) { // load failed:
-						// TODO: request player name
-						game_engine.enter_screen<Game_screen>("TODO");
+						game_engine.enter_screen<Game_screen>("rodney");
 					}
 				}
 			});
 		}
 
 		_root.add_new<gui::Button>("New Game", [&game_engine]{
-			// TODO: request player name
-			game_engine.enter_screen<Game_screen>("TODO");
+			game_engine.enter_screen<Game_screen>("rodney");
 		});
 
+#ifndef EMSCRIPTEN
 		_root.add_new<gui::Button>("Quit", [&game_engine] {
 			game_engine.exit();
 		});
+#endif
 	}
 
 	void Main_menu_screen::_on_enter(util::maybe<Screen&> prev) {
@@ -120,9 +124,6 @@ namespace mo {
 			_game_engine.leave_screen();
 			return;
 		}
-
-	//	_fade_left-=delta_time * second;
-	//	_fadein_left-=delta_time * second;
 
 		_time_acc+=delta_time * second;
 
