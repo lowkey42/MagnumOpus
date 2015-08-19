@@ -43,6 +43,7 @@ namespace renderer {
 			auto win_height()const noexcept{return _win_height;}
 
 			auto max_screenshake()const noexcept -> float;
+			auto brightness()const noexcept {return _brightness;}
 
 			void resolution(int width, int height, float max_screenshake=-1);
 
@@ -53,6 +54,7 @@ namespace renderer {
 			int _win_width, _win_height;
 			bool _fullscreen;
 			float _max_screenshake;
+			float _brightness;
 
 			std::unique_ptr<SDL_Window,void(*)(SDL_Window*)> _window;
 			SDL_GLContext _gl_ctx;

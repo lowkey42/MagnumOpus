@@ -166,7 +166,7 @@ namespace mo {
 				if(room.type==level::Room_type::end) {
 					auto enemy_count = util::random_int(rng, 1, 2);
 
-					switch(util::random_int(rng, 0, 3)) {
+					switch(util::random_int(rng, depth>0 ? 0 : 2, 3)) {
 						case 0:
 							for(int i=0; i<enemy_count; i++)
 								spawn("blueprint:pyro"_aid);

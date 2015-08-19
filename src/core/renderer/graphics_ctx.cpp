@@ -35,20 +35,22 @@ namespace {
 		int width;
 		int height;
 		bool fullscreen;
-		float max_screenshake = 0.1;
+		float max_screenshake = 0.5;
+		float brightness = 1.1;
 	};
 
 	sf2_structDef(Graphics_cfg,
 		sf2_member(width),
 		sf2_member(height),
 		sf2_member(fullscreen),
-		sf2_member(max_screenshake)
+		sf2_member(max_screenshake),
+		sf2_member(brightness)
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f};
+	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.1f};
 #else
-	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f};
+	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.1f};
 #endif
 
 }
@@ -87,6 +89,7 @@ namespace renderer {
 		_win_width = cfg.width;
 		_win_height = cfg.height;
 		_max_screenshake = cfg.max_screenshake;
+		_brightness = cfg.brightness;
 		_fullscreen = cfg.fullscreen;
 
 		if(&cfg==&default_cfg) {

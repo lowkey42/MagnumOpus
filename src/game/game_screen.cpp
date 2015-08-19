@@ -120,15 +120,15 @@ namespace mo {
 	Game_screen::Game_screen(Game_engine& engine, const Saveable_state& save_file) :
 	    Screen(engine), _engine(engine),
 	    _state(Game_state::create_from_save(engine, save_file)),
-		_player_sc_slot(&Game_screen::_on_state_change, this),
+	    _player_sc_slot(&Game_screen::_on_state_change, this),
 	    _join_slot(&Game_screen::_join, this),
 	    _unjoin_slot(&Game_screen::_unjoin, this),
-		_post_effect_obj(renderer::simple_vertex_layout,
-						 renderer::create_buffer(posteffect_buffer)),
+	    _post_effect_obj(renderer::simple_vertex_layout,
+	                     renderer::create_buffer(posteffect_buffer)),
 	    _lightmap{
-				create_framebuffer(engine),
-				create_framebuffer(engine)
-		},
+	            create_framebuffer(engine),
+	            create_framebuffer(engine)
+	    },
 	    _on_quit_slot(&Game_screen::_on_quit, this)
 	{
 		_on_quit_slot.connect(engine.controllers().quit_events);
@@ -267,8 +267,9 @@ namespace mo {
 		for(auto& screen : vscreens) {
 			glm::mat4 vp = glm::ortho(0.f,1.f,1.f,0.f,-1.f,1.f);
 
-			_lightmap_filter.bind().set_uniform("VP", vp)
-					.set_uniform("texture", 0);
+			_lightmap_filter.bind()
+			                .set_uniform("VP", vp)
+			                .set_uniform("texture", 0);
 			screen.vscreen.bind();
 
 			_lightmap[0].bind_target();
@@ -309,7 +310,8 @@ namespace mo {
 
 			_post_effects.bind().set_uniform("VP", vp)
 			        .set_uniform("fade", fade)
-					.set_uniform("texture", 0)
+			        .set_uniform("texture", 0)
+			        .set_uniform("brightness", _engine.graphics_ctx().brightness())
 			        .set_uniform("lightmap", 1);
 			screen.vscreen.bind();
 			_lightmap[lidx].bind(1);
