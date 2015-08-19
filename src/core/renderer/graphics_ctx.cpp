@@ -191,7 +191,7 @@ namespace renderer {
 	}
 
 	auto Graphics_ctx::max_screenshake()const noexcept -> float {
-		return _max_screenshake * 500;
+		return _max_screenshake * 300;
 	}
 
 	void Graphics_ctx::resolution(int width, int height, float max_screenshake) {

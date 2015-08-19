@@ -140,7 +140,7 @@ namespace mo {
 			        0.5f);
 
 		_text_renderer.draw(_new_highscore,
-			                glm::vec2(0,-150),
+			                glm::vec2(0,-80),
 			                glm::vec4(0.75,0,0,1), 0.2f);
 		draw_ui();
 	}

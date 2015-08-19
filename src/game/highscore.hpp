@@ -31,7 +31,7 @@ namespace mo {
 
 	extern void add_score(asset::Asset_manager& assets, Score score);
 
-	extern void prepare_list_scores();
+	extern void prepare_list_scores(asset::Asset_manager& assets);
 
 	extern auto list_scores(asset::Asset_manager& assets) -> std::vector<Score>;
 

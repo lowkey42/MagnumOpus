@@ -10,6 +10,8 @@
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
+#else
+#include <happyhttp/happyhttp.h>
 #endif
 
 namespace mo {
@@ -30,9 +32,16 @@ namespace mo {
 
 #ifdef EMSCRIPTEN
 		Score_list global_scores;
+#else
+		struct My_stackframe {
+			asset::Asset_manager* assets;
+			std::stringstream buffer;
+		};
 
-		constexpr const char* base_url = "http://second-system.de/leaderboard.php";
 #endif
+
+		constexpr const char* base_host = "second-system.de";
+		constexpr const char* base_url = "/leaderboard.php";
 	}
 
 	namespace asset {
@@ -56,16 +65,19 @@ namespace mo {
 
 
 	void add_score(asset::Asset_manager& assets, Score score) {
-
-#ifdef EMSCRIPTEN
 		std::stringstream cs_str;
 		cs_str<<"magnumOpus"<<score.name<<score.score<<score.level<<score.seed<<"42#23";
 
 		std::string cs = util::md5(cs_str.str());
 
+		std::stringstream path;
+		path<<base_url;
+		path<<"?game=magnumOpus&op=add&name="<<score.name<<"&score="<<score.score<<"&level="<<score.level<<"&seed="<<score.seed<<"&cs="<<cs;
+
+#ifdef EMSCRIPTEN
 		std::stringstream url;
-		url<<base_url;
-		url<<"?game=magnumOpus&op=add&name="<<score.name<<"&score="<<score.score<<"&level="<<score.level<<"&seed="<<score.seed<<"&cs="<<cs;
+		url<<"http://"<<base_host<<path;
+
 		emscripten_async_wget_data(url.str().c_str(), nullptr, +[](void* arg, void* data, int len){
 		}, +[](void*){});
 
@@ -87,27 +99,77 @@ namespace mo {
 
 #ifndef EMSCRIPTEN
 		assets.save("cfg:highscore"_aid, Score_list{score_list});
+
+		try {
+			happyhttp::Connection conn(base_host, 80 );
+			conn.setcallbacks(
+					+[](const happyhttp::Response* r, void* userdata){},
+					+[](const happyhttp::Response* r, void* userdata, const unsigned char* data, int n){},
+					+[](const happyhttp::Response* r, void* userdata){},
+					nullptr );
+
+			conn.request("GET", path.str().c_str());
+
+			while( conn.outstanding() )
+				conn.pump();
+
+		} catch(happyhttp::Wobbly e) {
+		}
+
 #endif
 	}
 
-	void prepare_list_scores() {
+	void prepare_list_scores(asset::Asset_manager& assets) {
 #ifdef EMSCRIPTEN
 		std::stringstream url;
-		url<<base_url<<"?game=magnumOpus&op=list";
-		DEBUG("prepare_list_scores: "<<url.str());
+		url<<"http://"<<base_host<<base_url<<"?game=magnumOpus&op=list";
 
 		emscripten_async_wget_data(url.str().c_str(), nullptr, +[](void* arg, void* data, int len) {
 
 			std::string resp((char*)data, len);
-			DEBUG("prepare_list_scores - success:\n"<<resp);
 
 			sf2::io::StringCharSource source(resp);
-			global_scores.scores.clear();
-			sf2::ParserDefChooser<Score_list>::get().parse(source, global_scores);
+			Score_list scores;
+			sf2::ParserDefChooser<Score_list>::get().parse(source, scores);
+			global_scores.scores = scores.scores;
 
 		}, +[](void* arg) {
-			DEBUG("prepare_list_scores - fail:");
 		});
+
+#else
+		My_stackframe frame;
+		frame.assets = &assets;
+
+		try {
+			happyhttp::Connection conn(base_host, 80 );
+			conn.setcallbacks(
+					+[](const happyhttp::Response* r, void* userdata){},
+					+[](const happyhttp::Response* r, void* userdata, const unsigned char* data, int n){
+						auto& frame = *((My_stackframe*)userdata);
+
+						frame.buffer<<std::string((const char*)data, n);
+					},
+					+[](const happyhttp::Response* r, void* userdata){
+						if(r->getstatus()==200) {
+							auto& frame = *((My_stackframe*)userdata);
+							auto str = frame.buffer.str();
+
+							sf2::io::StringCharSource source(str);
+							Score_list scores;
+							sf2::ParserDefChooser<Score_list>::get().parse(source, scores);
+							frame.assets->save("cfg:highscore"_aid, scores);
+						}
+					},
+					&frame );
+
+			conn.request("GET", (std::string(base_url)+"?game=magnumOpus&op=list").c_str());
+
+			while( conn.outstanding() )
+				conn.pump();
+
+		} catch(happyhttp::Wobbly e) {
+			INFO("list_score request '"<<(std::string(base_url)+"?game=magnumOpus&op=list")<<"' failed: "<<e.what());
+		}
 #endif
 	}
 
@@ -132,7 +194,7 @@ namespace mo {
 		int i = 1;
 		for(auto& s : scores) {
 			ss<<std::setw(2)<<(i++)<<". "
-			  <<std::setw(4)<<s.score<<" +"<<std::setw(4)<<(s.level+1)*100<<" "
+			  <<std::setw(4)<<s.score<<" ("<<std::setw(2)<<(s.level+1)<<") "
 			  <<std::setw(10)<<s.name.substr(0,10)<<std::endl;
 
 			if(i>15)

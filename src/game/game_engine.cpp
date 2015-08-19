@@ -52,7 +52,7 @@ namespace mo {
 		_controllers.update(Time(dt));
 
 		if(((uint32_t)dt_acc) % 60*5 == 0) {
-			prepare_list_scores();
+			prepare_list_scores(assets());
 			dt_acc+=1;
 		}
 
