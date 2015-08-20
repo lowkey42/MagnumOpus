@@ -140,7 +140,7 @@ namespace mo {
 			};
 
 
-			auto box_count = util::random_int(rng, 0, 3);
+			auto box_count = util::random_int(rng, 0, 2);
 			for(int i=0; i<box_count; i++) {
 				spawn("blueprint:box"_aid);
 			}
@@ -151,6 +151,7 @@ namespace mo {
 			}
 
 			if(room.type==level::Room_type::start) {
+				spawn("blueprint:box"_aid);
 
 			} else {
 				auto zombie_count = util::random_int(rng, 2, 5);
@@ -184,6 +185,10 @@ namespace mo {
 							break;
 					}
 
+				} else {
+					if(util::random_bool(rng, 0.3)) {
+						spawn("blueprint:turret_ice"_aid);
+					}
 				}
 			}
 		});
@@ -352,6 +357,13 @@ namespace mo {
 		state.update(dt);
 		ui.update(dt);
 		particle_renderer.update(dt, camera.main_camera());
+
+		camera.draw(
+			[&](const renderer::Camera& cam,
+				const std::vector<ecs::Entity_ptr>&) {
+
+			soundsys.play_sounds(cam);
+		});
 	}
 
 	auto Game_state::draw(Time dt) -> util::cvector_range<sys::cam::VScreen> {
@@ -362,7 +374,6 @@ namespace mo {
 			tilemap.draw(cam);
 			combat.draw(cam);
 			graphics.draw(cam);
-			soundsys.play_sounds(cam);
 			particle_renderer.draw(cam);
 		});
 

@@ -37,7 +37,7 @@ namespace cam {
 
 	void Camera_system::update(Time dt) {
 		auto ffeedback_diff = (_target_force_feedback-_force_feedback);
-		_force_feedback += ffeedback_diff * dt.value() * (ffeedback_diff>0 ? 10 : 2);
+		_force_feedback += ffeedback_diff * dt.value() * (ffeedback_diff>0 ? 10 : 3);
 
 		if(_target_force_feedback>0 &&
 		        std::abs(_target_force_feedback-_force_feedback)< 0.01f)

@@ -32,14 +32,7 @@ namespace mo {
 		}
 
 		void move(glm::vec2 direction) override {
-			if(direction.x>0)
-				set_dir(gui::Direction::right);
-			else if(direction.x<0)
-				set_dir(gui::Direction::left);
-			else if(direction.y<0)
-				set_dir(gui::Direction::up);
-			else if(direction.y>0)
-				set_dir(gui::Direction::down);
+			look_in_dir(direction);
 		}
 		void look_at(glm::vec2 position) override {
 			if(last_mouse_pos!=position) {
@@ -48,14 +41,18 @@ namespace mo {
 			}
 		}
 		void look_in_dir(glm::vec2 direction) override {
-			if(direction.x>0)
-				set_dir(gui::Direction::right);
-			else if(direction.x<0)
-				set_dir(gui::Direction::left);
-			else if(direction.y<0)
-				set_dir(gui::Direction::up);
-			else if(direction.y>0)
-				set_dir(gui::Direction::down);
+			if(std::abs(direction.x) >= std::abs(direction.y)) {
+				if(direction.x>0)
+					set_dir(gui::Direction::right);
+				else if(direction.x<0)
+					set_dir(gui::Direction::left);
+
+			} else {
+				if(direction.y<0)
+					set_dir(gui::Direction::up);
+				else if(direction.y>0)
+					set_dir(gui::Direction::down);
+			}
 		}
 		void attack() override {
 			activate = true;

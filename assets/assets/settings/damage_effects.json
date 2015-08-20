@@ -3,16 +3,16 @@
         "burning":{
             "time": 5,
             "confusion": 0.5,
-            "dmg_per_sec": 4,
+            "dmg_per_sec": 3,
             "dmg_type": "fire",
             "effect": "burning"
         },
 
         "poisoned":{
-            "time": 2,
+            "time": 4,
             "confusion": 1.0,
             "slow_down_factor": 0.8,
-            "dmg_per_sec": 1,
+            "dmg_per_sec": 3,
             "dmg_type": "gas",
             "effect": "poisoned"
         },

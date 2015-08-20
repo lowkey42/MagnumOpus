@@ -48,9 +48,9 @@ namespace {
 	)
 
 #ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.1f};
+	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.2f};
 #else
-	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.1f};
+	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.2f};
 #endif
 
 }
@@ -191,7 +191,10 @@ namespace renderer {
 	}
 
 	auto Graphics_ctx::max_screenshake()const noexcept -> float {
-		return _max_screenshake * 300;
+		return _screenshake_enabled ? _max_screenshake * 300 : 0;
+	}
+	void Graphics_ctx::toggle_screenschake(bool enable) {
+		_screenshake_enabled = enable;
 	}
 
 	void Graphics_ctx::resolution(int width, int height, float max_screenshake) {

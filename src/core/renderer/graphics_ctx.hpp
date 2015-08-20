@@ -47,6 +47,7 @@ namespace renderer {
 
 			void resolution(int width, int height, float max_screenshake=-1);
 
+			void toggle_screenschake(bool enable);
 
 		private:
 			asset::Asset_manager& _assets;
@@ -55,6 +56,7 @@ namespace renderer {
 			bool _fullscreen;
 			float _max_screenshake;
 			float _brightness;
+			bool _screenshake_enabled = true;
 
 			std::unique_ptr<SDL_Window,void(*)(SDL_Window*)> _window;
 			SDL_GLContext _gl_ctx;

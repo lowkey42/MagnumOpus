@@ -9,7 +9,7 @@
     },
     "Item": {
         "target": "health",
-        "mod": 15,
+        "mod": 10,
         "joinable": false
     },
     "Sprite": {

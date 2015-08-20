@@ -10,8 +10,8 @@ sound:roar = sounds/roar.ogg
 sound:select = sounds/Blip_Select.wav
 sound:explosion = sounds/Explosion.ogg
 sound:pickup_coin = sounds/Pickup_Coin.ogg
-sound:pickup_other = sounds/Powerup.wav
-sound:pickup_health = sounds/Powerup.wav
+sound:pickup_other = sounds/Powerup.ogg
+sound:pickup_health = sounds/Powerup.ogg
 
 sound:slime = sounds/slime.ogg
 sound:shotgun = sounds/shotgun.ogg

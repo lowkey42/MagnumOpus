@@ -225,8 +225,8 @@ namespace ui {
 		_health_shader.bind().set_uniform("tex", 0);
 		_hud_health_min_tex->bind();
 		auto min_health_scale = glm::vec3(
-			_hud_health_min_tex->width()  / world_cam.world_scale() /2.f,
-			_hud_health_min_tex->height() / world_cam.world_scale() /2.f,
+			_hud_health_min_tex->width()  / world_cam.world_scale() /1.5f,
+			_hud_health_min_tex->height() / world_cam.world_scale() /1.5f,
 			1
 		);
 

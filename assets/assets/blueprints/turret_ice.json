@@ -28,7 +28,7 @@
     },
     "Health":{
         "max_hp": 20,
-        "physical_resistence": 0.5,
+        "physical_resistence": 0.3,
         "vulnerabilities": [water, fire],
         "resistences": [frost],
         "death_effect": explosion_ice,
