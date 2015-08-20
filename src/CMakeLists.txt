@@ -43,7 +43,7 @@ else()
 		if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "Clang")
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -gline-tables-only")
 		else()
-			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast -g")
+			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 		endif()
 	endif()
 	

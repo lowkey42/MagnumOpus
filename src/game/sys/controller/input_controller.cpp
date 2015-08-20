@@ -273,9 +273,7 @@ namespace controller {
 				c.switch_weapon(w);
 	}
 	void Gamepad_controller::feedback(float force) {
-		DEBUG("gamepad-feedback: "<<force);
-		if(SDL_HapticRumblePlay(_haptic, glm::clamp(force,0.f,1.f), 500)!=0)
-			DEBUG("Rumble failed: "<<SDL_GetError()); // clear error
+		SDL_HapticRumblePlay(_haptic, glm::clamp(force,0.f,1.f), 500);
 	}
 
 	void Gamepad_controller::request_unjoin() {

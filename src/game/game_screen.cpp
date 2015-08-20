@@ -178,6 +178,7 @@ namespace mo {
 			_state->camera.update(1_s / 60);
 
 		_on_quit_slot.connect(_engine.controllers().quit_events);
+		_engine.graphics_ctx().toggle_screenschake(true);
 	}
 	void Game_screen::_on_leave(util::maybe<Screen&> next) {
 		_state->save();
@@ -189,6 +190,7 @@ namespace mo {
 
 		_on_quit_slot.disconnect(_engine.controllers().quit_events);
 		_engine.audio_ctx().pause_sounds();
+		_engine.graphics_ctx().toggle_screenschake(false);
 	}
 
 	namespace {
@@ -212,6 +214,7 @@ namespace mo {
 		if(_quit_to_menu && !_dying) {
 			DEBUG("=> menu");
 			_quit_to_menu = false;
+			_engine.audio_ctx().pause_sounds();
 			_engine.enter_screen<Main_menu_screen>(true);
 			return;
 		}
