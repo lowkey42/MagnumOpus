@@ -191,7 +191,7 @@ namespace renderer {
 	}
 
 	auto Graphics_ctx::max_screenshake()const noexcept -> float {
-		return _screenshake_enabled ? _max_screenshake * 300 : 0;
+		return _screenshake_enabled ? _max_screenshake * 100 : 0;
 	}
 	void Graphics_ctx::toggle_screenschake(bool enable) {
 		_screenshake_enabled = enable;
