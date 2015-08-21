@@ -235,6 +235,10 @@ Connection::Connection( const char* host, int port ) :
 	m_Port( port ),
 	m_Sock(-1)
 {
+#ifdef WIN32
+	WSADATA tmp;
+	WSAStartup(0x202,&tmp);
+#endif
 }
 
 
