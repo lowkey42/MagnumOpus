@@ -44,9 +44,7 @@ namespace mo {
 			}
 
 		protected:
-			void _on_frame(float dt) override {
-				_controllers.update(Time(dt));
-			}
+			void _on_frame(float dt) override;
 			auto _on_reload() -> std::tuple<bool, std::string> override;
 
 		private:

@@ -60,7 +60,7 @@ else()
 	
 	
 	if(WIN32)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -limagehlp -lsdl2main -lSDL2_mixer -lglew32") # why???
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -limagehlp -lsdl2main -lSDL2_mixer -lglew32 -lws2_32 -lwsock32") # why???
 		add_definitions(-DWIN)
 
 	else()
@@ -89,14 +89,13 @@ file(GLOB_RECURSE MAGNUM_SRCS
 		 game/*.h*)
 
 add_executable(MagnumOpus main.cpp ${MAGNUM_SRCS})
-target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
+
+if(EMSCRIPTEN)
+	target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
+else()
+	target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core happyhttp)
+endif()
 
 
 option(BUILD_TESTS "Build tests" OFF)
-
-if(BUILD_TESTS AND NOT EMSCRIPTEN)
-# Tests
-add_executable(TestLevelGen test_level_gen.cpp ${MAGNUM_SRCS})
-target_link_libraries(TestLevelGen ${SDL2_LIBRARY} core)
-endif()
 

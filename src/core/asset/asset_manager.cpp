@@ -16,6 +16,10 @@
 	#include <unistd.h>
 #endif
 
+#ifdef EMSCRIPTEN
+	#include <emscripten.h>
+#endif
+
 namespace {
 	std::string pwd() {
 		char cCurrentPath[FILENAME_MAX];
@@ -98,6 +102,29 @@ namespace asset {
 			".config"
 #endif
 		);
+
+#ifdef EMSCRIPTEN
+		EM_ASM(
+			FS.mkdir('/persistent_data');
+			FS.mount(IDBFS, {}, '/persistent_data');
+
+			Module.syncdone = 0;
+
+			//populate persistent_data directory with existing persistent source data
+			//stored with Indexed Db
+			//first parameter = "true" mean synchronize from Indexed Db to
+			//Emscripten file system,
+			// "false" mean synchronize from Emscripten file system to Indexed Db
+			//second parameter = function called when data are synchronized
+			FS.syncfs(true, function(err) {
+				//assert(!err);
+				Module.print("end file sync..");
+				Module.syncdone = 1;
+			});
+		);
+		write_dir_parent = "/persistent_data";
+#endif
+
 		create_dir(write_dir_parent);
 
 		std::string write_dir = write_dir_parent+PHYSFS_getDirSeparator()+app_name;
@@ -172,6 +199,17 @@ namespace asset {
 	Asset_manager::~Asset_manager() {
 		_assets.clear();
 		PHYSFS_deinit();
+	}
+
+	void Asset_manager::_post_write() {
+#ifdef EMSCRIPTEN
+		//persist Emscripten current data to Indexed Db
+		EM_ASM(
+			FS.syncfs(false,function (err) {
+				//assert(!err);
+			});
+		);
+#endif
 	}
 
 	util::maybe<std::string> Asset_manager::_base_dir(Asset_type type)const {

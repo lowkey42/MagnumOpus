@@ -5,6 +5,8 @@
 #include "intro_screen.hpp"
 #include "game_state.hpp"
 
+#include "highscore.hpp"
+
 #include <vector>
 #include <algorithm>
 
@@ -44,6 +46,17 @@ namespace mo {
 		std::cerr<<"Reload "<<(gs?"started":"cancled")<<std::endl;
 
 		return std::make_tuple(gs!=nullptr, "--reload");
+	}
+	void Game_engine::_on_frame(float dt) {
+		static float dt_acc = 0;
+		_controllers.update(Time(dt));
+
+		if(((uint32_t)dt_acc) % 60*5 == 0) {
+			prepare_list_scores(assets());
+			dt_acc+=1;
+		}
+
+		dt_acc+=dt;
 	}
 
 }

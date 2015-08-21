@@ -166,7 +166,11 @@ namespace mo {
 
 	void Ui_container::enable() {
 		_game_engine.controllers().screen_to_world_coords([&](glm::vec2 p){
-			return this->_mouse_camera.screen_to_world(p);
+			p = this->_mouse_camera.screen_to_world(p);
+			return glm::vec2(
+				p.x * (this->_camera.viewport().z/this->_mouse_camera.viewport().z),
+				p.y * (this->_camera.viewport().w/this->_mouse_camera.viewport().w)
+			);
 		});
 		_key_events.connect(_game_engine.input().keyboard_events);
 	}

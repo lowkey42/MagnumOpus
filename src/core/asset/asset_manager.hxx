@@ -50,6 +50,7 @@ namespace asset {
 	void Asset_manager::save(const AID& id, const T& asset) throw(Loading_failed) {
 		Loader<T>::store(_create(id), asset);
 		_assets.erase(id);
+		_post_write();
 	}
 
 

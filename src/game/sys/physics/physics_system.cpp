@@ -20,7 +20,7 @@ namespace physics {
 		: _world(world), _min_body_size(min_body_size),
 		  _max_body_velocity(max_body_velocity),
 		  _sub_step_time(std::min(min_body_size.value()/(2*max_body_velocity.value()), 1.f/60)),
-		  _max_steps_per_frame(static_cast<int>((7.f/_sub_step_time.value())/60 *4)),
+		  _max_steps_per_frame((1.f/60)/_sub_step_time.value() *1.5),
 		  _physics_pool(entity_manager.list<Physics_comp>()),
 		  _transform_sys(ts), _dt_acc(0) {
 		entity_manager.register_component_type<physics::Physics_comp>();
@@ -38,10 +38,11 @@ namespace physics {
 	void Physics_system::update(Time dt) {
 		_dt_acc+=dt;
 
-		int steps = std::min(static_cast<int>(_dt_acc/_sub_step_time), _max_steps_per_frame);
+		int steps = static_cast<int>(_dt_acc/_sub_step_time);
+		int actual_steps = std::min(steps, _max_steps_per_frame);
 
-		for(int i=0; i<steps; i++)
-			_step(i==steps-1);
+		for(int i=0; i<actual_steps; i++)
+			_step(i==actual_steps-1);
 
 		_dt_acc = std::max(_dt_acc- steps*_sub_step_time, Time(0));
 	}
