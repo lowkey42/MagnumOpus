@@ -38,6 +38,7 @@ namespace mo {
 			std::stringstream buffer;
 		};
 
+		bool highscore_outdated = true;
 #endif
 
 		constexpr const char* base_host = "second-system.de";
@@ -137,42 +138,7 @@ namespace mo {
 		});
 
 #else
-		My_stackframe frame;
-		frame.assets = &assets;
-
-		try {
-			happyhttp::Connection conn(base_host, 80 );
-			conn.setcallbacks(
-					+[](const happyhttp::Response* r, void* userdata){},
-					+[](const happyhttp::Response* r, void* userdata, const unsigned char* data, int n){
-						auto& frame = *((My_stackframe*)userdata);
-
-						frame.buffer<<std::string((const char*)data, n);
-					},
-					+[](const happyhttp::Response* r, void* userdata){
-				auto& frame = *((My_stackframe*)userdata);
-						auto str = frame.buffer.str();
-
-						DEBUG("loaded highscores. status="<<((int)r->getstatus())<<": "<<str);
-
-						if(r->getstatus()==200) {
-
-							sf2::io::StringCharSource source(str);
-							Score_list scores;
-							sf2::ParserDefChooser<Score_list>::get().parse(source, scores);
-							frame.assets->save("cfg:highscore"_aid, scores);
-						}
-					},
-					&frame );
-
-			conn.request("GET", (std::string(base_url)+"?game=magnumOpus&op=list").c_str());
-
-			while( conn.outstanding() )
-				conn.pump();
-
-		} catch(happyhttp::Wobbly e) {
-			INFO("list_score request '"<<(std::string(base_url)+"?game=magnumOpus&op=list")<<"' failed: "<<e.what());
-		}
+		highscore_outdated = true;
 #endif
 	}
 
@@ -181,6 +147,45 @@ namespace mo {
 		return global_scores.scores;
 
 #else
+		if(highscore_outdated) {
+			My_stackframe frame;
+			frame.assets = &assets;
+
+			try {
+				happyhttp::Connection conn(base_host, 80 );
+				conn.setcallbacks(
+						+[](const happyhttp::Response* r, void* userdata){},
+						+[](const happyhttp::Response* r, void* userdata, const unsigned char* data, int n){
+							auto& frame = *((My_stackframe*)userdata);
+
+							frame.buffer<<std::string((const char*)data, n);
+						},
+						+[](const happyhttp::Response* r, void* userdata){
+					auto& frame = *((My_stackframe*)userdata);
+							auto str = frame.buffer.str();
+
+							if(r->getstatus()==200) {
+
+								sf2::io::StringCharSource source(str);
+								Score_list scores;
+								sf2::ParserDefChooser<Score_list>::get().parse(source, scores);
+								frame.assets->save("cfg:highscore"_aid, scores);
+							}
+						},
+						&frame );
+
+				conn.request("GET", (std::string(base_url)+"?game=magnumOpus&op=list").c_str());
+
+				while( conn.outstanding() )
+					conn.pump();
+
+			} catch(happyhttp::Wobbly e) {
+				INFO("list_score request '"<<(std::string(base_url)+"?game=magnumOpus&op=list")<<"' failed: "<<e.what());
+			}
+
+			highscore_outdated = false;
+		}
+
 		auto stored_scores = assets.load_maybe<Score_list>("cfg:highscore"_aid);
 
 		return stored_scores.process(std::vector<Score>{}, [](auto& ss){return ss->scores;});
