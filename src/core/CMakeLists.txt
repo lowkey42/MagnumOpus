@@ -56,8 +56,8 @@ else()
 	
 	
 	if(WIN32)
-		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -lsdl2main -lSDL2_mixer -lglew32") # why???
-		set(WIN_LIBS "-limagehlp")
+		set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -lmingw32 -lsdl2main -lSDL2_mixer -lglew32 -lws2_32 -lwsock32") # why???
+		set(WIN_LIBS "-limagehlp -lws2_32 -lwsock32")
 		add_definitions(-DWIN)
 
 	else()

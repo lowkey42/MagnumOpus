@@ -150,9 +150,12 @@ namespace mo {
 						frame.buffer<<std::string((const char*)data, n);
 					},
 					+[](const happyhttp::Response* r, void* userdata){
+				auto& frame = *((My_stackframe*)userdata);
+						auto str = frame.buffer.str();
+
+						DEBUG("loaded highscores. status="<<((int)r->getstatus())<<": "<<str);
+
 						if(r->getstatus()==200) {
-							auto& frame = *((My_stackframe*)userdata);
-							auto str = frame.buffer.str();
 
 							sf2::io::StringCharSource source(str);
 							Score_list scores;
