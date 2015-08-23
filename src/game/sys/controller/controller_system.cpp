@@ -35,12 +35,13 @@ namespace controller {
 	namespace {
 
 		struct Controllable_interface_impl : public Controllable_interface {
-			Controllable_interface_impl(Time dt, ecs::Entity& entity)
+			Controllable_interface_impl(Time dt, ecs::Entity& entity, bool& active)
 				: _dt(dt), _entity(entity),
 				  _state(entity.get<State_comp>().process(State_data{},
 														   [](auto& s){return s.state();})),
 				  _target_rotation(entity.get<Transform_comp>().process(0_deg,
-																	[](auto& p){return p.rotation();})) {}
+																	[](auto& p){return p.rotation();})),
+				  _active(active) {}
 
 			~Controllable_interface_impl()noexcept;
 
@@ -63,11 +64,14 @@ namespace controller {
 				ecs::Entity& _entity;
 				const State_data _state;
 				Angle _target_rotation;
+				bool& _active;
 		};
 	}
 	void Controller_system::update(Time dt) {
 		for(auto& controllable : _controllables) {
-			Controllable_interface_impl c(dt, controllable.owner());
+			controllable._active = false;
+
+			Controllable_interface_impl c(dt, controllable.owner(), controllable._active);
 
 			if(controllable._controller)
 				(*controllable._controller)(c);
@@ -195,6 +199,8 @@ namespace controller {
                 }else if(len<0.00001 || std::isnan(len))
 					return;
 
+				_active = true;
+
 				comp.accelerate_active(direction);
 
 				if(_state.s!=Entity_state::attacking_melee && _state.s!=Entity_state::attacking_range)
@@ -214,6 +220,7 @@ namespace controller {
 		void Controllable_interface_impl::attack() {
 			_entity.get<combat::Weapon_comp>().process([&](auto& w){
 				w.attack();
+				_active = true;
 			});
 		}
 		void Controllable_interface_impl::use() {
@@ -227,12 +234,14 @@ namespace controller {
 
 			_entity.get<item::Collector_comp>().process([&](auto& c){
 				c.take();
+				_active = true;
 			});
 
 			set_state(Entity_state::taking);
 		}
 		void Controllable_interface_impl::switch_weapon(uint32_t weapon_id) {
 			auto r = _entity.get<item::Element_comp>().process(false, [&](item::Element_comp& e){
+				_active = true;
 				return e.flip_slot(weapon_id);
 			});
 
@@ -243,6 +252,9 @@ namespace controller {
 
 		Controllable_interface_impl::~Controllable_interface_impl()noexcept {
 			_entity.get<Transform_comp>().process([&](auto& c){
+				if(std::abs(normalize_to_half_rot(_target_rotation-c.rotation()).value()) > (20_deg).value())
+					_active = true;
+
 				c.rotate( normalize_to_half_rot(_target_rotation-c.rotation()), _dt );
 			});
 		}

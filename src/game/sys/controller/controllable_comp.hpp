@@ -71,11 +71,14 @@ namespace controller {
 					_controller->feedback(force);
 			}
 
+			auto active()const noexcept {return _active;}
+
 		private:
 			friend class Controller_system;
 
 			Controller* _controller = nullptr;
 			ecs::Component_type _controller_component = 0;
+			bool _active;
 	};
 
 }
