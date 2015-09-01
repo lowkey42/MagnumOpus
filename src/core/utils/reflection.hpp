@@ -29,33 +29,34 @@ namespace util {
 		return demangle(typeid(T).name());
 	}
 
+	using Typeuid = int32_t;
 
-	using Typeid_type = int32_t;
+	constexpr auto notypeuid = Typeuid(0);
 
-	constexpr auto notypeid = Typeid_type(0);
-
-	struct Typeid_gen_base {
-		protected:
-			static auto next_id()noexcept {
-				static auto idc = Typeid_type(1);
-				return idc++;
+	namespace details {
+		struct Typeuid_gen_base {
+			protected:
+				static auto next_uid()noexcept {
+					static auto idc = Typeuid(1);
+					return idc++;
+				}
+		};
+		template<typename T>
+		struct Typeuid_gen : Typeuid_gen_base {
+			static auto uid()noexcept {
+				static auto i = next_uid();
+				return i;
 			}
-	};
-	template<typename T>
-	struct Typeid_gen : Typeid_gen_base {
-		static auto id()noexcept {
-			static auto i = next_id();
-			return i;
-		}
-	};
+		};
+	}
 
 	template<class T>
-	auto typeid_of() {
-		return Typeid_gen<std::decay_t<std::remove_pointer_t<std::decay_t<T>>>>::id();
+	auto typeuid_of() {
+		return details::Typeuid_gen<std::decay_t<std::remove_pointer_t<std::decay_t<T>>>>::uid();
 	}
 	template<>
-	inline auto typeid_of<void>() {
-		return notypeid;
+	inline constexpr auto typeuid_of<void>() {
+		return notypeuid;
 	}
 
 }

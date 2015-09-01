@@ -186,8 +186,9 @@ void Engine::on_frame() {
 	_current_time = SDL_GetTicks() / 1000.0f;
 	const float delta_time = std::min(_current_time - _last_time, 1.f);
 
-
 	_graphics_ctx->start_frame();
+
+	_bus.update();
 
 	_audio_ctx->flip();
 	_input_manager->update(delta_time);

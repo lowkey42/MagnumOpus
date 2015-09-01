@@ -45,8 +45,8 @@ namespace util {
 
 
 	template<typename T>
-	Message_bus::Mailbox_ref::Mailbox_ref(Mailbox<T>& mailbox, Typeid_type self)
-	  : _self(self), _type(typeid_of<T>()),
+	Message_bus::Mailbox_ref::Mailbox_ref(Mailbox<T>& mailbox, Typeuid self)
+	  : _self(self), _type(typeuid_of<T>()),
 		_mailbox(static_cast<void*>(&mailbox)),
 		_send(+[](void* mb, const void* m){
 			static_cast<Mailbox<T>*>(mb)->enqueue(*static_cast<const T*>(m));
@@ -54,7 +54,7 @@ namespace util {
 	}
 
 	template<typename T>
-	void Message_bus::Mailbox_ref::exec_send(const T& m, Typeid_type self) {
+	void Message_bus::Mailbox_ref::exec_send(const T& m, Typeuid self) {
 		assert(_type==typeid_of<T>() && "Types don't match");
 
 		if(_self!=0 && self==_self) {
@@ -65,7 +65,7 @@ namespace util {
 	}
 
 	template<typename T>
-	void Message_bus::register_mailbox(Mailbox<T>& mailbox, Typeid_type self) {
+	void Message_bus::register_mailbox(Mailbox<T>& mailbox, Typeuid self) {
 		// TODO: mutex
 		_add_queue.emplace_back(mailbox, self);
 	}
@@ -78,22 +78,23 @@ namespace util {
 
 	inline void Message_bus::update() {
 		for(auto& m : _add_queue) {
-			_mb_groups[m._type].emplace_back(std::move(m));
+			group(m._type).emplace_back(std::move(m));
 		}
 		_add_queue.clear();
 
 		for(auto& m : _remove_queue) {
-			util::erase_fast(_mb_groups[m._type], m);
+			util::erase_fast(group(m._type), m);
 		}
 		_remove_queue.clear();
 	}
 
 
 	template<typename Msg>
-	void Message_bus::send_msg(const Msg& msg, Typeid_type self) {
-		auto boxes = _mb_groups.find(typeid_of<Msg>());
-		if(boxes!=_mb_groups.end()) {
-			for(auto& mb : boxes->second) {
+	void Message_bus::send_msg(const Msg& msg, Typeuid self) {
+		auto id = typeuid_of<Msg>();
+
+		if(id <_mb_groups.size()) {
+			for(auto& mb : _mb_groups[id]) {
 				mb.exec_send(msg, self);
 			}
 		}

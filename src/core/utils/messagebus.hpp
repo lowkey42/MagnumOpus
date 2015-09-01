@@ -1,7 +1,6 @@
 #pragma once
 
 #include <vector>
-#include <unordered_map>
 #include <cassert>
 #include <functional>
 #include <algorithm>
@@ -46,7 +45,7 @@ namespace util {
 			auto create_child() -> Message_bus;
 
 			template<typename T>
-			void register_mailbox(Mailbox<T>& mailbox, Typeid_type self=0);
+			void register_mailbox(Mailbox<T>& mailbox, Typeuid self=0);
 			template<typename T>
 			void unregister_mailbox(Mailbox<T>& mailbox);
 
@@ -54,40 +53,48 @@ namespace util {
 
 			template<typename Msg, typename... Arg>
 			void send(Arg&&... arg) {
-				send<Msg>(notypeid, std::forward<Arg>(arg)...);
+				send<Msg>(util::typeuid_of<void>(), std::forward<Arg>(arg)...);
 			}
 			template<typename Msg, typename... Arg>
-			void send(Typeid_type self, Arg&&... arg) {
+			void send(Typeuid self, Arg&&... arg) {
 				send_msg(Msg{std::forward<Arg>(arg)...}, self);
 			}
 
 			template<typename Msg>
-			void send_msg(const Msg& msg, Typeid_type self);
+			void send_msg(const Msg& msg, Typeuid self);
 
 		private:
 			Message_bus(Message_bus* parent);
 
 			struct Mailbox_ref {
 				template<typename T>
-				Mailbox_ref(Mailbox<T>& mailbox, Typeid_type self=0) ;
+				Mailbox_ref(Mailbox<T>& mailbox, Typeuid self=0) ;
 
 				template<typename T>
-				void exec_send(const T& m, Typeid_type self);
+				void exec_send(const T& m, Typeuid self);
 
 				bool operator==(const Mailbox_ref& rhs)const noexcept {
 					return _type==rhs._type && _mailbox==rhs._mailbox;
 				}
 
-				Typeid_type _self;
-				Typeid_type _type;
+				Typeuid _self;
+				Typeuid _type;
 				void* _mailbox;
 				std::function<void(void*, const void*)> _send;
 			};
 
+			auto& group(Typeuid id) {
+				if(std::size_t(id)>=_mb_groups.size()) {
+					_mb_groups.resize(id+1);
+					_mb_groups.back().reserve(4);
+				}
+				return _mb_groups[id];
+			}
+
 			Message_bus* _parent;
 			std::vector<Message_bus*> _children;
 
-			std::unordered_map<Typeid_type, std::vector<Mailbox_ref>> _mb_groups; // TODO: better datastructure? all keys known at compiletime but sparse
+			std::vector<std::vector<Mailbox_ref>> _mb_groups;
 
 			std::vector<Mailbox_ref> _add_queue;
 			std::vector<Mailbox_ref> _remove_queue;
