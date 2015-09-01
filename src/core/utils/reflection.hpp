@@ -17,7 +17,9 @@
 
 #include <string>
 #include <typeinfo>
+#include <type_traits>
 
+namespace mo {
 namespace util {
 
 	extern std::string demangle(const char* name);
@@ -27,4 +29,34 @@ namespace util {
 		return demangle(typeid(T).name());
 	}
 
+
+	using Typeid_type = int32_t;
+
+	constexpr auto notypeid = Typeid_type(0);
+
+	struct Typeid_gen_base {
+		protected:
+			static auto next_id()noexcept {
+				static auto idc = Typeid_type(1);
+				return idc++;
+			}
+	};
+	template<typename T>
+	struct Typeid_gen : Typeid_gen_base {
+		static auto id()noexcept {
+			static auto i = next_id();
+			return i;
+		}
+	};
+
+	template<class T>
+	auto typeid_of() {
+		return Typeid_gen<std::decay_t<std::remove_pointer_t<std::decay_t<T>>>>::id();
+	}
+	template<>
+	inline auto typeid_of<void>() {
+		return notypeid;
+	}
+
+}
 }

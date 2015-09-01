@@ -18,6 +18,7 @@
 #include <vector>
 #include <memory>
 #include "utils/maybe.hpp"
+#include "utils/messagebus.hpp"
 
 namespace mo {
 	namespace asset {class Asset_manager;}
@@ -96,6 +97,7 @@ namespace mo {
 			auto& assets()const noexcept {return *_asset_manager;}
 			auto& input()noexcept {return *_input_manager;}
 			auto& input()const noexcept {return *_input_manager;}
+			auto& bus()noexcept {return _bus;}
 
 		protected:
 			virtual void _on_frame(float dt) {};
@@ -117,6 +119,8 @@ namespace mo {
 
 			struct Reload_handler;
 			std::unique_ptr<Reload_handler> _rh;
+
+			util::Message_bus _bus;
 	};
 
 } /* namespace core */
