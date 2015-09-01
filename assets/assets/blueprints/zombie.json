@@ -7,7 +7,7 @@
 		"mass": 60,
 		"restitution": 0.8,
         "friction": 0.001,
-        "max_active_velocity": 10,
+        "max_active_velocity": 12,
         "active_acceleration": 2
 	},
     "Sprite": {
@@ -18,10 +18,10 @@
 	},
     "Simple_ai":{
         "attack_distance": 1,
-        "near":2,
+        "near":5,
         "max":10,
         "near_angle":300,
-        "far_angle":90,
+        "far_angle":180,
         "follow_time":2.0,
         "swarm_id":1
     },
