@@ -36,7 +36,7 @@
             "type": "range",
             "bullet_type": "bullet",
             "bullet_velocity": 40,
-            "cooldown": 1.2,
+            "cooldown": 0.8,
             "recoil": 200,
             "spreading": 15,
             "bullet_count": 5,
