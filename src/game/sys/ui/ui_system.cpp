@@ -72,7 +72,8 @@ namespace ui {
         }
 	}
 
-	Ui_system::Ui_system(Game_engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms)
+	Ui_system::Ui_system(Game_engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms,
+	                     std::function<float()> score_multiplicator)
 	    : _ui_comps(em.list<Ui_comp>()),
 	      _cam(calculate_vscreen(e, 512)),
 	      _hud(simple_vertex_layout, create_buffer(hud_vert)),
@@ -81,12 +82,15 @@ namespace ui {
 	      _hud_health_tex(e.assets().load<Texture>("tex:ui_hud_health"_aid)),
 	      _hud_health_min_tex(e.assets().load<Texture>("tex:ui_hud_health_min"_aid)),
 	      _score_font(e.assets().load<Font>("font:nixie"_aid)),
+	      _score_mult_font(e.assets().load<Font>("font:menu_font"_aid)),
 	      _score_text(_score_font),
+	      _score_mult_text(_score_mult_font),
 	      _join_msg(e.assets(), e.assets().load<Texture>("tex:ui_hud_join"_aid)),
 	      _bubble_renderer(e.assets(), 58/2.f),
 	      _assets(e.assets()),
 	      _transforms(transforms),
-	      _player_ready([&c=e.controllers()]{return c.player_ready();}) {
+	      _player_ready([&c=e.controllers()]{return c.player_ready();}),
+	      _score_multiplicator(score_multiplicator) {
 
 		em.register_component_type<Ui_minimal_comp>();
 
@@ -362,6 +366,32 @@ namespace ui {
 
 			_score_shader.set_uniform("model",model);
 			_score_text.draw();
+		}
+
+
+		auto score_mult = _score_multiplicator();
+		if(score_mult>1.f) {
+			std::stringstream multiplicator_ss;
+			multiplicator_ss.precision(1);
+			multiplicator_ss<<"x"<<std::fixed<<std::setfill(' ')<<std::setw(4)<<score_mult;
+			auto multiplicator_str = multiplicator_ss.str();
+
+			_score_mult_font->bind();
+			_score_mult_text.set(multiplicator_str);
+			auto f = 0.2+score_mult/10.f;
+			_score_shader.set_uniform("color",   glm::vec4(f,f,f,1));
+			for(auto& hud : _ui_comps) {
+				auto offset = hud._offset;
+
+				if(offset.x>0)
+					offset+=glm::vec3(-80, 140, 0);
+				else
+					offset+=glm::vec3(+80, 140, 0);
+
+				auto model = glm::scale(glm::translate(glm::mat4{}, offset), glm::vec3(0.75f,0.75f,1.f));
+				_score_shader.set_uniform("model",model);
+				_score_mult_text.draw();
+			}
 		}
 
 		if(_join_msg_fade>0_s) {

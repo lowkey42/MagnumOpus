@@ -71,6 +71,8 @@ namespace item {
 		glm::vec2 random_dir() {
 			return rotate(glm::vec2{1,0}, Angle{util::random_real(rng, remove_unit(0_deg), remove_unit(360_deg))});
 		}
+
+		constexpr auto score_mult_max_ttl = 2_s;
 	}
 
 	Item_system::Item_system(
@@ -104,7 +106,17 @@ namespace item {
 		INVARIANT(!_droprates->groups.empty(), "Couldn't load drop configuration");
 	}
 
+	void Item_system::up_score_multiplicator() {
+		_score_multiplicator+=1.0f;
+		_score_mult_ttl = score_mult_max_ttl;
+	}
+
 	void Item_system::update(Time dt) {
+		if(_score_mult_ttl>0_s)
+			_score_mult_ttl-=dt;
+		else
+			_score_multiplicator = std::max(1.f, _score_multiplicator - dt/1_s);
+
 		for(auto& c : _collectors) {
 			if(c._active) {
 				c._active = false;
@@ -212,7 +224,8 @@ namespace item {
 								break;
 							case score:
 								other.get<Score_comp>().process([&](Score_comp& s) {
-									s.add(item._mod);
+									this->_score_mult_ttl = score_mult_max_ttl;
+									s.add(item._mod * this->_score_multiplicator);
 									item._collected = true;
 									_audio.play_static(*_pickup_sound_coin);
 								});
@@ -241,6 +254,8 @@ namespace item {
 			process(e.get<Drop_comp>(),
 			        e.get<physics::Transform_comp>())
 			        >> [&](Drop_comp& d, physics::Transform_comp& t) {
+				up_score_multiplicator();
+
 				if(d._group>=0 && d._group<int8_t(_droprates->groups.size())) {
 					auto group = _droprates->groups[d._group];
 

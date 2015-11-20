@@ -277,7 +277,7 @@ namespace mo {
 	      items(engine.assets(), engine.audio_ctx(), em, physics, transform, state, particle_renderer),
 	      elements(engine.assets(), em, combat),
 	      soundsys(engine.assets(), em, transform, engine.audio_ctx()),
-		  ui(engine, em, transform) {
+	      ui(engine, em, transform, [&](){return this->items.score_multiplicator();}) {
 		em.register_component_type<Player_tag_comp>();
 
 		graphics.effects.connect(effect_bus);

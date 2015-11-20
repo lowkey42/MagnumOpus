@@ -48,6 +48,9 @@ namespace item {
 
 			void update(Time dt);
 
+			void up_score_multiplicator();
+			auto score_multiplicator()const noexcept {return _score_multiplicator;}
+
 		private:
 			void _on_collision(physics::Manifold& m);
 			void _drop_loot(ecs::Entity&, sys::state::State_data&);
@@ -65,6 +68,9 @@ namespace item {
 			audio::Sound_ptr _pickup_sound_coin;
 			audio::Sound_ptr _pickup_sound_health;
 			audio::Sound_ptr _pickup_sound_other;
+
+			float _score_multiplicator = 1.f;
+			Time _score_mult_ttl = Time(0);
 	};
 }
 }

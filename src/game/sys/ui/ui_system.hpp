@@ -36,7 +36,8 @@ namespace ui {
 
 	class Ui_system {
 		public:
-			Ui_system(Game_engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms);
+			Ui_system(Game_engine& e, ecs::Entity_manager& em, physics::Transform_system& transforms,
+			          std::function<float()> score_multiplicator);
 
 			void update(Time dt);
 			void draw(const renderer::Camera& world_cam);
@@ -55,7 +56,9 @@ namespace ui {
 
 			renderer::Shader_program _score_shader;
 			renderer::Font_ptr    _score_font;
+			renderer::Font_ptr     _score_mult_font;
 			renderer::Text_dynamic _score_text;
+			renderer::Text_dynamic _score_mult_text;
 
 			renderer::Textured_box _join_msg;
 
@@ -68,6 +71,8 @@ namespace ui {
 			std::function<bool()> _player_ready;
 			bool _last_player_ready = false;
 			Time _join_msg_fade = Time{0};
+
+			std::function<float()> _score_multiplicator;
 	};
 
 }
