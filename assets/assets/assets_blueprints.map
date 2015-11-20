@@ -25,6 +25,7 @@ blueprint:barrel = blueprints/barrel.json
 
 blueprint:coin = blueprints/coin.json
 blueprint:health_potion = blueprints/health_potion.json
+blueprint:bullet_time = blueprints/bullet_time.json
 
 blueprint:element_fire = blueprints/element_fire.json
 blueprint:element_frost = blueprints/element_frost.json

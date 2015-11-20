@@ -46,10 +46,12 @@ namespace item {
 			            state::State_system& state_system,
 			            renderer::Particle_renderer& particles);
 
-			void update(Time dt);
+			void update(Time realtime_dt, Time dt);
 
 			void up_score_multiplicator();
 			auto score_multiplicator()const noexcept {return _score_multiplicator;}
+
+			auto bullet_time_active()const noexcept {return _bullet_time_left>Time(0);}
 
 		private:
 			void _on_collision(physics::Manifold& m);
@@ -71,6 +73,8 @@ namespace item {
 
 			float _score_multiplicator = 1.f;
 			Time _score_mult_ttl = Time(0);
+
+			Time _bullet_time_left = Time(0);
 	};
 }
 }

@@ -111,11 +111,14 @@ namespace item {
 		_score_mult_ttl = score_mult_max_ttl;
 	}
 
-	void Item_system::update(Time dt) {
+	void Item_system::update(Time realtime_dt, Time dt) {
 		if(_score_mult_ttl>0_s)
 			_score_mult_ttl-=dt;
 		else
 			_score_multiplicator = std::max(1.f, _score_multiplicator - dt/1_s);
+
+		if(_bullet_time_left>Time(0))
+			_bullet_time_left -= realtime_dt;
 
 		for(auto& c : _collectors) {
 			if(c._active) {
@@ -237,6 +240,12 @@ namespace item {
 										_audio.play_static(*_pickup_sound_other);
 									}
 								});
+								break;
+
+							case bullet_time:
+								_bullet_time_left = Time(item._mod);
+								item._collected = true;
+								_audio.play_static(*_pickup_sound_other);
 								break;
 						}
 					}

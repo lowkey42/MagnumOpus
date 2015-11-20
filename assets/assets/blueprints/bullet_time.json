@@ -1,0 +1,18 @@
+{
+    "Transform":{"layer":0.2, "rot":135, "rotation_fixed":true},
+	"Physics":{
+        "radius": 0.2,
+        "mass": 1.0,
+        "restitution": 0.01,
+		"friction": 0.01,
+        "group":4
+    },
+    "Item": {
+        "target": "bullet_time",
+        "mod": 10,
+        "joinable": false
+    },
+    "Sprite": {
+        "aid": "anim:bullet_time"
+    }
+}

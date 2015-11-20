@@ -24,3 +24,4 @@ anim:stoneball = animations/stoneball.json
 anim:vomitball = animations/vomitball.json
 
 anim:health_potion = animations/health_potion.json
+anim:bullet_time = animations/bullet_time.json

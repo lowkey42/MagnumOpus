@@ -342,10 +342,22 @@ namespace mo {
 		}
 	}
 
+	float Game_state::saturation()const {
+		return _screen_saturation;
+	}
 	void Game_state::update(Time dt) {
 		em.process_queued_actions();
 
-		auto wdt = !main_player ? dt : main_player->get<sys::controller::Controllable_comp>().process(dt, [dt](auto& p){
+		auto saturation = !items.bullet_time_active() ? 1.f : main_player->get<sys::controller::Controllable_comp>().process(1.f, [](auto& p){
+			if(p.active())
+				return 0.4f;
+			else
+				return 0.0f;
+		});
+		_screen_saturation=glm::mix(_screen_saturation, saturation, dt.value()*5.f);
+
+
+		auto wdt = !main_player || !items.bullet_time_active() ? dt : main_player->get<sys::controller::Controllable_comp>().process(dt, [dt](auto& p){
 			if(p.active())
 				return dt;
 			else
@@ -356,7 +368,7 @@ namespace mo {
 		controller.update(dt);
 		transform.update(dt);
 		physics.update(wdt);
-		items.update(dt);
+		items.update(dt, wdt);
 		combat.update(wdt);
 		camera.update(dt);
 		graphics.update(wdt);

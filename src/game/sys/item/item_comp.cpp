@@ -23,7 +23,8 @@ namespace item {
 	sf2_enumDef(Item_target,
 		sf2_value(health),
 		sf2_value(score),
-		sf2_value(element)
+		sf2_value(element),
+		sf2_value(bullet_time)
 	)
 	sf2_structDef(Item_comp::Persisted_state,
 		sf2_member(target),

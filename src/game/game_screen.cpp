@@ -314,6 +314,7 @@ namespace mo {
 			_post_effects.bind().set_uniform("VP", vp)
 			        .set_uniform("fade", fade)
 			        .set_uniform("texture", 0)
+			        .set_uniform("saturate", _state->saturation())
 			        .set_uniform("brightness", _engine.graphics_ctx().brightness())
 			        .set_uniform("lightmap", 1);
 			screen.vscreen.bind();

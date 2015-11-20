@@ -109,6 +109,8 @@ namespace mo {
 
 		void forcefeedback(Position, float);
 
+		float saturation()const;
+
 		static auto create(Game_engine& engine,
 		                   std::string name) -> std::unique_ptr<Game_state>;
 		static auto create(Game_engine& engine,
@@ -122,6 +124,8 @@ namespace mo {
 
 		private:
 			Game_state(Game_engine& engine, Profile_data profile);
+
+			float _screen_saturation=1.f;
 	};
 
 	struct Saveable_state {

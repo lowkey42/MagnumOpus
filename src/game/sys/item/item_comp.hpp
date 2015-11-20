@@ -27,7 +27,8 @@ namespace item {
 	enum Item_target {
 		health,
 		score,
-		element
+		element,
+		bullet_time
 	};
 
 	class Item_comp : public ecs::Component<Item_comp> {
