@@ -345,18 +345,25 @@ namespace mo {
 	void Game_state::update(Time dt) {
 		em.process_queued_actions();
 
-		ai.update(dt);
+		auto wdt = !main_player ? dt : main_player->get<sys::controller::Controllable_comp>().process(dt, [dt](auto& p){
+			if(p.active())
+				return dt;
+			else
+				return dt/10.f;
+		});
+
+		ai.update(wdt);
 		controller.update(dt);
 		transform.update(dt);
-		physics.update(dt);
+		physics.update(wdt);
 		items.update(dt);
-		combat.update(dt);
+		combat.update(wdt);
 		camera.update(dt);
-		graphics.update(dt);
-		soundsys.update(dt);
-		state.update(dt);
+		graphics.update(wdt);
+		soundsys.update(wdt);
+		state.update(wdt);
 		ui.update(dt);
-		particle_renderer.update(dt, camera.main_camera());
+		particle_renderer.update(wdt, camera.main_camera());
 
 		camera.draw(
 			[&](const renderer::Camera& cam,
