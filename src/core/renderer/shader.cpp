@@ -17,7 +17,7 @@ namespace renderer {
 				case Shader_type::vertex:   return GL_VERTEX_SHADER;
 				case Shader_type::fragment: return GL_FRAGMENT_SHADER;
 				default: FAIL("Unsupported ShaderType");
-                return 0;
+				return 0;
 			}
 		}
 
@@ -49,29 +49,8 @@ namespace renderer {
 	}
 
 	Shader::Shader(Shader_type type, const std::string& source, const std::string name)throw(Shader_compiler_error) {
-		auto shader_source = util::replace(source, "#version auto",
-#ifdef EMSCRIPTEN
-				"#version 100\n"
-				"precision mediump float;"
-#else
-				"#version 330\n"
-				"out vec4 _fragColor;"
-#endif
-		);
-
-#ifdef EMSCRIPTEN
-		shader_source = util::replace(shader_source, "\nin ", type==Shader_type::fragment ? "\nvarying " : "\nattribute " );
-		shader_source = util::replace(shader_source, "\nout ", type==Shader_type::fragment ? "\n#ERROR " : "\nvarying ");
-
-#else
-		shader_source = util::replace(shader_source, "gl_FragColor", "_fragColor");
-//		shader_source = util::replace(shader_source, "\nin ", "\nin ");
-//		shader_source = util::replace(shader_source, "\nout ", "\nout ");
-#endif
-
-
-		char const * source_pointer = shader_source.c_str();
-		int len = shader_source.length();
+		char const * source_pointer = source.c_str();
+		int len = source.length();
 
 		_handle = glCreateShader(shader_type_to_GLenum(type));
 		glShaderSource(_handle, 1, &source_pointer , &len);
@@ -140,11 +119,6 @@ namespace renderer {
 		for(auto& s : _attached_shaders)
 			glAttachShader(_handle, s->_handle);
 
-		#ifdef EMSCRIPTEN
-
-		#else
-			glBindFragDataLocation(_handle, 0, "_fragColor");
-		#endif
 
 		glLinkProgram(_handle);
 

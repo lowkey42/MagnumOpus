@@ -1,7 +1,8 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 tex_coords;
-in vec4 fcolor;
+varying vec2 tex_coords;
+varying vec4 fcolor;
 
 uniform sampler2D texture;
 
@@ -10,6 +11,6 @@ void main() {
 
 	if(c.a>0.0) {
 		gl_FragColor = c * fcolor;
-	}else
+	} else
 		discard;
 }

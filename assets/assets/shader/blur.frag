@@ -1,6 +1,7 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 uvl;
+varying vec2 uvl;
 
 uniform sampler2D texture;
 uniform bool horiz;

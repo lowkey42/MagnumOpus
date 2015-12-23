@@ -1,6 +1,7 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 uvl;
+varying vec2 uvl;
 
 uniform sampler2D tex;
 
@@ -9,6 +10,6 @@ void main() {
 
 	if(c.a>0.0) {
 		gl_FragColor = c;
-	}else
+	} else
 		discard;
 }
