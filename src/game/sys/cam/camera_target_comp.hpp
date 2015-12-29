@@ -25,8 +25,9 @@ namespace cam {
 	class Camera_target_comp : public ecs::Component<Camera_target_comp> {
 		public:
 			static constexpr const char* name() {return "Camera_target";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Camera_target_comp(ecs::Entity& owner, Mass mass=Mass(0.1), float damping=0.5, float freq=3, float lazyness=2)
 			    : Component(owner), _mass(mass), _damping(damping), _freq(freq), _lazyness(lazyness) {}
@@ -38,8 +39,6 @@ namespace cam {
 			void chase(Position target, Time dt);
 			void reset();
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			friend class Camera_system;
 

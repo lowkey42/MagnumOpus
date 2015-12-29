@@ -28,8 +28,9 @@ namespace graphic {
 	class Particle_emiter_comp : public ecs::Component<Particle_emiter_comp> {
 		public:
 			static constexpr const char* name() {return "Particle_emiter";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Particle_emiter_comp(ecs::Entity& owner)
 			    : Component(owner) {}
@@ -41,8 +42,6 @@ namespace graphic {
 			                   bool scale=false);
 			auto particle_type(std::size_t i)const noexcept;
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 			friend class Graphic_system;
 
 		private:

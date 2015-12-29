@@ -22,16 +22,16 @@
         "follow_time":4.0,
         "swarm_id":-1
     },
-    "State",
+    "State":{},
     "Friend":{
         "group": 1
     },
     "Health":{
         "max_hp": 20,
         "physical_resistence": 0.5,
-        "vulnerabilities": [water],
-        "resistences": [fire],
-        "death_effect": blood,
+        "vulnerabilities": ["water"],
+        "resistences": ["fire"],
+        "death_effect": "blood",
         "death_force_feedback": 1.0
      },
     "Weapon":{
@@ -45,5 +45,5 @@
         }
     },
     "Drop":{"group":2},
-    "ui_min"
+    "ui_min":{}
 }

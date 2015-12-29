@@ -3,7 +3,6 @@
 #include "particle_emiter_comp.hpp"
 
 #include <sf2/sf2.hpp>
-#include <core/ecs/serializer_impl.hpp>
 
 #include "../../sys/physics/transform_comp.hpp"
 
@@ -31,46 +30,42 @@ namespace graphic {
 		bool temporary=false;
 	};
 
-	struct Particle_emiter_comp::Persisted_state {
-		std::vector<Emiter_state> emiters;
-
-		Persisted_state(const Particle_emiter_comp& p, bool save=false) {
-/* Particle Emiters are currently not serialised */
-
-			if(save) {
-				emiters.reserve(max_emiters);
-				for(auto i : range(max_emiters)) {
-					auto& e = p._emiters[i];
-					emiters.push_back({e._type, e._enabled, e._scale});
-				}
-			}
-		}
-	};
-
 	sf2_structDef(Emiter_state,
-		sf2_member(type),
-		sf2_member(enabled),
-		sf2_member(scale)
-	)
-	sf2_structDef(Particle_emiter_comp::Persisted_state,
-		sf2_member(emiters)
+		type,
+		enabled,
+		scale
 	)
 
-	void Particle_emiter_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
+	void Particle_emiter_comp::load(sf2::JsonDeserializer& state,
+	                                asset::Asset_manager&) {
+		std::vector<Emiter_state> emiters;
+		emiters.reserve(max_emiters);
+
+		state.read_virtual(
+			sf2::vmember("emiters", emiters)
+		);
 
 		for(auto i : range(max_emiters)) {
-			if(i>=s.emiters.size())
+			if(i>=emiters.size())
 				continue;
 
-			auto& se = s.emiters.at(i);
+			auto& se = emiters.at(i);
 
 			particle_type(i, se.type, se.scale);
 			enabled(i, se.enabled);
 		}
 	}
-	void Particle_emiter_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this, true});
+	void Particle_emiter_comp::save(sf2::JsonSerializer& state)const {
+		std::vector<Emiter_state> emiters;
+		emiters.reserve(max_emiters);
+		for(auto i : range(max_emiters)) {
+			auto& e = _emiters[i];
+			emiters.push_back({e._type, e._enabled, e._scale});
+		}
+
+		state.write_virtual(
+			sf2::vmember("emiters", emiters)
+		);
 	}
 
 	void Particle_emiter_comp::enabled(std::size_t i, bool e, bool temp) {

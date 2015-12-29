@@ -5,10 +5,22 @@ if(WIN32 OR EMSCRIPTEN)
 	SET(PHYSFS_ARCHIVE_7Z FALSE)
 endif(WIN32 OR EMSCRIPTEN)
 
+if(NOT CMAKE_BUILD_TYPE)
+	set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
 set(ROOT_DIR ${CMAKE_SOURCE_DIR})
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${ROOT_DIR}/modules")
-include_directories(AFTER ${ROOT_DIR}/dependencies)
+
+include_directories(BEFORE ${ROOT_DIR}/dependencies)
+include_directories(BEFORE ${ROOT_DIR}/dependencies/sf2/include)
+include_directories(BEFORE ${ROOT_DIR}/dependencies/gsl/include)
 add_definitions(-DGLM_FORCE_RADIANS)
+add_definitions(-DENABLE_SF2_ASSETS)
+if(NOT EMSCRIPTEN)
+	add_definitions(-DSTACKTRACE)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-pie")
+endif()
 
 add_subdirectory(dependencies/physfs)
 add_subdirectory(dependencies/soil)

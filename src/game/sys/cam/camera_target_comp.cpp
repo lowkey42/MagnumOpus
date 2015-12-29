@@ -1,6 +1,5 @@
 #include "camera_target_comp.hpp"
 #include <sf2/sf2.hpp>
-#include "../../../core/ecs/serializer_impl.hpp"
 #include "../../../core/utils/math.hpp"
 
 namespace mo {
@@ -10,31 +9,26 @@ namespace cam {
 	using namespace unit_literals;
 
 
+	void Camera_target_comp::load(sf2::JsonDeserializer& state,
+	                              asset::Asset_manager&) {
+		float mass_f = _mass / 1_kg;
 
-	struct Camera_target_comp::Persisted_state {
-		float mass, damping, freq, lazyness;
+		state.read_virtual(
+			sf2::vmember("mass", mass_f),
+			sf2::vmember("damping", _damping),
+			sf2::vmember("freq", _freq),
+			sf2::vmember("lazyness", _lazyness)
+		);
 
-		Persisted_state(const Camera_target_comp& c)
-				: mass(c._mass.value()), damping(c._damping),
-		          freq(c._freq), lazyness(c._lazyness) {}
-	};
-
-	sf2_structDef(Camera_target_comp::Persisted_state,
-		sf2_member(mass),
-		sf2_member(damping),
-		sf2_member(freq),
-		sf2_member(lazyness)
-	)
-
-	void Camera_target_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
-		_mass = Mass(s.mass);
-		_damping = s.damping;
-		_freq = s.freq;
-		_lazyness = s.lazyness;
+		_mass = mass_f * 1_kg;
 	}
-	void Camera_target_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Camera_target_comp::save(sf2::JsonSerializer& state)const {
+		state.write_virtual(
+			sf2::vmember("mass", _mass / 1_kg),
+			sf2::vmember("damping", _damping),
+			sf2::vmember("freq", _freq),
+			sf2::vmember("lazyness", _lazyness)
+		);
 	}
 
 	void Camera_target_comp::chase(Position target, Time dt) {

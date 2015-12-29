@@ -48,17 +48,15 @@ namespace sound {
 	public:
 
 		static constexpr const char* name() {return "Sound";}
-		void load(ecs::Entity_state&)override;
-		void store(ecs::Entity_state&)override;
+		void load(sf2::JsonDeserializer& state,
+		          asset::Asset_manager& asset_mgr)override;
+		void save(sf2::JsonSerializer& state)const override;
 
 		// TODO: nullptr check
 		Sound_comp(ecs::Entity& owner, asset::Ptr<Sound_comp_data> sc_data = asset::Ptr<Sound_comp_data>()) :
 			Component(owner), _sc_data(sc_data){}
 
 		std::shared_ptr<const audio::Sound> get_sound(int pos) const noexcept;
-
-		struct Persisted_state;
-		friend struct Persisted_state;
 
 	private:
 		friend class Sound_system;

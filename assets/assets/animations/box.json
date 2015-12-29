@@ -1,6 +1,6 @@
 ﻿{
 	"animations": {
-		"idle": {"row":0, "fps":1, "frames":1}
+		"idle": {"row":0, "fps":1, "frames":1},
 		"died": {"row":1, "fps":1, "frames":1}
 	},
 	

@@ -8,7 +8,6 @@
 #include <core/units.hpp>
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 
 namespace mo {
@@ -63,38 +62,9 @@ namespace sound {
 			std::unordered_map<Effect_type, Sound_effect_data_value> effects;
 		};
 
-		sf2_structDef(Sound_effect_data_value, sf2_member(sound), sf2_member(is_static))
-		sf2_structDef(Sound_effect_data, sf2_member(effects))
+		sf2_structDef(Sound_effect_data_value, sound, is_static)
+		sf2_structDef(Sound_effect_data, effects)
 	}
-}
-}
-}
-
-namespace mo {
-namespace asset {
-	template<>
-	struct Loader<sys::sound::Sound_effect_data> {
-		using RT = std::shared_ptr<sys::sound::Sound_effect_data>;
-
-		static RT load(istream in) throw(Loading_failed) {
-			auto r = std::make_shared<sys::sound::Sound_effect_data>();
-
-			sf2::parseStream(in, *r);
-
-			return r;
-		}
-
-		static void store(ostream out, const sys::sound::Sound_effect_data& asset) throw(Loading_failed) {
-			sf2::writeStream(out,asset);
-		}
-	};
-}
-}
-
-
-namespace mo {
-namespace sys {
-namespace sound {
 
 	Sound_system::Sound_system(asset::Asset_manager& assets,
 	                           ecs::Entity_manager& entity_manager,

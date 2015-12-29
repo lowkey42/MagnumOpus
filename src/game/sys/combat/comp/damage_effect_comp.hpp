@@ -38,8 +38,9 @@ namespace combat {
 	class Damage_effect_comp : public ecs::Component<Damage_effect_comp> {
 		public:
 			static constexpr const char* name() {return "DmgEffect";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Damage_effect_comp(ecs::Entity& owner,
 			                   Damage_effect etype=Damage_effect::none) noexcept
@@ -51,8 +52,6 @@ namespace combat {
 			auto confusion()const noexcept {return _confusion;}
 
 			friend class Combat_system;
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			Damage_effect _type = Damage_effect::none;
 
@@ -73,12 +72,12 @@ namespace sys {
 namespace combat {
 
 	sf2_enumDef(Damage_effect,
-		sf2_value(none),
-		sf2_value(burning),
-		sf2_value(poisoned),
-		sf2_value(wet),
-		sf2_value(frozen),
-		sf2_value(blinded)
+		none,
+		burning,
+		poisoned,
+		wet,
+		frozen,
+		blinded
 	)
 
 }

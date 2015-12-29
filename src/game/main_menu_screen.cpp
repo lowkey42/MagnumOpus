@@ -49,8 +49,6 @@ namespace mo {
 
 			return ss.str();
 		}
-
-		constexpr Time fade = 2_s;
 	}
 
 	Main_menu_screen::Main_menu_screen(Game_engine& game_engine, bool ingame)

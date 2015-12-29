@@ -25,13 +25,13 @@
         "follow_time":2.0,
         "swarm_id":1
     },
-    "State",
+    "State": {},
     "Friend":{
         "group": 1
     },
     "Health":{
         "max_hp": 10,
-        "death_effect": blood
+        "death_effect": "blood"
      },
     "Weapon":{
         "weapon":{
@@ -44,5 +44,5 @@
         }
     },
     "Drop":{"group":1},
-    "ui_min"
+    "ui_min": {}
 }

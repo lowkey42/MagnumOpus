@@ -5,79 +5,57 @@
 #include <cstdio>
 #include <GL/glew.h>
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #include "../utils/log.hpp"
 #include "../asset/asset_manager.hpp"
 
-namespace {
-	void sdl_error_check() {
-		const char *err = SDL_GetError();
-		if(*err != '\0') {
-			std::string errorStr(err);
-			SDL_ClearError();
-			FAIL("SDL: "<<errorStr);
-		}
-	}
-
-#ifndef EMSCRIPTEN
-	void
-#ifdef GLAPIENTRY
-	GLAPIENTRY
-#endif
-	gl_debug_callback(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void*) {
-		WARN(std::string(message,length)<<" (source: "<<source<<", type: "<<type<<", id: "<<id<<", severity: "<<severity<<")");
-	}
-#endif
-
-
-	struct Graphics_cfg {
-		int width;
-		int height;
-		bool fullscreen;
-		float max_screenshake = 0.5;
-		float brightness = 1.1;
-	};
-
-	sf2_structDef(Graphics_cfg,
-		sf2_member(width),
-		sf2_member(height),
-		sf2_member(fullscreen),
-		sf2_member(max_screenshake),
-		sf2_member(brightness)
-	)
-
-#ifndef EMSCRIPTEN
-	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.2f};
-#else
-	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.2f};
-#endif
-
-}
-
-namespace mo {
-namespace asset {
-	template<>
-	struct Loader<Graphics_cfg> {
-		using RT = std::shared_ptr<Graphics_cfg>;
-
-		static RT load(istream in) throw(Loading_failed) {
-			auto r = std::make_shared<Graphics_cfg>();
-
-			sf2::parseStream(in, *r);
-
-			return r;
-		}
-
-		static void store(ostream out, const Graphics_cfg& asset) throw(Loading_failed) {
-			sf2::writeStream(out,asset);
-		}
-	};
-}
-}
-
 namespace mo {
 namespace renderer {
+	namespace {
+		void sdl_error_check() {
+			const char *err = SDL_GetError();
+			if(*err != '\0') {
+				std::string errorStr(err);
+				SDL_ClearError();
+				FAIL("SDL: "<<errorStr);
+			}
+		}
+
+	#ifndef EMSCRIPTEN
+		void
+	#ifdef GLAPIENTRY
+		GLAPIENTRY
+	#endif
+		gl_debug_callback(GLenum source,GLenum type,GLuint id,GLenum severity,GLsizei length,const GLchar* message,const void*) {
+			WARN(std::string(message,length)<<" (source: "<<source<<", type: "<<type<<", id: "<<id<<", severity: "<<severity<<")");
+		}
+	#endif
+
+
+		struct Graphics_cfg {
+			int width;
+			int height;
+			bool fullscreen;
+			float max_screenshake = 0.5;
+			float brightness = 1.1;
+		};
+
+		sf2_structDef(Graphics_cfg,
+			width,
+			height,
+			fullscreen,
+			max_screenshake,
+			brightness
+		)
+
+	#ifndef EMSCRIPTEN
+		constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.2f};
+	#else
+		constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.2f};
+	#endif
+
+	}
+
 
 	Graphics_ctx::Graphics_ctx(const std::string& name, asset::Asset_manager& assets)
 	 : _assets(assets), _name(name), _window(nullptr, SDL_DestroyWindow) {

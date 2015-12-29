@@ -18,7 +18,7 @@
     "Bullet": {
         "damage": 1
     },
-    "Friend",
+    "Friend": {},
     "State": {
         "delete_dead":true
     },

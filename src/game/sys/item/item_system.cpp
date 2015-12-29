@@ -1,7 +1,6 @@
 #include "item_system.hpp"
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #include <core/asset/asset_manager.hpp>
 #include <core/utils/random.hpp>
@@ -32,34 +31,10 @@ namespace item {
 		std::vector<Droprate_group> groups;
 	};
 
-	sf2_structDef(Droprate, sf2_member(item_aid), sf2_member(chance), sf2_member(min), sf2_member(max))
-	sf2_structDef(Droprate_group, sf2_member(values))
-	sf2_structDef(Droprate_conf, sf2_member(groups))
-}
-}
-namespace asset {
-	template<>
-	struct Loader<sys::item::Droprate_conf> {
-		using RT = std::shared_ptr<sys::item::Droprate_conf>;
+	sf2_structDef(Droprate, item_aid, chance, min, max)
+	sf2_structDef(Droprate_group, values)
+	sf2_structDef(Droprate_conf, groups)
 
-		static RT load(istream in) throw(Loading_failed) {
-			auto r = std::make_shared<sys::item::Droprate_conf>();
-
-			sf2::parseStream(in, *r);
-
-			return r;
-		}
-
-		static void store(ostream out, const sys::item::Droprate_conf& asset) throw(Loading_failed) {
-			sf2::writeStream(out,asset);
-		}
-	};
-}
-}
-
-namespace mo {
-namespace sys {
-namespace item {
 
 	using namespace unit_literals;
 	using namespace combat;

@@ -19,7 +19,7 @@
         "damage": 3,
         "damage_type": "stone"
     },
-    "Friend",
+    "Friend": {},
     "State": {
         "delete_dead":true
     },

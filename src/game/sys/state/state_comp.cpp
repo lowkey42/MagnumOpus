@@ -1,7 +1,5 @@
 #include "state_comp.hpp"
 
-#include <core/ecs/serializer_impl.hpp>
-
 namespace mo {
 namespace sys {
 namespace state {
@@ -22,36 +20,39 @@ namespace state {
 	};
 
 	sf2_enumDef(Entity_state,
-		sf2_value(idle),
-		sf2_value(walking),
-		sf2_value(attacking_melee),
-		sf2_value(attacking_range),
-		sf2_value(interacting),
-		sf2_value(taking),
-		sf2_value(change_weapon),
-		sf2_value(damaged),
-		sf2_value(healed),
-		sf2_value(dying),
-		sf2_value(dead),
-		sf2_value(resurrected)
+		idle,
+		walking,
+		attacking_melee,
+		attacking_range,
+		interacting,
+		taking,
+		change_weapon,
+		damaged,
+		healed,
+		dying,
+		dead,
+		resurrected
 	)
 
 	sf2_structDef(State_comp::Persisted_state,
-		sf2_member(state),
-		sf2_member(state_background),
-		sf2_member(state_left),
-		sf2_member(state_bg_left),
-		sf2_member(delete_dead)
+		state,
+		state_background,
+		state_left,
+		state_bg_left,
+		delete_dead
 	)
 
-	void State_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
+	void State_comp::load(sf2::JsonDeserializer& state,
+	                      asset::Asset_manager&) {
+		auto s = Persisted_state{*this};
+		state.read(s);
 		_state_primary = State_data{s.state, 1.0f, s.state_left*1_s};
 		_state_background = {s.state_background, 1.0f, s.state_bg_left*1_s};
 		_delete_dead = s.delete_dead;
 	}
-	void State_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void State_comp::save(sf2::JsonSerializer& state)const {
+		auto s = Persisted_state{*this};
+		state.write(s);
 	}
 
 	namespace {

@@ -37,8 +37,9 @@ namespace item {
 	class Element_comp : public ecs::Component<Element_comp> {
 		public:
 			static constexpr const char* name() {return "Element";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Element_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}

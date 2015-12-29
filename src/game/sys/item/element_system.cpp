@@ -6,7 +6,6 @@
 
 #include <core/asset/asset_manager.hpp>
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #include <vector>
 
@@ -20,10 +19,10 @@ namespace item {
 	namespace {
 
 		struct Config_data {
-			std::map<std::vector<Element>, combat::Weapon::Persisted_state> weapons;
+			std::map<std::vector<Element>, combat::Weapon> weapons;
 		};
 		sf2_structDef(Config_data,
-			sf2_member(weapons)
+			weapons
 		)
 	}
 
@@ -49,10 +48,12 @@ namespace asset {
 			auto r = std::make_shared<Type>();
 
 			sys::item::Config_data data;
-			sf2::parseStream(in, data);
+			sf2::deserialize_json(in, [&](auto& msg, uint32_t row, uint32_t column) {
+				ERROR("Error parsing JSON from "<<in.aid().str()<<" at "<<row<<":"<<column<<": "<<msg);
+			}, data);
 
 			for(auto& rec : data.weapons) {
-				r->weapons.emplace(rec.first, rec.second.to_weapon());
+				r->weapons.emplace(rec.first, rec.second);
 			}
 
 			return r;

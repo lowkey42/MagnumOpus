@@ -32,8 +32,9 @@ namespace combat {
 	class Laser_sight_comp : public ecs::Component<Laser_sight_comp> {
 		public:
 			static constexpr const char* name() {return "Laser_sight";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Laser_sight_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}
@@ -41,8 +42,6 @@ namespace combat {
 			auto color()const noexcept {return _color;}
 			auto width()const noexcept {return _width;}
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			glm::vec4 _color {1,0,0,0.2};
 			float _width = 0.04;
@@ -78,10 +77,6 @@ namespace combat {
 		float       force_feedback=0.f;
 
 		Weapon() = default;
-		// TODO[seb]: remove if not required under windows
-		// ~Weapon() = default;
-		// Weapon(const Weapon&) = default;
-		// Weapon& operator=(const Weapon&) = default;
 
 		Weapon(Weapon_type type, asset::AID bullet_type, Speed bullet_vel, Angle spreading, int bullet_count,
 		       Effect_type effect, Element damage_type, Damage_effect damage_effect, float melee_damage, Distance melee_range, Angle melee_angle,
@@ -91,22 +86,20 @@ namespace combat {
 		      melee_range(melee_range), melee_angle(melee_angle), attack_delay(attack_delay), cooldown(cooldown),
 		      recoil(recoil), fuel_usage(fuel_usage), force_feedback(force_feedback) {}
 
-		struct Persisted_state;
 	};
 
 	class Weapon_comp : public ecs::Component<Weapon_comp> {
 		public:
 			static constexpr const char* name() {return "Weapon";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager&)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Weapon_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}
 
 			void attack()noexcept{_attack = true;}
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			friend class Combat_system;
 
@@ -157,91 +150,79 @@ namespace sys {
 namespace combat {
 	using namespace unit_literals;
 
-	struct Weapon::Persisted_state {
-		Weapon_type type;
-		std::string bullet_type;
-		float bullet_velocity;
-		float spreading = 0;
-		int bullet_count = 1;
+	sf2_enumDef(Weapon_type, range, melee)
 
-		Effect_type effect = Effect_type::none;
-		Element damage_type   = Element::neutral;
-		Damage_effect damage_effect = Damage_effect::none;
+	inline void save(sf2::JsonSerializer& s, const Weapon& w) {
+		std::string bullet_type = w.bullet_type ? w.bullet_type.name() : "";
+		float bullet_velocity = w.bullet_vel / (1_km/hour);
+		float spreading = w.spreading.in_degrees()*2;
+		float melee_range = w.melee_range / 1_m;
+		float melee_angle = w.melee_angle / 1_deg;
+		float attack_delay = w.attack_delay / 1_s;
+		float cooldown = w.cooldown / 1_s;
+		float recoil = w.recoil / 1_n;
 
-		float melee_damage = 0;
-		float melee_range = 1;
-		float melee_angle = 90;
+		s.write_virtual(
+			sf2::vmember("type", w.type),
+			sf2::vmember("bullet_type", bullet_type),
+			sf2::vmember("bullet_velocity", bullet_velocity),
+			sf2::vmember("spreading", spreading),
+			sf2::vmember("bullet_count", w.bullet_count),
+			sf2::vmember("effect", w.effect),
+			sf2::vmember("damage_type", w.damage_type),
+			sf2::vmember("damage_effect", w.damage_effect),
+			sf2::vmember("melee_damage", w.melee_damage),
+			sf2::vmember("melee_range", melee_range),
+			sf2::vmember("melee_angle", melee_angle),
+			sf2::vmember("attack_delay", attack_delay),
+			sf2::vmember("cooldown", cooldown),
+			sf2::vmember("recoil", recoil),
+			sf2::vmember("fuel_usage", w.fuel_usage),
+			sf2::vmember("force_feedback", w.force_feedback)
+		);
+	}
 
-		float attack_delay = 0;
-		float cooldown = 1;
+	inline void load(sf2::JsonDeserializer& s, Weapon& w) {
+		std::string bullet_type = w.bullet_type ? w.bullet_type.name() : "";
+		float bullet_velocity = w.bullet_vel / (1_km/hour);
+		float spreading = w.spreading.in_degrees()*2;
+		float melee_range = w.melee_range / 1_m;
+		float melee_angle = w.melee_angle / 1_deg;
+		float attack_delay = w.attack_delay / 1_s;
+		float cooldown = w.cooldown / 1_s;
+		float recoil = w.recoil / 1_n;
 
-		float recoil = 0;
+		s.read_virtual(
+			sf2::vmember("type", w.type),
+			sf2::vmember("bullet_type", bullet_type),
+			sf2::vmember("bullet_velocity", bullet_velocity),
+			sf2::vmember("spreading", spreading),
+			sf2::vmember("bullet_count", w.bullet_count),
+			sf2::vmember("effect", w.effect),
+			sf2::vmember("damage_type", w.damage_type),
+			sf2::vmember("damage_effect", w.damage_effect),
+			sf2::vmember("melee_damage", w.melee_damage),
+			sf2::vmember("melee_range", melee_range),
+			sf2::vmember("melee_angle", melee_angle),
+			sf2::vmember("attack_delay", attack_delay),
+			sf2::vmember("cooldown", cooldown),
+			sf2::vmember("recoil", recoil),
+			sf2::vmember("fuel_usage", w.fuel_usage),
+			sf2::vmember("force_feedback", w.force_feedback)
+		);
 
-		float fuel_usage = 0.f;
-		float force_feedback = 0.f;
+		w.bullet_type = bullet_type.empty() ? asset::AID()
+		                         : asset::AID{asset::Asset_type::blueprint,
+		                                      bullet_type};
+		w.bullet_vel = bullet_velocity * (1_km/hour);
+		w.spreading = spreading/2 * 1_deg;
+		w.melee_range = melee_range * 1_m;
+		w.melee_angle = melee_angle * 1_deg;
+		w.attack_delay = attack_delay * 1_s;
+		w.cooldown = cooldown * 1_s;
+		w.recoil = recoil * 1_n;
+	}
 
-		Persisted_state() = default;
-		Persisted_state(const Weapon& c)
-		    : type(c.type),
-		      bullet_type(c.bullet_type ? c.bullet_type.name() : ""),
-		      bullet_velocity(c.bullet_vel / (1_km/hour)),
-		      spreading(c.spreading.in_degrees()*2),
-		      bullet_count(c.bullet_count),
-		      effect(c.effect),
-		      damage_type(c.damage_type),
-		      damage_effect(c.damage_effect),
-		      melee_damage(c.melee_damage),
-		      melee_range(c.melee_range.value()),
-		      melee_angle(c.melee_angle / (1_deg).value()),
-		      attack_delay(c.attack_delay.value()),
-		      cooldown(c.cooldown.value()),
-		      recoil(c.recoil.value()),
-		      fuel_usage(c.fuel_usage),
-		      force_feedback(c.force_feedback) {}
-
-		auto to_weapon()const noexcept -> Weapon {
-            return Weapon{
-				type,
-				bullet_type.empty() ? asset::AID()
-				                    : asset::AID{asset::Asset_type::blueprint, bullet_type},
-				bullet_velocity * (1_km/hour),
-				spreading/2.f * 1_deg,
-				bullet_count,
-				effect,
-				damage_type,
-				damage_effect,
-				melee_damage,
-				melee_range * 1_m,
-				melee_angle * 1_deg,
-				attack_delay * 1_s,
-				cooldown * 1_s,
-				recoil * 1_n,
-				fuel_usage,
-				force_feedback
-			};
-		}
-	};
-
-	sf2_enumDef(Weapon_type, sf2_value(range), sf2_value(melee))
-
-	sf2_structDef(Weapon::Persisted_state,
-		sf2_member(type),
-		sf2_member(bullet_type),
-		sf2_member(bullet_velocity),
-		sf2_member(spreading),
-		sf2_member(bullet_count),
-		sf2_member(effect),
-		sf2_member(damage_type),
-		sf2_member(damage_effect),
-		sf2_member(cooldown),
-		sf2_member(melee_damage),
-		sf2_member(melee_range),
-		sf2_member(melee_angle),
-		sf2_member(attack_delay),
-		sf2_member(recoil),
-		sf2_member(fuel_usage),
-		sf2_member(force_feedback)
-	)
 }
 }
 }

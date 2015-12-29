@@ -6,7 +6,6 @@
 
 #include <iomanip>
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #ifdef EMSCRIPTEN
 #include <emscripten.h>
@@ -17,10 +16,10 @@
 namespace mo {
 
 	sf2_structDef(Score,
-		sf2_member(name),
-		sf2_member(score),
-		sf2_member(level),
-		sf2_member(seed)
+		name,
+		score,
+		level,
+		seed
 	)
 
 	namespace {
@@ -28,7 +27,7 @@ namespace mo {
 			std::vector<Score> scores;
 		};
 
-		sf2_structDef(Score_list, sf2_member(scores))
+		sf2_structDef(Score_list, scores)
 
 #ifdef EMSCRIPTEN
 		Score_list global_scores;
@@ -44,26 +43,6 @@ namespace mo {
 		constexpr const char* base_host = "second-system.de";
 		constexpr const char* base_url = "/leaderboard.php";
 	}
-
-	namespace asset {
-		template<>
-		struct Loader<Score_list> {
-			using RT = std::shared_ptr<Score_list>;
-
-			static RT load(istream in) throw(Loading_failed){
-				auto r = std::make_shared<Score_list>();
-
-				sf2::parseStream(in, *r);
-
-				return r;
-			}
-
-			static void store(ostream out, const Score_list& asset) throw(Loading_failed) {
-				sf2::writeStream(out,asset);
-			}
-		};
-	}
-
 
 	void add_score(asset::Asset_manager& assets, Score score) {
 		std::stringstream cs_str;
@@ -128,10 +107,14 @@ namespace mo {
 		emscripten_async_wget_data(url.str().c_str(), nullptr, +[](void* arg, void* data, int len) {
 
 			std::string resp((char*)data, len);
+			auto resps = std::istringstream{resp};
 
-			sf2::io::StringCharSource source(resp);
 			Score_list scores;
-			sf2::ParserDefChooser<Score_list>::get().parse(source, scores);
+
+			sf2::deserialize_json(resps, [&](auto& msg, uint32_t row, uint32_t column) {
+				ERROR("Error parsing JSON from highscore at "<<row<<":"<<column<<": "<<msg);
+			}, scores);
+
 			global_scores.scores = scores.scores;
 
 		}, +[](void* arg) {
@@ -166,9 +149,12 @@ namespace mo {
 
 							if(r->getstatus()==200) {
 
-								sf2::io::StringCharSource source(str);
+								auto source = std::istringstream{str};
 								Score_list scores;
-								sf2::ParserDefChooser<Score_list>::get().parse(source, scores);
+
+								sf2::deserialize_json(source, [&](auto& msg, uint32_t row, uint32_t column) {
+									ERROR("Error parsing JSON from highscore at "<<row<<":"<<column<<": "<<msg);
+								}, scores);
 								frame.assets->save("cfg:highscore"_aid, scores);
 							}
 						},

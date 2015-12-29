@@ -19,37 +19,46 @@
 #include <unordered_map>
 
 #include "ecs.hpp"
+#include "../asset/asset_manager.hpp"
+
+#include <sf2/sf2.hpp>
+
 
 namespace mo {
-	namespace asset {
-		class AID;
-		class Asset_manager;
-	}
+namespace asset {
+	class AID;
+	class Asset_manager;
+}
 
-	namespace ecs {
+namespace ecs {
 
-		// entity transfer object
-		using ETO = std::string;
+	struct EcsSerializer : public sf2::JsonSerializer {
+		EcsSerializer(std::ostream& stream, Entity_manager& m,
+		              asset::Asset_manager& assets)
+			: sf2::JsonSerializer(stream),
+			  manager(m), assets(assets) {
+		}
 
-		class Serializer {
-			public:
-				Serializer(Entity_manager& entityMgr, asset::Asset_manager& assetMgr);
+		Entity_manager& manager;
+		asset::Asset_manager& assets;
+	};
+	struct EcsDeserializer : public sf2::JsonDeserializer {
+		EcsDeserializer(const std::string& source_name,
+		                std::istream& stream, Entity_manager& m,
+		                asset::Asset_manager& assets);
 
-				auto apply(const asset::AID& blueprint, Entity_ptr target)const -> Entity_ptr;
-				void detach(Entity_ptr target)const;
+		Entity_manager& manager;
+		asset::Asset_manager& assets;
+	};
 
-				void write(std::ostream&);
-				void read(std::istream&);
+	extern void load(sf2::JsonDeserializer& s, Entity& e);
+	extern void save(sf2::JsonSerializer& s, const Entity& e);
+	extern void load(sf2::JsonDeserializer& s, Entity_ptr& e);
 
-				void on_reload();
 
-				auto export_entity(Entity& e)const -> ETO;
-				auto import_entity(const ETO& eto) -> Entity_ptr;
+	class Blueprint;
 
-			private:
-				Entity_manager& _entities;
-				asset::Asset_manager& _assets;
-		};
-
-	}
+	extern void apply_blueprint(asset::Asset_manager&, Entity& e,
+	                            asset::AID blueprint);
+}
 }

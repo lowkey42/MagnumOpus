@@ -1,7 +1,6 @@
 #include "animation.hpp"
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 namespace mo{
 namespace renderer{
@@ -29,36 +28,36 @@ namespace renderer{
 	};
 
 	sf2_enumDef(Animation_type,
-		sf2_value(idle),
-		sf2_value(walking),
-		sf2_value(attacking_melee),
-		sf2_value(attacking_range),
-		sf2_value(interacting),
-		sf2_value(taking),
-		sf2_value(change_weapon),
-		sf2_value(damaged),
-		sf2_value(healed),
-		sf2_value(died),
-		sf2_value(dying),
-		sf2_value(resurrected)
+		idle,
+		walking,
+		attacking_melee,
+		attacking_range,
+		interacting,
+		taking,
+		change_weapon,
+		damaged,
+		healed,
+		died,
+		dying,
+		resurrected
 	)
 
 	sf2_structDef(Animation_frame_data,
-		sf2_member(row),
-		sf2_member(fps),
-		sf2_member(frames),
-		sf2_member(modulation)
+		row,
+		fps,
+		frames,
+		modulation
 	)
 
 	sf2_structDef(Animation,
-		sf2_member(_data)
+		_data
 	)
 
 	sf2_structDef(Animation_data,
-		sf2_member(frame_width),
-		sf2_member(frame_height),
-		sf2_member(texName),
-		sf2_member(animations),
+		frame_width,
+		frame_height,
+		texName,
+		animations
 	)
 
 	Animation::Animation(std::unique_ptr<Animation_data> data){
@@ -155,7 +154,9 @@ namespace asset {
 
 	std::shared_ptr<renderer::Animation> Loader<renderer::Animation>::load(istream in) throw(Loading_failed){
 		auto r = std::make_unique<renderer::Animation_data>();
-		sf2::parseStream(in, *r);
+		sf2::deserialize_json(in, [&](auto& msg, uint32_t row, uint32_t column) {
+			ERROR("Error parsing JSON from "<<in.aid().str()<<" at "<<row<<":"<<column<<": "<<msg);
+		}, *r);
 
 		r->texture = in.manager().load<renderer::Texture>(r->texName);
 
@@ -167,7 +168,7 @@ namespace asset {
 
 	void Loader<renderer::Animation>::store(ostream out, const renderer::Animation& asset) throw(Loading_failed) {
 		asset._data->texName = asset._data->texture.aid().name();
-		sf2::writeStream(out, asset);
+		sf2::serialize_json(out, asset);
 	}
 }
 }

@@ -7,7 +7,6 @@
 #include <core/utils/random.hpp>
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #include <algorithm>
 #include <random>
@@ -16,55 +15,38 @@
 
 using namespace mo::util;
 
-namespace {
-	template<typename T>
-	struct Range {
-		T min;
-		T max;
-	};
-	using IntRange = Range<int>;
-	sf2_structDef(IntRange, sf2_member(min), sf2_member(max))
-
-
-	struct Dungeon_cfg {
-		IntRange room_size;
-		IntRange rooms;
-		int max_width, max_height;
-		float split_prop_factor;
-	};
-	sf2_structDef(Dungeon_cfg,
-		sf2_member(room_size),
-		sf2_member(rooms),
-		sf2_member(max_width),
-		sf2_member(max_height),
-		sf2_member(split_prop_factor)
-	)
-
-	struct Dungeon_cfg_map {
-		std::map<int, Dungeon_cfg> levels;
-	};
-	sf2_structDef(Dungeon_cfg_map, sf2_member(levels))
-
-}
-
 namespace mo {
-namespace asset {
-
-	template<>
-	struct Loader<Dungeon_cfg_map> {
-		using T = Dungeon_cfg_map;
-		static auto load(istream in) throw(Loading_failed) -> std::shared_ptr<T> {
-			auto i = std::make_shared<T>();
-			sf2::parseStream(in, *i);
-			return i;
-		}
-		static void store(ostream out, T& asset) throw(Loading_failed);
-	};
-
-}
-
 namespace level {
 	namespace {
+		template<typename T>
+		struct Range {
+			T min;
+			T max;
+		};
+		using IntRange = Range<int>;
+		sf2_structDef(IntRange, min, max)
+
+
+		struct Dungeon_cfg {
+			IntRange room_size;
+			IntRange rooms;
+			int max_width, max_height;
+			float split_prop_factor;
+		};
+		sf2_structDef(Dungeon_cfg,
+			room_size,
+			rooms,
+			max_width,
+			max_height,
+			split_prop_factor
+		)
+
+		struct Dungeon_cfg_map {
+			std::map<int, Dungeon_cfg> levels;
+		};
+		sf2_structDef(Dungeon_cfg_map, levels)
+
+
 		auto nodoycares_rng = mo::util::create_random_generator();
 
 		auto rand_wall() {

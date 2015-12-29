@@ -5,9 +5,6 @@
 #include <game/sys/state/state_comp.hpp>
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
-
-#include "../../../core/ecs/serializer_impl.hpp"
 
 #include <string>
 
@@ -43,18 +40,18 @@ namespace sound {
 namespace state {
 
 	sf2_enumDef(sys::state::Entity_state,
-		sf2_value(idle),
-		sf2_value(walking),
-		sf2_value(attacking_melee),
-		sf2_value(attacking_range),
-		sf2_value(interacting),
-		sf2_value(taking),
-		sf2_value(change_weapon),
-		sf2_value(damaged),
-		sf2_value(healed),
-		sf2_value(dying),
-		sf2_value(dead),
-		sf2_value(resurrected)
+		idle,
+		walking,
+		attacking_melee,
+		attacking_range,
+		interacting,
+		taking,
+		change_weapon,
+		damaged,
+		healed,
+		dying,
+		dead,
+		resurrected
 	)
 
 }
@@ -62,35 +59,31 @@ namespace state {
 namespace sound {
 
 	sf2_structDef(Sound_entry,
-		sf2_member(sound_name)
+		sound_name
 	)
 
 	sf2_structDef(Sounds_map,
-		sf2_member(sounds)
+		sounds
 	)
 
 	sf2_structDef(Sound_comp_data,
-		sf2_member(_data)
+		_data
 	)
 
-	struct Sound_comp::Persisted_state {
-		std::string aid;
-		Persisted_state(const Sound_comp& c) :
-			aid(c._sc_data.aid().str()){}
-
-	};
-
-	sf2_structDef(Sound_comp::Persisted_state,
-		sf2_member(aid)
-	)
-
-	void Sound_comp::load(ecs::Entity_state &state){
-		auto s = state.read_to(Persisted_state{*this});
-		_sc_data = state.asset_mgr().load<Sound_comp_data>(asset::AID(s.aid));
+	void Sound_comp::load(sf2::JsonDeserializer& state,
+	                      asset::Asset_manager& asset_mgr){
+		auto aid = _sc_data ? _sc_data.aid().str() : std::string{};
+		state.read_virtual(
+			sf2::vmember("aid", aid)
+		);
+		_sc_data = asset_mgr.load<Sound_comp_data>(asset::AID(aid));
 	}
 
-	void Sound_comp::store(ecs::Entity_state &state){
-		state.write_from(Persisted_state{*this});
+	void Sound_comp::save(sf2::JsonSerializer& state)const {
+		auto aid = _sc_data ? _sc_data.aid().str() : std::string{};
+		state.write_virtual(
+			sf2::vmember("aid", aid)
+		);
 	}
 
 	std::shared_ptr<const audio::Sound> Sound_comp::get_sound(int pos) const noexcept {
@@ -110,7 +103,9 @@ namespace asset {
 
 	std::shared_ptr<sys::sound::Sound_comp_data> Loader<sys::sound::Sound_comp_data>::load(istream in) throw(Loading_failed){
 		auto r = std::make_unique<sys::sound::Sounds_map>();
-		sf2::parseStream(in, *r);
+		sf2::deserialize_json(in, [&](auto& msg, uint32_t row, uint32_t column) {
+			ERROR("Error parsing JSON from "<<in.aid().str()<<" at "<<row<<":"<<column<<": "<<msg);
+		}, *r);
 
 		// TODO [Sebastian]: automatic calculation of enum-class ending
 		using estate = sys::state::Entity_state;
@@ -135,7 +130,7 @@ namespace asset {
 
 	void Loader<sys::sound::Sound_comp_data>::store(ostream out, const sys::sound::Sound_comp_data& asset) throw(Loading_failed) {
 
-		sf2::writeStream(out, asset);
+		sf2::serialize_json(out, asset);
 	}
 }
 }

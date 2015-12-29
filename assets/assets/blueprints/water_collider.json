@@ -17,7 +17,7 @@
         "damage_type": "water",
         "damage_effect": "wet"
     },
-    "Friend",
+    "Friend": {},
     "State": {
         "delete_dead":true
     }

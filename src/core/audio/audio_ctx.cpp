@@ -5,7 +5,6 @@
 #include "../asset/asset_manager.hpp"
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #ifndef EMSCRIPTEN
 #	include <SDL2/SDL_mixer.h>
@@ -27,11 +26,11 @@ namespace mo {
 			};
 
 			sf2_structDef(Sounds_cfg,
-				sf2_member(frequence),
-				sf2_member(channels),
-				sf2_member(buffer_size),
-				sf2_member(music_volume),
-				sf2_member(sound_volume)
+				frequence,
+				channels,
+				buffer_size,
+				music_volume,
+				sound_volume
 			)
 
 #ifndef EMSCRIPTEN
@@ -60,28 +59,6 @@ namespace mo {
 				return channel<<version_bits | version;
 			}
 		}
-	}
-
-	namespace asset {
-		template<>
-		struct Loader<audio::Sounds_cfg> {
-			using RT = std::shared_ptr<audio::Sounds_cfg>;
-
-			static RT load(istream in) throw(Loading_failed) {
-				auto r = std::make_shared<audio::Sounds_cfg>();
-
-				sf2::parseStream(in, *r);
-
-				return r;
-			}
-
-			static void store(ostream out, const audio::Sounds_cfg& asset) throw (Loading_failed) {
-				sf2::writeStream(out, asset);
-			}
-		};
-	}
-
-	namespace audio {
 
 		using namespace unit_literals;
 

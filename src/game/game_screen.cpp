@@ -196,11 +196,11 @@ namespace mo {
 	namespace {
 		void move_level(Game_state& state, int offset) {
 			auto players = std::vector<ecs::ETO>{
-				state.em.serializer().export_entity(*state.main_player)
+				ecs::save_entity(state.em, *state.main_player)
 			};
 
 			for(auto& p : state.sec_players) {
-				players.push_back(state.em.serializer().export_entity(*p));
+				players.push_back(ecs::save_entity(state.em, *p));
 			}
 
 			state.engine.enter_screen<Game_screen>(

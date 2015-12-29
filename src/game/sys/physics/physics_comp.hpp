@@ -34,8 +34,9 @@ namespace physics {
 	class Physics_comp : public ecs::Component<Physics_comp> {
 		public:
 			static constexpr const char* name() {return "Physics";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Physics_comp(ecs::Entity& owner,
 						 Distance body_radius=Distance(1),

@@ -45,7 +45,6 @@ namespace asset {
 			stream& operator=(const stream&) = delete;
 			stream& operator=(stream&&)noexcept;
 
-			auto eof()const noexcept -> bool;
 			auto length()const noexcept -> size_t;
 
 			auto aid()const noexcept {return _aid;}
@@ -81,7 +80,43 @@ namespace asset {
 
 			auto operator=(ostream&&) -> ostream&;
 	};
+}
+}
 
+#ifdef ENABLE_SF2_ASSETS
+#include <sf2/sf2.hpp>
+
+namespace mo {
+namespace asset {
+	/**
+	 * Specialize this template for each asset-type
+	 * Instances should be lightweight
+	 * Implementations should NEVER return nullptr
+	 */
+	template<class T>
+	struct Loader {
+		static_assert(sf2::is_annotated_struct<T>::value, "Required AssetLoader specialization not provided.");
+
+		static auto load(istream in) throw(Loading_failed) -> std::shared_ptr<T> {
+			auto r = std::make_shared<T>();
+
+			sf2::deserialize_json(in, [&](auto& msg, uint32_t row, uint32_t column) {
+				ERROR("Error parsing JSON from "<<in.aid().str()<<" at "<<row<<":"<<column<<": "<<msg);
+			}, *r);
+
+			return r;
+		}
+		static void store(ostream out, const T& asset) throw(Loading_failed) {
+			sf2::serialize_json(out,asset);
+		}
+	};
+
+}
+}
+#else
+
+namespace mo {
+namespace asset {
 	/**
 	 * Specialize this template for each asset-type
 	 * Instances should be lightweight
@@ -97,3 +132,4 @@ namespace asset {
 
 }
 }
+#endif

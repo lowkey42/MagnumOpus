@@ -21,24 +21,28 @@
 #include "../utils/pool.hpp"
 #include "../utils/events.hpp"
 
+#include <sf2/sf2.hpp>
+
 #include <vector>
 #include <memory>
 
 namespace mo {
+namespace asset {
+	class Asset_manager;
+}
+
 namespace ecs {
 
 	class Entity;
 	using Entity_weak_ptr = std::weak_ptr<Entity>;
 	using Entity_ptr = std::shared_ptr<Entity>;
 	template<typename T> class Component_pool;
-	class Entity_state;
-
 
 	using Component_type = uint16_t;
 
 
 	namespace details {
-		constexpr Component_type max_comp_type = 32;
+		constexpr Component_type max_comp_type = 32; // TODO: find better alternative
 
 		class Component_base : public util::no_copy {
 			public:
@@ -56,8 +60,14 @@ namespace ecs {
 					return _owner!=nullptr;
 				}
 
-				virtual void load(Entity_state& state){}
-				virtual void store(Entity_state& state){}
+				virtual void load(sf2::JsonDeserializer& state,
+				                  asset::Asset_manager& asset_mgr) {
+					state.read_lambda([](auto&){return false;});
+				}
+
+				virtual void save(sf2::JsonSerializer& state)const {
+					state.write_virtual();
+				}
 
 			protected:
 				static Component_type _next_type_id()noexcept;
@@ -69,6 +79,10 @@ namespace ecs {
 
 				Entity* _owner;
 		};
+		extern void load(sf2::JsonDeserializer& state, Component_base& v);
+		inline void save(sf2::JsonSerializer& state, const Component_base& v) {
+			v.save(state);
+		}
 
 		extern Component_base*& get_component(Entity& e, Component_type t);
 		extern Entity_ptr get_entity(Entity& e);

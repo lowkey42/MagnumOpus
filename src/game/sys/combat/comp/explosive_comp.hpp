@@ -30,8 +30,9 @@ namespace combat {
 	class Explosive_comp : public ecs::Component<Explosive_comp> {
 		public:
 			static constexpr const char* name() {return "Explosive";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Explosive_comp(ecs::Entity& owner, float damage=10, Distance range=Distance(2),
 						   Time delay=Time(0), bool on_contact=false, bool on_damage=false) noexcept
@@ -41,8 +42,7 @@ namespace combat {
 			~Explosive_comp()noexcept = default;
 			Explosive_comp& operator=(Explosive_comp&&)noexcept = default;
 
-			struct Persisted_state;
-			friend struct Persisted_state;
+
 		private:
 			friend class Combat_system;
 			friend class Reaper_subsystem;

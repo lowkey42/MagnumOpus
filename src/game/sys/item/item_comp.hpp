@@ -34,15 +34,14 @@ namespace item {
 	class Item_comp : public ecs::Component<Item_comp> {
 		public:
 			static constexpr const char* name() {return "Item";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Item_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}
 
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 			friend class Item_system;
 		private:
 

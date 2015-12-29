@@ -148,13 +148,13 @@ namespace std {
 namespace mo {
 namespace level {
 	sf2_enumDef(Element,
-		sf2_value(neutral),
-		sf2_value(fire),
-		sf2_value(frost),
-		sf2_value(water),
-		sf2_value(stone),
-		sf2_value(gas),
-		sf2_value(lightning)
+		neutral,
+		fire,
+		frost,
+		water,
+		stone,
+		gas,
+		lightning
 	)
 }
 }

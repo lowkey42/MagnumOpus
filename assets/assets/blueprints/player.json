@@ -22,14 +22,15 @@
         "freq": 5.0,
         "lazyness":1
     },
-    "Target_tag",
-    "State",
+	"ui":{},
+    "Target_tag":{},
+    "State":{},
     "Friend":{
         "group": 2
     },
     "Health":{
         "max_hp": 30,
-        "death_effect": blood
+        "death_effect": "blood"
      },
     "Weapon":{
         "weapon": {
@@ -51,7 +52,7 @@
         "occlusion": 200,
         "width": 0.07
     },
-    "Score",
+    "Score":{},
     "Collector":{
         "force": 500,
         "near": 0.5,
@@ -59,7 +60,6 @@
         "near_angle": 180,
         "far_angle": 60
     },
-    "ui",
     "Explosive": {
         "damage": 10,
         "range": 4,
@@ -68,5 +68,5 @@
         "blast_force": 100,
         "force_feedback": 1.0
     },
-    "Element"
+    "Element":{}
 }

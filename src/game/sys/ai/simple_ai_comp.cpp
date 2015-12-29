@@ -6,7 +6,6 @@
 #include "../../../core/units.hpp"
 
 #include <sf2/sf2.hpp>
-#include "../../../core/ecs/serializer_impl.hpp"
 
 #include <core/utils/random.hpp>
 #include "../../level/level.hpp"
@@ -18,42 +17,43 @@ namespace ai {
 	using namespace unit_literals;
 
 
-	struct Simple_ai_comp::Persisted_state {
-		float attack_distance, near, max, near_angle,
-		      far_angle, follow_time, swarm_id;
+	void Simple_ai_comp::load(sf2::JsonDeserializer& state,
+	                          asset::Asset_manager&) {
+		float attack_distance_f = attack_distance / 1_m;
+		float near_f = near / 1_m;
+		float max_f = max / 1_m;
+		float near_angle_f = near_angle / 1_deg;
+		float far_angle_f = far_angle / 1_deg;
+		float follow_time_f = _follow_time / 1_s;
 
-		Persisted_state(const Simple_ai_comp& c)
-				: attack_distance(c.attack_distance.value()),
-		          near(c.near.value()), max(c.max.value()),
-				  near_angle(c.near_angle.value() / (1_deg).value()),
-				  far_angle(c.far_angle.value() / (1_deg).value()),
-		          follow_time(c._follow_time.value()),
-		          swarm_id(c._swarm_id){}
-	};
+		state.read_virtual(
+			sf2::vmember("attack_distance", attack_distance_f),
+			sf2::vmember("near", near_f),
+			sf2::vmember("max", max_f),
+			sf2::vmember("near_angle", near_angle_f),
+			sf2::vmember("far_angle", far_angle_f),
+			sf2::vmember("follow_time", follow_time_f),
+			sf2::vmember("swarm_id", _swarm_id)
+		);
 
-	sf2_structDef(Simple_ai_comp::Persisted_state,
-		sf2_member(attack_distance),
-		sf2_member(near),
-		sf2_member(max),
-		sf2_member(near_angle),
-		sf2_member(far_angle),
-		sf2_member(follow_time),
-		sf2_member(swarm_id)
-	)
-
-	void Simple_ai_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
-		attack_distance=Distance(s.attack_distance);
-		near=Distance(s.near);
-		max=Distance(s.max);
-		near_angle=s.near_angle * 1_deg;
-		far_angle=s.far_angle* 1_deg;
-		_follow_time=Time(s.follow_time);
-		_swarm_id=s.swarm_id;
+		attack_distance = attack_distance_f * 1_m;
+		near = near_f * 1_m;
+		max = max_f * 1_m;
+		near_angle = near_angle_f * 1_deg;
+		far_angle = far_angle_f * 1_deg;
+		_follow_time = follow_time_f * 1_s;
 	}
 
-	void Simple_ai_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Simple_ai_comp::save(sf2::JsonSerializer& state)const {
+		state.write_virtual(
+			sf2::vmember("attack_distance", attack_distance / 1_m),
+			sf2::vmember("near", near / 1_m),
+			sf2::vmember("max", max / 1_m),
+			sf2::vmember("near_angle", near_angle / 1_deg),
+			sf2::vmember("far_angle", far_angle / 1_deg),
+			sf2::vmember("follow_time", _follow_time / 1_s),
+			sf2::vmember("swarm_id", _swarm_id)
+		);
 	}
 
 

@@ -1,6 +1,6 @@
 {
     "weapons":{
-        [fire]: {
+        ["fire"]: {
             "type": "range",
             "bullet_type": "flame_collider",
             "bullet_velocity": 12,
@@ -13,7 +13,7 @@
             "damage_effect": "burning",
             "force_feedback": 0.1
         },
-        [gas]: {
+        ["gas"]: {
             "type": "range",
             "bullet_type": "poison_collider",
             "bullet_velocity": 10,
@@ -26,7 +26,7 @@
             "damage_effect": "poisoned",
             "force_feedback": 0.1
         },
-        [water]: {
+        ["water"]: {
             "type": "range",
             "bullet_type": "water_collider",
             "bullet_velocity": 15,
@@ -40,7 +40,7 @@
             "force_feedback": 0.1
         },
 
-        [stone]: {
+        ["stone"]: {
             "type": "range",
             "bullet_type": "bullet_stoneball",
             "bullet_velocity": 50,
@@ -49,7 +49,7 @@
             "fuel_usage": 0.1,
             "force_feedback": 0.1
         },
-        [frost]: {
+        ["frost"]: {
             "type": "range",
             "bullet_type": "frost_collider",
             "bullet_velocity": 10,
@@ -63,7 +63,7 @@
             "force_feedback": 0.1
         },
         
-        [frost, water]: {
+        ["frost", "water"]: {
             "type": "range",
             "bullet_type": "bullet_ice_shard",
             "bullet_velocity": 50,
@@ -78,7 +78,7 @@
             "force_feedback": 0.1
         },
 
-        [frost, stone]: {
+        ["frost", "stone"]: {
             "type": "range",
             "bullet_type": "bullet_iceball",
             "bullet_velocity": 50,
@@ -88,7 +88,7 @@
             "force_feedback": 0.1
         },
 
-        [frost, stone, water]: {
+        ["frost", "stone", "water"]: {
             "type": "range",
             "bullet_type": "bullet_iceball_exploding",
             "bullet_velocity": 80,
@@ -98,7 +98,7 @@
             "force_feedback": 0.2
         },
 
-        [frost, stone, water, fire]: {
+        ["frost", "stone", "water", "fire"]: {
             "type": "range",
             "bullet_type": "bullet_iceball",
             "bullet_velocity": 80,
@@ -110,7 +110,7 @@
             "force_feedback": 0.2
         },
 
-        [fire, gas]: {
+        ["fire", "gas"]: {
             "type": "range",
             "bullet_type": "bullet_fire_shard",
             "bullet_velocity": 70,
@@ -124,7 +124,7 @@
             "effect": "shotgun",
             "force_feedback": 0.2
         },
-        [fire, stone]: {
+        ["fire", "stone"]: {
             "type": "range",
             "bullet_type": "bullet_fireball",
             "bullet_velocity": 60,
@@ -133,7 +133,7 @@
             "fuel_usage": 0.05,
             "force_feedback": 0.2
         },
-        [fire, stone, gas]: {
+        ["fire", "stone", "gas"]: {
             "type": "range",
             "bullet_type": "bullet_fireball_exploding",
             "bullet_velocity": 80,
@@ -144,7 +144,7 @@
         },
 
 
-        [fire, water]: {
+        ["fire", "water"]: {
             "type": "range",
             "bullet_type": "steam",
             "bullet_velocity": 5,
@@ -153,7 +153,7 @@
             "bullet_count": 3,
             "fuel_usage": 0.02
         },
-        [fire, water, gas]: {
+        ["fire", "water", "gas"]: {
             "type": "range",
             "bullet_type": "gas_cloud",
             "bullet_velocity": 20,
@@ -162,7 +162,7 @@
             "fuel_usage": 0.02
         },
 
-        [gas, water]: {
+        ["gas", "water"]: {
             "type": "range",
             "bullet_type": "vomit_bullet",
             "bullet_velocity": 60,
@@ -171,7 +171,7 @@
             "fuel_usage": 0.05,
             "force_feedback": 0.2
         },
-        [gas, water, fire, frost]: {
+        ["gas", "water", "fire", "frost"]: {
             "type": "range",
             "bullet_type": "vomit_bullet",
             "bullet_velocity": 80,
@@ -183,7 +183,7 @@
             "force_feedback": 0.2
         },
 
-        [gas, water, stone]: {
+        ["gas", "water", "stone"]: {
             "type": "range",
             "bullet_type": "vomit_bullet_exploding",
             "bullet_velocity": 60,
@@ -195,20 +195,20 @@
 
 
 
-        [fire, frost]: {
+        ["fire", "frost"]: {
             "type": "range",
             "bullet_type": "bullet",
             "bullet_velocity": 60,
             "cooldown": 0.1,
             "recoil": 200,
             "spreading": 20,
-            "bullet_count": 5
+            "bullet_count": 5,
             "effect": "wind_thrower",
             "fuel_usage": 0.02,
             "force_feedback": 0.5
         },
 
-        [stone, fire, frost]: {
+        ["stone", "fire", "frost"]: {
             "type": "range",
             "bullet_type": "bullet_stoneball",
             "bullet_velocity": 60,
@@ -220,7 +220,7 @@
             "fuel_usage": 0.02,
             "force_feedback": 0.5
         },
-        [stone, fire, gas, water]: {
+        ["stone", "fire", "gas", "water"]: {
             "type": "range",
             "bullet_type": "bullet_stone_shard",
             "bullet_velocity": 60,
@@ -232,7 +232,7 @@
             "fuel_usage": 0.02,
             "force_feedback": 0.5
         },
-        [stone, fire, gas, frost]: {
+        ["stone", "fire", "gas", "frost"]: {
             "type": "range",
             "bullet_type": "bullet_stone_shard",
             "bullet_velocity": 60,

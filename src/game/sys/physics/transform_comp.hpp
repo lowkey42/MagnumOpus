@@ -27,8 +27,9 @@ namespace physics {
 	class Transform_comp : public ecs::Component<Transform_comp> {
 		public:
 			static constexpr const char* name() {return "Transform";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Transform_comp(ecs::Entity& owner, Distance x=Distance(0),
 						   Distance y=Distance(0), Angle rotation=Angle(0))noexcept
