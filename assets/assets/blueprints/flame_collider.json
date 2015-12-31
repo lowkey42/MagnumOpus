@@ -21,5 +21,4 @@
     "State": {
         "delete_dead":true
     }
-    # ,"Sprite": {"aid": "anim:fireball"}
 }
