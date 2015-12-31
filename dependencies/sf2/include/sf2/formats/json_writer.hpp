@@ -217,11 +217,11 @@ namespace format {
 	}
 
 	inline void Json_writer::write(uint8_t v) {
-		_write(v);
+		_write((uint16_t) v);
 	}
 
 	inline void Json_writer::write(int8_t v) {
-		_write(v);
+		_write((int16_t) v);
 	}
 
 	inline void Json_writer::write(uint16_t v) {

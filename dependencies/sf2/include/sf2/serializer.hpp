@@ -267,9 +267,7 @@ namespace sf2 {
 
 			// other
 			template<class T>
-			std::enable_if_t<not is_annotated<T>::value
-			                && not details::is_range<T>::value
-			                && not details::has_save<Writer,T>::value>
+			std::enable_if_t<std::is_integral<T>::value || std::is_floating_point<T>::value>
 			  write_value(const T& inst) {
 				writer.write(inst);
 			}

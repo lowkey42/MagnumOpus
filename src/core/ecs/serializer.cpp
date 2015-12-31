@@ -148,6 +148,9 @@ namespace ecs {
 		util::erase_fast(users, target.get());
 	}
 
+	void init_blueprints(Entity_manager& ecs) {
+		ecs.register_component_type<BlueprintComponent>();
+	}
 
 	void apply_blueprint(asset::Asset_manager& asset_mgr, Entity& e,
 	                     asset::AID blueprint) {

@@ -58,6 +58,8 @@ namespace ecs {
 
 	class Blueprint;
 
+	extern void init_blueprints(Entity_manager&);
+
 	extern void apply_blueprint(asset::Asset_manager&, Entity& e,
 	                            asset::AID blueprint);
 }

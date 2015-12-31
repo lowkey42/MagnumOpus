@@ -23,6 +23,8 @@ namespace ecs {
 
 	Entity_manager::Entity_manager(asset::Asset_manager& asset_mgr)
 		: _asset_mgr(asset_mgr), _unoptimized_deletions(0) {
+
+		init_blueprints(*this);
 	}
 
 	Entity_ptr Entity_manager::emplace()noexcept {
