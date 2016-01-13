@@ -13,8 +13,6 @@
 extern "C" {
 #endif
 
-int query_gl_extension( const char *extension);
-
 /**
 	This function upscales an image.
 	Not to be used to create MIPmaps,

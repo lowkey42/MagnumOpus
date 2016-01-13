@@ -3,13 +3,13 @@ cmake_minimum_required(VERSION 2.6)
 project(soil)
 
 SET(SOIL_SRCS
+    etc1_utils.c
     image_DXT.c
     image_helper.c
-    SOIL.c
-	stb_image_aug.c
+    SOIL2.c
 )
 
-if(NOT EMSCRIPTEN)
+if(NOT EMSCRIPTEN AND NOT ANDROID)
 	find_package(GLEW REQUIRED)
 
 	find_package(OpenGL REQUIRED)
@@ -19,7 +19,7 @@ if(NOT EMSCRIPTEN)
 	if(NOT OPENGL_FOUND)
 		message(ERROR " OPENGL not found!")
 	endif(NOT OPENGL_FOUND)
-endif(NOT EMSCRIPTEN)
+endif()
 
 ADD_LIBRARY(soil STATIC ${SOIL_SRCS})
 SET_TARGET_PROPERTIES(soil PROPERTIES OUTPUT_NAME "soil")

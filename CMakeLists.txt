@@ -1,12 +1,20 @@
 cmake_minimum_required(VERSION 2.6)
 
-if(WIN32 OR EMSCRIPTEN)
+if(ANDROID)
+	SET(PHYSFS_HAVE_CDROM_SUPPORT FALSE)
+endif()
+
+if(WIN32 OR EMSCRIPTEN OR ANDROID)
 	SET(PHYSFS_INTERNAL_ZLIB TRUE)
 	SET(PHYSFS_ARCHIVE_7Z FALSE)
-endif(WIN32 OR EMSCRIPTEN)
+endif()
 
 if(NOT CMAKE_BUILD_TYPE)
 	set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
+if(ANDROID)
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
 set(ROOT_DIR ${CMAKE_SOURCE_DIR})
@@ -17,7 +25,7 @@ include_directories(BEFORE ${ROOT_DIR}/dependencies/sf2/include)
 include_directories(BEFORE ${ROOT_DIR}/dependencies/gsl/include)
 add_definitions(-DGLM_FORCE_RADIANS)
 add_definitions(-DENABLE_SF2_ASSETS)
-if(NOT EMSCRIPTEN)
+if(NOT EMSCRIPTEN AND NOT ANDROID)
 	add_definitions(-DSTACKTRACE)
 	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-pie")
 endif()

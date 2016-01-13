@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 2.6)
 
 project(core)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
 
 set(WIN_LIBS "")
 
@@ -15,6 +15,21 @@ if(EMSCRIPTEN)
 	set(SDL2_LIBRARY "")
 	add_definitions(-DSLOW_SYSTEM)
 	
+elseif(ANDROID)
+#	find_package(SDL2 REQUIRED)
+#	include_directories(${SDL2_INCLUDE_DIR})
+#	find_package(SDL2_MIXER REQUIRED)
+	
+	set(SDL2_LIBRARY "-lsdl2main -lSDL2")
+	set(SDLMIXER_LIBRARY "-lSDL2_mixer")
+	
+	find_package(ZLIB)
+	include_directories(${ZLIB_INCLUDE_DIR})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	set(GLEW_LIBRARIES "")
+	set(OPENGL_LIBRARIES "")
+	add_definitions(-DSLOW_SYSTEM)
+
 else()
 	if(NOT CMAKE_BUILD_TYPE)
 		set(CMAKE_BUILD_TYPE "Debug")
@@ -65,7 +80,7 @@ else()
 		INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-pie")
 	endif()
-endif(EMSCRIPTEN)
+endif()
 
 
 file(GLOB_RECURSE CORE_SRCS

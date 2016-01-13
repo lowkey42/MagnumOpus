@@ -10,30 +10,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-#include <GL/glew.h>
-#include <string.h>
-#include <stdio.h>
-
-int query_gl_extension( const char *extension) {
-	return 1;
-/*#ifdef EMSCRIPTEN
-	return 1; // workaround for EMSCRIPTEN
-#else
-	GLint num_extensions, i;
-
-	glGetIntegerv(GL_NUM_EXTENSIONS, &num_extensions);
-	for(i = 0; i < num_extensions; ++i)
-	{
-			const GLubyte *ext = glGetStringi(GL_EXTENSIONS, i);
-			if(strcmp((const char*)ext, extension) == 0)
-					return 1;
-	}
-
-	return 0;
-#endif
-*/
-}
-
 /*	Upscaling the image uses simple bilinear interpolation	*/
 int
 	up_scale_image
@@ -346,7 +322,7 @@ find_max_RGBE
 	for( i = width * height; i > 0; --i )
 	{
 		/* float scale = powf( 2.0f, img[3] - 128.0f ) / 255.0f; */
-		float scale = ldexp( 1.0f / 255.0f, (int)(img[3]) - 128 );
+		float scale = (float)ldexp( 1.0f / 255.0f, (int)(img[3]) - 128 );
 		for( j = 0; j < 3; ++j )
 		{
 			if( img[j] * scale > max_val )
@@ -387,14 +363,14 @@ RGBE_to_RGBdivA
 		/* decode this pixel, and find the max */
 		float r,g,b,e, m;
 		/* e = scale * powf( 2.0f, img[3] - 128.0f ) / 255.0f; */
-		e = scale * ldexp( 1.0f / 255.0f, (int)(img[3]) - 128 );
+		e = scale * (float)ldexp( 1.0f / 255.0f, (int)(img[3]) - 128 );
 		r = e * img[0];
 		g = e * img[1];
 		b = e * img[2];
 		m = (r > g) ? r : g;
 		m = (b > m) ? b : m;
 		/* and encode it into RGBdivA */
-		iv = (m != 0.0f) ? (int)(255.0f / m) : 1.0f;
+		iv = (m != 0.0f) ? (int)(255.0f / m) : 1;
 		iv = (iv < 1) ? 1 : iv;
 		img[3] = (iv > 255) ? 255 : iv;
 		iv = (int)(img[3] * r + 0.5f);
@@ -436,14 +412,14 @@ RGBE_to_RGBdivA2
 		/* decode this pixel, and find the max */
 		float r,g,b,e, m;
 		/* e = scale * powf( 2.0f, img[3] - 128.0f ) / 255.0f; */
-		e = scale * ldexp( 1.0f / 255.0f, (int)(img[3]) - 128 );
+		e = scale * (float)ldexp( 1.0f / 255.0f, (int)(img[3]) - 128 );
 		r = e * img[0];
 		g = e * img[1];
 		b = e * img[2];
 		m = (r > g) ? r : g;
 		m = (b > m) ? b : m;
 		/* and encode it into RGBdivA */
-		iv = (m != 0.0f) ? (int)sqrtf( 255.0f * 255.0f / m ) : 1.0f;
+		iv = (m != 0.0f) ? (int)sqrtf( 255.0f * 255.0f / m ) : 1;
 		iv = (iv < 1) ? 1 : iv;
 		img[3] = (iv > 255) ? 255 : iv;
 		iv = (int)(img[3] * img[3] * r / 255.0f + 0.5f);

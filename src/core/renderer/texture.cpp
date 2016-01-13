@@ -1,33 +1,14 @@
 #include "texture.hpp"
 
 #include <SDL2/SDL.h>
-#include <GL/glew.h>
-#include <soil/SOIL.h>
+#include <GLES2/gl2.h>
+#include <soil/SOIL2.h>
 
 namespace mo {
 namespace renderer {
 
-	Texture::Texture(const std::string& path) throw(Texture_loading_failed) {
-		_handle = SOIL_load_OGL_texture
-		(
-			path.c_str(),
-			SOIL_LOAD_AUTO,
-			SOIL_CREATE_NEW_ID,
-			SOIL_FLAG_INVERT_Y | SOIL_FLAG_MULTIPLY_ALPHA,
-			&_width,
-			&_height
-		);
+#define CLAMP_TO_EDGE 0x812F
 
-		if(!_handle)
-			throw Texture_loading_failed(SOIL_last_result());
-
-		glBindTexture(GL_TEXTURE_2D, _handle);
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-		glBindTexture(GL_TEXTURE_2D, 0);
-	}
 	Texture::Texture(std::vector<uint8_t> buffer) throw(Texture_loading_failed) {
 		_handle = SOIL_load_OGL_texture_from_memory
 		(
@@ -46,8 +27,6 @@ namespace renderer {
 		glBindTexture(GL_TEXTURE_2D, _handle);
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 
@@ -58,8 +37,8 @@ namespace renderer {
 
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, CLAMP_TO_EDGE);
 
 	}
 
@@ -69,8 +48,8 @@ namespace renderer {
 		glBindTexture( GL_TEXTURE_2D, _handle );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 		glTexParameteri( GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST );
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
-		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, CLAMP_TO_EDGE);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, CLAMP_TO_EDGE);
 
 		glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height,
 					 0, GL_RGBA, GL_UNSIGNED_BYTE, rgbaData.data());

@@ -1,7 +1,12 @@
 #include "vertex_object.hpp"
 
 #include "../utils/log.hpp"
-#include <GL/glew.h>
+
+#ifdef ANDROID
+	#include <GLES2/gl2.h>
+#else
+	#include <GL/glew.h>
+#endif
 
 #include "shader.hpp"
 
@@ -19,7 +24,7 @@ namespace renderer {
 				case Vertex_layout::Mode::triangle_fan:   return GL_TRIANGLE_FAN;
 				case Vertex_layout::Mode::triangles:      return GL_TRIANGLES;
 				default: FAIL("Unsupported VertexLayout::Mode");
-                return 0;
+				return 0;
 			}
 		}
 		GLenum to_gl(Vertex_layout::Element_type e) {
@@ -31,9 +36,8 @@ namespace renderer {
 				case Vertex_layout::Element_type::int_t:    return GL_INT;
 				case Vertex_layout::Element_type::uint_t:   return GL_UNSIGNED_INT;
 				case Vertex_layout::Element_type::float_t:  return GL_FLOAT;
-				case Vertex_layout::Element_type::double_t: return GL_DOUBLE;
 				default: FAIL("Unsupported VertexLayout::ElementType");
-                return 0;
+				return 0;
 			}
 		}
 	}
@@ -126,8 +130,13 @@ namespace renderer {
 
 			glEnableVertexAttribArray(index);
 			glVertexAttribPointer(index,e.size,to_gl(e.type),e.normalized, buffer->_element_size, e.offset);
+
+#ifdef ANDROID
+			INVARIANT(e.divisor==0, "Instancing is not supported on Android devises");
+#else
 			glVertexAttribDivisor(index, e.divisor);
 			instanced |= e.divisor>0;
+#endif
 
 			index++;
 		}
@@ -135,17 +144,47 @@ namespace renderer {
 		return instanced;
 	}
 
+	Object::Object(Object&& o)noexcept
+	    : _layout(o._layout), _mode(o._mode), _data(std::move(o._data)), _vao_id(o._vao_id) {
+		o._vao_id = 0;
+	}
 
+
+#ifdef ANDROID
 	void Object::_init(const Vertex_layout& layout) {
+		_layout = &layout;
+	}
+	Object::~Object()noexcept {
+	}
+
+	void Object::draw()const {
+		_layout->_build(_data);
+		glDrawArrays(to_gl(_mode), 0, _data.at(0).size());
+	}
+
+	Object& Object::operator=(Object&& o)noexcept {
+		INVARIANT(this!=&o, "move to self");
+
+		_vao_id = o._vao_id;
+		o._vao_id = 0;
+
+		_layout = o._layout;
+		_mode = o._mode;
+		_data = std::move(o._data);
+		_instanced = o._instanced;
+
+		return *this;
+	}
+
+#else
+	void Object::_init(const Vertex_layout& layout) {
+		_layout = &layout;
+
 		glGenVertexArrays(1, &_vao_id);
 
 		glBindVertexArray(_vao_id);
 		_instanced = layout._build(_data);
 		glBindVertexArray(0);
-	}
-	Object::Object(Object&& o)noexcept
-	    : _data(std::move(o._data)), _vao_id(o._vao_id) {
-		o._vao_id = 0;
 	}
 	Object::~Object()noexcept {
 		if(_vao_id)
@@ -170,8 +209,15 @@ namespace renderer {
 
 		_vao_id = o._vao_id;
 		o._vao_id = 0;
+
+		_layout = o._layout;
+		_mode = o._mode;
+		_data = std::move(o._data);
+		_instanced = o._instanced;
+
 		return *this;
 	}
+#endif
 
 }
 }

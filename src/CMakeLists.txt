@@ -5,7 +5,7 @@ add_subdirectory(core)
 
 project(MagnumOpus)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++14 -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
 
 include_directories(${ROOT_DIR}/src)
 
@@ -17,6 +17,21 @@ if(EMSCRIPTEN)
 	set(GLEW_LIBRARIES "")
 	set(OPENGL_LIBRARIES "")
 	set(SDL2_LIBRARY "")
+	add_definitions(-DSLOW_SYSTEM)
+	
+elseif(ANDROID)
+#	find_package(SDL2 REQUIRED)
+#	include_directories(${SDL2_INCLUDE_DIR})
+#	find_package(SDL2_MIXER REQUIRED)
+	
+	set(SDL2_LIBRARY "-lsdl2main -lSDL2")
+	set(SDLMIXER_LIBRARY "-lSDL2_mixer")
+	
+	find_package(ZLIB)
+	include_directories(${ZLIB_INCLUDE_DIR})
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+	set(OPENGL_LIBRARIES "")
+	set(GLEW_LIBRARIES "")
 	add_definitions(-DSLOW_SYSTEM)
 	
 else()
@@ -68,7 +83,7 @@ else()
 		INCLUDE_DIRECTORIES(${ZLIB_INCLUDE_DIR})
 		set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fno-pie")
 	endif()
-endif(EMSCRIPTEN)
+endif()
 
 
 

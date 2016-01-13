@@ -1,8 +1,11 @@
 /*
+ 	Fork by Martin Lucas Golini
+ 	 
+ 	Original author
 	Jonathan Dummer
 	2007-07-26-10.36
 
-	Simple OpenGL Image Library
+	Simple OpenGL Image Library 2
 
 	Public Domain
 	using Sean Barret's stb_image as a base
@@ -15,33 +18,107 @@
 
 #define SOIL_CHECK_FOR_GL_ERRORS 0
 
-#ifdef WIN32
+#if defined( __APPLE_CC__ ) || defined ( __APPLE__ )
+	#include <TargetConditionals.h>
+
+	#if defined( __IPHONE__ ) || ( defined( TARGET_OS_IPHONE ) && TARGET_OS_IPHONE ) || ( defined( TARGET_IPHONE_SIMULATOR ) && TARGET_IPHONE_SIMULATOR )
+		#define SOIL_PLATFORM_IOS
+		#include <dlfcn.h>
+	#else
+		#define SOIL_PLATFORM_OSX
+	#endif
+#elif defined( __ANDROID__ ) || defined( ANDROID )
+	#define SOIL_PLATFORM_ANDROID
+#elif ( defined ( linux ) || defined( __linux__ ) || defined( __FreeBSD__ ) || defined(__OpenBSD__) || defined( __NetBSD__ ) || defined( __DragonFly__ ) || defined( __SVR4 ) )
+	#define SOIL_X11_PLATFORM
+#endif
+
+#if ( defined( SOIL_PLATFORM_IOS ) || defined( SOIL_PLATFORM_ANDROID ) ) && ( !defined( SOIL_GLES1 ) && !defined( SOIL_GLES2 ) )
+	#define SOIL_GLES2
+#endif
+
+#if ( defined( SOIL_GLES2 ) || defined( SOIL_GLES1 ) ) && !defined( SOIL_NO_EGL ) && !defined( SOIL_PLATFORM_IOS )
+	#include <EGL/egl.h>
+#endif
+
+#if defined( SOIL_GLES2 )
+	#ifdef SOIL_PLATFORM_IOS
+		#include <OpenGLES/ES2/gl.h>
+		#include <OpenGLES/ES2/glext.h>
+	#else
+		#include <GLES2/gl2.h>
+		#include <GLES2/gl2ext.h>
+	#endif
+
+	#define APIENTRY GL_APIENTRY
+#elif defined( SOIL_GLES1 )
+	#ifndef GL_GLEXT_PROTOTYPES
+	#define GL_GLEXT_PROTOTYPES
+	#endif
+	#ifdef SOIL_PLATFORM_IOS
+		#include <OpenGLES/ES1/gl.h>
+		#include <OpenGLES/ES1/glext.h>
+	#else
+		#include <GLES/gl.h>
+		#include <GLES/glext.h>
+	#endif
+
+	#define APIENTRY GL_APIENTRY
+#else
+
+#if defined( __WIN32__ ) || defined( _WIN32 ) || defined( WIN32 )
+	#define SOIL_PLATFORM_WIN32
 	#define WIN32_LEAN_AND_MEAN
 	#include <windows.h>
 	#include <wingdi.h>
 	#include <GL/gl.h>
+	
+	#ifndef GL_UNSIGNED_SHORT_4_4_4_4
+	#define GL_UNSIGNED_SHORT_4_4_4_4 0x8033
+	#endif
+	#ifndef GL_UNSIGNED_SHORT_5_5_5_1
+	#define GL_UNSIGNED_SHORT_5_5_5_1 0x8034
+	#endif
+	#ifndef GL_UNSIGNED_SHORT_5_6_5
+	#define GL_UNSIGNED_SHORT_5_6_5 0x8363
+	#endif
 #elif defined(__APPLE__) || defined(__APPLE_CC__)
 	/*	I can't test this Apple stuff!	*/
 	#include <OpenGL/gl.h>
 	#include <Carbon/Carbon.h>
 	#define APIENTRY
-#elif defined(EMSCRIPTEN)
-	#include <GL/gl.h>
-#else
+#elif defined( SOIL_X11_PLATFORM )
 	#include <GL/gl.h>
 	#include <GL/glx.h>
+#else
+	#include <GL/gl.h>
 #endif
 
-#include "SOIL.h"
-#include "stb_image_aug.h"
+#endif
+
+#ifndef GL_BGRA
+#define GL_BGRA                                             0x80E1
+#endif
+
+#ifndef GL_RG
+#define GL_RG                             0x8227
+#endif
+
+#include "SOIL2.h"
+#define STB_IMAGE_IMPLEMENTATION
+#include "stb_image.h"
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include "stb_image_write.h"
 #include "image_helper.h"
 #include "image_DXT.h"
+#include "pvr_helper.h"
+#include "pkm_helper.h"
 
 #include <stdlib.h>
 #include <string.h>
 
 /*	error reporting	*/
-char *result_string_pointer = "SOIL initialized";
+const char *result_string_pointer = "SOIL initialized";
 
 /*	for loading cube maps	*/
 enum{
@@ -66,6 +143,7 @@ int query_cubemap_capability( void );
 #define SOIL_PROXY_TEXTURE_CUBE_MAP			0x851B
 #define SOIL_MAX_CUBE_MAP_TEXTURE_SIZE		0x851C
 /*	for non-power-of-two texture	*/
+#define SOIL_IS_POW2( v ) ( ( v & ( v - 1 ) ) == 0 )
 static int has_NPOT_capability = SOIL_CAPABILITY_UNKNOWN;
 int query_NPOT_capability( void );
 /*	for texture rectangles	*/
@@ -81,24 +159,197 @@ int query_DXT_capability( void );
 #define SOIL_RGBA_S3TC_DXT3		0x83F2
 #define SOIL_RGBA_S3TC_DXT5		0x83F3
 typedef void (APIENTRY * P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC) (GLenum target, GLint level, GLenum internalformat, GLsizei width, GLsizei height, GLint border, GLsizei imageSize, const GLvoid * data);
-P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC soilGlCompressedTexImage2D = NULL;
-unsigned int SOIL_direct_load_DDS(
-		const char *filename,
-		unsigned int reuse_texture_ID,
-		int flags,
-		int loading_as_cubemap );
-unsigned int SOIL_direct_load_DDS_from_memory(
-		const unsigned char *const buffer,
-		int buffer_length,
-		unsigned int reuse_texture_ID,
-		int flags,
-		int loading_as_cubemap );
+static P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC soilGlCompressedTexImage2D = NULL;
+
+typedef void (APIENTRY *P_SOIL_GLGENERATEMIPMAPPROC)(GLenum target);
+static P_SOIL_GLGENERATEMIPMAPPROC soilGlGenerateMipmap = NULL;
+
+static int has_gen_mipmap_capability = SOIL_CAPABILITY_UNKNOWN;
+static int query_gen_mipmap_capability( void );
+
+static int has_PVR_capability = SOIL_CAPABILITY_UNKNOWN;
+int query_PVR_capability( void );
+static int has_BGRA8888_capability = SOIL_CAPABILITY_UNKNOWN;
+int query_BGRA8888_capability( void );
+static int has_ETC1_capability = SOIL_CAPABILITY_UNKNOWN;
+int query_ETC1_capability( void );
+
+/* GL_IMG_texture_compression_pvrtc */
+#define SOIL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG                      0x8C00
+#define SOIL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG                      0x8C01
+#define SOIL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG                     0x8C02
+#define SOIL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG                     0x8C03
+#define SOIL_GL_ETC1_RGB8_OES                                     0x8D64
+
+#if defined( SOIL_X11_PLATFORM ) || defined( SOIL_PLATFORM_WIN32 ) || defined( SOIL_PLATFORM_OSX )
+typedef const GLubyte *(APIENTRY * P_SOIL_glGetStringiFunc) (GLenum, GLuint);
+static P_SOIL_glGetStringiFunc soilGlGetStringiFunc = NULL;
+
+static int isAtLeastGL3()
+{
+	static int is_gl3 = SOIL_CAPABILITY_UNKNOWN;
+
+	if ( SOIL_CAPABILITY_UNKNOWN == is_gl3 )
+	{
+		const char * verstr	= (const char *) glGetString( GL_VERSION );
+		is_gl3				= ( verstr && ( atoi(verstr) >= 3 ) );
+	}
+
+	return is_gl3;
+}
+#endif
+
+#ifdef SOIL_PLATFORM_WIN32
+static int soilTestWinProcPointer(const PROC pTest)
+{
+	ptrdiff_t iTest;
+	if(!pTest) return 0;
+	iTest = (ptrdiff_t)pTest;
+	if(iTest == 1 || iTest == 2 || iTest == 3 || iTest == -1) return 0;
+	return 1;
+}
+#endif
+
+void * SOIL_GL_GetProcAddress(const char *proc)
+{
+	void *func = NULL;
+
+#if defined( SOIL_PLATFORM_IOS )
+	func = dlsym( RTLD_DEFAULT, proc );
+#elif defined( SOIL_GLES2 ) || defined( SOIL_GLES1 )
+	#ifndef SOIL_NO_EGL
+		func = eglGetProcAddress( proc );
+	#else
+		func = NULL;
+	#endif
+#elif defined( SOIL_PLATFORM_WIN32 )
+	func =  wglGetProcAddress( proc );
+
+	if (!soilTestWinProcPointer((const PROC)func))
+		func = NULL;
+#elif defined( SOIL_PLATFORM_OSX )
+	/*	I can't test this Apple stuff!	*/
+	CFBundleRef bundle;
+	CFURLRef bundleURL =
+	CFURLCreateWithFileSystemPath(
+								  kCFAllocatorDefault,
+								  CFSTR("/System/Library/Frameworks/OpenGL.framework"),
+								  kCFURLPOSIXPathStyle,
+								  true );
+	CFStringRef extensionName =
+	CFStringCreateWithCString(
+							  kCFAllocatorDefault,
+							  proc,
+							  kCFStringEncodingASCII );
+	bundle = CFBundleCreate( kCFAllocatorDefault, bundleURL );
+	assert( bundle != NULL );
+
+	func = CFBundleGetFunctionPointerForName( bundle, extensionName );
+
+	CFRelease( bundleURL );
+	CFRelease( extensionName );
+	CFRelease( bundle );
+#elif defined( SOIL_X11_PLATFORM )
+	func =
+#if !defined(GLX_VERSION_1_4)
+	glXGetProcAddressARB
+#else
+	glXGetProcAddress
+#endif
+	( (const GLubyte *)proc );
+#endif
+
+	return func;
+}
+
+/* Based on the SDL2 implementation */
+int SOIL_GL_ExtensionSupported(const char *extension)
+{
+	const char *extensions;
+	const char *start;
+	const char *where, *terminator;
+
+	/* Extension names should not have spaces. */
+	where = strchr(extension, ' ');
+
+	if (where || *extension == '\0')
+	{
+		return 0;
+	}
+
+	#if defined( SOIL_X11_PLATFORM ) || defined( SOIL_PLATFORM_WIN32 ) || defined( SOIL_PLATFORM_OSX )
+	/* Lookup the available extensions */
+	if ( isAtLeastGL3() )
+	{
+		GLint num_exts = 0;
+		GLint i;
+
+		if ( NULL == soilGlGetStringiFunc )
+		{
+			soilGlGetStringiFunc = (P_SOIL_glGetStringiFunc)SOIL_GL_GetProcAddress("glGetStringi");
+
+			if ( NULL == soilGlGetStringiFunc )
+			{
+				return 0;
+			}
+		}
+
+		#ifndef GL_NUM_EXTENSIONS
+		#define GL_NUM_EXTENSIONS 0x821D
+		#endif
+		glGetIntegerv(GL_NUM_EXTENSIONS, &num_exts);
+		for (i = 0; i < num_exts; i++)
+		{
+			const char *thisext = (const char *) soilGlGetStringiFunc(GL_EXTENSIONS, i);
+
+			if (strcmp(thisext, extension) == 0)
+			{
+				return 1;
+			}
+		}
+
+		return 0;
+	}
+	#endif
+
+	/* Try the old way with glGetString(GL_EXTENSIONS) ... */
+	extensions = (const char *) glGetString(GL_EXTENSIONS);
+
+	if (!extensions)
+	{
+		return 0;
+	}
+
+	/*
+	 * It takes a bit of care to be fool-proof about parsing the OpenGL
+	 * extensions string. Don't be fooled by sub-strings, etc.
+	 */
+	start = extensions;
+
+	for (;;) {
+		where = strstr(start, extension);
+
+		if (!where)
+			break;
+
+		terminator = where + strlen(extension);
+
+		if (where == start || *(where - 1) == ' ')
+			if (*terminator == ' ' || *terminator == '\0')
+				return 1;
+
+		start = terminator;
+	}
+
+	return 0;
+}
+
 /*	other functions	*/
 unsigned int
 	SOIL_internal_create_OGL_texture
 	(
 		const unsigned char *const data,
-		int width, int height, int channels,
+		int *width, int *height, int channels,
 		unsigned int reuse_texture_ID,
 		unsigned int flags,
 		unsigned int opengl_texture_type,
@@ -113,9 +364,7 @@ unsigned int
 		const char *filename,
 		int force_channels,
 		unsigned int reuse_texture_ID,
-		unsigned int flags,
-		int* width_out,  // extension [lowkey]
-		int* height_out  // extension [lowkey]
+		unsigned int flags
 	)
 {
 	/*	variables	*/
@@ -129,23 +378,36 @@ unsigned int
 			note: direct uploading will only load what is in the
 			DDS file, no MIPmaps will be generated, the image will
 			not be flipped, etc.	*/
-		tex_id = SOIL_direct_load_DDS( filename, reuse_texture_ID, flags, 0 );
+		tex_id = SOIL_direct_load_DDS( filename, reuse_texture_ID, flags, 0, &width,&height );
 		if( tex_id )
 		{
 			/*	hey, it worked!!	*/
 			return tex_id;
 		}
 	}
+
+	if( flags & SOIL_FLAG_PVR_LOAD_DIRECT )
+	{
+		tex_id = SOIL_direct_load_PVR( filename, reuse_texture_ID, flags, 0, &width,&height );
+		if( tex_id )
+		{
+			/*	hey, it worked!!	*/
+			return tex_id;
+		}
+	}
+
+	if( flags & SOIL_FLAG_ETC1_LOAD_DIRECT )
+	{
+		tex_id = SOIL_direct_load_ETC1( filename, reuse_texture_ID, flags, &width,&height );
+		if( tex_id )
+		{
+			/*	hey, it worked!!	*/
+			return tex_id;
+		}
+	}
+
 	/*	try to load the image	*/
 	img = SOIL_load_image( filename, &width, &height, &channels, force_channels );
-
-	// extension [lowkey]
-	if(width_out)
-		*width_out = width;
-	if(height_out)
-		*height_out = height;
-	// END extension [lowkey]
-
 	/*	channels holds the original number of channels, which may have been forced	*/
 	if( (force_channels >= 1) && (force_channels <= 4) )
 	{
@@ -159,7 +421,7 @@ unsigned int
 	}
 	/*	OK, make it a texture!	*/
 	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
+			img, &width, &height, channels,
 			reuse_texture_ID, flags,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE );
@@ -180,7 +442,7 @@ unsigned int
 	)
 {
 	/*	variables	*/
-	unsigned char* img;
+	unsigned char* img = NULL;
 	int width, height, channels;
 	unsigned int tex_id;
 	/*	no direct uploading of the image as a DDS file	*/
@@ -192,8 +454,14 @@ unsigned int
 		result_string_pointer = "Invalid fake HDR format specified";
 		return 0;
 	}
-	/*	try to load the image (only the HDR type) */
-	img = stbi_hdr_load_rgbe( filename, &width, &height, &channels, 4 );
+
+	/* check if the image is HDR */
+	if ( stbi_is_hdr( filename ) )
+	{
+		/*	try to load the image (only the HDR type) */
+		img = stbi_load( filename, &width, &height, &channels, 4 );
+	}
+
 	/*	channels holds the original number of channels, which may have been forced	*/
 	if( NULL == img )
 	{
@@ -211,7 +479,7 @@ unsigned int
 	}
 	/*	OK, make it a texture!	*/
 	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
+			img, &width, &height, channels,
 			reuse_texture_ID, flags,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE );
@@ -229,8 +497,7 @@ unsigned int
 		int force_channels,
 		unsigned int reuse_texture_ID,
 		unsigned int flags,
-		int* width_out,  // extension [lowkey]
-		int* height_out  // extension [lowkey]
+		int* width_ret, int* height_ret
 	)
 {
 	/*	variables	*/
@@ -246,26 +513,55 @@ unsigned int
 			not be flipped, etc.	*/
 		tex_id = SOIL_direct_load_DDS_from_memory(
 				buffer, buffer_length,
-				reuse_texture_ID, flags, 0 );
+				reuse_texture_ID, flags, 0, &width,&height );
 		if( tex_id )
 		{
 			/*	hey, it worked!!	*/
+
+			if(width_ret) *width_ret = width;
+			if(height_ret) *height_ret = height;
+
 			return tex_id;
 		}
 	}
+
+	if( flags & SOIL_FLAG_PVR_LOAD_DIRECT )
+	{
+		tex_id = SOIL_direct_load_PVR_from_memory(
+				buffer, buffer_length,
+				reuse_texture_ID, flags, 0, &width,&height );
+		if( tex_id )
+		{
+			/*	hey, it worked!!	*/
+
+			if(width_ret) *width_ret = width;
+			if(height_ret) *height_ret = height;
+
+			return tex_id;
+		}
+	}
+
+	if( flags & SOIL_FLAG_ETC1_LOAD_DIRECT )
+	{
+		tex_id = SOIL_direct_load_ETC1_from_memory(
+				buffer, buffer_length,
+				reuse_texture_ID, flags, &width,&height );
+		if( tex_id )
+		{
+			/*	hey, it worked!!	*/
+
+			if(width_ret) *width_ret = width;
+			if(height_ret) *height_ret = height;
+
+			return tex_id;
+		}
+	}
+
 	/*	try to load the image	*/
 	img = SOIL_load_image_from_memory(
 					buffer, buffer_length,
 					&width, &height, &channels,
 					force_channels );
-
-	// extension [lowkey]
-	if(width_out)
-		*width_out = width;
-	if(height_out)
-		*height_out = height;
-	 // END extension [lowkey]
-
 	/*	channels holds the original number of channels, which may have been forced	*/
 	if( (force_channels >= 1) && (force_channels <= 4) )
 	{
@@ -279,12 +575,17 @@ unsigned int
 	}
 	/*	OK, make it a texture!	*/
 	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
+			img, &width, &height, channels,
 			reuse_texture_ID, flags,
 			GL_TEXTURE_2D, GL_TEXTURE_2D,
 			GL_MAX_TEXTURE_SIZE );
 	/*	and nuke the image data	*/
 	SOIL_free_image_data( img );
+
+	/* return dimensions, if requested */
+	if(width_ret) *width_ret = width;
+	if(height_ret) *height_ret = height;
+
 	/*	and return the handle, such as it is	*/
 	return tex_id;
 }
@@ -339,7 +640,7 @@ unsigned int
 	}
 	/*	upload the texture, and create a texture ID if necessary	*/
 	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
+			img, &width, &height, channels,
 			reuse_texture_ID, flags,
 			SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_X,
 			SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -363,7 +664,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -388,7 +689,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -413,7 +714,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -438,7 +739,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -463,7 +764,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -532,7 +833,7 @@ unsigned int
 	}
 	/*	upload the texture, and create a texture ID if necessary	*/
 	tex_id = SOIL_internal_create_OGL_texture(
-			img, width, height, channels,
+			img, &width, &height, channels,
 			reuse_texture_ID, flags,
 			SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_X,
 			SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -558,7 +859,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_X,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -585,7 +886,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Y,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -612,7 +913,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Y,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -639,7 +940,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_POSITIVE_Z,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -666,7 +967,7 @@ unsigned int
 		}
 		/*	upload the texture, but reuse the assigned texture ID	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				img, width, height, channels,
+				img, &width, &height, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP, SOIL_TEXTURE_CUBE_MAP_NEGATIVE_Z,
 				SOIL_MAX_CUBE_MAP_TEXTURE_SIZE );
@@ -704,13 +1005,29 @@ unsigned int
 			note: direct uploading will only load what is in the
 			DDS file, no MIPmaps will be generated, the image will
 			not be flipped, etc.	*/
-		tex_id = SOIL_direct_load_DDS( filename, reuse_texture_ID, flags, 1 );
+		tex_id = SOIL_direct_load_DDS( filename, reuse_texture_ID, flags, 1, &width,&height );
 		if( tex_id )
 		{
 			/*	hey, it worked!!	*/
 			return tex_id;
 		}
 	}
+
+	if ( flags & SOIL_FLAG_PVR_LOAD_DIRECT )
+	{
+		tex_id = SOIL_direct_load_PVR( filename, reuse_texture_ID, flags, 1, &width,&height );
+		if( tex_id )
+		{
+			/*	hey, it worked!!	*/
+			return tex_id;
+		}
+	}
+
+	if ( flags & SOIL_FLAG_ETC1_LOAD_DIRECT )
+	{
+		return 0;
+	}
+
 	/*	face order checking	*/
 	for( i = 0; i < 6; ++i )
 	{
@@ -792,13 +1109,31 @@ unsigned int
 			not be flipped, etc.	*/
 		tex_id = SOIL_direct_load_DDS_from_memory(
 				buffer, buffer_length,
-				reuse_texture_ID, flags, 1 );
+				reuse_texture_ID, flags, 1, &width,&height );
 		if( tex_id )
 		{
 			/*	hey, it worked!!	*/
 			return tex_id;
 		}
 	}
+
+	if ( flags & SOIL_FLAG_PVR_LOAD_DIRECT )
+	{
+		tex_id = SOIL_direct_load_PVR_from_memory(
+				buffer, buffer_length,
+				reuse_texture_ID, flags, 1, &width,&height );
+		if ( tex_id )
+		{
+			/*	hey, it worked!!	*/
+			return tex_id;
+		}
+	}
+
+	if ( flags & SOIL_FLAG_ETC1_LOAD_DIRECT )
+	{
+		return 0;
+	}
+
 	/*	face order checking	*/
 	for( i = 0; i < 6; ++i )
 	{
@@ -952,7 +1287,7 @@ unsigned int
 		}
 		/*	upload it as a texture	*/
 		tex_id = SOIL_internal_create_OGL_texture(
-				sub_img, sz, sz, channels,
+				sub_img, &sz, &sz, channels,
 				tex_id, flags,
 				SOIL_TEXTURE_CUBE_MAP,
 				cubemap_target,
@@ -968,7 +1303,7 @@ unsigned int
 	SOIL_create_OGL_texture
 	(
 		const unsigned char *const data,
-		int width, int height, int channels,
+		int *width, int *height, int channels,
 		unsigned int reuse_texture_ID,
 		unsigned int flags
 	)
@@ -999,11 +1334,91 @@ void check_for_GL_errors( const char *calling_location )
 }
 #endif
 
+static void createMipmaps(const unsigned char *const img,
+		int width, int height, int channels,
+		unsigned int flags,
+		unsigned int opengl_texture_target,
+		unsigned int internal_texture_format,
+		unsigned int original_texture_format,
+		int DXT_mode)
+{
+	if ( ( flags & SOIL_FLAG_GL_MIPMAPS ) && query_gen_mipmap_capability() == SOIL_CAPABILITY_PRESENT )
+	{
+		soilGlGenerateMipmap(opengl_texture_target);
+	}
+	else
+	{
+		int MIPlevel = 1;
+		int MIPwidth = (width+1) / 2;
+		int MIPheight = (height+1) / 2;
+		unsigned char *resampled = (unsigned char*)malloc( channels*MIPwidth*MIPheight );
+
+		while( ((1<<MIPlevel) <= width) || ((1<<MIPlevel) <= height) )
+		{
+			/*	do this MIPmap level	*/
+			mipmap_image(
+					img, width, height, channels,
+					resampled,
+					(1 << MIPlevel), (1 << MIPlevel) );
+
+			/*  upload the MIPmaps	*/
+			if( DXT_mode == SOIL_CAPABILITY_PRESENT )
+			{
+				/*	user wants me to do the DXT conversion!	*/
+				int DDS_size;
+				unsigned char *DDS_data = NULL;
+				if( (channels & 1) == 1 )
+				{
+					/*	RGB, use DXT1	*/
+					DDS_data = convert_image_to_DXT1(
+							resampled, MIPwidth, MIPheight, channels, &DDS_size );
+				} else
+				{
+					/*	RGBA, use DXT5	*/
+					DDS_data = convert_image_to_DXT5(
+							resampled, MIPwidth, MIPheight, channels, &DDS_size );
+				}
+				if( DDS_data )
+				{
+					soilGlCompressedTexImage2D(
+						opengl_texture_target, MIPlevel,
+						internal_texture_format, MIPwidth, MIPheight, 0,
+						DDS_size, DDS_data );
+					check_for_GL_errors( "glCompressedTexImage2D" );
+					SOIL_free_image_data( DDS_data );
+				} else
+				{
+					/*	my compression failed, try the OpenGL driver's version	*/
+					glTexImage2D(
+						opengl_texture_target, MIPlevel,
+						internal_texture_format, MIPwidth, MIPheight, 0,
+						original_texture_format, GL_UNSIGNED_BYTE, resampled );
+					check_for_GL_errors( "glTexImage2D" );
+				}
+			} else
+			{
+				/*	user want OpenGL to do all the work!	*/
+				glTexImage2D(
+					opengl_texture_target, MIPlevel,
+					internal_texture_format, MIPwidth, MIPheight, 0,
+					original_texture_format, GL_UNSIGNED_BYTE, resampled );
+				check_for_GL_errors( "glTexImage2D" );
+			}
+			/*	prep for the next level	*/
+			++MIPlevel;
+			MIPwidth = (MIPwidth + 1) / 2;
+			MIPheight = (MIPheight + 1) / 2;
+		}
+
+		SOIL_free_image_data( resampled );
+	}
+}
+
 unsigned int
 	SOIL_internal_create_OGL_texture
 	(
 		const unsigned char *const data,
-		int width, int height, int channels,
+		int *width, int *height, int channels,
 		unsigned int reuse_texture_ID,
 		unsigned int flags,
 		unsigned int opengl_texture_type,
@@ -1012,11 +1427,20 @@ unsigned int
 	)
 {
 	/*	variables	*/
-	unsigned char* img;
+	unsigned char* img = NULL;
 	unsigned int tex_id;
 	unsigned int internal_texture_format = 0, original_texture_format = 0;
 	int DXT_mode = SOIL_CAPABILITY_UNKNOWN;
 	int max_supported_size;
+	int iwidth = *width;
+	int iheight = *height;
+	int needCopy;
+	GLint unpack_aligment;
+
+	/*	how large of a texture can this OpenGL implementation handle?	*/
+	/*	texture_check_size_enum will be GL_MAX_TEXTURE_SIZE or SOIL_MAX_CUBE_MAP_TEXTURE_SIZE	*/
+	glGetIntegerv( texture_check_size_enum, &max_supported_size );
+
 	/*	If the user wants to use the texture rectangle I kill a few flags	*/
 	if( flags & SOIL_FLAG_TEXTURE_RECTANGLE )
 	{
@@ -1047,18 +1471,36 @@ unsigned int
 			return 0;
 		}
 	}
-	/*	create a copy the image data	*/
-	img = (unsigned char*)malloc( width*height*channels );
-	memcpy( img, data, width*height*channels );
+
+	/*	if the user can't support NPOT textures, make sure we force the POT option	*/
+	if( (query_NPOT_capability() == SOIL_CAPABILITY_NONE) &&
+		!(flags & SOIL_FLAG_TEXTURE_RECTANGLE) )
+	{
+		/*	add in the POT flag */
+		flags |= SOIL_FLAG_POWER_OF_TWO;
+	}
+
+	needCopy = ( ( flags & SOIL_FLAG_INVERT_Y ) ||
+				 ( flags & SOIL_FLAG_NTSC_SAFE_RGB ) ||
+				 ( flags & SOIL_FLAG_MULTIPLY_ALPHA ) ||
+				 ( flags & SOIL_FLAG_CoCg_Y )
+				);
+
+	/*	create a copy the image data only if needed */
+	if ( needCopy ) {
+		img = (unsigned char*)malloc( iwidth*iheight*channels );
+		memcpy( img, data, iwidth*iheight*channels );
+	}
+
 	/*	does the user want me to invert the image?	*/
 	if( flags & SOIL_FLAG_INVERT_Y )
 	{
 		int i, j;
-		for( j = 0; j*2 < height; ++j )
+		for( j = 0; j*2 < iheight; ++j )
 		{
-			int index1 = j * width * channels;
-			int index2 = (height - 1 - j) * width * channels;
-			for( i = width * channels; i > 0; --i )
+			int index1 = j * iwidth * channels;
+			int index2 = (iheight - 1 - j) * iwidth * channels;
+			for( i = iwidth * channels; i > 0; --i )
 			{
 				unsigned char temp = img[index1];
 				img[index1] = img[index2];
@@ -1071,7 +1513,7 @@ unsigned int
 	/*	does the user want me to scale the colors into the NTSC safe RGB range?	*/
 	if( flags & SOIL_FLAG_NTSC_SAFE_RGB )
 	{
-		scale_image_RGB_to_NTSC_safe( img, width, height, channels );
+		scale_image_RGB_to_NTSC_safe( img, iwidth, iheight, channels );
 	}
 	/*	does the user want me to convert from straight to pre-multiplied alpha?
 		(and do we even _have_ alpha?)	*/
@@ -1081,13 +1523,13 @@ unsigned int
 		switch( channels )
 		{
 		case 2:
-			for( i = 0; i < 2*width*height; i += 2 )
+			for( i = 0; i < 2*iwidth*iheight; i += 2 )
 			{
 				img[i] = (img[i] * img[i+1] + 128) >> 8;
 			}
 			break;
 		case 4:
-			for( i = 0; i < 4*width*height; i += 4 )
+			for( i = 0; i < 4*iwidth*iheight; i += 4 )
 			{
 				img[i+0] = (img[i+0] * img[i+3] + 128) >> 8;
 				img[i+1] = (img[i+1] * img[i+3] + 128) >> 8;
@@ -1099,98 +1541,88 @@ unsigned int
 			break;
 		}
 	}
-	/*	if the user can't support NPOT textures, make sure we force the POT option	*/
-	if( (query_NPOT_capability() == SOIL_CAPABILITY_NONE) &&
-		!(flags & SOIL_FLAG_TEXTURE_RECTANGLE) )
-	{
-		/*	add in the POT flag */
-		flags |= SOIL_FLAG_POWER_OF_TWO;
-	}
-	/*	how large of a texture can this OpenGL implementation handle?	*/
-	/*	texture_check_size_enum will be GL_MAX_TEXTURE_SIZE or SOIL_MAX_CUBE_MAP_TEXTURE_SIZE	*/
-	glGetIntegerv( texture_check_size_enum, &max_supported_size );
+
 	/*	do I need to make it a power of 2?	*/
 	if(
-		(flags & SOIL_FLAG_POWER_OF_TWO) ||	/*	user asked for it	*/
-		(flags & SOIL_FLAG_MIPMAPS) ||		/*	need it for the MIP-maps	*/
-		(width > max_supported_size) ||		/*	it's too big, (make sure it's	*/
-		(height > max_supported_size) )		/*	2^n for later down-sampling)	*/
+		( ( flags & SOIL_FLAG_POWER_OF_TWO) && ( !SOIL_IS_POW2(iwidth) || !SOIL_IS_POW2(iheight) ) ) ||	/*	user asked for it and the texture is not power of 2	*/
+		( (flags & SOIL_FLAG_MIPMAPS)&& !( ( flags & SOIL_FLAG_GL_MIPMAPS ) &&
+										   query_gen_mipmap_capability() == SOIL_CAPABILITY_PRESENT &&
+										   query_NPOT_capability() == SOIL_CAPABILITY_PRESENT ) ) ||	/*	need it for the MIP-maps when mipmaps required
+																											and not GL mipmaps required and supported	*/
+		(iwidth > max_supported_size) ||		/*	it's too big, (make sure it's	*/
+		(iheight > max_supported_size) )		/*	2^n for later down-sampling)	*/
 	{
 		int new_width = 1;
 		int new_height = 1;
-		while( new_width < width )
+		while( new_width < iwidth )
 		{
 			new_width *= 2;
 		}
-		while( new_height < height )
+		while( new_height < iheight )
 		{
 			new_height *= 2;
 		}
 		/*	still?	*/
-		if( (new_width != width) || (new_height != height) )
+		if( (new_width != iwidth) || (new_height != iheight) )
 		{
 			/*	yep, resize	*/
 			unsigned char *resampled = (unsigned char*)malloc( channels*new_width*new_height );
 			up_scale_image(
-					img, width, height, channels,
+					NULL != img ? img : data, iwidth, iheight, channels,
 					resampled, new_width, new_height );
-			/*	OJO	this is for debug only!	*/
-			/*
-			SOIL_save_image( "\\showme.bmp", SOIL_SAVE_TYPE_BMP,
-							new_width, new_height, channels,
-							resampled );
-			*/
-			/*	nuke the old guy, then point it at the new guy	*/
+
+			/*	nuke the old guy ( if a copy exists ), then point it at the new guy	*/
 			SOIL_free_image_data( img );
 			img = resampled;
-			width = new_width;
-			height = new_height;
+			*width = new_width;
+			*height = new_height;
+			iwidth = new_width;
+			iheight = new_height;
 		}
 	}
 	/*	now, if it is too large...	*/
-	if( (width > max_supported_size) || (height > max_supported_size) )
+	if( (iwidth > max_supported_size) || (iheight > max_supported_size) )
 	{
 		/*	I've already made it a power of two, so simply use the MIPmapping
 			code to reduce its size to the allowable maximum.	*/
 		unsigned char *resampled;
 		int reduce_block_x = 1, reduce_block_y = 1;
 		int new_width, new_height;
-		if( width > max_supported_size )
+		if( iwidth > max_supported_size )
 		{
-			reduce_block_x = width / max_supported_size;
+			reduce_block_x = iwidth / max_supported_size;
 		}
-		if( height > max_supported_size )
+		if( iheight > max_supported_size )
 		{
-			reduce_block_y = height / max_supported_size;
+			reduce_block_y = iheight / max_supported_size;
 		}
-		new_width = width / reduce_block_x;
-		new_height = height / reduce_block_y;
+		new_width = iwidth / reduce_block_x;
+		new_height = iheight / reduce_block_y;
 		resampled = (unsigned char*)malloc( channels*new_width*new_height );
 		/*	perform the actual reduction	*/
-		mipmap_image(	img, width, height, channels,
+		mipmap_image( NULL != img ? img : data, iwidth, iheight, channels,
 						resampled, reduce_block_x, reduce_block_y );
 		/*	nuke the old guy, then point it at the new guy	*/
 		SOIL_free_image_data( img );
 		img = resampled;
-		width = new_width;
-		height = new_height;
+		*width = new_width;
+		*height = new_height;
+		iwidth = new_width;
+		iheight = new_height;
 	}
 	/*	does the user want us to use YCoCg color space?	*/
 	if( flags & SOIL_FLAG_CoCg_Y )
 	{
 		/*	this will only work with RGB and RGBA images */
-		convert_RGB_to_YCoCg( img, width, height, channels );
-		/*
-		save_image_as_DDS( "CoCg_Y.dds", width, height, channels, img );
-		*/
+		convert_RGB_to_YCoCg( img, iwidth, iheight, channels );
 	}
 	/*	create the OpenGL texture ID handle
-    	(note: allowing a forced texture ID lets me reload a texture)	*/
-    tex_id = reuse_texture_ID;
-    if( tex_id == 0 )
-    {
+		(note: allowing a forced texture ID lets me reload a texture)	*/
+	tex_id = reuse_texture_ID;
+	if( tex_id == 0 )
+	{
 		glGenTextures( 1, &tex_id );
-    }
+	}
 	check_for_GL_errors( "glGenTextures" );
 	/* Note: sometimes glGenTextures fails (usually no OpenGL context)	*/
 	if( tex_id )
@@ -1233,6 +1665,14 @@ unsigned int
 		/*  bind an OpenGL texture ID	*/
 		glBindTexture( opengl_texture_type, tex_id );
 		check_for_GL_errors( "glBindTexture" );
+
+		/* set the unpack aligment */
+		glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_aligment);
+		if ( 1 != unpack_aligment )
+		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT,1);
+		}
+
 		/*  upload the main image	*/
 		if( DXT_mode == SOIL_CAPABILITY_PRESENT )
 		{
@@ -1242,17 +1682,17 @@ unsigned int
 			if( (channels & 1) == 1 )
 			{
 				/*	RGB, use DXT1	*/
-				DDS_data = convert_image_to_DXT1( img, width, height, channels, &DDS_size );
+				DDS_data = convert_image_to_DXT1( NULL != img ? img : data, iwidth, iheight, channels, &DDS_size );
 			} else
 			{
 				/*	RGBA, use DXT5	*/
-				DDS_data = convert_image_to_DXT5( img, width, height, channels, &DDS_size );
+				DDS_data = convert_image_to_DXT5( NULL != img ? img : data, iwidth, iheight, channels, &DDS_size );
 			}
 			if( DDS_data )
 			{
 				soilGlCompressedTexImage2D(
 					opengl_texture_target, 0,
-					internal_texture_format, width, height, 0,
+					internal_texture_format, iwidth, iheight, 0,
 					DDS_size, DDS_data );
 				check_for_GL_errors( "glCompressedTexImage2D" );
 				SOIL_free_image_data( DDS_data );
@@ -1262,8 +1702,8 @@ unsigned int
 				/*	my compression failed, try the OpenGL driver's version	*/
 				glTexImage2D(
 					opengl_texture_target, 0,
-					internal_texture_format, width, height, 0,
-					original_texture_format, GL_UNSIGNED_BYTE, img );
+					internal_texture_format, iwidth, iheight, 0,
+					original_texture_format, GL_UNSIGNED_BYTE, NULL != img ? img : data );
 				check_for_GL_errors( "glTexImage2D" );
 				/*	printf( "OpenGL DXT compressor\n" );	*/
 			}
@@ -1272,74 +1712,18 @@ unsigned int
 			/*	user want OpenGL to do all the work!	*/
 			glTexImage2D(
 				opengl_texture_target, 0,
-				internal_texture_format, width, height, 0,
-				original_texture_format, GL_UNSIGNED_BYTE, img );
+				internal_texture_format, iwidth, iheight, 0,
+				original_texture_format, GL_UNSIGNED_BYTE, NULL != img ? img : data );
+
 			check_for_GL_errors( "glTexImage2D" );
 			/*printf( "OpenGL DXT compressor\n" );	*/
 		}
+
 		/*	are any MIPmaps desired?	*/
-		if( flags & SOIL_FLAG_MIPMAPS )
+		if( flags & SOIL_FLAG_MIPMAPS || flags & SOIL_FLAG_GL_MIPMAPS )
 		{
-			int MIPlevel = 1;
-			int MIPwidth = (width+1) / 2;
-			int MIPheight = (height+1) / 2;
-			unsigned char *resampled = (unsigned char*)malloc( channels*MIPwidth*MIPheight );
-			while( ((1<<MIPlevel) <= width) || ((1<<MIPlevel) <= height) )
-			{
-				/*	do this MIPmap level	*/
-				mipmap_image(
-						img, width, height, channels,
-						resampled,
-						(1 << MIPlevel), (1 << MIPlevel) );
-				/*  upload the MIPmaps	*/
-				if( DXT_mode == SOIL_CAPABILITY_PRESENT )
-				{
-					/*	user wants me to do the DXT conversion!	*/
-					int DDS_size;
-					unsigned char *DDS_data = NULL;
-					if( (channels & 1) == 1 )
-					{
-						/*	RGB, use DXT1	*/
-						DDS_data = convert_image_to_DXT1(
-								resampled, MIPwidth, MIPheight, channels, &DDS_size );
-					} else
-					{
-						/*	RGBA, use DXT5	*/
-						DDS_data = convert_image_to_DXT5(
-								resampled, MIPwidth, MIPheight, channels, &DDS_size );
-					}
-					if( DDS_data )
-					{
-						soilGlCompressedTexImage2D(
-							opengl_texture_target, MIPlevel,
-							internal_texture_format, MIPwidth, MIPheight, 0,
-							DDS_size, DDS_data );
-						check_for_GL_errors( "glCompressedTexImage2D" );
-						SOIL_free_image_data( DDS_data );
-					} else
-					{
-						/*	my compression failed, try the OpenGL driver's version	*/
-						glTexImage2D(
-							opengl_texture_target, MIPlevel,
-							internal_texture_format, MIPwidth, MIPheight, 0,
-							original_texture_format, GL_UNSIGNED_BYTE, resampled );
-						check_for_GL_errors( "glTexImage2D" );
-					}
-				} else
-				{
-					/*	user want OpenGL to do all the work!	*/
-					glTexImage2D(
-						opengl_texture_target, MIPlevel,
-						internal_texture_format, MIPwidth, MIPheight, 0,
-						original_texture_format, GL_UNSIGNED_BYTE, resampled );
-					check_for_GL_errors( "glTexImage2D" );
-				}
-				/*	prep for the next level	*/
-				++MIPlevel;
-				MIPwidth = (MIPwidth + 1) / 2;
-				MIPheight = (MIPheight + 1) / 2;
-			}
-			SOIL_free_image_data( resampled );
+			createMipmaps( NULL != img ? img : data, iwidth, iheight, channels, flags, opengl_texture_target, internal_texture_format, original_texture_format, DXT_mode );
+
 			/*	instruct OpenGL to use the MIPmaps	*/
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
@@ -1351,6 +1735,13 @@ unsigned int
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
 			check_for_GL_errors( "GL_TEXTURE_MIN/MAG_FILTER" );
 		}
+
+		/* recover the unpack aligment */
+		if ( 1 != unpack_aligment )
+		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_aligment);
+		}
+
 		/*	does the user want clamping, or wrapping?	*/
 		if( flags & SOIL_FLAG_TEXTURE_REPEATS )
 		{
@@ -1364,8 +1755,8 @@ unsigned int
 			check_for_GL_errors( "GL_TEXTURE_WRAP_*" );
 		} else
 		{
-			/*	unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;	*/
-			unsigned int clamp_mode = GL_CLAMP_TO_EDGE;
+			unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;
+			/* unsigned int clamp_mode = GL_CLAMP; */
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, clamp_mode );
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, clamp_mode );
 			if( opengl_texture_type == SOIL_TEXTURE_CUBE_MAP )
@@ -1382,7 +1773,9 @@ unsigned int
 		/*	failed	*/
 		result_string_pointer = "Failed to generate an OpenGL texture name; missing OpenGL context?";
 	}
+
 	SOIL_free_image_data( img );
+
 	return tex_id;
 }
 
@@ -1416,12 +1809,12 @@ int
 		return 0;
 	}
 
-    /*  Get the data from OpenGL	*/
-    pixel_data = (unsigned char*)malloc( 3*width*height );
-    glReadPixels (x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixel_data);
+	/*  Get the data from OpenGL	*/
+	pixel_data = (unsigned char*)malloc( 3*width*height );
+	glReadPixels (x, y, width, height, GL_RGB, GL_UNSIGNED_BYTE, pixel_data);
 
-    /*	invert the image	*/
-    for( j = 0; j*2 < height; ++j )
+	/*	invert the image	*/
+	for( j = 0; j*2 < height; ++j )
 	{
 		int index1 = j * width * 3;
 		int index2 = (height - 1 - j) * width * 3;
@@ -1435,11 +1828,11 @@ int
 		}
 	}
 
-    /*	save the image	*/
-    save_result = SOIL_save_image( filename, image_type, width, height, 3, pixel_data);
+	/*	save the image	*/
+	save_result = SOIL_save_image( filename, image_type, width, height, 3, pixel_data);
 
-    /*  And free the memory	*/
-    SOIL_free_image_data( pixel_data );
+	/*	And free the memory	*/
+	SOIL_free_image_data( pixel_data );
 	return save_result;
 }
 
@@ -1520,9 +1913,15 @@ int
 		save_result = save_image_as_DDS( filename,
 				width, height, channels, (const unsigned char *const)data );
 	} else
+	if( image_type == SOIL_SAVE_TYPE_PNG )
+	{
+		save_result = stbi_write_png( filename,
+				width, height, channels, (const unsigned char *const)data, 0 );
+	} else
 	{
 		save_result = 0;
 	}
+
 	if( save_result == 0 )
 	{
 		result_string_pointer = "Saving the image failed";
@@ -1539,7 +1938,8 @@ void
 		unsigned char *img_data
 	)
 {
-	free( (void*)img_data );
+	if ( img_data )
+		free( (void*)img_data );
 }
 
 const char*
@@ -1556,7 +1956,8 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 		int buffer_length,
 		unsigned int reuse_texture_ID,
 		int flags,
-		int loading_as_cubemap )
+		int loading_as_cubemap,
+		int* width_ret, int* height_ret )
 {
 	/*	variables	*/
 	DDS_header header;
@@ -1738,7 +2139,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 	/*	do this for each face of the cubemap!	*/
 	for( cf_target = ogl_target_start; cf_target <= ogl_target_end; ++cf_target )
 	{
-		if( buffer_index + DDS_full_size <= buffer_length )
+		if( buffer_index + DDS_full_size <= (unsigned int)buffer_length )
 		{
 			unsigned int byte_offset = DDS_main_size;
 			memcpy( (void*)DDS_data, (const void*)(&buffer[buffer_index]), DDS_full_size );
@@ -1748,7 +2149,7 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 			{
 				/*	and remember, DXT uncompressed uses BGR(A),
 					so swap to RGB(A) for ALL MIPmap levels	*/
-				for( i = 0; i < DDS_full_size; i += block_size )
+				for( i = 0; i < (int)DDS_full_size; i += block_size )
 				{
 					unsigned char temp = DDS_data[i];
 					DDS_data[i] = DDS_data[i+2];
@@ -1831,8 +2232,8 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, GL_REPEAT );
 		} else
 		{
-			/*	unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;	*/
-			unsigned int clamp_mode = GL_CLAMP_TO_EDGE;
+			unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;
+			/* unsigned int clamp_mode = GL_CLAMP; */
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, clamp_mode );
 			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, clamp_mode );
 			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, clamp_mode );
@@ -1840,6 +2241,10 @@ unsigned int SOIL_direct_load_DDS_from_memory(
 	}
 
 quick_exit:
+	/* return dimensions, if requested */
+	if(width_ret) *width_ret = width;
+	if(height_ret) *height_ret = height;
+
 	/*	report success or failure	*/
 	return tex_ID;
 }
@@ -1848,7 +2253,8 @@ unsigned int SOIL_direct_load_DDS(
 		const char *filename,
 		unsigned int reuse_texture_ID,
 		int flags,
-		int loading_as_cubemap )
+		int loading_as_cubemap,
+		int* width_ret, int* height_ret )
 {
 	FILE *f;
 	unsigned char *buffer;
@@ -1886,8 +2292,474 @@ unsigned int SOIL_direct_load_DDS(
 	}
 	/*	now try to do the loading	*/
 	tex_ID = SOIL_direct_load_DDS_from_memory(
-		(const unsigned char *const)buffer, buffer_length,
-		reuse_texture_ID, flags, loading_as_cubemap );
+		(const unsigned char *const)buffer, (int)buffer_length,
+		reuse_texture_ID, flags, loading_as_cubemap, width_ret, height_ret );
+	SOIL_free_image_data( buffer );
+	return tex_ID;
+}
+
+unsigned int SOIL_direct_load_PVR_from_memory(
+		const unsigned char *const buffer,
+		int buffer_length,
+		unsigned int reuse_texture_ID,
+		int flags,
+		int loading_as_cubemap,
+		int* width_ret, int* height_ret )
+{
+	PVR_Texture_Header* header = (PVR_Texture_Header*)buffer;
+	int num_surfs = 1;
+	GLuint tex_ID = 0;
+	GLenum PVR_format = 0;
+	GLenum PVR_type = GL_RGB;
+	unsigned int opengl_texture_type = loading_as_cubemap ? SOIL_TEXTURE_CUBE_MAP : GL_TEXTURE_2D;
+	int is_PVRTC_supported = query_PVR_capability() == SOIL_CAPABILITY_PRESENT;
+	int is_BGRA8888_supported  = query_BGRA8888_capability() == SOIL_CAPABILITY_PRESENT;
+	int is_compressed_format_supported = 0;
+	int is_compressed_format = 0;
+	int mipmaps = 0;
+	int i;
+	GLint unpack_aligment;
+
+	// Check the header size
+	if ( header->dwHeaderSize != sizeof(PVR_Texture_Header) ) {
+		if ( header->dwHeaderSize == PVRTEX_V1_HEADER_SIZE ) {
+			result_string_pointer = "this is an old pvr ( update the PVR file )";
+
+			if ( loading_as_cubemap ) {
+				if( header->dwpfFlags & PVRTEX_CUBEMAP ) {
+					num_surfs = 6;
+				} else {
+					result_string_pointer = "tried to load a non-cubemap PVR as cubemap";
+					return 0;
+				}
+			}
+		} else {
+			result_string_pointer = "invalid PVR header";
+
+			return 0;
+		}
+	} else {
+		if ( loading_as_cubemap ) {
+			// Header V2
+			if( header->dwNumSurfs < 1 ) {
+				if( header->dwpfFlags & PVRTEX_CUBEMAP ) {
+					num_surfs = 6;
+				} else {
+					result_string_pointer = "tried to load a non-cubemap PVR as cubemap";
+					return 0;
+				}
+			} else {
+				num_surfs = header->dwNumSurfs;
+			}
+		}
+	}
+
+	// Check the magic identifier
+	if ( header->dwPVR != PVRTEX_IDENTIFIER ) {
+		result_string_pointer = "invalid PVR header";
+		return 0;
+	}
+
+	/* Only accept untwiddled data UNLESS texture format is PVRTC */
+	if ( ((header->dwpfFlags & PVRTEX_TWIDDLE) == PVRTEX_TWIDDLE)
+		&& ((header->dwpfFlags & PVRTEX_PIXELTYPE)!=OGL_PVRTC2)
+		&& ((header->dwpfFlags & PVRTEX_PIXELTYPE)!=OGL_PVRTC4) )
+	{
+		// We need to load untwiddled textures -- hw will twiddle for us.
+		result_string_pointer = "pvr is not compressed ( untwiddled texture )";
+		return 0;
+	}
+
+	switch( header->dwpfFlags & PVRTEX_PIXELTYPE )
+	{
+		case OGL_RGBA_4444:
+			PVR_format = GL_UNSIGNED_SHORT_4_4_4_4;
+			PVR_type = GL_RGBA;
+			break;
+		case OGL_RGBA_5551:
+			PVR_format = GL_UNSIGNED_SHORT_5_5_5_1;
+			PVR_type = GL_RGBA;
+			break;
+		case OGL_RGBA_8888:
+			PVR_format = GL_UNSIGNED_BYTE;
+			PVR_type = GL_RGBA;
+			break;
+		case OGL_RGB_565:
+			PVR_format = GL_UNSIGNED_SHORT_5_6_5;
+			PVR_type = GL_RGB;
+			break;
+		case OGL_RGB_555:
+			result_string_pointer = "failed: pixel type OGL_RGB_555 not supported.";
+			return 0;
+		case OGL_RGB_888:
+			PVR_format = GL_UNSIGNED_BYTE;
+			PVR_type = GL_RGB;
+			break;
+		case OGL_I_8:
+			PVR_format = GL_UNSIGNED_BYTE;
+			PVR_type = GL_LUMINANCE;
+			break;
+		case OGL_AI_88:
+			PVR_format = GL_UNSIGNED_BYTE;
+			PVR_type = GL_LUMINANCE_ALPHA;
+			break;
+		case MGLPT_PVRTC2:
+		case OGL_PVRTC2:
+			if(is_PVRTC_supported) {
+				is_compressed_format_supported = is_compressed_format = 1;
+				PVR_format = header->dwAlphaBitMask==0 ? SOIL_COMPRESSED_RGB_PVRTC_2BPPV1_IMG : SOIL_COMPRESSED_RGBA_PVRTC_2BPPV1_IMG ;	// PVRTC2
+			} else {
+				result_string_pointer = "error: PVRTC2 not supported.Decompress the texture first.";
+				return 0;
+			}
+			break;
+		case MGLPT_PVRTC4:
+		case OGL_PVRTC4:
+			if(is_PVRTC_supported) {
+				is_compressed_format_supported = is_compressed_format = 1;
+				PVR_format = header->dwAlphaBitMask==0 ? SOIL_COMPRESSED_RGB_PVRTC_4BPPV1_IMG : SOIL_COMPRESSED_RGBA_PVRTC_4BPPV1_IMG ;	// PVRTC4
+			} else {
+				result_string_pointer = "error: PVRTC4 not supported. Decompress the texture first.";
+				return 0;
+			}
+			break;
+		case OGL_BGRA_8888:
+			if(is_BGRA8888_supported) {
+				PVR_format = GL_UNSIGNED_BYTE;
+				PVR_type   = GL_BGRA;
+				break;
+			} else {
+				result_string_pointer = "Unable to load GL_BGRA texture as extension GL_IMG_texture_format_BGRA8888 is unsupported.";
+				return 0;
+			}
+		default:											// NOT SUPPORTED
+			result_string_pointer = "failed: pixel type not supported.";
+			return 0;
+	}
+
+	#ifdef SOIL_GLES1
+	//  check that this data is cube map data or not.
+	if( loading_as_cubemap ) {
+		result_string_pointer = "cube map textures are not available in GLES1.x.";
+		return 0;
+	}
+	#endif
+
+	// load the texture up
+	tex_ID = reuse_texture_ID;
+	if( tex_ID == 0 )
+	{
+		glGenTextures( 1, &tex_ID );
+	}
+
+	glBindTexture( opengl_texture_type, tex_ID );
+
+	if( glGetError() ) {
+		result_string_pointer = "failed: glBindTexture() failed.";
+		return 0;
+	}
+
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_aligment);
+	if ( 1 != unpack_aligment )
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT,1);				// Never have row-aligned in headers
+	}
+
+	#define _MAX( a, b ) (( a <= b )? b : a)
+	for(i=0; i<num_surfs; i++) {
+		char *texture_ptr = (char*)buffer + header->dwHeaderSize + header->dwTextureDataSize * i;
+		char *cur_texture_ptr = 0;
+		int	mipmap_level;
+		unsigned int width= header->dwWidth, height = header->dwHeight;
+		unsigned int compressed_image_size = 0;
+
+		/* return dimensions, if requested */
+		if(width_ret) *width_ret = width;
+		if(height_ret) *height_ret = height;
+
+		mipmaps = ( ( flags & SOIL_FLAG_MIPMAPS ) && (header->dwpfFlags & PVRTEX_MIPMAP) ) ? header->dwMipMapCount : 0;
+
+		for(mipmap_level = 0; mipmap_level <= mipmaps; width = _MAX(width/2, (unsigned int)1), height = _MAX(height/2, (unsigned int)1), mipmap_level++ ) {
+			// Do Alpha-swap if needed
+			cur_texture_ptr = texture_ptr;
+
+			// Load the Texture
+			/* If the texture is PVRTC then use GLCompressedTexImage2D */
+			if( is_compressed_format ) {
+				/* Calculate how many bytes this MIP level occupies */
+				if ((header->dwpfFlags & PVRTEX_PIXELTYPE)==OGL_PVRTC2) {
+					compressed_image_size = ( _MAX(width, PVRTC2_MIN_TEXWIDTH) * _MAX(height, PVRTC2_MIN_TEXHEIGHT) * header->dwBitCount + 7 ) / 8;
+				} else {// PVRTC4 case
+					compressed_image_size = ( _MAX(width, PVRTC4_MIN_TEXWIDTH) * _MAX(height, PVRTC4_MIN_TEXHEIGHT) * header->dwBitCount + 7 ) / 8;
+				}
+
+				if ( is_compressed_format_supported ) {
+					/* Load compressed texture data at selected MIP level */
+					if ( loading_as_cubemap ) {
+						soilGlCompressedTexImage2D( SOIL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mipmap_level, PVR_format, width, height, 0, compressed_image_size, cur_texture_ptr );
+					} else {
+						soilGlCompressedTexImage2D( opengl_texture_type, mipmap_level, PVR_format, width, height, 0, compressed_image_size, cur_texture_ptr );
+					}
+				} else {
+					result_string_pointer = "failed: GPU doesnt support compressed textures";
+				}
+			} else {
+				/* Load uncompressed texture data at selected MIP level */
+				if ( loading_as_cubemap ) {
+					glTexImage2D( SOIL_TEXTURE_CUBE_MAP_POSITIVE_X + i, mipmap_level, PVR_type, width, height, 0, PVR_type, PVR_format, cur_texture_ptr );
+				} else {
+					glTexImage2D( opengl_texture_type, mipmap_level, PVR_type, width, height, 0, PVR_type, PVR_format, cur_texture_ptr );
+				}
+			}
+
+			if( glGetError() ) {
+				result_string_pointer = "failed: glCompressedTexImage2D() failed.";
+				if ( 1 != unpack_aligment )
+				{
+					glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_aligment);
+				}
+				return 0;
+			}
+
+			// offset the texture pointer by one mip-map level
+			/* PVRTC case */
+			if ( is_compressed_format ) {
+				texture_ptr += compressed_image_size;
+			} else {
+				/* New formula that takes into account bit counts inferior to 8 (e.g. 1 bpp) */
+				texture_ptr += (width * height * header->dwBitCount + 7) / 8;
+			}
+		}
+	}
+	#undef _MAX
+
+	if ( 1 != unpack_aligment )
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_aligment);
+	}
+
+	if( tex_ID )
+	{
+		/*	did I have MIPmaps?	*/
+		if( mipmaps )
+		{
+			/*	instruct OpenGL to use the MIPmaps	*/
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR );
+		} else
+		{
+			/*	instruct OpenGL _NOT_ to use the MIPmaps	*/
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+		}
+
+		/*	does the user want clamping, or wrapping?	*/
+		if( flags & SOIL_FLAG_TEXTURE_REPEATS )
+		{
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, GL_REPEAT );
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, GL_REPEAT );
+			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, GL_REPEAT );
+		} else
+		{
+			unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;
+			/* unsigned int clamp_mode = GL_CLAMP; */
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, clamp_mode );
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, clamp_mode );
+			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, clamp_mode );
+		}
+	}
+
+	return tex_ID;
+}
+
+unsigned int SOIL_direct_load_PVR(
+		const char *filename,
+		unsigned int reuse_texture_ID,
+		int flags,
+		int loading_as_cubemap,
+		int* width_ret, int* height_ret )
+{
+	FILE *f;
+	unsigned char *buffer;
+	size_t buffer_length, bytes_read;
+	unsigned int tex_ID = 0;
+	/*	error checks	*/
+	if( NULL == filename )
+	{
+		result_string_pointer = "NULL filename";
+		return 0;
+	}
+	f = fopen( filename, "rb" );
+	if( NULL == f )
+	{
+		/*	the file doesn't seem to exist (or be open-able)	*/
+		result_string_pointer = "Can not find PVR file";
+		return 0;
+	}
+	fseek( f, 0, SEEK_END );
+	buffer_length = ftell( f );
+	fseek( f, 0, SEEK_SET );
+	buffer = (unsigned char *) malloc( buffer_length );
+	if( NULL == buffer )
+	{
+		result_string_pointer = "malloc failed";
+		fclose( f );
+		return 0;
+	}
+	bytes_read = fread( (void*)buffer, 1, buffer_length, f );
+	fclose( f );
+	if( bytes_read < buffer_length )
+	{
+		/*	huh?	*/
+		buffer_length = bytes_read;
+	}
+	/*	now try to do the loading	*/
+	tex_ID = SOIL_direct_load_PVR_from_memory(
+		(const unsigned char *const)buffer, (int)buffer_length,
+		reuse_texture_ID, flags, loading_as_cubemap, width_ret, height_ret );
+	SOIL_free_image_data( buffer );
+	return tex_ID;
+}
+
+unsigned int SOIL_direct_load_ETC1_from_memory(
+		const unsigned char *const buffer,
+		int buffer_length,
+		unsigned int reuse_texture_ID,
+		int flags,
+		int* width_ret, int* height_ret )
+{
+	GLuint tex_ID = 0;
+	PKMHeader* header = (PKMHeader*)buffer;
+	unsigned int opengl_texture_type = GL_TEXTURE_2D;
+	unsigned int width;
+	unsigned int height;
+	unsigned long compressed_image_size = buffer_length - PKM_HEADER_SIZE;
+	char *texture_ptr = (char*)buffer + PKM_HEADER_SIZE;
+	GLint unpack_aligment;
+
+	if ( query_ETC1_capability() != SOIL_CAPABILITY_PRESENT ) {
+		result_string_pointer = "error: ETC1 not supported. Decompress the texture first.";
+		return 0;
+	}
+
+	if ( 0 != strcmp( header->aName, "PKM 10" ) ) {
+		result_string_pointer = "error: PKM 10 header not found.";
+		return 0;
+	}
+
+	width = (header->iWidthMSB << 8) | header->iWidthLSB;
+	height = (header->iHeightMSB << 8) | header->iHeightLSB;
+	compressed_image_size = (((width + 3) & ~3) * ((height + 3) & ~3)) >> 1;
+
+	// load the texture up
+	tex_ID = reuse_texture_ID;
+	if( tex_ID == 0 )
+	{
+		glGenTextures( 1, &tex_ID );
+	}
+
+	glBindTexture( opengl_texture_type, tex_ID );
+
+	if( glGetError() ) {
+		result_string_pointer = "failed: glBindTexture() failed.";
+		return 0;
+	}
+
+	glGetIntegerv(GL_UNPACK_ALIGNMENT, &unpack_aligment);
+	if ( 1 != unpack_aligment )
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT,1);				// Never have row-aligned in headers
+	}
+
+	soilGlCompressedTexImage2D( opengl_texture_type, 0, SOIL_GL_ETC1_RGB8_OES, width, height, 0, compressed_image_size, texture_ptr );
+
+	if( glGetError() ) {
+		result_string_pointer = "failed: glCompressedTexImage2D() failed.";
+
+		if ( 1 != unpack_aligment )
+		{
+			glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_aligment);
+		}
+		return 0;
+	}
+
+	if ( 1 != unpack_aligment )
+	{
+		glPixelStorei(GL_UNPACK_ALIGNMENT, unpack_aligment);
+	}
+
+	if( tex_ID )
+	{
+		/* No MIPmaps for ETC1 */
+		glTexParameteri( opengl_texture_type, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
+		glTexParameteri( opengl_texture_type, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
+
+		/*	does the user want clamping, or wrapping?	*/
+		if( flags & SOIL_FLAG_TEXTURE_REPEATS )
+		{
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, GL_REPEAT );
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, GL_REPEAT );
+			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, GL_REPEAT );
+		} else
+		{
+			unsigned int clamp_mode = SOIL_CLAMP_TO_EDGE;
+			/* unsigned int clamp_mode = GL_CLAMP; */
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_S, clamp_mode );
+			glTexParameteri( opengl_texture_type, GL_TEXTURE_WRAP_T, clamp_mode );
+			glTexParameteri( opengl_texture_type, SOIL_TEXTURE_WRAP_R, clamp_mode );
+		}
+	}
+
+	/* return dimensions, if requested */
+	if(width_ret) *width_ret = width;
+	if(height_ret) *height_ret = height;
+
+	return tex_ID;
+}
+
+unsigned int SOIL_direct_load_ETC1(const char *filename,
+		unsigned int reuse_texture_ID,
+		int flags,
+		int* width_ret, int* height_ret )
+{
+	FILE *f;
+	unsigned char *buffer;
+	size_t buffer_length, bytes_read;
+	unsigned int tex_ID = 0;
+	/*	error checks	*/
+	if( NULL == filename )
+	{
+		result_string_pointer = "NULL filename";
+		return 0;
+	}
+	f = fopen( filename, "rb" );
+	if( NULL == f )
+	{
+		/*	the file doesn't seem to exist (or be open-able)	*/
+		result_string_pointer = "Can not find PVR file";
+		return 0;
+	}
+	fseek( f, 0, SEEK_END );
+	buffer_length = ftell( f );
+	fseek( f, 0, SEEK_SET );
+	buffer = (unsigned char *) malloc( buffer_length );
+	if( NULL == buffer )
+	{
+		result_string_pointer = "malloc failed";
+		fclose( f );
+		return 0;
+	}
+	bytes_read = fread( (void*)buffer, 1, buffer_length, f );
+	fclose( f );
+	if( bytes_read < buffer_length )
+	{
+		/*	huh?	*/
+		buffer_length = bytes_read;
+	}
+	/*	now try to do the loading	*/
+	tex_ID = SOIL_direct_load_ETC1_from_memory(
+		(const unsigned char *const)buffer, (int)buffer_length,
+		reuse_texture_ID, flags, width_ret, height_ret );
 	SOIL_free_image_data( buffer );
 	return tex_ID;
 }
@@ -1898,7 +2770,13 @@ int query_NPOT_capability( void )
 	if( has_NPOT_capability == SOIL_CAPABILITY_UNKNOWN )
 	{
 		/*	we haven't yet checked for the capability, do so	*/
-		if( query_gl_extension("GL_ARB_texture_non_power_of_two")!=1 )
+		if(
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_ARB_texture_non_power_of_two" ) )
+		&&
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_OES_texture_npot" ) )
+			)
 		{
 			/*	not there, flag the failure	*/
 			has_NPOT_capability = SOIL_CAPABILITY_NONE;
@@ -1918,9 +2796,16 @@ int query_tex_rectangle_capability( void )
 	if( has_tex_rectangle_capability == SOIL_CAPABILITY_UNKNOWN )
 	{
 		/*	we haven't yet checked for the capability, do so	*/
-		if(query_gl_extension("GL_ARB_texture_rectangle")!=1 &&
-			query_gl_extension("GL_EXT_texture_rectangle")!=1 &&
-			query_gl_extension("GL_NV_texture_rectangle")!=1 )
+		if(
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_ARB_texture_rectangle" ) )
+		&&
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_EXT_texture_rectangle" ) )
+		&&
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_NV_texture_rectangle" ) )
+			)
 		{
 			/*	not there, flag the failure	*/
 			has_tex_rectangle_capability = SOIL_CAPABILITY_NONE;
@@ -1940,8 +2825,13 @@ int query_cubemap_capability( void )
 	if( has_cubemap_capability == SOIL_CAPABILITY_UNKNOWN )
 	{
 		/*	we haven't yet checked for the capability, do so	*/
-		if(query_gl_extension("GL_ARB_texture_cube_map")!=1 &&
-		        query_gl_extension("GL_EXT_texture_cube_map")!=1 )
+		if(
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_ARB_texture_cube_map" ) )
+		&&
+			(0 == SOIL_GL_ExtensionSupported(
+				"GL_EXT_texture_cube_map" ) )
+			)
 		{
 			/*	not there, flag the failure	*/
 			has_cubemap_capability = SOIL_CAPABILITY_NONE;
@@ -1955,61 +2845,43 @@ int query_cubemap_capability( void )
 	return has_cubemap_capability;
 }
 
+static P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC get_glCompressedTexImage2D_addr()
+{
+	/*	and find the address of the extension function	*/
+	P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC ext_addr = NULL;
+	
+#if defined( SOIL_PLATFORM_WIN32 ) || defined( SOIL_PLATFORM_OSX ) || defined( SOIL_X11_PLATFORM )
+	ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)SOIL_GL_GetProcAddress( "glCompressedTexImage2D" );
+#else
+	ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)&glCompressedTexImage2D;
+#endif
+	
+	return ext_addr;
+}
+
 int query_DXT_capability( void )
 {
 	/*	check for the capability	*/
 	if( has_DXT_capability == SOIL_CAPABILITY_UNKNOWN )
 	{
 		/*	we haven't yet checked for the capability, do so	*/
-		if(query_gl_extension("GL_EXT_texture_compression_s3tc")!=1)
+		if (	0 == SOIL_GL_ExtensionSupported(
+					"GL_EXT_texture_compression_s3tc" )  &&
+				0 == SOIL_GL_ExtensionSupported(
+					"WEBGL_compressed_texture_s3tc ") &&
+				0 == SOIL_GL_ExtensionSupported(
+					"WEBKIT_WEBGL_compressed_texture_s3tc") &&
+				0 == SOIL_GL_ExtensionSupported(
+					"MOZ_WEBGL_compressed_texture_s3tc"
+				)
+			)
 		{
 			/*	not there, flag the failure	*/
 			has_DXT_capability = SOIL_CAPABILITY_NONE;
 		} else
 		{
-			/*	and find the address of the extension function	*/
-			P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC ext_addr = NULL;
-			#ifdef WIN32
-				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
-						wglGetProcAddress
-						(
-							"glCompressedTexImage2DARB"
-						);
-			#elif defined(__APPLE__) || defined(__APPLE_CC__)
-				/*	I can't test this Apple stuff!	*/
-				CFBundleRef bundle;
-				CFURLRef bundleURL =
-					CFURLCreateWithFileSystemPath(
-						kCFAllocatorDefault,
-						CFSTR("/System/Library/Frameworks/OpenGL.framework"),
-						kCFURLPOSIXPathStyle,
-						true );
-				CFStringRef extensionName =
-					CFStringCreateWithCString(
-						kCFAllocatorDefault,
-						"glCompressedTexImage2DARB",
-						kCFStringEncodingASCII );
-				bundle = CFBundleCreate( kCFAllocatorDefault, bundleURL );
-				assert( bundle != NULL );
-				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
-						CFBundleGetFunctionPointerForName
-						(
-							bundle, extensionName
-						);
-				CFRelease( bundleURL );
-				CFRelease( extensionName );
-				CFRelease( bundle );
+			P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC ext_addr = get_glCompressedTexImage2D_addr();
 
-			#elif defined(EMSCRIPTEN)
-				ext_addr = NULL;
-
-			#else
-				ext_addr = (P_SOIL_GLCOMPRESSEDTEXIMAGE2DPROC)
-						glXGetProcAddressARB
-						(
-							(const GLubyte *)"glCompressedTexImage2DARB"
-						);
-			#endif
 			/*	Flag it so no checks needed later	*/
 			if( NULL == ext_addr )
 			{
@@ -2030,4 +2902,127 @@ int query_DXT_capability( void )
 	}
 	/*	let the user know if we can do DXT or not	*/
 	return has_DXT_capability;
+}
+
+int query_PVR_capability( void )
+{
+	/*	check for the capability	*/
+	if( has_PVR_capability == SOIL_CAPABILITY_UNKNOWN )
+	{
+		/*	we haven't yet checked for the capability, do so	*/
+		if (0 == SOIL_GL_ExtensionSupported(
+				"GL_IMG_texture_compression_pvrtc" ) )
+		{
+			/*	not there, flag the failure	*/
+			has_PVR_capability = SOIL_CAPABILITY_NONE;
+		} else
+		{
+			if ( NULL == soilGlCompressedTexImage2D ) {
+				soilGlCompressedTexImage2D = get_glCompressedTexImage2D_addr();
+			}
+			
+			/*	it's there!	*/
+			has_PVR_capability = SOIL_CAPABILITY_PRESENT;
+		}
+	}
+	/*	let the user know if we can do cubemaps or not	*/
+	return has_PVR_capability;
+}
+
+int query_BGRA8888_capability( void )
+{
+	/*	check for the capability	*/
+	if( has_BGRA8888_capability == SOIL_CAPABILITY_UNKNOWN )
+	{
+		/*	we haven't yet checked for the capability, do so	*/
+		if (0 == SOIL_GL_ExtensionSupported(
+				"GL_IMG_texture_format_BGRA8888" ) )
+		{
+			/*	not there, flag the failure	*/
+			has_BGRA8888_capability = SOIL_CAPABILITY_NONE;
+		} else
+		{
+			/*	it's there!	*/
+			has_BGRA8888_capability = SOIL_CAPABILITY_PRESENT;
+		}
+	}
+	/*	let the user know if we can do cubemaps or not	*/
+	return has_BGRA8888_capability;
+}
+
+int query_ETC1_capability( void )
+{
+	/*	check for the capability	*/
+	if( has_ETC1_capability == SOIL_CAPABILITY_UNKNOWN )
+	{
+		/*	we haven't yet checked for the capability, do so	*/
+		if (0 == SOIL_GL_ExtensionSupported(
+				"GL_OES_compressed_ETC1_RGB8_texture" ) )
+		{
+			/*	not there, flag the failure	*/
+			has_ETC1_capability = SOIL_CAPABILITY_NONE;
+		} else
+		{
+			if ( NULL == soilGlCompressedTexImage2D ) {
+				soilGlCompressedTexImage2D = get_glCompressedTexImage2D_addr();
+			}
+
+			/*	it's there!	*/
+			has_ETC1_capability = SOIL_CAPABILITY_PRESENT;
+		}
+	}
+	/*	let the user know if we can do cubemaps or not	*/
+	return has_ETC1_capability;
+}
+
+int query_gen_mipmap_capability( void )
+{
+	/* check for the capability   */
+	P_SOIL_GLGENERATEMIPMAPPROC ext_addr = NULL;
+
+	if( has_gen_mipmap_capability == SOIL_CAPABILITY_UNKNOWN )
+	{
+		if (	0 == SOIL_GL_ExtensionSupported(
+					"GL_ARB_framebuffer_object" )
+			&&
+				0 == SOIL_GL_ExtensionSupported(
+					"GL_EXT_framebuffer_object" )
+			&&  0 == SOIL_GL_ExtensionSupported(
+					"GL_OES_framebuffer_object" )
+			)
+		{
+			/* not there, flag the failure */
+			has_gen_mipmap_capability = SOIL_CAPABILITY_NONE;
+		}
+		else
+		{
+			#if !defined( SOIL_GLES1 ) && !defined( SOIL_GLES2 )
+
+			ext_addr = (P_SOIL_GLGENERATEMIPMAPPROC)SOIL_GL_GetProcAddress("glGenerateMipmap");
+
+			if(ext_addr == NULL)
+			{
+				ext_addr = (P_SOIL_GLGENERATEMIPMAPPROC)SOIL_GL_GetProcAddress("glGenerateMipmapEXT");
+			}
+
+			#elif defined( SOIL_GLES2 )
+				ext_addr = 	&glGenerateMipmap;
+			#else /** SOIL_GLES1 */
+				ext_addr = &glGenerateMipmapOES;
+			#endif
+		}
+
+		if(ext_addr == NULL)
+		{
+			/* this should never happen */
+			has_gen_mipmap_capability = SOIL_CAPABILITY_NONE;
+		} else
+		{
+			/* it's there! */
+			has_gen_mipmap_capability = SOIL_CAPABILITY_PRESENT;
+			soilGlGenerateMipmap = ext_addr;
+		}
+	}
+
+	return has_gen_mipmap_capability;
 }

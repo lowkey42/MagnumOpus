@@ -47,7 +47,6 @@ namespace renderer {
 	VERTEX_FACTORY(int32_t,   int_t,    1)
 	VERTEX_FACTORY(uint32_t,  uint_t,   1)
 	VERTEX_FACTORY(float,     float_t,  1)
-	VERTEX_FACTORY(double,    double_t, 1)
 	VERTEX_FACTORY(glm::vec2, float_t,  2)
 	VERTEX_FACTORY(glm::vec3, float_t,  3)
 	VERTEX_FACTORY(glm::vec4, float_t,  4)

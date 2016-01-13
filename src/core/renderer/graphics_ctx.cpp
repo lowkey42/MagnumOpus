@@ -1,9 +1,13 @@
+#ifndef ANDROID
+	#include <GL/glew.h>
+#endif
+
 #include "graphics_ctx.hpp"
 
 #include <iostream>
 #include <sstream>
 #include <cstdio>
-#include <GL/glew.h>
+#include <GLES2/gl2.h>
 #include <sf2/sf2.hpp>
 
 #include "../utils/log.hpp"
@@ -21,6 +25,7 @@ namespace renderer {
 			}
 		}
 
+#ifndef ANDROID
 	#ifndef EMSCRIPTEN
 		void
 	#ifdef GLAPIENTRY
@@ -30,14 +35,16 @@ namespace renderer {
 			WARN(std::string(message,length)<<" (source: "<<source<<", type: "<<type<<", id: "<<id<<", severity: "<<severity<<")");
 		}
 	#endif
-
+#endif
 
 		struct Graphics_cfg {
 			int width;
 			int height;
 			bool fullscreen;
-			float max_screenshake = 0.5;
-			float brightness = 1.1;
+			float max_screenshake;
+			float brightness;
+
+			Graphics_cfg();
 		};
 
 		sf2_structDef(Graphics_cfg,
@@ -49,9 +56,11 @@ namespace renderer {
 		)
 
 	#ifndef EMSCRIPTEN
-		constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.2f};
+		Graphics_cfg::Graphics_cfg() : width(1920), height(1080), fullscreen(true),
+		    max_screenshake(0.5f), brightness(1.1f) {}
 	#else
-		constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.2f};
+		Graphics_cfg::Graphics_cfg() : width(1024), height(512), fullscreen(false),
+		    max_screenshake(0.5f), brightness(1.2f) {}
 	#endif
 
 	}
@@ -59,6 +68,8 @@ namespace renderer {
 
 	Graphics_ctx::Graphics_ctx(const std::string& name, asset::Asset_manager& assets)
 	 : _assets(assets), _name(name), _window(nullptr, SDL_DestroyWindow) {
+
+		auto default_cfg = Graphics_cfg{};
 
 		auto& cfg = asset::unpack(assets.load_maybe<Graphics_cfg>("cfg:graphics"_aid)).get_or_other(
 			default_cfg
@@ -108,11 +119,12 @@ namespace renderer {
 
 		if(SDL_GL_SetSwapInterval(-1)) SDL_GL_SetSwapInterval(1);
 
+#ifndef ANDROID
 		glewExperimental = GL_TRUE;
 		glewInit();
 
-#ifndef EMSCRIPTEN
-		INVARIANT(GLEW_VERSION_3_3, "Requested OpenGL 3.3 Context but 3.3 Features are not available.");
+	#ifndef EMSCRIPTEN
+		INVARIANT(GLEW_VERSION_2_0, "Requested OpenGL 3.3 Context but 3.3 Features are not available.");
 
 		if(GLEW_KHR_debug){
 			glDebugMessageCallback((GLDEBUGPROC)gl_debug_callback, stderr);
@@ -120,6 +132,7 @@ namespace renderer {
 		else{
 			WARN("No OpenGL debug log available.");
 		}
+	#endif
 #endif
 
 		glEnable(GL_BLEND);
@@ -176,7 +189,10 @@ namespace renderer {
 	}
 
 	void Graphics_ctx::resolution(int width, int height, float max_screenshake) {
-		Graphics_cfg cfg{_win_width, _win_height, _fullscreen, _max_screenshake};
+		auto cfg = *_assets.load<Graphics_cfg>("cfg:graphics"_aid);
+		cfg.width = width;
+		cfg.height = height;
+		cfg.max_screenshake = max_screenshake;
 		_assets.save<Graphics_cfg>("cfg:graphics"_aid, cfg);
 	}
 

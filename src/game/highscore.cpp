@@ -149,7 +149,7 @@ namespace mo {
 
 							if(r->getstatus()==200) {
 
-								auto source = std::istringstream{str};
+								std::istringstream source{str};
 								Score_list scores;
 
 								sf2::deserialize_json(source, [&](auto& msg, uint32_t row, uint32_t column) {

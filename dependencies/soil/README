@@ -1,0 +1,5 @@
+Source: https://bitbucket.org/SpartanJ/soil2
+License: Public Domain
+
+
+Modifications: return the dimensions of loaded textures

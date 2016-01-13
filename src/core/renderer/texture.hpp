@@ -32,7 +32,6 @@ namespace renderer {
 
 	class Texture {
 		public:
-			explicit Texture(const std::string& path) throw(Texture_loading_failed);
 			explicit Texture(std::vector<uint8_t> buffer) throw(Texture_loading_failed);
 			Texture(int width, int height, std::vector<uint8_t> rgba_data);
 			virtual ~Texture()noexcept;

@@ -23,6 +23,7 @@
 #include <cmath>
 #include <iostream>
 #include <functional>
+#include <cstdlib>
 
 namespace sf2 {
 namespace format {

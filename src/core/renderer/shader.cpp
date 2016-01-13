@@ -3,7 +3,7 @@
 #include "../utils/string_utils.hpp"
 #include "../utils/log.hpp"
 
-#include <GL/glew.h>
+#include <GLES2/gl2.h>
 #include <glm/gtc/type_ptr.hpp>
 
 #include "vertex_object.hpp"

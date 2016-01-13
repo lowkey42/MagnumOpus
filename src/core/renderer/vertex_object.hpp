@@ -113,7 +113,7 @@ namespace renderer {
 			};
 
 			enum class Element_type {
-				byte_t, ubyte_t, short_t, ushort_t, int_t, uint_t, float_t, double_t
+				byte_t, ubyte_t, short_t, ushort_t, int_t, uint_t, float_t
 			};
 
 			struct Element {
@@ -170,6 +170,7 @@ namespace renderer {
 		private:
 			void _init(const Vertex_layout& layout);
 
+			const Vertex_layout* _layout;
 			Vertex_layout::Mode _mode;
 			std::vector<Buffer> _data;
 			unsigned int _vao_id;

@@ -4,12 +4,12 @@
 
 #include "graphics_ctx.hpp"
 
+#include <cmath>
 #include <iostream>
 #include <glm/glm.hpp>
 #include <glm/gtx/transform.hpp>
 
-#include <SDL2/SDL.h>
-#include <GL/glew.h>
+#include <GLES2/gl2.h>
 
 
 namespace mo {
@@ -19,7 +19,7 @@ namespace renderer {
 		float width = engine.graphics_ctx().win_width();
 		float height = engine.graphics_ctx().win_height();
 
-		float vheight = height/std::round(height/target_height);
+		float vheight = height/glm::round(height/target_height);
 		float vwidth  = width/height * vheight;
 
 	//	INFO("virtual resolution: "<<width<<"X"<<height);

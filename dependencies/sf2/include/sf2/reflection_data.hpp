@@ -28,11 +28,16 @@ namespace sf2 {
 
 	namespace details {
 		constexpr auto calc_hash(const char* data, std::size_t len)noexcept -> std::size_t {
+			return len==0 ? 0 :
+			                (len==1 ? 0 : calc_hash(data+1, len-1)*101) + data[0];
+			/*
+			// requires N3652 (Relaxing constraints on constexpr-functions), that is not supported by gcc < 5.0 (mingw & ndk)
 			std::size_t h = 0;
 			for(std::size_t i=0; i<len; ++i)
 				h = h*101 + data[i];
 
 			return h;
+			*/
 		}
 	}
 
