@@ -18,6 +18,7 @@ namespace asset {
 
 		if     ("gen"==r.first)          _type=Asset_type::gen;
 		else if("tex"==r.first)          _type=Asset_type::tex;
+		else if("tex_cube"==r.first)     _type=Asset_type::tex_cube;
 		else if("vert_shader"==r.first)  _type=Asset_type::vert_shader;
 		else if("frag_shader"==r.first)  _type=Asset_type::frag_shader;
 		else if("sound"==r.first)        _type=Asset_type::sound;
@@ -27,6 +28,8 @@ namespace asset {
 		else if("blueprint"==r.first)    _type=Asset_type::blueprint;
 		else if("font"==r.first)         _type=Asset_type::font;
 		else if("anim"==r.first)         _type=Asset_type::anim;
+		else if("mesh"==r.first)         _type=Asset_type::mesh;
+		else if("mesh_anim"==r.first)    _type=Asset_type::mesh_anim;
 		else FAIL("Unknown AssetClass: "<<r.first);
 	}
 
@@ -36,6 +39,7 @@ namespace asset {
 		switch(_type) {
 			case Asset_type::gen:         class_name="gen";         break;
 			case Asset_type::tex:         class_name="tex";         break;
+			case Asset_type::tex_cube:    class_name="tex_cube";    break;
 			case Asset_type::vert_shader: class_name="vert_shader"; break;
 			case Asset_type::frag_shader: class_name="frag_shader"; break;
 			case Asset_type::sound:       class_name="sound";       break;
@@ -45,6 +49,8 @@ namespace asset {
 			case Asset_type::blueprint:   class_name="blueprint";   break;
 			case Asset_type::font:        class_name="font";        break;
 			case Asset_type::anim:        class_name="anim";        break;
+			case Asset_type::mesh:        class_name="mesh";        break;
+			case Asset_type::mesh_anim:   class_name="mesh_anim";   break;
 			default: FAIL("Unknown AssetType: "<<static_cast<uint16_t>(_type));
 		}
 

@@ -29,8 +29,9 @@ namespace ai {
 	class Simple_ai_comp : public ecs::Component<Simple_ai_comp>, public controller::Controller {
 		public:
 			static constexpr const char* name() {return "Simple_ai";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Simple_ai_comp(ecs::Entity& owner);
 
@@ -47,10 +48,6 @@ namespace ai {
 			Distance max;
 			Angle near_angle;
 			Angle far_angle;
-
-
-			struct Persisted_state;
-			friend struct Persisted_state;
 
 		private:
 			friend class Ai_system;

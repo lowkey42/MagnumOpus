@@ -22,7 +22,7 @@
         "damage_type": "frost",
         "damage_effect": "frozen"
     },
-    "Friend",
+    "Friend": {},
     "State": {
         "delete_dead":true
     },

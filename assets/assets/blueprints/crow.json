@@ -24,7 +24,7 @@
         "follow_time":3.0,
         "swarm_id":2
     },
-    "State",
+    "State": {},
     "Friend":{
         "group": 1
     },

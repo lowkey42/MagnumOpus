@@ -1,11 +1,11 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 UV;
+varying vec2 UV;
 
 uniform sampler2D myTextureSampler;
 
 void main() {
-	
 	vec4 tex = texture2D(myTextureSampler, UV);
 	if(tex.a < 0.1){
 		discard;
@@ -15,8 +15,5 @@ void main() {
 
 	if(tex.a<=0.1)
 		discard;
-	
-	//gl_FragColor.rgb = texture2D(myTextureSampler, UV).rgb;
-	//gl_FragColor.a = 0.1;
 }
 

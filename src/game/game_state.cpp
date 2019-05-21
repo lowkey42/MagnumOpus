@@ -10,6 +10,7 @@
 #include <core/utils/random.hpp>
 
 #include <ctime>
+#include <sstream>
 
 #include "sys/physics/transform_comp.hpp"
 
@@ -20,7 +21,6 @@
 #include "tags.hpp"
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 
 namespace mo {
@@ -90,7 +90,7 @@ namespace mo {
 
 		if(!players.empty()) {
 			for(auto& p : players) {
-				auto player = state->em.serializer().import_entity(p);
+				auto player = ecs::load_entity(state->em, p);
 
 				player->get<sys::physics::Transform_comp>().process([&](sys::physics::Transform_comp& trans) {
 					trans.position(start_position);
@@ -225,11 +225,11 @@ namespace mo {
 
 
 		Profile_data profile = Profile_data{};
-		sf2::parseStream(stream, profile);
+		sf2::deserialize_json(stream, profile);
 
 		auto state = std::unique_ptr<Game_state>(new Game_state(engine, profile));
 
-		state->em.serializer().read(stream);
+		state->em.read(stream);
 
 		for(auto& player : state->em.list<Player_tag_comp>()) {
 			if(player.id()==0) {
@@ -453,10 +453,10 @@ namespace mo {
 	}
 
 	sf2_structDef(Profile_data,
-		sf2_member(name),
-		sf2_member(seed),
-		sf2_member(difficulty),
-		sf2_member(depth)
+		name,
+		seed,
+		difficulty,
+		depth
 	)
 
 	namespace asset {
@@ -466,10 +466,10 @@ namespace mo {
 
 		void Loader<Saveable_state>::store(ostream out, const Saveable_state& asset) {
 			asset.profile.process([&](auto& p){
-				sf2::writeStream(out, p);
+				sf2::serialize_json(out, p);
 			});
 			out<<std::endl;
-			asset.em.process([&](auto& em){em.serializer().write(out);});
+			asset.em.process([&](auto& em){em.write(out);});
 		}
 	}
 

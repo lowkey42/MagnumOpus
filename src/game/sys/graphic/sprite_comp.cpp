@@ -1,7 +1,6 @@
 #include "sprite_comp.hpp"
 
 #include <sf2/sf2.hpp>
-#include "../../../core/ecs/serializer_impl.hpp"
 
 #include <string>
 
@@ -9,25 +8,23 @@ namespace mo {
 namespace sys {
 namespace graphic {
 
-	struct Sprite_comp::Persisted_state {
-		std::string aid;
+	void Sprite_comp::load(sf2::JsonDeserializer& state,
+	                       asset::Asset_manager& assets){
+		std::string aid = _animation ? _animation.aid().str() : "";
 
-		Persisted_state(const Sprite_comp& c)
-		    : aid(c._animation.aid().str()){}
+		state.read_virtual(
+			sf2::vmember("aid", aid)
+		);
 
-	};
-
-	sf2_structDef(Sprite_comp::Persisted_state,
-		sf2_member(aid)
-	)
-
-	void Sprite_comp::load(ecs::Entity_state &state){
-		auto s = state.read_to(Persisted_state{*this});
-		_animation = state.asset_mgr().load<renderer::Animation>(asset::AID(s.aid));
+		_animation = assets.load<renderer::Animation>(asset::AID(aid));
 	}
 
-	void Sprite_comp::store(ecs::Entity_state &state){
-		state.write_from(Persisted_state{*this});
+	void Sprite_comp::save(sf2::JsonSerializer& state)const {
+		std::string aid = _animation ? _animation.aid().str() : "";
+
+		state.write_virtual(
+			sf2::vmember("aid", aid)
+		);
 	}
 
 	renderer::Sprite_batch::Sprite Sprite_comp::sprite() const noexcept{

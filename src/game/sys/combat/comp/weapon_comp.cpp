@@ -2,67 +2,54 @@
 
 #include "weapon_comp.hpp"
 
-#include <core/ecs/serializer_impl.hpp>
-
 namespace mo {
 namespace sys {
 namespace combat {
 
 	using namespace unit_literals;
 
+	void Laser_sight_comp::load(sf2::JsonDeserializer& state,
+	                            asset::Asset_manager&) {
+		float r=_color.r*255,g=_color.g*255,b=_color.b*255,a=_color.a*255;
 
-	struct Laser_sight_comp::Persisted_state {
-		uint8_t r,g,b, occlusion;
-		float width;
+		state.read_virtual(
+			sf2::vmember("r", r),
+			sf2::vmember("g", g),
+			sf2::vmember("b", b),
+			sf2::vmember("occlusion", a),
+			sf2::vmember("width", _width)
+		);
 
-		Persisted_state(const Laser_sight_comp& o)
-		    : r(o._color.r*255), g(o._color.g*255),
-		      b(o._color.b*255), occlusion(o._color.a*255),
-		      width(o._width){
-		}
-	};
-	sf2_structDef(Laser_sight_comp::Persisted_state,
-		sf2_member(r),
-		sf2_member(g),
-		sf2_member(b),
-		sf2_member(occlusion),
-		sf2_member(width)
-	)
-
-	void Laser_sight_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
-
-		_color = {s.r/255.f, s.g/255.f, s.b/255.f, s.occlusion/255.f};
-		_width = s.width;
+		_color = {r/255.f, g/255.f, b/255.f, a/255.f};
 	}
-	void Laser_sight_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Laser_sight_comp::save(sf2::JsonSerializer& state)const {
+		state.write_virtual(
+			sf2::vmember("r", _color.r * 255),
+			sf2::vmember("g", _color.g * 255),
+			sf2::vmember("b", _color.b * 255),
+			sf2::vmember("occlusion", _color.a * 255),
+			sf2::vmember("width", _width)
+		);
 	}
 
+	void Weapon_comp::load(sf2::JsonDeserializer& state,
+	                       asset::Asset_manager&) {
+		float cooldown_left = _cooldown_left / 1_s;
 
+		state.read_virtual(
+			sf2::vmember("weapon", _weapon),
+			sf2::vmember("cooldown_left", cooldown_left)
+		);
 
-	struct Weapon_comp::Persisted_state {
-		Weapon::Persisted_state weapon;
-
-		float cooldown_left;
-
-		Persisted_state(const Weapon_comp& c)
-		    : weapon(c._weapon),
-		      cooldown_left(c._cooldown_left.value()) {}
-	};
-
-	sf2_structDef(Weapon_comp::Persisted_state,
-		sf2_member(weapon),
-		sf2_member(cooldown_left)
-	)
-
-	void Weapon_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
-		_weapon = s.weapon.to_weapon();
-		_cooldown_left = s.cooldown_left * 1_s;
+		_cooldown_left = cooldown_left * 1_s;
 	}
-	void Weapon_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Weapon_comp::save(sf2::JsonSerializer& state)const {
+		float cooldown_left = _cooldown_left / 1_s;
+
+		state.write_virtual(
+			sf2::vmember("weapon", _weapon),
+			sf2::vmember("cooldown_left", cooldown_left)
+		);
 	}
 
 	Weapon_modifier::Weapon_modifier(

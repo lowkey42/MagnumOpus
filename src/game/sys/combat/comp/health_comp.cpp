@@ -2,68 +2,66 @@
 
 #include "health_comp.hpp"
 
-#include <core/ecs/serializer_impl.hpp>
-
 #include "../../../level/elements.hpp"
 
 namespace mo {
 namespace sys {
 namespace combat {
 
-	struct Health_comp::Persisted_state {
-		float auto_heal_max;
-		float auto_heal;
-		float max_hp;
-		float current_hp;
 
-		float physical_resistence;
+	void Health_comp::load(sf2::JsonDeserializer& state,
+	                       asset::Asset_manager&) {
 		std::vector<level::Element> resistences;
 		std::vector<level::Element> vulnerabilities;
+		for(auto e : _resistences)
+			resistences.push_back(e);
 
-		Effect_type death_effect;
-		float death_force_feedback;
+		for(auto e : _vulnerabilities)
+			vulnerabilities.push_back(e);
 
-		Persisted_state(const Health_comp& c)
-		    : auto_heal_max(c._auto_heal_max), auto_heal(c._auto_heal),
-		      max_hp(c._max_hp), current_hp(c._current_hp),
-		      physical_resistence(c._physical_resistence),
-		      death_effect(c._death_effect),
-		      death_force_feedback(c._death_force_feedback) {
-			for(auto e : c._resistences)
-				resistences.push_back(e);
 
-			for(auto e : c._vulnerabilities)
-				vulnerabilities.push_back(e);
-		}
-	};
+		state.read_virtual(
+			sf2::vmember("auto_heal_max", _auto_heal_max),
+			sf2::vmember("auto_heal", _auto_heal),
+			sf2::vmember("max_hp", _max_hp),
+			sf2::vmember("current_hp", _current_hp),
+			sf2::vmember("physical_resistence", _physical_resistence),
+			sf2::vmember("resistences", resistences),
+			sf2::vmember("vulnerabilities", vulnerabilities),
+			sf2::vmember("death_effect", _death_effect),
+			sf2::vmember("death_force_feedback", _death_force_feedback)
+		);
 
-	sf2_structDef(Health_comp::Persisted_state,
-		sf2_member(auto_heal_max),
-		sf2_member(auto_heal),
-		sf2_member(max_hp),
-		sf2_member(current_hp),
-		sf2_member(physical_resistence),
-		sf2_member(resistences),
-		sf2_member(vulnerabilities),
-		sf2_member(death_effect),
-		sf2_member(death_force_feedback)
-	)
 
-	void Health_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
-		_auto_heal_max = s.auto_heal_max;
-		_auto_heal = s.auto_heal;
-		_max_hp = s.max_hp;
-		_current_hp = s.current_hp==0 ? s.max_hp : s.current_hp;
-		_physical_resistence = s.physical_resistence;
-		_death_effect = s.death_effect;
-		_death_force_feedback = s.death_force_feedback;
 
-		_resistences = level::Elements{s.resistences};
-		_vulnerabilities = level::Elements{s.vulnerabilities};
+		if(_current_hp==0)
+			_current_hp = _max_hp;
+
+		_resistences = level::Elements{resistences};
+		_vulnerabilities = level::Elements{vulnerabilities};
+
 	}
-	void Health_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Health_comp::save(sf2::JsonSerializer& state)const {
+		std::vector<level::Element> resistences;
+		std::vector<level::Element> vulnerabilities;
+		for(auto e : _resistences)
+			resistences.push_back(e);
+
+		for(auto e : _vulnerabilities)
+			vulnerabilities.push_back(e);
+
+
+		state.write_virtual(
+			sf2::vmember("auto_heal_max", _auto_heal_max),
+			sf2::vmember("auto_heal", _auto_heal),
+			sf2::vmember("max_hp", _max_hp),
+			sf2::vmember("current_hp", _current_hp),
+			sf2::vmember("physical_resistence", _physical_resistence),
+			sf2::vmember("resistences", resistences),
+			sf2::vmember("vulnerabilities", vulnerabilities),
+			sf2::vmember("death_effect", _death_effect),
+			sf2::vmember("death_force_feedback", _death_force_feedback)
+		);
 	}
 
 	void Health_comp::damage(float hp, level::Element type)noexcept{

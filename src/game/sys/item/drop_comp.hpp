@@ -25,8 +25,9 @@ namespace item {
 	class Drop_comp : public ecs::Component<Drop_comp> {
 		public:
 			static constexpr const char* name() {return "Drop";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Drop_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}

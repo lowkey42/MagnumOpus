@@ -1,6 +1,7 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 uv;
+varying vec2 uv;
 
 uniform sampler2D myTextureSampler;
 

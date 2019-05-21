@@ -27,8 +27,9 @@ namespace graphic {
 	class Sprite_comp : public ecs::Component<Sprite_comp> {
 		public:
 			static constexpr const char* name() {return "Sprite";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Sprite_comp(ecs::Entity& owner, asset::Ptr<renderer::Animation> animation = asset::Ptr<renderer::Animation>()) :
 				Component(owner), _animation(animation) {}
@@ -42,9 +43,6 @@ namespace graphic {
 
 			void current_frame(const float frame) noexcept { _current_frame = frame; }
 			void animation_type(renderer::Animation_type type) noexcept;
-
-			struct Persisted_state;
-			friend struct Persisted_state;
 
 		private:
 			friend class Graphic_system;

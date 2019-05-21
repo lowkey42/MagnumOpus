@@ -146,9 +146,6 @@ namespace asset {
 		return _manager.physical_location(_aid);
 	}
 
-	bool stream::eof()const noexcept {
-		return PHYSFS_eof((PHYSFS_File*)_file);
-	}
 	size_t stream::length()const noexcept {
 		return PHYSFS_fileLength((PHYSFS_File*)_file);
 	}

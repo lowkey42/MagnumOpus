@@ -17,9 +17,8 @@
         "damage_type": "fire",
         "damage_effect": "burning"
     },
-    "Friend",
+    "Friend": {},
     "State": {
         "delete_dead":true
     }
-    # ,"Sprite": {"aid": "anim:fireball"}
 }

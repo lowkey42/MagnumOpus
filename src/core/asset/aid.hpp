@@ -24,6 +24,7 @@ namespace asset {
 	enum class Asset_type : uint8_t {
 		gen,
 		tex,
+		tex_cube,
 		vert_shader,
 		frag_shader,
 		sound,
@@ -32,7 +33,9 @@ namespace asset {
 		cfg,
 		blueprint,
 		font,
-		anim
+		anim,
+		mesh,
+		mesh_anim
 	};
 
 	/**

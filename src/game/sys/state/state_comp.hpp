@@ -76,8 +76,9 @@ namespace state {
 	class State_comp : public ecs::Component<State_comp> {
 		public:
 			static constexpr const char* name() {return "State";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			State_comp(ecs::Entity& owner, Entity_state s = Entity_state::idle) noexcept
 				: Component(owner) {

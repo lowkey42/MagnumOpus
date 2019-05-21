@@ -21,6 +21,7 @@
 #include <vector>
 #include <SDL2/SDL.h>
 #include <SDL2/SDL_gamecontroller.h>
+#include <sf2/sf2.hpp>
 
 namespace mo {
 namespace sys {
@@ -262,16 +263,170 @@ namespace controller {
 	};
 	using Mapping_ptr = std::shared_ptr<const Mapping>;
 
-}
-}
-namespace asset {
-	template<>
-	struct Loader<sys::controller::Mapping> {
-		using RT = std::shared_ptr<sys::controller::Mapping>;
 
-		static RT load(istream in);
+	sf2_enumDef(Command,
+		move_up,
+		move_down,
+		move_left,
+		move_right,
+		attack,
+		use_or_take,
+		weapon_0,
+		weapon_1,
+		weapon_2,
+		weapon_3,
+		enter_leave_game,
+		quit
+	)
 
-		static void store(ostream out, sys::controller::Mapping& asset);
-	};
+	sf2_enumDef(Key,
+		Return,
+		Escape,
+		Backspace,
+		Tab,
+		Space,
+		Exclaim,
+		Quotedbl,
+		Hash,
+		Percent,
+		Dollar,
+		Ampersand,
+		Quote,
+		LeftParan,
+		RightParan,
+		Asterisk,
+		Plus,
+		Comma,
+		Minus,
+		Period,
+		Slash,
+		T_0,
+		T_1,
+		T_2,
+		T_3,
+		T_4,
+		T_5,
+		T_6,
+		T_7,
+		T_8,
+		T_9,
+		Colon,
+		Semicolon,
+		Less,
+		Equals,
+		Greater,
+		Question,
+		At,
+		LeftBracket,
+		RightBracket,
+		Backslash,
+		Caret,
+		Underscore,
+		Backquote,
+		A,
+		B,
+		C,
+		D,
+		E,
+		F,
+		G,
+		H,
+		I,
+		J,
+		K,
+		L,
+		M,
+		N,
+		O,
+		P,
+		Q,
+		R,
+		S,
+		T,
+		U,
+		V,
+		W,
+		X,
+		Y,
+		Z,
+		Capslock,
+
+		F1,
+		F2,
+		F3,
+		F4,
+		F5,
+		F6,
+		F7,
+		F8,
+		F9,
+		F10,
+		F11,
+		F12,
+		PrintScreen,
+		Scrolllock,
+		Pause,
+
+		Left,
+		Right,
+		Up,
+		Down,
+
+		KP_0,
+		KP_1,
+		KP_2,
+		KP_3,
+		KP_4,
+		KP_5,
+		KP_6,
+		KP_7,
+		KP_8,
+		KP_9,
+
+		LControl,
+		LShift,
+		LAlt,
+		LSuper,
+		RControl,
+		RShift,
+		RAlt,
+		RSuper
+	)
+
+	sf2_enumDef(Pad_stick,
+		left,
+		right
+	)
+
+	sf2_enumDef(Pad_button,
+		a,
+		b,
+		x,
+		y,
+		back,
+		guide,
+		start,
+		left_stick,
+		right_stick,
+		left_shoulder,
+		right_shoulder,
+		d_pad_up,
+		d_pad_down,
+		d_pad_left,
+		d_pad_right,
+		left_trigger,
+		right_trigger
+	)
+
+	sf2_structDef(Mapping,
+		mouse_look,
+		key_action,
+		mouse_button_action,
+		pad_button_action,
+		aim_sticks,
+		move_sticks,
+		stick_dead_zone
+	)
+}
 }
 }

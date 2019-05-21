@@ -23,15 +23,14 @@ namespace mo {
 	class Player_tag_comp : public ecs::Component<Player_tag_comp> {
 		public:
 			static constexpr const char* name() {return "Player_tag";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Player_tag_comp(ecs::Entity& owner, uint8_t id=0): Component(owner), _id(id) {}
 
 			auto id()const noexcept{return _id;}
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			uint8_t _id;
 	};

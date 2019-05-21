@@ -17,7 +17,7 @@
         "effect": "explosion_ice",
         "force_feedback": 0.75
     },
-    "Friend",
+    "Friend": {},
     "State": {
         "delete_dead":true
     },

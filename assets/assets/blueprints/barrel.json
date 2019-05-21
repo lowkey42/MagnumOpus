@@ -19,7 +19,7 @@
     },
     "Health":{
         "max_hp": 1,
-        "vulnerabilities": [fire]
+        "vulnerabilities": ["fire"]
      },
     "State": {
         "delete_dead":true

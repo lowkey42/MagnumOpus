@@ -95,6 +95,9 @@ namespace ecs {
 	};
 
 
+	// entity transfer object
+	using ETO = std::string;
+
 	class Entity_manager : util::no_copy_move {
 		public:
 			Entity_manager(asset::Asset_manager& asset_mgr);
@@ -102,8 +105,6 @@ namespace ecs {
 			auto emplace()noexcept -> Entity_ptr;
 			auto emplace(const asset::AID& blueprint)noexcept -> Entity_ptr;
 			void erase(Entity_ptr entity);
-			auto list_entities()const {return util::range(_entities);}
-			void clear(); //< "Please do not press this button again."
 
 			template<typename Comp>
 			auto list() -> typename Comp::Pool&;
@@ -116,10 +117,16 @@ namespace ecs {
 			void process_queued_actions();
 			void shrink_to_fit();
 
-			auto serializer()noexcept -> Serializer& {return *_serializer;}
+
+			void write(std::ostream&);
+			void write(std::ostream&, const std::vector<Entity_ptr>&);
+			void read(std::istream&, bool clear=true);
 
 		private:
 			friend class Entity;
+			friend auto load_entity(Entity_manager& manager, const ETO& eto) -> Entity_ptr;
+
+			asset::Asset_manager& _asset_mgr;
 
 			std::vector<Entity_ptr> _entities;
 			std::vector<Entity_ptr> _delete_queue;
@@ -127,8 +134,10 @@ namespace ecs {
 
 			std::unique_ptr<Component_pool_base> _pools[details::max_comp_type];
 			std::unordered_map<std::string, details::Component_type_info> _types;
-			std::unique_ptr<Serializer> _serializer;
 	};
+
+	extern auto save_entity(Entity_manager& manager, const Entity& entity) -> ETO;
+	extern auto load_entity(Entity_manager& manager, const ETO& eto) -> Entity_ptr;
 
 } /* namespace ecs */
 }

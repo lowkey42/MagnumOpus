@@ -4,7 +4,6 @@
 #include <map>
 
 #include <sf2/sf2.hpp>
-#include <sf2/FileParser.hpp>
 
 #include "../state/state_comp.hpp"
 #include "../physics/transform_comp.hpp"
@@ -50,14 +49,14 @@ namespace combat {
 		};
 
 		sf2_structDef(Damage_effect_data,
-			sf2_member(time),
-			sf2_member(confusion),
-			sf2_member(slow_down_factor),
-			sf2_member(dmg_per_sec),
-			sf2_member(dmg_type),
-			sf2_member(effect)
+			time,
+			confusion,
+			slow_down_factor,
+			dmg_per_sec,
+			dmg_type,
+			effect
 		)
-		sf2_structDef(Ot_effect_datas, sf2_member(effects))
+		sf2_structDef(Ot_effect_datas, effects)
 	}
 
 	struct Dmg_effect_data {
@@ -77,7 +76,9 @@ namespace asset {
 			auto r = std::make_shared<Dmg_effect_data>();
 
 			Ot_effect_datas d;
-			sf2::parseStream(in, d);
+			sf2::deserialize_json(in, [&](auto& msg, uint32_t row, uint32_t column) {
+				ERROR("Error parsing JSON from "<<in.aid().str()<<" at "<<row<<":"<<column<<": "<<msg);
+			}, d);
 
 			r->effects.resize(damge_effect_count);
 

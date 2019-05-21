@@ -1,9 +1,10 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 position;
-in vec2 in_uv;
+attribute vec2 position;
+attribute vec2 in_uv;
 
-out vec2 uv;
+varying vec2 uv;
 
 uniform mat4 MVP;
 

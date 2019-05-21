@@ -25,8 +25,9 @@ namespace combat {
 	class Score_comp : public ecs::Component<Score_comp> {
 		public:
 			static constexpr const char* name() {return "Score";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Score_comp(ecs::Entity& owner, int value=0) noexcept
 				: Component(owner), _value(value) {}
@@ -36,8 +37,6 @@ namespace combat {
 
 			void add(int mod)noexcept {_value+=mod;}
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			friend class Collectable_subsystem;
 			friend class Reaper_subsystem;

@@ -1,6 +1,7 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 uvl;
+varying vec2 uvl;
 
 uniform sampler2D texture;
 
@@ -13,6 +14,6 @@ void main() {
 
 	if(c.a>0.0 && maxc>0.85 && lum>0.3) {
 		gl_FragColor = c * maxc;
-	}else
+	} else
 		discard;
 }

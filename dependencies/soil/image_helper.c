@@ -12,9 +12,11 @@
 
 #include <GL/glew.h>
 #include <string.h>
+#include <stdio.h>
 
 int query_gl_extension( const char *extension) {
-#ifdef EMSCRIPTEN
+	return 1;
+/*#ifdef EMSCRIPTEN
 	return 1; // workaround for EMSCRIPTEN
 #else
 	GLint num_extensions, i;
@@ -29,6 +31,7 @@ int query_gl_extension( const char *extension) {
 
 	return 0;
 #endif
+*/
 }
 
 /*	Upscaling the image uses simple bilinear interpolation	*/

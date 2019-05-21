@@ -1,7 +1,6 @@
 #include "transform_comp.hpp"
 
 #include <sf2/sf2.hpp>
-#include "../../../core/ecs/serializer_impl.hpp"
 
 namespace mo {
 namespace sys {
@@ -20,16 +19,19 @@ namespace physics {
 	};
 
 	sf2_structDef(Transform_comp::Persisted_state,
-		sf2_member(x),
-		sf2_member(y),
-		sf2_member(rot),
-		sf2_member(rot_speed),
-		sf2_member(layer),
-		sf2_member(rotation_fixed)
+		x,
+		y,
+		rot,
+		rot_speed,
+		layer,
+		rotation_fixed
 	)
 
-	void Transform_comp::load(ecs::Entity_state& state){
-		auto s = state.read_to(Persisted_state{*this});
+	void Transform_comp::load(sf2::JsonDeserializer& state,
+	                          asset::Asset_manager&){
+		auto s = Persisted_state{*this};
+		state.read(s);
+
 		_position.x = Distance(s.x);
 		_position.y = Distance(s.y);
 		_rotation = Angle(s.rot);
@@ -38,8 +40,9 @@ namespace physics {
 		layer(s.layer);
 		_dirty = true;
 	}
-	void Transform_comp::store(ecs::Entity_state& state){
-		state.write_from(Persisted_state{*this});
+	void Transform_comp::save(sf2::JsonSerializer& state)const {
+		auto s = Persisted_state{*this};
+		state.write(s);
 	}
 
 }

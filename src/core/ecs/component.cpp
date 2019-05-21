@@ -1,6 +1,7 @@
 #include "component.hpp"
 
 #include "ecs.hpp"
+#include "serializer.hpp"
 
 namespace mo {
 namespace ecs {
@@ -46,6 +47,9 @@ namespace details {
 		return id;
 	}
 
+	void load(sf2::JsonDeserializer& state, Component_base& v){
+		v.load(state, static_cast<EcsDeserializer&>(state).assets);
+	}
 }
 }
 }

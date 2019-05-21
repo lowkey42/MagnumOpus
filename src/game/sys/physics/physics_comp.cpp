@@ -1,7 +1,6 @@
 #include "physics_comp.hpp"
 
 #include <sf2/sf2.hpp>
-#include "../../../core/ecs/serializer_impl.hpp"
 
 namespace mo {
 namespace sys {
@@ -13,8 +12,8 @@ namespace physics{
 		float x, y;
 	};
 	sf2_structDef(DFloatS,
-		sf2_member(x),
-		sf2_member(y)
+		x,
+		y
 	)
 
 	struct Physics_comp::Persisted_state {
@@ -46,20 +45,23 @@ namespace physics{
 	};
 
 	sf2_structDef(Physics_comp::Persisted_state,
-		sf2_member(radius),
-		sf2_member(mass),
-		sf2_member(restitution),
-		sf2_member(friction),
-		sf2_member(max_active_velocity),
-		sf2_member(active_acceleration),
-		sf2_member(group),
-		sf2_member(velocity),
-		sf2_member(acceleration),
-		sf2_member(group_exclude)
+		radius,
+		mass,
+		restitution,
+		friction,
+		max_active_velocity,
+		active_acceleration,
+		group,
+		velocity,
+		acceleration,
+		group_exclude
 	)
 
-	void Physics_comp::load(ecs::Entity_state& state){
-		auto s = state.read_to(Persisted_state{*this});
+	void Physics_comp::load(sf2::JsonDeserializer& state,
+	                        asset::Asset_manager&){
+
+		auto s = Persisted_state{*this};
+		state.read(s);
 
 		_body_radius = Distance(s.radius);
 		mass(Mass(s.mass));
@@ -74,8 +76,9 @@ namespace physics{
 		_acceleration = {Speed_per_time(s.acceleration.x), Speed_per_time(s.acceleration.y)};
 		_active = true;
 	}
-	void Physics_comp::store(ecs::Entity_state& state){
-		state.write_from(Persisted_state{*this});
+	void Physics_comp::save(sf2::JsonSerializer& state)const {
+		auto s = Persisted_state{*this};
+		state.write(s);
 	}
 
 

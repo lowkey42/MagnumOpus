@@ -28,8 +28,9 @@ namespace combat {
 	class Health_comp : public ecs::Component<Health_comp> {
 		public:
 			static constexpr const char* name() {return "Health";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Health_comp(ecs::Entity& owner) noexcept
 				: Component(owner) {}
@@ -45,8 +46,6 @@ namespace combat {
 
 			auto death_effect()const noexcept {return _death_effect;}
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			friend class Combat_system;
 			friend class Reaper_subsystem;

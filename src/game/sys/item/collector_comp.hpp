@@ -29,8 +29,9 @@ namespace item {
 	class Collector_comp : public ecs::Component<Collector_comp> {
 		public:
 			static constexpr const char* name() {return "Collector";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Collector_comp(ecs::Entity& owner) noexcept : Component(owner) {}
 

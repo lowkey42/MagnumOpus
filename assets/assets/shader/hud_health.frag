@@ -1,11 +1,10 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 uvl;
+varying vec2 uvl;
 
 uniform sampler2D tex;
-
 uniform float health;
-
 uniform float health_anim;
 
 vec4 calc(vec4 hb, float h) {

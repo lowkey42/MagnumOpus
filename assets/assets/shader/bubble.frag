@@ -1,15 +1,12 @@
-#version auto
+#version 100
+precision mediump float;
 
-in vec2 uvl;
+varying vec2 uvl;
 
 uniform sampler2D texture;
-
 uniform float time;
-
 uniform float fill_level;
-
 uniform float activity;
-
 uniform vec4 color;
 
 vec4 get(vec2 rp,float r, float offset, float speedX, float speedY) {

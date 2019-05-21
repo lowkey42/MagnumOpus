@@ -1,7 +1,5 @@
 #include "collector_comp.hpp"
 
-#include <core/ecs/serializer_impl.hpp>
-
 #include "../physics/physics_comp.hpp"
 #include "../physics/transform_system.hpp"
 
@@ -11,37 +9,43 @@ namespace item {
 
 	using namespace unit_literals;
 
-	struct Collector_comp::Persisted_state {
-		float force;
-		float near, far;
-		float near_angle, far_angle;
 
-		Persisted_state(const Collector_comp& c)
-		    : force(c._force.value()),
-		      near(c._near.value()),
-		      far(c._far.value()),
-		      near_angle(c._near_angle / 1_deg),
-		      far_angle(c._far_angle / 1_deg) {}
-	};
+	void Collector_comp::load(sf2::JsonDeserializer& state,
+	                          asset::Asset_manager&) {
+		float force = _force / 1_n;
+		float near = _near / 1_m;
+		float far = _far / 1_m;
+		float near_angle = _near_angle / 1_deg;
+		float far_angle = _far_angle / 1_deg;
 
-	sf2_structDef(Collector_comp::Persisted_state,
-		sf2_member(force),
-		sf2_member(near),
-		sf2_member(far),
-		sf2_member(near_angle),
-		sf2_member(far_angle)
-	)
+		state.read_virtual(
+			sf2::vmember("force", force),
+			sf2::vmember("near", near),
+			sf2::vmember("far", far),
+			sf2::vmember("near_angle", near_angle),
+			sf2::vmember("far_angle", far_angle)
+		);
 
-	void Collector_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
-		_force      = s.force * 1_n;
-		_near       = s.near * 1_m;
-		_far        = s.far * 1_m;
-		_near_angle = s.near_angle * 1_deg;
-		_far_angle  = s.far_angle * 1_deg;
+		_force      = force * 1_n;
+		_near       = near * 1_m;
+		_far        = far * 1_m;
+		_near_angle = near_angle * 1_deg;
+		_far_angle  = far_angle * 1_deg;
 	}
-	void Collector_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Collector_comp::save(sf2::JsonSerializer& state)const {
+		float force = _force / 1_n;
+		float near = _near / 1_m;
+		float far = _far / 1_m;
+		float near_angle = _near_angle / 1_deg;
+		float far_angle = _far_angle / 1_deg;
+
+		state.write_virtual(
+			sf2::vmember("force", force),
+			sf2::vmember("near", near),
+			sf2::vmember("far", far),
+			sf2::vmember("near_angle", near_angle),
+			sf2::vmember("far_angle", far_angle)
+		);
 	}
 
 }

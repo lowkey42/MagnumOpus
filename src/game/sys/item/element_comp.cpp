@@ -1,8 +1,6 @@
 #define MO_BUILD_SERIALIZER
 #include "element_comp.hpp"
 
-#include <core/ecs/serializer_impl.hpp>
-
 namespace mo {
 namespace sys {
 namespace item {
@@ -14,7 +12,7 @@ namespace item {
 		std::vector<level::Element> self;
 		std::vector<Element_slot> slots;
 
-		Persisted_state(Element_comp& e) {
+		Persisted_state(const Element_comp& e) {
 			auto self_size = e._self_effects.size();
 			self.reserve(self_size);
 			for(auto i : range(self_size))
@@ -29,17 +27,19 @@ namespace item {
 	};
 
 	sf2_structDef(Element_slot,
-		sf2_member(element),
-		sf2_member(fill),
-		sf2_member(active),
+		element,
+		fill,
+		active
 	)
 	sf2_structDef(Element_comp::Persisted_state,
-		sf2_member(self),
-		sf2_member(slots)
+		self,
+		slots
 	)
 
-	void Element_comp::load(ecs::Entity_state& state) {
-		auto s = state.read_to(Persisted_state{*this});
+	void Element_comp::load(sf2::JsonDeserializer& state,
+	                        asset::Asset_manager&) {
+		auto s = Persisted_state{*this};
+		state.read(s);
 		_self_effects = Elements{s.self};
 
 		INVARIANT(s.slots.size()<=element_slots, "loaded more slots than available");
@@ -48,8 +48,9 @@ namespace item {
 		for(auto& es : s.slots)
 			_slots[i++] = es;
 	}
-	void Element_comp::store(ecs::Entity_state& state) {
-		state.write_from(Persisted_state{*this});
+	void Element_comp::save(sf2::JsonSerializer& state)const {
+		auto s = Persisted_state{*this};
+		state.write(s);
 	}
 
 	bool Element_comp::flip_slot(std::size_t i)noexcept {

@@ -31,7 +31,7 @@
 
 /**
  * void example(asset::Manager& assetMgr) {
- *		asset::Ptr itemTex = assetMgr.load<Texture>("tex:items/health/small"_aid);
+ *		asset::Ptr<Texture> itemTex = assetMgr.load<Texture>("tex:items/health/small"_aid);
  * }
  */
 namespace mo {
@@ -47,8 +47,8 @@ namespace asset {
 			bool operator==(const Ptr& o)const noexcept;
 			bool operator<(const Ptr& o)const noexcept;
 
-            auto operator*() -> const R&;
-            auto operator*()const -> const R&;
+			auto operator*() -> const R&;
+			auto operator*()const -> const R&;
 
 			auto operator->() -> const R*;
 			auto operator->()const -> const R*;

@@ -1,8 +1,9 @@
-#version auto
+#version 100
+precision mediump float;
 
 uniform vec4 color;
 
-in float rp;
+varying float rp;
 
 void main() {
 	gl_FragColor = color * (1.0-abs(rp));

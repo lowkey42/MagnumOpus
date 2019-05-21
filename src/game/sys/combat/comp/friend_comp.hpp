@@ -25,8 +25,9 @@ namespace combat {
 	class Friend_comp : public ecs::Component<Friend_comp> {
 		public:
 			static constexpr const char* name() {return "Friend";}
-			void load(ecs::Entity_state&)override;
-			void store(ecs::Entity_state&)override;
+			void load(sf2::JsonDeserializer& state,
+			          asset::Asset_manager& asset_mgr)override;
+			void save(sf2::JsonSerializer& state)const override;
 
 			Friend_comp(ecs::Entity& owner, int group=0) noexcept
 				: Component(owner), _group(group) {}
@@ -34,8 +35,6 @@ namespace combat {
 			void group(int group)noexcept {_group=group;}
 			auto group()const noexcept {return _group;}
 
-			struct Persisted_state;
-			friend struct Persisted_state;
 		private:
 			float _group;
 	};
