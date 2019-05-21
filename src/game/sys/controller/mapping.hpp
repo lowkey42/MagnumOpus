@@ -269,9 +269,9 @@ namespace asset {
 	struct Loader<sys::controller::Mapping> {
 		using RT = std::shared_ptr<sys::controller::Mapping>;
 
-		static RT load(istream in) throw(Loading_failed);
+		static RT load(istream in);
 
-		static void store(ostream out, sys::controller::Mapping& asset) throw(Loading_failed);
+		static void store(ostream out, sys::controller::Mapping& asset);
 	};
 }
 }

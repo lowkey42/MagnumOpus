@@ -327,14 +327,14 @@ namespace asset {
 	struct Loader<ecs::Blueprint> {
 		using RT = std::shared_ptr<ecs::Blueprint>;
 
-		static RT load(istream in) throw(Loading_failed){
+		static RT load(istream in) {
 			return std::make_shared<ecs::Blueprint>(
 						in.manager(),
 						in.aid(),
 						ecs::Blueprint::Data{in.content()});
 		}
 
-		static void store(ostream out, ecs::Blueprint& asset) throw(Loading_failed) {
+		static void store(ostream out, ecs::Blueprint& asset) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

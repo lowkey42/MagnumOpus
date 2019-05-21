@@ -17,7 +17,8 @@ namespace item {
 		Persisted_state(const Item_comp& c)
 			: target(c._target),
 			  element(c._element),
-			  mod(c._mod){}
+			  mod(c._mod),
+		      joinable(c._joinable){}
 	};
 
 	sf2_enumDef(Item_target,

@@ -1,7 +1,7 @@
 {
     "Transform":{"layer":0.2},
 	"Physics":{
-        "radius": 0.25,
+        "radius": 0.1,
         "mass": 1,
         "restitution": 0.0,
 		"friction": 0.0001,

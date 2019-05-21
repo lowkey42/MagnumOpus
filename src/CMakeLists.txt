@@ -5,14 +5,14 @@ add_subdirectory(core)
 
 project(MagnumOpus)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Werror -Wno-unused-parameter")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++1y -Wextra -Wall -pedantic -Wno-unused-parameter -fPIC")
 
 include_directories(${ROOT_DIR}/src)
 
 
 if(EMSCRIPTEN)
-	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -Oz -s DEMANGLE_SUPPORT=1")
-	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -O3 -s USE_SDL=2 -s TOTAL_MEMORY=134217728 -s DEMANGLE_SUPPORT=1")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -s WASM=1 -s SINGLE_FILE=1 -s DEMANGLE_SUPPORT=1 -s USE_SDL=2 -s USE_SDL_MIXER=2 -s FULL_ES3=1 -s USE_VORBIS=1 -s USE_OGG=1 -s TOTAL_MEMORY=134217728 -O3")
+	set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -s WASM=1 -s SINGLE_FILE=1 -s DEMANGLE_SUPPORT=1 -s USE_SDL=2 -s USE_SDL_MIXER=2 -s FULL_ES3=1 -s USE_VORBIS=1 -s USE_OGG=1 -s TOTAL_MEMORY=134217728 -O3")
 	set(ZLIB_LIBRARY "")
 	set(GLEW_LIBRARIES "")
 	set(OPENGL_LIBRARIES "")
@@ -46,6 +46,8 @@ else()
 			set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Ofast")
 		endif()
 	endif()
+
+	set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 	
 	add_definitions(-DSTACKTRACE)
 	find_package(GLEW REQUIRED)
@@ -92,6 +94,7 @@ add_executable(MagnumOpus main.cpp ${MAGNUM_SRCS})
 
 if(EMSCRIPTEN)
 	target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core)
+	set_target_properties(MagnumOpus PROPERTIES SUFFIX ".html" LINK_FLAGS "-s WASM=1 -s SINGLE_FILE=1 -s DEMANGLE_SUPPORT=1 -s USE_SDL_MIXER=2 -s USE_SDL=2 -s FULL_ES3=1 -s USE_VORBIS=1 -s USE_OGG=1 -s TOTAL_MEMORY=134217728 -O3")
 else()
 	target_link_libraries(MagnumOpus ${SDL2_LIBRARY} core happyhttp)
 endif()

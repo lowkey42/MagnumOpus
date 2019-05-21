@@ -33,7 +33,7 @@ namespace audio {
 
 	class Music {
 		public:
-			explicit Music(asset::istream stream) throw(Music_loading_failed);
+			explicit Music(asset::istream stream);
 			virtual ~Music()noexcept = default;
 
 			Music& operator=(Music&&) noexcept = default;
@@ -60,11 +60,11 @@ namespace asset {
 	struct Loader<audio::Music> {
 		using RT = std::shared_ptr<audio::Music>;
 
-		static RT load(istream in) throw(Loading_failed){
+		static RT load(istream in) {
 			return std::make_unique<audio::Music>(std::move(in));
 		}
 
-		static void store(ostream out, const audio::Music& asset) throw(Loading_failed) {
+		static void store(ostream out, const audio::Music& asset) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

@@ -34,7 +34,7 @@ namespace audio {
 	class Sound {
 		public:
 			Sound() = delete;
-			explicit Sound(asset::istream stream) throw(Sound_loading_failed);
+			explicit Sound(asset::istream stream);
 			virtual ~Sound()noexcept = default;
 
 			Sound& operator=(Sound&&) noexcept = default;
@@ -60,11 +60,11 @@ namespace asset {
 	struct Loader<audio::Sound> {
 		using RT = std::shared_ptr<audio::Sound>;
 
-		static RT load(istream in) throw(Loading_failed){
+		static RT load(istream in) {
 			return std::make_unique<audio::Sound>(std::move(in));
 		}
 
-		static void store(ostream out, const audio::Sound& asset) throw(Loading_failed) {
+		static void store(ostream out, const audio::Sound& asset) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

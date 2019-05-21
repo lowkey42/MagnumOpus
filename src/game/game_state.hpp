@@ -147,9 +147,9 @@ namespace mo {
 		struct Loader<Saveable_state> {
 			using RT = std::shared_ptr<Saveable_state>;
 
-			static RT load(istream in) throw(Loading_failed);
+			static RT load(istream in);
 
-			static void store(ostream out, const Saveable_state& asset) throw(Loading_failed);
+			static void store(ostream out, const Saveable_state& asset);
 		};
 	}
 }

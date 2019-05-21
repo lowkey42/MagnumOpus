@@ -45,7 +45,7 @@ namespace asset {
 	struct Loader<Type> {
 		using RT = std::shared_ptr<Type>;
 
-		static RT load(istream in) throw(Loading_failed) {
+		static RT load(istream in) {
 			auto r = std::make_shared<Type>();
 
 			sys::item::Config_data data;
@@ -58,7 +58,7 @@ namespace asset {
 			return r;
 		}
 
-		static void store(ostream out, const Type& asset) throw(Loading_failed) {
+		static void store(ostream out, const Type& asset) {
 			//sf2::writeStream(out,asset);
 			INVARIANT(false, "NOT IMPLEMENTED");
 		}

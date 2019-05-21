@@ -165,9 +165,16 @@ namespace mo {
 				}
 
 				if(room.type==level::Room_type::end) {
-					auto enemy_count = util::random_int(rng, 1, 2);
+					auto enemy_count = depth>0 ? util::random_int(rng, 1, 2) : 1;
 
-					switch(util::random_int(rng, depth>0 ? 0 : 2, 3)) {
+					auto min_type = 0;
+					auto max_type = 2;
+					if(depth==0)
+						min_type = 2;
+					else if(depth==1)
+						max_type = 1;
+
+					switch(util::random_int(rng, min_type, max_type)) {
 						case 0:
 							for(int i=0; i<enemy_count; i++)
 								spawn("blueprint:pyro"_aid);
@@ -185,8 +192,8 @@ namespace mo {
 							break;
 					}
 
-				} else {
-					if(util::random_bool(rng, 0.3)) {
+				} else if(depth>0) {
+					if(util::random_bool(rng, 0.3f)) {
 						spawn("blueprint:turret_ice"_aid);
 					}
 				}
@@ -453,11 +460,11 @@ namespace mo {
 	)
 
 	namespace asset {
-		auto Loader<Saveable_state>::load(istream in) throw(Loading_failed) -> std::shared_ptr<Saveable_state> {
+		auto Loader<Saveable_state>::load(istream in) -> std::shared_ptr<Saveable_state> {
 			return std::make_shared<Saveable_state>(std::move(in));
 		}
 
-		void Loader<Saveable_state>::store(ostream out, const Saveable_state& asset) throw(Loading_failed) {
+		void Loader<Saveable_state>::store(ostream out, const Saveable_state& asset) {
 			asset.profile.process([&](auto& p){
 				sf2::writeStream(out, p);
 			});

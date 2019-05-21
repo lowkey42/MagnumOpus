@@ -90,9 +90,9 @@ namespace asset {
 	struct Loader<renderer::Animation> {
 		using RT = std::shared_ptr<renderer::Animation>;
 
-		static RT load(istream in) throw(Loading_failed);
+		static RT load(istream in);
 
-		static void store(ostream out, const renderer::Animation& asset) throw(Loading_failed);
+		static void store(ostream out, const renderer::Animation& asset);
 	};
 }
 }

@@ -157,13 +157,13 @@ namespace asset {
 	struct Loader<level::Level> {
 		using RT = std::shared_ptr<const level::Level>;
 
-		RT operator()(istream in) throw(Loading_failed){
+		RT operator()(istream in) {
 			auto l = std::make_shared<level::Level>();
 			l->load(in);
 			return l;
 		}
 
-		void operator()(ostream out, const level::Level& level) throw(Loading_failed) {
+		void operator()(ostream out, const level::Level& level) {
 			level.store(out);
 		}
 	};

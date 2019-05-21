@@ -15,8 +15,8 @@ namespace cam {
 
 	constexpr auto world_scale = 64; // pixel/meter
 	constexpr auto vscreen_height = 512;
-	constexpr auto min_zoom = 1.f / 2;
-	constexpr auto max_zoom = 0.8f;
+	constexpr auto min_zoom = 0.1f;
+	constexpr auto max_zoom = 0.5f;
 
 	VScreen::VScreen(glm::vec2 real_size, glm::vec2 vsize, float world_scale)
 		: camera(vsize, world_scale), vscreen(real_size.x, real_size.y, true) {
@@ -71,7 +71,7 @@ namespace cam {
 
 				target._last_rotation = target._last_rotation*(1-dt.value()*4.f) + target_rot*dt.value()*4.f;
 
-				target_offset += rotate(Position{3_m, 0_m}, target._last_rotation);
+				//target_offset += rotate(Position{1_m, 0_m}, target._last_rotation);
 
 				target.chase(target_pos, dt);
 			});

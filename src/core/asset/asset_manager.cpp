@@ -16,7 +16,7 @@
 	#include <unistd.h>
 #endif
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 	#include <emscripten.h>
 #endif
 
@@ -103,7 +103,7 @@ namespace asset {
 #endif
 		);
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		EM_ASM(
 			FS.mkdir('/persistent_data');
 			FS.mount(IDBFS, {}, '/persistent_data');
@@ -202,7 +202,7 @@ namespace asset {
 	}
 
 	void Asset_manager::_post_write() {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		//persist Emscripten current data to Indexed Db
 		EM_ASM(
 			FS.syncfs(false,function (err) {
@@ -274,7 +274,7 @@ namespace asset {
 		return util::nothing();
 	}
 
-	ostream Asset_manager::_create(const AID& id) throw(Loading_failed) {
+	ostream Asset_manager::_create(const AID& id) {
 		std::string path;
 
 		auto path_res = _dispatcher.find(id);

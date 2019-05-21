@@ -32,8 +32,8 @@ namespace renderer {
 
 	class Texture {
 		public:
-			explicit Texture(const std::string& path) throw(Texture_loading_failed);
-			explicit Texture(std::vector<uint8_t> buffer) throw(Texture_loading_failed);
+			explicit Texture(const std::string& path);
+			explicit Texture(std::vector<uint8_t> buffer);
 			Texture(int width, int height, std::vector<uint8_t> rgba_data);
 			virtual ~Texture()noexcept;
 
@@ -105,11 +105,11 @@ namespace asset {
 	struct Loader<renderer::Texture> {
 		using RT = std::shared_ptr<renderer::Texture>;
 
-		static RT load(istream in) throw(Loading_failed){
+		static RT load(istream in) {
 			return std::make_shared<renderer::Texture>(in.bytes());
 		}
 
-		static void store(ostream out, const renderer::Texture& asset) throw(Loading_failed) {
+		static void store(ostream out, const renderer::Texture& asset) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

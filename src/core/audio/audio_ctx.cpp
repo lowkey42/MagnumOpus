@@ -7,7 +7,7 @@
 #include <sf2/sf2.hpp>
 #include <sf2/FileParser.hpp>
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 #	include <SDL2/SDL_mixer.h>
 #else
 #	include <SDL/SDL_mixer.h>
@@ -34,7 +34,7 @@ namespace mo {
 				sf2_member(sound_volume)
 			)
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.8f, 1.0f};
 #else
 			constexpr auto default_cfg = Sounds_cfg{44100, 2, 4096, 0.8f, 1.0f};
@@ -67,7 +67,7 @@ namespace mo {
 		struct Loader<audio::Sounds_cfg> {
 			using RT = std::shared_ptr<audio::Sounds_cfg>;
 
-			static RT load(istream in) throw(Loading_failed) {
+			static RT load(istream in) {
 				auto r = std::make_shared<audio::Sounds_cfg>();
 
 				sf2::parseStream(in, *r);
@@ -75,7 +75,7 @@ namespace mo {
 				return r;
 			}
 
-			static void store(ostream out, const audio::Sounds_cfg& asset) throw (Loading_failed) {
+			static void store(ostream out, const audio::Sounds_cfg& asset) {
 				sf2::writeStream(out, asset);
 			}
 		};
@@ -110,7 +110,9 @@ namespace mo {
 
 			int mix_flags = MIX_INIT_OGG;
 			if((Mix_Init(mix_flags)&mix_flags) != mix_flags) {
+#ifndef __EMSCRIPTEN__
 				FAIL("Initializing Mixer failed: " << Mix_GetError());
+#endif
 			}
 
 			// Open SDL Audio Mixer
@@ -158,7 +160,7 @@ namespace mo {
 			if(!music || !music->valid())
 				return;
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 			Mix_FadeInMusic(music->getMusic(), -1, static_cast<int>(fade_time/1_ms));
 #else
 			Mix_PlayMusic(music->getMusic(), -1);
@@ -229,7 +231,7 @@ namespace mo {
 			auto c = extract_channel(id);
 			auto v = extract_version(id);
 			if(c<_dynamic_channels && _channel_versions[c]==v) {
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 				auto a = angle.in_degrees();
 
 				// Converting Coordinate System from game (up = 90, right = 180 / -180, down = -90, left = 0)
@@ -262,7 +264,7 @@ namespace mo {
 			auto c = extract_channel(id);
 			auto v = extract_version(id);
 			if(c>=_dynamic_channels || _channel_versions[c]==v) {
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 				Mix_FadeOutChannel(c, 100);
 #else
 				Mix_HaltChannel(c);

@@ -20,7 +20,7 @@ namespace {
 		}
 	}
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 	void
 #ifdef GLAPIENTRY
 	GLAPIENTRY
@@ -47,7 +47,7 @@ namespace {
 		sf2_member(brightness)
 	)
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 	constexpr auto default_cfg = Graphics_cfg{1920,1080,true, 0.5f, 1.2f};
 #else
 	constexpr auto default_cfg = Graphics_cfg{1024,512,false, 0.5f, 1.2f};
@@ -61,7 +61,7 @@ namespace asset {
 	struct Loader<Graphics_cfg> {
 		using RT = std::shared_ptr<Graphics_cfg>;
 
-		static RT load(istream in) throw(Loading_failed) {
+		static RT load(istream in) {
 			auto r = std::make_shared<Graphics_cfg>();
 
 			sf2::parseStream(in, *r);
@@ -69,7 +69,7 @@ namespace asset {
 			return r;
 		}
 
-		static void store(ostream out, const Graphics_cfg& asset) throw(Loading_failed) {
+		static void store(ostream out, const Graphics_cfg& asset) {
 			sf2::writeStream(out,asset);
 		}
 	};
@@ -96,7 +96,7 @@ namespace renderer {
 			assets.save<Graphics_cfg>("cfg:graphics"_aid, cfg);
 		}
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
 		SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -128,12 +128,12 @@ namespace renderer {
 			FAIL("Failure to create OpenGL context. This application requires a OpenGL 3.3 capable GPU. Error was: "<< ex.what());
 		}
 
-		if(SDL_GL_SetSwapInterval(-1)) SDL_GL_SetSwapInterval(1);
+		SDL_GL_SetSwapInterval(1);
 
 		glewExperimental = GL_TRUE;
 		glewInit();
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 		INVARIANT(GLEW_VERSION_3_3, "Requested OpenGL 3.3 Context but 3.3 Features are not available.");
 
 		if(GLEW_KHR_debug){
@@ -148,6 +148,7 @@ namespace renderer {
 		glBlendFunc(GL_ONE, GL_ONE_MINUS_SRC_ALPHA);
 		glEnable(GL_DEPTH_TEST);
 		set_clear_color(0.0f,0.0f,0.0f);
+		SDL_GL_SetSwapInterval(1);
 	}
 
 	Graphics_ctx::~Graphics_ctx() {
@@ -185,6 +186,12 @@ namespace renderer {
 		// unbind texture
 		glActiveTexture(0);
 		glBindTexture(GL_TEXTURE_2D, 0);
+
+#ifndef SLOW_SYSTEM
+		if( delta_time < 1.f/60 ) {
+            SDL_Delay(Uint32(1000*(1.f/60 - delta_time)));
+        }
+#endif
 	}
 	void Graphics_ctx::set_clear_color(float r, float g, float b) {
 		_clear_color = glm::vec3(r,g,b);

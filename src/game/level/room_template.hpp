@@ -63,13 +63,13 @@ namespace asset {
 	struct Loader<level::Room_template> {
 		using RT = std::shared_ptr<const level::Room_template>;
 
-		RT operator()(istream in) throw(Loading_failed){
+		RT operator()(istream in) {
 			auto r = std::make_shared<level::Room_template>();
 			r->load(in);
 			return r;
 		}
 
-		void operator()(ostream out, const level::Room_template& asset) throw(Loading_failed) {
+		void operator()(ostream out, const level::Room_template& asset) {
 			asset.store(out);
 		}
 	};

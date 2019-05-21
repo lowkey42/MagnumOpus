@@ -80,9 +80,9 @@ namespace asset {
 	struct Loader<sys::sound::Sound_comp_data> {
 		using RT = std::shared_ptr<sys::sound::Sound_comp_data>;
 
-		static RT load(istream in) throw(Loading_failed);
+		static RT load(istream in);
 
-		static void store(ostream out, const sys::sound::Sound_comp_data& asset) throw(Loading_failed);
+		static void store(ostream out, const sys::sound::Sound_comp_data& asset);
 	};
 
 }

@@ -316,6 +316,7 @@
 					  printStackTrace("Caught SIGFPE: Arithmetic Exception");
 					  break;
 				  }
+					  break;
 				  case SIGILL:
 						switch(siginfo->si_code) {
 						  case ILL_ILLOPC:

@@ -72,7 +72,7 @@ namespace asset {
 	struct Loader<sys::combat::Dmg_effect_data> {
 		using RT = std::shared_ptr<sys::combat::Dmg_effect_data>;
 
-		static RT load(istream in) throw(Loading_failed) {
+		static RT load(istream in) {
 			using namespace sys::combat;
 			auto r = std::make_shared<Dmg_effect_data>();
 
@@ -91,7 +91,7 @@ namespace asset {
 			return r;
 		}
 
-		static void store(ostream out, const sys::combat::Dmg_effect_data& asset) throw(Loading_failed) {
+		static void store(ostream out, const sys::combat::Dmg_effect_data& asset) {
 			INVARIANT(false, "Not implemented");
 		}
 	};

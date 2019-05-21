@@ -42,7 +42,7 @@ namespace asset {
 	struct Loader<sys::item::Droprate_conf> {
 		using RT = std::shared_ptr<sys::item::Droprate_conf>;
 
-		static RT load(istream in) throw(Loading_failed) {
+		static RT load(istream in) {
 			auto r = std::make_shared<sys::item::Droprate_conf>();
 
 			sf2::parseStream(in, *r);
@@ -50,7 +50,7 @@ namespace asset {
 			return r;
 		}
 
-		static void store(ostream out, const sys::item::Droprate_conf& asset) throw(Loading_failed) {
+		static void store(ostream out, const sys::item::Droprate_conf& asset) {
 			sf2::writeStream(out,asset);
 		}
 	};
@@ -112,6 +112,13 @@ namespace item {
 	}
 
 	void Item_system::update(Time realtime_dt, Time dt) {
+		for(auto& i : _em.list<Item_comp>()) {
+			i._despawn_time_left -= dt.value();
+			if(i._despawn_time_left < 0.f) {
+				_em.erase(i.owner_ptr());
+			}
+		}
+
 		if(_score_mult_ttl>0_s)
 			_score_mult_ttl-=dt;
 		else
@@ -228,7 +235,7 @@ namespace item {
 							case score:
 								other.get<Score_comp>().process([&](Score_comp& s) {
 									this->_score_mult_ttl = score_mult_max_ttl;
-									s.add(item._mod * this->_score_multiplicator);
+									s.add(item._mod);
 									item._collected = true;
 									_audio.play_static(*_pickup_sound_coin);
 								});
@@ -272,10 +279,17 @@ namespace item {
 						if(util::random_bool(rng, item.chance)) {
 							auto count = util::random_int(rng, item.min, item.max);
 
+							if(item.item_aid=="coin" && this->_score_multiplicator>1.1f) {
+								count = int(std::max(1,count) * std::min(10.f, std::max(1.f, this->_score_multiplicator) + 0.5f));
+							}
+
 							while(count-->0) {
 								auto spawned = _em.emplace(asset::AID(asset::Asset_type::blueprint, item.item_aid));
 								spawned->get<physics::Transform_comp>().get_or_throw().position(t.position());
 								spawned->get<physics::Physics_comp>().get_or_throw().impulse(random_dir()  *5_n);
+								spawned->get<Item_comp>().process([&](auto& item){
+									item._despawn_time_left = util::random_real(rng, 8.f, 12.f);
+								});
 							}
 						}
 					}

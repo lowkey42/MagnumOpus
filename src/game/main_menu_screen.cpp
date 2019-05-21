@@ -49,8 +49,6 @@ namespace mo {
 
 			return ss.str();
 		}
-
-		constexpr Time fade = 2_s;
 	}
 
 	Main_menu_screen::Main_menu_screen(Game_engine& game_engine, bool ingame)
@@ -58,7 +56,7 @@ namespace mo {
 	      Ui_container(game_engine, calculate_vscreen(game_engine, 512),
 	                    - vec2{
 	                       300,
-                   #ifndef EMSCRIPTEN
+                   #ifndef __EMSCRIPTEN__
 	                       (100*3+5*4)
 	               #else
 	                       (ingame ? 205 : 100)
@@ -89,7 +87,7 @@ namespace mo {
 					try {
 						game_engine.enter_screen<Game_screen>();
 
-					} catch(util::Error e) { // load failed:
+					} catch(util::Error&) { // load failed:
 						game_engine.enter_screen<Game_screen>("rodney");
 					}
 				}
@@ -100,7 +98,7 @@ namespace mo {
 			game_engine.enter_screen<Game_screen>("rodney");
 		});
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 		_root.add_new<gui::Button>("Quit", [&game_engine] {
 			game_engine.exit();
 		});

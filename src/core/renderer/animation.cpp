@@ -153,7 +153,7 @@ namespace renderer{
 
 namespace asset {
 
-	std::shared_ptr<renderer::Animation> Loader<renderer::Animation>::load(istream in) throw(Loading_failed){
+	std::shared_ptr<renderer::Animation> Loader<renderer::Animation>::load(istream in) {
 		auto r = std::make_unique<renderer::Animation_data>();
 		sf2::parseStream(in, *r);
 
@@ -165,7 +165,7 @@ namespace asset {
 		return anim;
 	}
 
-	void Loader<renderer::Animation>::store(ostream out, const renderer::Animation& asset) throw(Loading_failed) {
+	void Loader<renderer::Animation>::store(ostream out, const renderer::Animation& asset) {
 		asset._data->texName = asset._data->texture.aid().name();
 		sf2::writeStream(out, asset);
 	}

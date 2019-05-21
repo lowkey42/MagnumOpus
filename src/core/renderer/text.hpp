@@ -132,11 +132,11 @@ namespace asset {
 	struct Loader<renderer::Font> {
 		using RT = std::shared_ptr<renderer::Font>;
 
-		static RT load(istream in) throw(Loading_failed){
+		static RT load(istream in) {
 			return std::make_shared<renderer::Font>(in.manager(), in);
 		}
 
-		static void store(ostream out, const renderer::Texture& asset) throw(Loading_failed) {
+		static void store(ostream out, const renderer::Texture& asset) {
 			// TODO
 			FAIL("NOT IMPLEMENTED, YET!");
 		}

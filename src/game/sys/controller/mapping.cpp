@@ -173,7 +173,7 @@ namespace controller {
 }
 namespace asset {
 
-	std::shared_ptr<sys::controller::Mapping> Loader<sys::controller::Mapping>::load(istream in) throw(Loading_failed){
+	std::shared_ptr<sys::controller::Mapping> Loader<sys::controller::Mapping>::load(istream in) {
 		auto r = std::make_shared<sys::controller::Mapping>();
 
 		std::string data = in.content();
@@ -184,7 +184,7 @@ namespace asset {
 		return r;
 	}
 
-	void Loader<sys::controller::Mapping>::store(ostream out, sys::controller::Mapping& asset) throw(Loading_failed) {
+	void Loader<sys::controller::Mapping>::store(ostream out, sys::controller::Mapping& asset) {
 		std::string data = sf2::writeString(asset);
 		out.write(data.c_str(), data.length());
 	}

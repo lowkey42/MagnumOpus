@@ -78,15 +78,15 @@ namespace asset {
 			void shrink_to_fit()noexcept;
 
 			template<typename T>
-			auto load(const AID& id) throw(Loading_failed) -> Ptr<T>;
+			auto load(const AID& id) -> Ptr<T>;
 
 			template<typename T>
-			auto load_maybe(const AID& id) throw(Loading_failed) -> util::maybe<Ptr<T>>;
+			auto load_maybe(const AID& id) -> util::maybe<Ptr<T>>;
 
 			auto list(Asset_type type) -> std::vector<AID>;
 
 			template<typename T>
-			void save(const AID& id, const T& asset) throw(Loading_failed);
+			void save(const AID& id, const T& asset);
 
 			bool exists(const AID& id)const noexcept;
 
@@ -98,7 +98,7 @@ namespace asset {
 			using Reloader = void (*)(void*, istream);
 
 			template<class T>
-			static void _asset_reloader_impl(void* asset, istream in) throw(Loading_failed);
+			static void _asset_reloader_impl(void* asset, istream in);
 
 			struct Asset {
 				std::shared_ptr<void> data;
@@ -118,7 +118,7 @@ namespace asset {
 			auto _open(const std::string& path, const AID& aid) -> util::maybe<istream>;
 			auto _locate(const AID& id)const -> util::maybe<std::string>;
 
-			auto _create(const AID& id)throw(Loading_failed) -> ostream;
+			auto _create(const AID& id) -> ostream;
 			void _post_write();
 	};
 

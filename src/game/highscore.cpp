@@ -8,7 +8,7 @@
 #include <sf2/sf2.hpp>
 #include <sf2/FileParser.hpp>
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 #include <emscripten.h>
 #else
 #include <happyhttp/happyhttp.h>
@@ -30,7 +30,7 @@ namespace mo {
 
 		sf2_structDef(Score_list, sf2_member(scores))
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		Score_list global_scores;
 #else
 		struct My_stackframe {
@@ -50,7 +50,7 @@ namespace mo {
 		struct Loader<Score_list> {
 			using RT = std::shared_ptr<Score_list>;
 
-			static RT load(istream in) throw(Loading_failed){
+			static RT load(istream in) {
 				auto r = std::make_shared<Score_list>();
 
 				sf2::parseStream(in, *r);
@@ -58,7 +58,7 @@ namespace mo {
 				return r;
 			}
 
-			static void store(ostream out, const Score_list& asset) throw(Loading_failed) {
+			static void store(ostream out, const Score_list& asset) {
 				sf2::writeStream(out,asset);
 			}
 		};
@@ -75,7 +75,7 @@ namespace mo {
 		path<<base_url;
 		path<<"?game=magnumOpus&op=add&name="<<score.name<<"&score="<<score.score<<"&level="<<score.level<<"&seed="<<score.seed<<"&cs="<<cs;
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		std::stringstream url;
 		url<<"http://"<<base_host<<path.str();
 
@@ -98,7 +98,7 @@ namespace mo {
 
 		score_list.resize(std::min(score_list.size(), std::size_t(15)));
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 		assets.save("cfg:highscore"_aid, Score_list{score_list});
 
 		try {
@@ -121,7 +121,7 @@ namespace mo {
 	}
 
 	void prepare_list_scores(asset::Asset_manager& assets) {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		std::stringstream url;
 		url<<"http://"<<base_host<<base_url<<"?game=magnumOpus&op=list";
 
@@ -143,7 +143,7 @@ namespace mo {
 	}
 
 	auto list_scores(asset::Asset_manager& assets) -> std::vector<Score> {
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		return global_scores.scores;
 
 #else

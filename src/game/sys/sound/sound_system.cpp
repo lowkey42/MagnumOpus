@@ -76,7 +76,7 @@ namespace asset {
 	struct Loader<sys::sound::Sound_effect_data> {
 		using RT = std::shared_ptr<sys::sound::Sound_effect_data>;
 
-		static RT load(istream in) throw(Loading_failed) {
+		static RT load(istream in) {
 			auto r = std::make_shared<sys::sound::Sound_effect_data>();
 
 			sf2::parseStream(in, *r);
@@ -84,7 +84,7 @@ namespace asset {
 			return r;
 		}
 
-		static void store(ostream out, const sys::sound::Sound_effect_data& asset) throw(Loading_failed) {
+		static void store(ostream out, const sys::sound::Sound_effect_data& asset) {
 			sf2::writeStream(out,asset);
 		}
 	};

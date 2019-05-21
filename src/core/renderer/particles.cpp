@@ -231,6 +231,7 @@ namespace renderer {
 				switch(_collision_handler) {
 					case Collision_handler::stop:
 						p.velocity*=0.2f;
+						break;
 
 					case Collision_handler::bounce:
 					default:

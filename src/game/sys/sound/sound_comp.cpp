@@ -108,7 +108,7 @@ namespace sound {
 
 namespace asset {
 
-	std::shared_ptr<sys::sound::Sound_comp_data> Loader<sys::sound::Sound_comp_data>::load(istream in) throw(Loading_failed){
+	std::shared_ptr<sys::sound::Sound_comp_data> Loader<sys::sound::Sound_comp_data>::load(istream in) {
 		auto r = std::make_unique<sys::sound::Sounds_map>();
 		sf2::parseStream(in, *r);
 
@@ -133,7 +133,7 @@ namespace asset {
 		return sc_data;
 	}
 
-	void Loader<sys::sound::Sound_comp_data>::store(ostream out, const sys::sound::Sound_comp_data& asset) throw(Loading_failed) {
+	void Loader<sys::sound::Sound_comp_data>::store(ostream out, const sys::sound::Sound_comp_data& asset) {
 
 		sf2::writeStream(out, asset);
 	}

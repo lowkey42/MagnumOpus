@@ -9,13 +9,13 @@ namespace mo {
 namespace asset {
 
 	template<class T>
-	void Asset_manager::_asset_reloader_impl(void* asset, istream in) throw(Loading_failed) {
+	void Asset_manager::_asset_reloader_impl(void* asset, istream in) {
 		auto newAsset = Loader<T>::load(std::move(in));
 		*static_cast<T*>(asset) = std::move(*newAsset.get());
 	}
 
 	template<typename T>
-	Ptr<T> Asset_manager::load(const AID& id) throw(Loading_failed) {
+	Ptr<T> Asset_manager::load(const AID& id) {
 		auto asset = load_maybe<T>(id);
 
 		if(asset.is_nothing())
@@ -25,7 +25,7 @@ namespace asset {
 	}
 
 	template<typename T>
-	auto Asset_manager::load_maybe(const AID& id) throw(Loading_failed) -> util::maybe<Ptr<T>> {
+	auto Asset_manager::load_maybe(const AID& id) -> util::maybe<Ptr<T>> {
 		auto res = _assets.find(id);
 		if(res!=_assets.end())
 			return Ptr<T>{*this, id, std::static_pointer_cast<const T>(res->second.data)};
@@ -47,7 +47,7 @@ namespace asset {
 	}
 
 	template<typename T>
-	void Asset_manager::save(const AID& id, const T& asset) throw(Loading_failed) {
+	void Asset_manager::save(const AID& id, const T& asset) {
 		Loader<T>::store(_create(id), asset);
 		_assets.erase(id);
 		_post_write();

@@ -40,7 +40,7 @@ namespace renderer {
 
 	class Shader {
 		public:
-			Shader(Shader_type type, const std::string& source, const std::string name="unnamed")throw(Shader_compiler_error);
+			Shader(Shader_type type, const std::string& source, const std::string name="unnamed");
 			~Shader()noexcept;
 
 			Shader& operator=(Shader&&);
@@ -68,7 +68,7 @@ namespace renderer {
 			Shader_program& attach_shader(std::shared_ptr<const Shader> shader);
 			Shader_program& bind_all_attribute_locations(const Vertex_layout&);
 			Shader_program& bind_attribute_location(const std::string& name, int l);
-			Shader_program& build()throw(Shader_compiler_error);
+			Shader_program& build();
 			Shader_program& detach_all();
 
 
@@ -101,7 +101,7 @@ namespace asset {
 	struct Loader<renderer::Shader> {
 		using RT = std::shared_ptr<renderer::Shader>;
 
-		static RT load(istream in) throw(Loading_failed){
+		static RT load(istream in) {
 			switch(in.aid().type()) {
 				case Asset_type::frag_shader:
 					return std::make_shared<renderer::Shader>(renderer::Shader_type::fragment, in.content(), in.aid().str());
@@ -116,7 +116,7 @@ namespace asset {
 			throw Loading_failed("Unsupported assetId for shader: "+in.aid().str());
 		}
 
-		static void store(istream out, const renderer::Shader&) throw(Loading_failed) {
+		static void store(istream out, const renderer::Shader&) {
 			throw Loading_failed("Saving shaders is not supported!");
 		}
 	};

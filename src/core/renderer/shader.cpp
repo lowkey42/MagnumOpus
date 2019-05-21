@@ -22,6 +22,7 @@ namespace renderer {
 		}
 
 		util::maybe<const std::string> read_gl_info_log(unsigned int handle) {
+#ifndef __EMSCRIPTEN__
 			auto info_log_length=0;
 			glGetShaderiv(handle, GL_INFO_LOG_LENGTH, &info_log_length);
 			if( info_log_length>1 ) {
@@ -30,7 +31,7 @@ namespace renderer {
 				glGetShaderInfoLog(handle, info_log_length, NULL, &info_log_buffer[0]);
 				return std::move(info_log_buffer);
 			};
-
+#endif
 			return util::nothing();
 		}
 
@@ -48,9 +49,9 @@ namespace renderer {
 		}
 	}
 
-	Shader::Shader(Shader_type type, const std::string& source, const std::string name)throw(Shader_compiler_error) {
+	Shader::Shader(Shader_type type, const std::string& source, const std::string name) {
 		auto shader_source = util::replace(source, "#version auto",
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 				"#version 100\n"
 				"precision mediump float;"
 #else
@@ -59,7 +60,7 @@ namespace renderer {
 #endif
 		);
 
-#ifdef EMSCRIPTEN
+#ifdef __EMSCRIPTEN__
 		shader_source = util::replace(shader_source, "\nin ", type==Shader_type::fragment ? "\nvarying " : "\nattribute " );
 		shader_source = util::replace(shader_source, "\nout ", type==Shader_type::fragment ? "\n#ERROR " : "\nvarying ");
 
@@ -136,11 +137,11 @@ namespace renderer {
 		return *this;
 	}
 
-	Shader_program& Shader_program::build()throw(Shader_compiler_error) {
+	Shader_program& Shader_program::build() {
 		for(auto& s : _attached_shaders)
 			glAttachShader(_handle, s->_handle);
 
-		#ifdef EMSCRIPTEN
+		#ifdef __EMSCRIPTEN__
 
 		#else
 			glBindFragDataLocation(_handle, 0, "_fragColor");

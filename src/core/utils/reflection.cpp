@@ -1,6 +1,6 @@
 #include "reflection.hpp"
 
-#if defined(__GNUG__) && !defined(EMSCRIPTEN)
+#if defined(__GNUG__) && !defined(__EMSCRIPTEN__)
 #include <memory>
 #include <cxxabi.h>
 #include <cstdlib>

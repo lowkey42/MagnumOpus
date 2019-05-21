@@ -1,6 +1,6 @@
 #include "music.hpp"
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 #	include <SDL2/SDL_mixer.h>
 #else
 #	include <SDL/SDL_mixer.h>
@@ -9,7 +9,7 @@
 namespace mo {
 namespace audio {
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 	namespace {
 		int64_t istream_seek( struct SDL_RWops *context, int64_t offset, int whence) {
 			std::istream* stream = (std::istream*) context->hidden.unknown.data1;
@@ -46,12 +46,12 @@ namespace audio {
 	}
 #endif
 
-	Music::Music(asset::istream stream) throw(Music_loading_failed) :
+	Music::Music(asset::istream stream) :
 	    _handle(nullptr, Mix_FreeMusic), _stream(std::make_unique<asset::istream>(std::move(stream))){
 
 		auto id = _stream->aid();
 
-#ifndef EMSCRIPTEN
+#ifndef __EMSCRIPTEN__
 		SDL_RWops *rwops = SDL_AllocRW();
 		INVARIANT(rwops, "SDL_AllocRW failed");
 
@@ -70,6 +70,7 @@ namespace audio {
 		if(location.is_nothing())
 			return;
 
+		DEBUG("Load Music: "<<location.get_or_throw());
 		_handle.reset(Mix_LoadMUS(location.get_or_throw().c_str()));
 #endif
 

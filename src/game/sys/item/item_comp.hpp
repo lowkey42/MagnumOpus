@@ -51,6 +51,7 @@ namespace item {
 			float          _mod = 0.f;
 			bool           _joinable = false;
 			bool           _collected = false;
+			float          _despawn_time_left = 999999.f;
 	};
 
 }

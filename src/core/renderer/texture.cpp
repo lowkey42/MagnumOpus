@@ -7,7 +7,7 @@
 namespace mo {
 namespace renderer {
 
-	Texture::Texture(const std::string& path) throw(Texture_loading_failed) {
+	Texture::Texture(const std::string& path) {
 		_handle = SOIL_load_OGL_texture
 		(
 			path.c_str(),
@@ -28,7 +28,7 @@ namespace renderer {
 		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
-	Texture::Texture(std::vector<uint8_t> buffer) throw(Texture_loading_failed) {
+	Texture::Texture(std::vector<uint8_t> buffer) {
 		_handle = SOIL_load_OGL_texture_from_memory
 		(
 			buffer.data(),
@@ -100,13 +100,13 @@ namespace renderer {
 
 	void Texture::bind(int index)const {
 		auto tex = GL_TEXTURE0+index;
-		INVARIANT(tex<GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "to many textures");
+		INVARIANT(tex<GL_TEXTURE8, "to many textures");
 		glActiveTexture(tex);
 		glBindTexture(GL_TEXTURE_2D, _handle);
 	}
 	void Texture::unbind(int index)const {
 		auto tex = GL_TEXTURE0+index;
-		INVARIANT(tex<GL_MAX_COMBINED_TEXTURE_IMAGE_UNITS, "to many textures");
+		INVARIANT(tex<GL_TEXTURE8, "to many textures");
 		glActiveTexture(tex);
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}

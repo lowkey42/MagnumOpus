@@ -5,10 +5,10 @@
 	"Physics":{
 		"radius": 0.25,
 		"mass": 60,
-		"restitution": 0.5,
-        "friction": 0.05,
-        "max_active_velocity": 32,
-        "active_acceleration": 14
+		"restitution": 0.1,
+        "friction": 0.1,
+        "max_active_velocity": 18,
+        "active_acceleration": 100
 	},
     "Sprite": {
         "aid": "anim:soldier"
